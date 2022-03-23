@@ -1,0 +1,14 @@
+.vscode
+*.suo
+.vs
+bin
+obj
+dist
+**/appsettings.Testing.json
+**/appsettings.Development.json
+**/appsettings.Staging.json
+**/appsettings.Production.json
+**/appsettings.DEV.Development.json
+*.user
+.env
+*.xmldocs.xml
