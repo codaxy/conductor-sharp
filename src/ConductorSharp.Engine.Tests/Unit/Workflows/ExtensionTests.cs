@@ -13,7 +13,7 @@ public class ExtensionTests
     {
         var builder = new ContainerBuilder();
 
-        builder.RegisterWorkflowDefinition("Infrastructure/Files/workflowDefinition.json");
+        builder.RegisterWorkflowDefinition("Infrastructure/Files/definition.json");
 
         var container = builder.Build();
 

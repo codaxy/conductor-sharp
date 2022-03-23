@@ -32,10 +32,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Infrastructure\Files\" />
 	  <Folder Include="Infrastructure\Workers\" />
 	  <Folder Include="Unit\TaskBuilder\" />
 	  <Folder Include="Unit\Worker\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Infrastructure\Files\definition.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>
