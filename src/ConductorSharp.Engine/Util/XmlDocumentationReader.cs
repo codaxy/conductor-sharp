@@ -12,11 +12,11 @@ public static class XmlDocumentationReader
 {
     private static string GetDirectoryPath(this Assembly assembly)
     {
-        var codeBase = assembly.Location;
-        var uri = new UriBuilder(codeBase);
-        var path = Uri.UnescapeDataString(uri.Path);
+        //var codeBase = assembly.Location;
+        //var uri = new UriBuilder(codeBase);
+        //var path = Uri.UnescapeDataString(uri.Path);
 
-        return Path.GetDirectoryName(path);
+        return Path.GetDirectoryName(assembly.Location);
     }
 
     private static HashSet<Assembly> loadedAssemblies = new HashSet<Assembly>();

@@ -32,7 +32,7 @@ public class ConductorClient : IConductorClient
         _restClient.UseNewtonsoftJson();
     }
 
-    private void CheckResponse(IRestResponse response)
+    private void CheckResponse(RestResponse response)
     {
         var bodyParameter = response.Request.Parameters.FirstOrDefault(
             a => a.Type == ParameterType.RequestBody
@@ -66,7 +66,7 @@ public class ConductorClient : IConductorClient
         }
     }
 
-    private IRestRequest CreateRequest(Uri relativeUrl, HttpMethod method, object body = null)
+    private RestRequest CreateRequest(Uri relativeUrl, HttpMethod method, object body = null)
     {
         Uri uri;
 
@@ -77,15 +77,17 @@ public class ConductorClient : IConductorClient
                 $"{_restConfig.BaseUrl}/{_restConfig.ApiPath}/{relativeUrl.OriginalString}"
             );
 
-        var request = new RestRequest(uri, (Method)Enum.Parse(typeof(Method), method.Method));
+        var request = new RestRequest(uri, (Method)Enum.Parse(typeof(Method), method.Method))
+        {
+            // TODO: This does not work with the latest version of restsharp
+            //OnBeforeDeserialization = resp =>
+            //{
+            //    resp.ContentType = "";
+            //}
+        };
 
         if (body != null)
             request.AddJsonBody(body);
-
-        request.OnBeforeDeserialization = resp =>
-        {
-            resp.ContentType = "application/json";
-        };
 
         return request;
     }
