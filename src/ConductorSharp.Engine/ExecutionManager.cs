@@ -63,7 +63,7 @@ public class ExecutionManager
                     .ContinueWith(_ => _semaphore.Release());
             }
 
-            await Task.Delay(_configuration.SleepInterval);
+            await Task.Delay(_configuration.SleepInterval, cancellationToken);
         }
     }
 

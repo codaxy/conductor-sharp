@@ -8,18 +8,18 @@ namespace ConductorSharp.Engine.Service;
 public class WorkflowEngineBackgroundService : IHostedService
 {
     private readonly IDeploymentService _deploymentService;
-    private readonly ExecutionManager _orchestrator;
+    private readonly ExecutionManager _executionManager;
     private readonly ModuleDeployment _deployment;
     private Task _executingTask;
 
     public WorkflowEngineBackgroundService(
         IDeploymentService deploymentService,
-        ExecutionManager orchestrator,
+        ExecutionManager executionManager,
         ModuleDeployment deployment
     )
     {
         _deploymentService = deploymentService;
-        _orchestrator = orchestrator;
+        _executionManager = executionManager;
         _deployment = deployment;
     }
 
@@ -32,7 +32,7 @@ public class WorkflowEngineBackgroundService : IHostedService
     private async Task RunAsync(CancellationToken cancellationToken)
     {
         await _deploymentService.Deploy(_deployment);
-        await _orchestrator.StartAsync(cancellationToken);
+        await _executionManager.StartAsync(cancellationToken);
     }
 
     public async Task StopAsync(CancellationToken cancellationToken) => await _executingTask;
