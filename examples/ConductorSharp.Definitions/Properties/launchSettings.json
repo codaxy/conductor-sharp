@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ConductorSharp.Definitions": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

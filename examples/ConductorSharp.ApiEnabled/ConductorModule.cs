@@ -16,12 +16,11 @@ public class ConductorModule : Module
 
     private static void RegisterTasks(ContainerBuilder builder)
     {
-        builder.RegisterWorkerTask<NumberHandler>();
-        builder.RegisterWorkerTask<StringHandler>();
+        builder.RegisterWorkerTask<PrepareEmailHandler>();
     }
 
     private static void RegisterWorkflows(ContainerBuilder builder)
     {
-        builder.RegisterWorkflow<ExampleWorkflow>();
+    
     }
 }

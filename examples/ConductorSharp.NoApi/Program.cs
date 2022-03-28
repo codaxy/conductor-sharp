@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ConductorSharp.Engine.Extensions;
 using AutoMapper;
 using MediatR.Extensions.Autofac.DependencyInjection;
-using ConductorSharp.Definitions;
+using ConductorSharp.NoApi;
 
 
 IConfiguration? configuration = null;

@@ -7,7 +7,7 @@ namespace ConductorSharp.Client.Model.Common;
 public class TaskDefinition
 {
     [JsonProperty("ownerApp")]
-    public string OwnerApp { get; set; }
+    public string OwnerApp { get; set; } = "test@test.local";
 
     [JsonProperty("createTime")]
     public long CreateTime { get; set; }

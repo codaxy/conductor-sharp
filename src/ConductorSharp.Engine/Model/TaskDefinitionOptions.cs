@@ -4,7 +4,7 @@ namespace ConductorSharp.Engine.Model;
 
 public class TaskDefinitionOptions
 {
-    public string OwnerApp { get; set; } = "UNDEFINED";
+    public string OwnerApp { get; set; } = "undefined";
     public string CreatedBy { get; set; } = "UNDEFINED";
     public string UpdatedBy { get; set; } = "UNDEFINED";
     public string Description { get; set; }
@@ -20,6 +20,6 @@ public class TaskDefinitionOptions
     public int RateLimitFrequencyInSeconds { get; set; } = 1;
     public string IsolationGroupId { get; set; }
     public string ExecutionNameSpace { get; set; }
-    public string OwnerEmail { get; set; } = "UNDEFINED";
+    public string OwnerEmail { get; set; } = "undefined@undefined.local";
     public int PollTimeoutSeconds { get; set; }
 }

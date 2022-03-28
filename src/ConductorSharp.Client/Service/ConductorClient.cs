@@ -77,7 +77,7 @@ public class ConductorClient : IConductorClient
                 $"{_restConfig.BaseUrl}/{_restConfig.ApiPath}/{relativeUrl.OriginalString}"
             );
 
-        var request = new RestRequest(uri, (Method)Enum.Parse(typeof(Method), method.Method))
+        var request = new RestRequest(uri, (Method)Enum.Parse(typeof(Method), method.Method, true))
         {
             // TODO: This does not work with the latest version of restsharp
             //OnBeforeDeserialization = resp =>
@@ -106,7 +106,7 @@ public class ConductorClient : IConductorClient
         return response.Data;
     }
 
-    public async Task<T> ExecuteRequestAsync<T>(Uri relativeUrl, HttpMethod method)
+    public async Task<T>ExecuteRequestAsync<T>(Uri relativeUrl, HttpMethod method)
     {
         var request = CreateRequest(relativeUrl, method);
 
@@ -114,7 +114,7 @@ public class ConductorClient : IConductorClient
 
         CheckResponse(response);
 
-        return response.Data;
+        return JsonConvert.DeserializeObject<T>(response.Content);
     }
 
     public async Task ExecuteRequestAsync(Uri relativeUrl, HttpMethod method, object resource)

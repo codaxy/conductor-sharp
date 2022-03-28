@@ -21,11 +21,11 @@ public class MetadataService : IMetadataService
 
     public async Task<TaskDefinition[]> GetAllTaskDefinitions() =>
         (
-            await _conductorClient.ExecuteRequestAsync<GetAllTaskDefinitionsResponse>(
+            await _conductorClient.ExecuteRequestAsync<TaskDefinition[]>(
                 ApiUrls.GetAllTaskDefinitions(),
                 HttpMethod.Get
             )
-        ).Result.ToArray();
+        );
 
     public async Task CreateTaskDefinitions(List<TaskDefinition> definitions) =>
         await _conductorClient.ExecuteRequestAsync(
@@ -81,11 +81,11 @@ public class MetadataService : IMetadataService
 
     public async Task<WorkflowDefinition[]> GetAllWorkflowDefinitions() =>
         (
-            await _conductorClient.ExecuteRequestAsync<GetAllWorkflowDefinitionsResponse>(
+            await _conductorClient.ExecuteRequestAsync<WorkflowDefinition[]>(
                 ApiUrls.GetAlleWorkflowDefinitions(),
                 HttpMethod.Get
             )
-        ).Result.ToArray();
+        );
     public async Task<EventHandlerDefinition[]> GetAllEventHandlerDefinitions() =>
         await _conductorClient.ExecuteRequestAsync<EventHandlerDefinition[]>(
             ApiUrls.GetAllEventDefinitions(),

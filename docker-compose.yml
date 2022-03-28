@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+  conductorsharp.apienabled:
+    image: ${DOCKER_REGISTRY-}conductorsharpapienabled
+    build:
+      context: .
+      dockerfile: examples/ConductorSharp.ApiEnabled/Dockerfile
+
+  conductorsharp.noapi:
+    image: ${DOCKER_REGISTRY-}conductorsharpnoapi
+    build:
+      context: .
+      dockerfile: examples/ConductorSharp.NoApi/Dockerfile
+
+  conductorsharp.definitions:
+    image: ${DOCKER_REGISTRY-}conductorsharpdefinitions
+    build:
+      context: .
+      dockerfile: examples/ConductorSharp.Definitions/Dockerfile
+
