@@ -102,7 +102,7 @@ public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput,
                             a =>
                                 new JProperty(
                                     a.Key,
-                                    JArray.FromObject(a.Value.Select(a => a.Build()))
+                                    JArray.FromObject(a.Value.SelectMany(a => a.Build()))
                                 )
                         )
                     }
