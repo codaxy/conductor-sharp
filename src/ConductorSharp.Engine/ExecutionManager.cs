@@ -59,6 +59,7 @@ public class ExecutionManager
 
             foreach (var scheduledWorker in scheduledWorkers)
             {
+                await _semaphore.WaitAsync(cancellationToken);
                 _ = PollAndHandle(scheduledWorker, cancellationToken)
                     .ContinueWith(_ => _semaphore.Release());
             }
