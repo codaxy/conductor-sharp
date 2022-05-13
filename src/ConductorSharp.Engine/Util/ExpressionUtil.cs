@@ -66,6 +66,7 @@ public static class ExpressionUtil
             return ccex.Value;
         }
 
+        // Handle interpolated strings containing references to wf inputs or task outputs
         if (member.Expression is MethodCallExpression methodExpression
                 && methodExpression.Method.Name == nameof(string.Format)
                 && methodExpression.Method.DeclaringType == typeof(string))
