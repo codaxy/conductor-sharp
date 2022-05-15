@@ -1,6 +1,7 @@
 # conductor-sharp
 
 A Conductor client library with some quality of life additions and a builder for conductor workflows.
+[More info soon on wiki](https://github.com/codaxy/conductor-sharp/wiki)
 
 ## Motivation behind the library
 
