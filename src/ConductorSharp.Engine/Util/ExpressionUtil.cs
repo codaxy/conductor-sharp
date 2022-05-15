@@ -66,6 +66,10 @@ public static class ExpressionUtil
             return ccex.Value;
         }
 
+        // Handle assignment of value types (boxing)
+        if (member.Expression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
+            return CreateExpressionString(unaryEx);
+
         // Handle interpolated strings containing references to wf inputs or task outputs
         if (member.Expression is MethodCallExpression methodExpression
                 && methodExpression.Method.Name == nameof(string.Format)
