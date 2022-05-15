@@ -3,17 +3,18 @@ using MediatR;
 using Newtonsoft.Json.Linq;
 using System.Linq.Expressions;
 
-namespace ConductorSharp.Engine.Builders;
-
-public class SubWorkflowTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput>
-    where TInput : IRequest<TOutput>
+namespace ConductorSharp.Engine.Builders
 {
-    public SubWorkflowTaskBuilder(Expression taskExpression, Expression inputExpression)
-        : base(taskExpression, inputExpression) { }
 
-    public override WorkflowDefinition.Task[] Build() =>
-        new WorkflowDefinition.Task[]
-        {
+    public class SubWorkflowTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput>
+        where TInput : IRequest<TOutput>
+    {
+        public SubWorkflowTaskBuilder(Expression taskExpression, Expression inputExpression)
+            : base(taskExpression, inputExpression) { }
+
+        public override WorkflowDefinition.Task[] Build() =>
+            new WorkflowDefinition.Task[]
+            {
                 new WorkflowDefinition.Task
                 {
                     Name = _taskName,
@@ -30,5 +31,6 @@ public class SubWorkflowTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, T
                         new JProperty("description", _description)
                     }.ToString(Newtonsoft.Json.Formatting.None),
                 }
-        };
+            };
+    }
 }

@@ -6,79 +6,81 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 
-namespace ConductorSharp.Engine.Builders;
-
-public class TaskDefinitionBuilder
+namespace ConductorSharp.Engine.Builders
 {
-    public static TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) =>
-        Build(typeof(T), updateOptions);
 
-    public static TaskDefinition Build(
-        Type taskType,
-        Action<TaskDefinitionOptions> updateOptions = null
-    )
+    public class TaskDefinitionBuilder
     {
-        var options = new TaskDefinitionOptions();
+        public static TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) =>
+            Build(typeof(T), updateOptions);
 
-        updateOptions?.Invoke(options);
-
-        XmlDocumentationReader.LoadXmlDocumentation(taskType.Assembly);
-
-        var interfaces = taskType.GetInterfaces()
-            .Where(a => a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
-            .First();
-        var genericArguments = interfaces.GetGenericArguments();
-
-        var inputType = genericArguments[0];
-        var outputType = genericArguments[1];
-
-        var originalName = NamingUtil.DetermineRegistrationName(taskType);
-
-        return new TaskDefinition
+        public static TaskDefinition Build(
+            Type taskType,
+            Action<TaskDefinitionOptions> updateOptions = null
+        )
         {
-            OwnerApp = options.OwnerApp,
-            Name = originalName,
-            Description =
-                options.Description ?? DetermineDescription(taskType.GetDocSection("summary")),
-            RetryCount = options.RetryCount,
-            TimeoutSeconds = options.TimeoutSeconds,
-            InputKeys = inputType.GetProperties()
-                .Select(
-                    a =>
-                        a.GetDocSection("originalName")
-                        ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name)
-                )
-                .ToList(),
-            OutputKeys = outputType.GetProperties()
-                .Select(
-                    a =>
-                        a.GetDocSection("originalName")
-                        ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name)
-                )
-                .ToList(),
-            TimeoutPolicy = options.TimeoutPolicy,
-            RetryLogic = options.RetryLogic,
-            RetryDelaySeconds = options.RetryDelaySeconds,
-            ResponseTimeoutSeconds = options.ResponseTimeoutSeconds,
-            ConcurrentExecLimit = options.ConcurrentExecLimit,
-            RateLimitPerFrequency = options.RateLimitPerFrequency,
-            RateLimitFrequencyInSeconds = options.RateLimitFrequencyInSeconds,
-            OwnerEmail = options.OwnerEmail,
-            PollTimeoutSeconds = options.PollTimeoutSeconds,
-            CreatedBy = options.CreatedBy,
-            UpdatedBy = options.UpdatedBy,
-            InputTemplate = options.InputTemplate,
-            ExecutionNameSpace = options.ExecutionNameSpace,
-        };
-    }
+            var options = new TaskDefinitionOptions();
 
-    private static string DetermineDescription(string description, params string[] labels)
-    {
-        var descriptionProperty = string.IsNullOrEmpty(description)
-            ? new JProperty("description", "Missing description")
-            : new JProperty("description", description);
+            updateOptions?.Invoke(options);
 
-        var descriptionObject = new JObject(descriptionProperty);
-        return descriptionObject.ToString(Newtonsoft.Json.Formatting.None);
+            XmlDocumentationReader.LoadXmlDocumentation(taskType.Assembly);
+
+            var interfaces = taskType.GetInterfaces()
+                .Where(a => a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
+                .First();
+            var genericArguments = interfaces.GetGenericArguments();
+
+            var inputType = genericArguments[0];
+            var outputType = genericArguments[1];
+
+            var originalName = NamingUtil.DetermineRegistrationName(taskType);
+
+            return new TaskDefinition
+            {
+                OwnerApp = options.OwnerApp,
+                Name = originalName,
+                Description =
+                    options.Description ?? DetermineDescription(taskType.GetDocSection("summary")),
+                RetryCount = options.RetryCount,
+                TimeoutSeconds = options.TimeoutSeconds,
+                InputKeys = inputType.GetProperties()
+                    .Select(
+                        a =>
+                            a.GetDocSection("originalName")
+                            ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name)
+                    )
+                    .ToList(),
+                OutputKeys = outputType.GetProperties()
+                    .Select(
+                        a =>
+                            a.GetDocSection("originalName")
+                            ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name)
+                    )
+                    .ToList(),
+                TimeoutPolicy = options.TimeoutPolicy,
+                RetryLogic = options.RetryLogic,
+                RetryDelaySeconds = options.RetryDelaySeconds,
+                ResponseTimeoutSeconds = options.ResponseTimeoutSeconds,
+                ConcurrentExecLimit = options.ConcurrentExecLimit,
+                RateLimitPerFrequency = options.RateLimitPerFrequency,
+                RateLimitFrequencyInSeconds = options.RateLimitFrequencyInSeconds,
+                OwnerEmail = options.OwnerEmail,
+                PollTimeoutSeconds = options.PollTimeoutSeconds,
+                CreatedBy = options.CreatedBy,
+                UpdatedBy = options.UpdatedBy,
+                InputTemplate = options.InputTemplate,
+                ExecutionNameSpace = options.ExecutionNameSpace,
+            };
+        }
+
+        private static string DetermineDescription(string description, params string[] labels)
+        {
+            var descriptionProperty = string.IsNullOrEmpty(description)
+                ? new JProperty("description", "Missing description")
+                : new JProperty("description", description);
+
+            var descriptionObject = new JObject(descriptionProperty);
+            return descriptionObject.ToString(Newtonsoft.Json.Formatting.None);
+        }
     }
 }

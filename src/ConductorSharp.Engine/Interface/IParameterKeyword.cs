@@ -1,6 +1,8 @@
-﻿namespace ConductorSharp.Engine.Interface;
-
-public interface IParameterKeyword
+﻿namespace ConductorSharp.Engine.Interface
 {
-    public string GetValue();
+
+    public interface IParameterKeyword
+    {
+        public string GetValue();
+    }
 }

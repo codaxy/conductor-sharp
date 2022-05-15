@@ -1,5 +1,7 @@
-﻿namespace ConductorSharp.Engine.Model;
-
-public class NoOutput
+﻿namespace ConductorSharp.Engine.Model
 {
+
+    public class NoOutput
+    {
+    }
 }

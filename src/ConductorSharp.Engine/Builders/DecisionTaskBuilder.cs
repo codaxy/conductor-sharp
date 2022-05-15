@@ -8,87 +8,88 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace ConductorSharp.Engine.Builders;
-
-public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput>
-    where TWorkflow : ITypedWorkflow
+namespace ConductorSharp.Engine.Builders
 {
-    private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
 
-    private string _currentCaseName;
-
-    public DecisionTaskBuilder(Expression taskExpression, Expression inputExpression)
-        : base(taskExpression, inputExpression) { }
-
-    public DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
+    public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput>
+        where TWorkflow : ITypedWorkflow
     {
-        _currentCaseName = caseName;
+        private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
 
-        if (!_caseDictionary.ContainsKey(_currentCaseName))
-            _caseDictionary.Add(caseName, new List<ITaskBuilder>());
+        private string _currentCaseName;
 
-        return this;
-    }
+        public DecisionTaskBuilder(Expression taskExpression, Expression inputExpression)
+            : base(taskExpression, inputExpression) { }
 
-    public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
-        Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> taskSelector,
-        Expression<Func<TWorkflow, F>> expression,
-        string script
-    ) where F : IRequest<G>
-    {
-        var builder = new LambdaTaskBuilder<F, G>(script, taskSelector.Body, expression.Body);
-        _caseDictionary[_currentCaseName].Add(builder);
-
-        return this;
-    }
-
-    public DecisionTaskBuilder<TWorkflow> WithTask(
-        Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> taskSelector,
-        Expression<Func<TWorkflow, DynamicForkJoinInput>> expression
-    )
-    {
-        var builder = new DynamicForkJoinTaskBuilder(taskSelector.Body, expression.Body);
-        _caseDictionary[_currentCaseName].Add(builder);
-
-        return this;
-    }
-
-    public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
-        Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> taskSelector,
-        Expression<Func<TWorkflow, F>> expression
-    ) where F : IRequest<G>
-    {
-        var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body);
-        _caseDictionary[_currentCaseName].Add(builder);
-
-        return this;
-    }
-
-    public DecisionTaskBuilder<TWorkflow> WithTask<F>(
-        Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
-        Expression<Func<TWorkflow, F>> expression,
-        params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
-    ) where F : IRequest<NoOutput>
-    {
-        var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
-
-        foreach (var funcase in caseActions)
+        public DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
         {
-            builder.AddCase(funcase.Item1);
-            funcase.Item2.Invoke(builder);
+            _currentCaseName = caseName;
+
+            if (!_caseDictionary.ContainsKey(_currentCaseName))
+                _caseDictionary.Add(caseName, new List<ITaskBuilder>());
+
+            return this;
         }
 
-        _caseDictionary[_currentCaseName].Add(builder);
-
-        return this;
-    }
-
-    public override WorkflowDefinition.Task[] Build()
-    {
-        var decisionTaskName = $"DECISION_{_taskRefferenceName}";
-
-        return new WorkflowDefinition.Task[]
+        public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
+            Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> taskSelector,
+            Expression<Func<TWorkflow, F>> expression,
+            string script
+        ) where F : IRequest<G>
         {
+            var builder = new LambdaTaskBuilder<F, G>(script, taskSelector.Body, expression.Body);
+            _caseDictionary[_currentCaseName].Add(builder);
+
+            return this;
+        }
+
+        public DecisionTaskBuilder<TWorkflow> WithTask(
+            Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> taskSelector,
+            Expression<Func<TWorkflow, DynamicForkJoinInput>> expression
+        )
+        {
+            var builder = new DynamicForkJoinTaskBuilder(taskSelector.Body, expression.Body);
+            _caseDictionary[_currentCaseName].Add(builder);
+
+            return this;
+        }
+
+        public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
+            Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> taskSelector,
+            Expression<Func<TWorkflow, F>> expression
+        ) where F : IRequest<G>
+        {
+            var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body);
+            _caseDictionary[_currentCaseName].Add(builder);
+
+            return this;
+        }
+
+        public DecisionTaskBuilder<TWorkflow> WithTask<F>(
+            Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
+            Expression<Func<TWorkflow, F>> expression,
+            params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
+        ) where F : IRequest<NoOutput>
+        {
+            var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
+
+            foreach (var funcase in caseActions)
+            {
+                builder.AddCase(funcase.Item1);
+                funcase.Item2.Invoke(builder);
+            }
+
+            _caseDictionary[_currentCaseName].Add(builder);
+
+            return this;
+        }
+
+        public override WorkflowDefinition.Task[] Build()
+        {
+            var decisionTaskName = $"DECISION_{_taskRefferenceName}";
+
+            return new WorkflowDefinition.Task[]
+            {
                 new WorkflowDefinition.Task
                 {
                     Name = decisionTaskName,
@@ -107,6 +108,7 @@ public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput,
                         )
                     }
                 }
-        };
+            };
+        }
     }
 }

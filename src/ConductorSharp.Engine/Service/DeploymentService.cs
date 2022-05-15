@@ -4,69 +4,71 @@ using ConductorSharp.Engine.Model;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
-namespace ConductorSharp.Engine.Service;
-
-public class DeploymentService : IDeploymentService
+namespace ConductorSharp.Engine.Service
 {
-    private readonly IMetadataService _metadataService;
-    private readonly ILogger<DeploymentService> _logger;
 
-    public DeploymentService(
-        IMetadataService metadataService,
-        ILogger<DeploymentService> logger
-    )
+    public class DeploymentService : IDeploymentService
     {
-        _metadataService = metadataService;
-        _logger = logger;
-    }
+        private readonly IMetadataService _metadataService;
+        private readonly ILogger<DeploymentService> _logger;
 
-    public async Task Deploy(Deployment deployment)
-    {
-        _logger.LogInformation("Deploying conductor definitions");
-
-        if (deployment.TaskDefinitions.Count > 0)
-            await _metadataService.CreateTaskDefinitions(deployment.TaskDefinitions);
-
-        _logger.LogDebug(
-            "Registered {registeredTasksCount} tasks",
-            deployment.TaskDefinitions.Count
-        );
-
-        if (deployment.WorkflowDefinitions.Count > 0)
-            await _metadataService.CreateWorkflowDefinitions(deployment.WorkflowDefinitions);
-
-        _logger.LogDebug(
-            "Registered {registeredWorkflowsCount} workflows ",
-            deployment.WorkflowDefinitions.Count
-        );
-
-        // TODO: Add registration for event handlers
-
-        _logger.LogInformation("Finished deploying conductor definitions");
-    }
-
-    public async Task Remove(Deployment deployment)
-    {
-        foreach (var definition in deployment.TaskDefinitions)
+        public DeploymentService(
+            IMetadataService metadataService,
+            ILogger<DeploymentService> logger
+        )
         {
-            var oldDefinition = await _metadataService.GetTaskDefinition(definition.Name);
-
-            if (oldDefinition?.Name != null)
-                await _metadataService.DeleteTaskDefinition(definition.Name);
+            _metadataService = metadataService;
+            _logger = logger;
         }
 
-        foreach (var definition in deployment.WorkflowDefinitions)
+        public async Task Deploy(Deployment deployment)
         {
-            var oldDefinition = await _metadataService.GetWorkflowDefinition(
-                definition.Name,
-                definition.Version
+            _logger.LogInformation("Deploying conductor definitions");
+
+            if (deployment.TaskDefinitions.Count > 0)
+                await _metadataService.CreateTaskDefinitions(deployment.TaskDefinitions);
+
+            _logger.LogDebug(
+                "Registered {registeredTasksCount} tasks",
+                deployment.TaskDefinitions.Count
             );
 
-            if (oldDefinition?.Name != null)
-                await _metadataService.DeleteWorkflowDefinition(
+            if (deployment.WorkflowDefinitions.Count > 0)
+                await _metadataService.CreateWorkflowDefinitions(deployment.WorkflowDefinitions);
+
+            _logger.LogDebug(
+                "Registered {registeredWorkflowsCount} workflows ",
+                deployment.WorkflowDefinitions.Count
+            );
+
+            // TODO: Add registration for event handlers
+
+            _logger.LogInformation("Finished deploying conductor definitions");
+        }
+
+        public async Task Remove(Deployment deployment)
+        {
+            foreach (var definition in deployment.TaskDefinitions)
+            {
+                var oldDefinition = await _metadataService.GetTaskDefinition(definition.Name);
+
+                if (oldDefinition?.Name != null)
+                    await _metadataService.DeleteTaskDefinition(definition.Name);
+            }
+
+            foreach (var definition in deployment.WorkflowDefinitions)
+            {
+                var oldDefinition = await _metadataService.GetWorkflowDefinition(
                     definition.Name,
                     definition.Version
                 );
+
+                if (oldDefinition?.Name != null)
+                    await _metadataService.DeleteWorkflowDefinition(
+                        definition.Name,
+                        definition.Version
+                    );
+            }
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using ConductorSharp.Client.Model.Common;
 
-namespace ConductorSharp.Engine.Interface;
-
-public interface ITypedWorkflow
+namespace ConductorSharp.Engine.Interface
 {
-    WorkflowDefinition GetDefinition();
+
+    public interface ITypedWorkflow
+    {
+        WorkflowDefinition GetDefinition();
+    }
 }

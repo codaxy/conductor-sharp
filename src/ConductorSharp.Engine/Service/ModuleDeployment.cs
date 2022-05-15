@@ -2,18 +2,20 @@
 using ConductorSharp.Engine.Model;
 using System.Collections.Generic;
 
-namespace ConductorSharp.Engine.Service;
-
-public class ModuleDeployment : Deployment
+namespace ConductorSharp.Engine.Service
 {
-    public ModuleDeployment(
-        IEnumerable<TaskDefinition> taskDefinitions,
-        IEnumerable<WorkflowDefinition> workflowDefinitions,
-        IEnumerable<EventHandlerDefinition> eventHandlerDefinitions
-    )
+
+    public class ModuleDeployment : Deployment
     {
-        TaskDefinitions.AddRange(taskDefinitions);
-        WorkflowDefinitions.AddRange(workflowDefinitions);
-        EventHandlerDefinitions.AddRange(eventHandlerDefinitions);
+        public ModuleDeployment(
+            IEnumerable<TaskDefinition> taskDefinitions,
+            IEnumerable<WorkflowDefinition> workflowDefinitions,
+            IEnumerable<EventHandlerDefinition> eventHandlerDefinitions
+        )
+        {
+            TaskDefinitions.AddRange(taskDefinitions);
+            WorkflowDefinitions.AddRange(workflowDefinitions);
+            EventHandlerDefinitions.AddRange(eventHandlerDefinitions);
+        }
     }
 }

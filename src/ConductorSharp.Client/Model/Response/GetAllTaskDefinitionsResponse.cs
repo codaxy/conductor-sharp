@@ -2,10 +2,12 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace ConductorSharp.Client.Model.Response;
-
-public class GetAllTaskDefinitionsResponse
+namespace ConductorSharp.Client.Model.Response
 {
-    [JsonProperty("result")]
-    public List<TaskDefinition> Result { get; set; }
+
+    public class GetAllTaskDefinitionsResponse
+    {
+        [JsonProperty("result")]
+        public List<TaskDefinition> Result { get; set; }
+    }
 }

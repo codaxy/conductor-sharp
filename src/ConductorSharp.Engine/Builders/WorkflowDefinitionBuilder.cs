@@ -12,147 +12,149 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace ConductorSharp.Engine.Builders;
-
-public class WorkflowDefinitionBuilder<TWorkflow> where TWorkflow : ITypedWorkflow
+namespace ConductorSharp.Engine.Builders
 {
-    private readonly Type _workflowType;
-    private string _name;
-    private JObject _inputs = new();
-    private WorkflowOptions _workflowOptions;
 
-    public List<WorkflowDefinition.Task> WorkflowTasks { get; set; } =
-        new List<WorkflowDefinition.Task>();
-
-    public WorkflowDefinitionBuilder()
+    public class WorkflowDefinitionBuilder<TWorkflow> where TWorkflow : ITypedWorkflow
     {
-        _workflowType = typeof(TWorkflow);
-        _workflowOptions = new WorkflowOptions();
+        private readonly Type _workflowType;
+        private string _name;
+        private JObject _inputs = new();
+        private WorkflowOptions _workflowOptions;
 
-        XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
+        public List<WorkflowDefinition.Task> WorkflowTasks { get; set; } =
+            new List<WorkflowDefinition.Task>();
 
-        _name = NamingUtil.DetermineRegistrationName(_workflowType);
-
-        var summary = _workflowType.GetDocSection("summary");
-        var ownerApp = _workflowType.GetDocSection("ownerApp");
-        var ownerEmail = _workflowType.GetDocSection("ownerEmail");
-        var labels = _workflowType.GetDocSection("labels");
-
-        _workflowOptions.Version = 1;
-
-        if (!string.IsNullOrEmpty(summary))
-            _workflowOptions.Description = summary;
-
-        if (!string.IsNullOrEmpty(ownerApp))
-            _workflowOptions.OwnerApp = ownerApp;
-
-        if (!string.IsNullOrEmpty(ownerEmail))
-            _workflowOptions.OwnerEmail = ownerEmail;
-
-        if (!string.IsNullOrEmpty(labels))
-            _workflowOptions.Labels = labels.Split(",").Select(a => a.Trim()).ToArray();
-
-        var input = _workflowType.BaseType.GenericTypeArguments[0];
-        var props = input.GetProperties();
-
-        foreach (var prop in props)
+        public WorkflowDefinitionBuilder()
         {
-            var isRequired = prop.GetCustomAttribute<RequiredAttribute>();
-            var description = prop.GetDocSection("summary");
+            _workflowType = typeof(TWorkflow);
+            _workflowOptions = new WorkflowOptions();
 
-            var propertyName =
-                prop.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(prop.Name);
+            XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
 
-            var requiredString = isRequired != null ? "(required)" : "(optional)";
-            _inputs.Add(
-                new JProperty(
-                    propertyName,
-                    new JObject
-                    {
+            _name = NamingUtil.DetermineRegistrationName(_workflowType);
+
+            var summary = _workflowType.GetDocSection("summary");
+            var ownerApp = _workflowType.GetDocSection("ownerApp");
+            var ownerEmail = _workflowType.GetDocSection("ownerEmail");
+            var labels = _workflowType.GetDocSection("labels");
+
+            _workflowOptions.Version = 1;
+
+            if (!string.IsNullOrEmpty(summary))
+                _workflowOptions.Description = summary;
+
+            if (!string.IsNullOrEmpty(ownerApp))
+                _workflowOptions.OwnerApp = ownerApp;
+
+            if (!string.IsNullOrEmpty(ownerEmail))
+                _workflowOptions.OwnerEmail = ownerEmail;
+
+            if (!string.IsNullOrEmpty(labels))
+                _workflowOptions.Labels = labels.Split(",").Select(a => a.Trim()).ToArray();
+
+            var input = _workflowType.BaseType.GenericTypeArguments[0];
+            var props = input.GetProperties();
+
+            foreach (var prop in props)
+            {
+                var isRequired = prop.GetCustomAttribute<RequiredAttribute>();
+                var description = prop.GetDocSection("summary");
+
+                var propertyName =
+                    prop.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(prop.Name);
+
+                var requiredString = isRequired != null ? "(required)" : "(optional)";
+                _inputs.Add(
+                    new JProperty(
+                        propertyName,
+                        new JObject
+                        {
                             new JProperty("value", ""),
                             new JProperty("description", $"{description} {requiredString}"),
-                    }
-                )
-            );
+                        }
+                    )
+                );
+            }
         }
-    }
 
-    public WorkflowDefinition Build(Action<WorkflowOptions> adjustOptions)
-    {
-        adjustOptions.Invoke(_workflowOptions);
-
-        return new WorkflowDefinition
+        public WorkflowDefinition Build(Action<WorkflowOptions> adjustOptions)
         {
-            Name = _name,
-            Tasks = WorkflowTasks,
-            FailureWorkflow =
-                _workflowOptions.FailureWorkflow != null
-                    ? NamingUtil.DetermineRegistrationName(_workflowOptions.FailureWorkflow)
-                    : null,
-            Description = new JObject()
+            adjustOptions.Invoke(_workflowOptions);
+
+            return new WorkflowDefinition
+            {
+                Name = _name,
+                Tasks = WorkflowTasks,
+                FailureWorkflow =
+                    _workflowOptions.FailureWorkflow != null
+                        ? NamingUtil.DetermineRegistrationName(_workflowOptions.FailureWorkflow)
+                        : null,
+                Description = new JObject()
                 {
                     new JProperty("description", _workflowOptions.Description),
                     new JProperty("labels", _workflowOptions.Labels)
                 }.ToString(Formatting.None),
-            InputParameters = _inputs,
-            OwnerApp = _workflowOptions.OwnerApp,
-            OwnerEmail = _workflowOptions.OwnerEmail,
-        };
-    }
-
-    public void AddTask<F, G>(
-        Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence,
-        Expression<Func<TWorkflow, F>> input,
-        string script
-    ) where F : IRequest<G>
-    {
-        var tasks = new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body).Build();
-        AddTasks(tasks);
-    }
-    public void AddTask<F, G>(
-        Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence,
-        Expression<Func<TWorkflow, F>> input
-    ) where F : IRequest<G>
-    {
-        var tasks = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body).Build();
-        AddTasks(tasks);
-    }
-
-    public void AddTask(
-        Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> refference,
-        Expression<Func<TWorkflow, DynamicForkJoinInput>> input
-    )
-    {
-        var tasks = new DynamicForkJoinTaskBuilder(refference.Body, input.Body).Build();
-        AddTasks(tasks);
-    }
-
-    public void AddTasks(params WorkflowDefinition.Task[] taskDefinitions) =>
-        WorkflowTasks.AddRange(taskDefinitions);
-
-    public void AddTask<F, G>(
-        Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> refference,
-        Expression<Func<TWorkflow, F>> input
-    ) where F : IRequest<G>
-    {
-        var tasks = new SimpleTaskBuilder<F, G>(refference.Body, input.Body).Build();
-        AddTasks(tasks);
-    }
-
-    public void AddTask(
-        Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
-        Expression<Func<TWorkflow, DecisionTaskInput>> expression,
-        params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
-    )
-    {
-        var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
-
-        foreach (var funcase in caseActions)
-        {
-            builder.AddCase(funcase.Item1);
-            funcase.Item2.Invoke(builder);
+                InputParameters = _inputs,
+                OwnerApp = _workflowOptions.OwnerApp,
+                OwnerEmail = _workflowOptions.OwnerEmail,
+            };
         }
 
-        AddTasks(builder.Build());
+        public void AddTask<F, G>(
+            Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence,
+            Expression<Func<TWorkflow, F>> input,
+            string script
+        ) where F : IRequest<G>
+        {
+            var tasks = new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body).Build();
+            AddTasks(tasks);
+        }
+        public void AddTask<F, G>(
+            Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence,
+            Expression<Func<TWorkflow, F>> input
+        ) where F : IRequest<G>
+        {
+            var tasks = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body).Build();
+            AddTasks(tasks);
+        }
+
+        public void AddTask(
+            Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> refference,
+            Expression<Func<TWorkflow, DynamicForkJoinInput>> input
+        )
+        {
+            var tasks = new DynamicForkJoinTaskBuilder(refference.Body, input.Body).Build();
+            AddTasks(tasks);
+        }
+
+        public void AddTasks(params WorkflowDefinition.Task[] taskDefinitions) =>
+            WorkflowTasks.AddRange(taskDefinitions);
+
+        public void AddTask<F, G>(
+            Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> refference,
+            Expression<Func<TWorkflow, F>> input
+        ) where F : IRequest<G>
+        {
+            var tasks = new SimpleTaskBuilder<F, G>(refference.Body, input.Body).Build();
+            AddTasks(tasks);
+        }
+
+        public void AddTask(
+            Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
+            Expression<Func<TWorkflow, DecisionTaskInput>> expression,
+            params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
+        )
+        {
+            var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
+
+            foreach (var funcase in caseActions)
+            {
+                builder.AddCase(funcase.Item1);
+                funcase.Item2.Invoke(builder);
+            }
+
+            AddTasks(builder.Build());
+        }
     }
 }

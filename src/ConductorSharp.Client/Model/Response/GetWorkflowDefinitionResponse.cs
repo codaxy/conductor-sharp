@@ -1,10 +1,12 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using Newtonsoft.Json;
 
-namespace ConductorSharp.Client.Model.Response;
-
-public class GetWorkflowDefinitionResponse
+namespace ConductorSharp.Client.Model.Response
 {
-    [JsonProperty("result")]
-    public WorkflowDefinition Result { get; set; }
+
+    public class GetWorkflowDefinitionResponse
+    {
+        [JsonProperty("result")]
+        public WorkflowDefinition Result { get; set; }
+    }
 }

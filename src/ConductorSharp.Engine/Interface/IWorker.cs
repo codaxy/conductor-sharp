@@ -1,5 +1,7 @@
-﻿namespace ConductorSharp.Engine.Interface;
-
-public interface IWorker
+﻿namespace ConductorSharp.Engine.Interface
 {
+
+    public interface IWorker
+    {
+    }
 }

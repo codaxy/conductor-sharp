@@ -1,33 +1,35 @@
 ﻿using System;
 
-namespace ConductorSharp.Engine.Util;
-
-public static class NamingUtil
+namespace ConductorSharp.Engine.Util
 {
-    public static string DetermineRegistrationName(Type taskType)
+
+    public static class NamingUtil
     {
-        var originalName = taskType.GetDocSection("originalName");
+        public static string DetermineRegistrationName(Type taskType)
+        {
+            var originalName = taskType.GetDocSection("originalName");
 
-        if (originalName != null)
-            return originalName;
+            if (originalName != null)
+                return originalName;
 
-        var originalNameAttribute = (OriginalNameAttribute)Attribute.GetCustomAttribute(
-            taskType,
-            typeof(OriginalNameAttribute)
-        );
+            var originalNameAttribute = (OriginalNameAttribute)Attribute.GetCustomAttribute(
+                taskType,
+                typeof(OriginalNameAttribute)
+            );
 
-        if (originalNameAttribute != null)
-            return originalNameAttribute.OriginalName;
+            if (originalNameAttribute != null)
+                return originalNameAttribute.OriginalName;
 
-        var name = SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(taskType.Name);
-        //var scope = taskType.Namespace.Split(".").Last().ToUpper();
+            var name = SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(taskType.Name);
+            //var scope = taskType.Namespace.Split(".").Last().ToUpper();
 
-        //name = name.Replace($"{scope}_", "");
+            //name = name.Replace($"{scope}_", "");
 
-        return name;
-        //return $"{scope}_{name}";
+            return name;
+            //return $"{scope}_{name}";
+        }
+
+        public static string DetermineReferenceName(string referenceName) =>
+            SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(referenceName);
     }
-
-    public static string DetermineReferenceName(string referenceName) =>
-        SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(referenceName);
 }

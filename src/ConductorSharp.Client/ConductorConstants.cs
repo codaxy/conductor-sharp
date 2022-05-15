@@ -1,21 +1,23 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace ConductorSharp.Client;
-
-public static class ConductorConstants
+namespace ConductorSharp.Client
 {
-    public static string SimpleTask { get; } = "SIMPLE";
-    public static string SubworkflowTask { get; } = "SUB_WORKFLOW";
-    public static JsonSerializer IoJsonSerializer { get; } =
-        new()
-        {
-            ContractResolver = new DefaultContractResolver
+
+    public static class ConductorConstants
+    {
+        public static string SimpleTask { get; } = "SIMPLE";
+        public static string SubworkflowTask { get; } = "SUB_WORKFLOW";
+        public static JsonSerializer IoJsonSerializer { get; } =
+            new()
             {
-                NamingStrategy = new SnakeCaseNamingStrategy()
-            },
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
-            TypeNameHandling = TypeNameHandling.Auto
-        };
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                },
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+    }
 }

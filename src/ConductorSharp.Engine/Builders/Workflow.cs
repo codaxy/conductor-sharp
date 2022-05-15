@@ -1,30 +1,32 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 
-namespace ConductorSharp.Engine.Builders;
-
-public class WorkflowInput<T> : IWorkflowInput where T : WorkflowOutput
+namespace ConductorSharp.Engine.Builders
 {
-}
 
-public class WorkflowOutput
-{
-}
+    public class WorkflowInput<T> : IWorkflowInput where T : WorkflowOutput
+    {
+    }
 
-public class WorkflowId
-{
-}
+    public class WorkflowOutput
+    {
+    }
 
-public interface IWorkflowInput
-{
-}
-public abstract class Workflow<TInput, TOutput> : ITypedWorkflow
-    where TInput : WorkflowInput<TOutput>
-    where TOutput : WorkflowOutput
-{
-    public TInput WorkflowInput { get; set; }
-    public TOutput WorkflowOutput { get; set; }
-    public WorkflowId Id { get; set; }
+    public class WorkflowId
+    {
+    }
 
-    public abstract WorkflowDefinition GetDefinition();
+    public interface IWorkflowInput
+    {
+    }
+    public abstract class Workflow<TInput, TOutput> : ITypedWorkflow
+        where TInput : WorkflowInput<TOutput>
+        where TOutput : WorkflowOutput
+    {
+        public TInput WorkflowInput { get; set; }
+        public TOutput WorkflowOutput { get; set; }
+        public WorkflowId Id { get; set; }
+
+        public abstract WorkflowDefinition GetDefinition();
+    }
 }

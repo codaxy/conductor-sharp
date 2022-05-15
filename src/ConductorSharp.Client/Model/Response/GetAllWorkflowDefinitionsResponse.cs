@@ -2,10 +2,12 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace ConductorSharp.Client.Model.Response;
-
-public class GetAllWorkflowDefinitionsResponse
+namespace ConductorSharp.Client.Model.Response
 {
-    [JsonProperty("result")]
-    public List<WorkflowDefinition> Result { get; set; }
+
+    public class GetAllWorkflowDefinitionsResponse
+    {
+        [JsonProperty("result")]
+        public List<WorkflowDefinition> Result { get; set; }
+    }
 }

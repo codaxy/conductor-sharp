@@ -3,22 +3,23 @@ using ConductorSharp.Engine.Model;
 using Newtonsoft.Json.Linq;
 using System.Linq.Expressions;
 
-namespace ConductorSharp.Engine.Builders;
-
-public class DynamicForkJoinTaskBuilder : BaseTaskBuilder<DynamicForkJoinInput, NoOutput>
+namespace ConductorSharp.Engine.Builders
 {
-    public DynamicForkJoinTaskBuilder(
-        Expression taskExpression,
-        Expression inputExpression
-    ) : base(taskExpression, inputExpression) { }
 
-    public override WorkflowDefinition.Task[] Build()
+    public class DynamicForkJoinTaskBuilder : BaseTaskBuilder<DynamicForkJoinInput, NoOutput>
     {
-        var dynamicTaskName = $"FORK_JOIN_DYNAMIC_{_taskRefferenceName}";
-        var joinTaskName = $"JOIN_{_taskRefferenceName}";
+        public DynamicForkJoinTaskBuilder(
+            Expression taskExpression,
+            Expression inputExpression
+        ) : base(taskExpression, inputExpression) { }
 
-        return new WorkflowDefinition.Task[]
+        public override WorkflowDefinition.Task[] Build()
         {
+            var dynamicTaskName = $"FORK_JOIN_DYNAMIC_{_taskRefferenceName}";
+            var joinTaskName = $"JOIN_{_taskRefferenceName}";
+
+            return new WorkflowDefinition.Task[]
+            {
                 new WorkflowDefinition.Task
                 {
                     Name = dynamicTaskName,
@@ -41,6 +42,7 @@ public class DynamicForkJoinTaskBuilder : BaseTaskBuilder<DynamicForkJoinInput, 
                         Newtonsoft.Json.Formatting.None
                     )
                 }
-        };
+            };
+        }
     }
 }

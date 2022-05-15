@@ -1,8 +1,10 @@
-﻿namespace ConductorSharp.Engine.Util;
-
-public class DocumentationConfiguration
+﻿namespace ConductorSharp.Engine.Util
 {
-    public string Destination { get; set; }
-    public string Source { get; set; }
-    public string YmlDestination { get; set; }
+
+    public class DocumentationConfiguration
+    {
+        public string Destination { get; set; }
+        public string Source { get; set; }
+        public string YmlDestination { get; set; }
+    }
 }

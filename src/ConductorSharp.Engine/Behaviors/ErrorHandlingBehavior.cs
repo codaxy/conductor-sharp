@@ -4,24 +4,26 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConductorSharp.Engine.Behaviors;
-
-public class ErrorHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+namespace ConductorSharp.Engine.Behaviors
 {
-    public async Task<TResponse> Handle(
-        TRequest request,
-        CancellationToken cancellationToken,
-        RequestHandlerDelegate<TResponse> next
-    )
+
+    public class ErrorHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
     {
-        try
+        public async Task<TResponse> Handle(
+            TRequest request,
+            CancellationToken cancellationToken,
+            RequestHandlerDelegate<TResponse> next
+        )
         {
-            return await next();
-        }
-        catch (Exception ex)
-        {
-            throw new BaseWorkerException(ex.Message, ex);
+            try
+            {
+                return await next();
+            }
+            catch (Exception ex)
+            {
+                throw new BaseWorkerException(ex.Message, ex);
+            }
         }
     }
 }

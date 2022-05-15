@@ -3,37 +3,39 @@ using Microsoft.Extensions.Hosting;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConductorSharp.Engine.Service;
-
-public class WorkflowEngineBackgroundService : IHostedService
+namespace ConductorSharp.Engine.Service
 {
-    private readonly IDeploymentService _deploymentService;
-    private readonly ExecutionManager _executionManager;
-    private readonly ModuleDeployment _deployment;
-    private Task _executingTask;
 
-    public WorkflowEngineBackgroundService(
-        IDeploymentService deploymentService,
-        ExecutionManager executionManager,
-        ModuleDeployment deployment
-    )
+    public class WorkflowEngineBackgroundService : IHostedService
     {
-        _deploymentService = deploymentService;
-        _executionManager = executionManager;
-        _deployment = deployment;
-    }
+        private readonly IDeploymentService _deploymentService;
+        private readonly ExecutionManager _executionManager;
+        private readonly ModuleDeployment _deployment;
+        private Task _executingTask;
 
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        _executingTask = RunAsync(cancellationToken);
-        return Task.CompletedTask;
-    }
+        public WorkflowEngineBackgroundService(
+            IDeploymentService deploymentService,
+            ExecutionManager executionManager,
+            ModuleDeployment deployment
+        )
+        {
+            _deploymentService = deploymentService;
+            _executionManager = executionManager;
+            _deployment = deployment;
+        }
 
-    private async Task RunAsync(CancellationToken cancellationToken)
-    {
-        await _deploymentService.Deploy(_deployment);
-        await _executionManager.StartAsync(cancellationToken);
-    }
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            _executingTask = RunAsync(cancellationToken);
+            return Task.CompletedTask;
+        }
 
-    public async Task StopAsync(CancellationToken cancellationToken) => await _executingTask;
+        private async Task RunAsync(CancellationToken cancellationToken)
+        {
+            await _deploymentService.Deploy(_deployment);
+            await _executionManager.StartAsync(cancellationToken);
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken) => await _executingTask;
+    }
 }
