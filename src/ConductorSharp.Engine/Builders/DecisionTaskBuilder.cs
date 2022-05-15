@@ -95,7 +95,7 @@ public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput,
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = _inputParameters,
                     Type = "DECISION",
-                    CaseValueParam = "decision_value",
+                    CaseValueParam = "case_value_param",
                     DecisionCases = new Newtonsoft.Json.Linq.JObject
                     {
                         _caseDictionary.Select(
