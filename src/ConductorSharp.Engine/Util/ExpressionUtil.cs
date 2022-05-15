@@ -3,6 +3,7 @@ using ConductorSharp.Engine.Interface;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -65,14 +66,32 @@ public static class ExpressionUtil
             return ccex.Value;
         }
 
+        // Handle interpolated strings containing references to wf inputs or task outputs
+        if (member.Expression is MethodCallExpression methodExpression
+                && methodExpression.Method.Name == nameof(string.Format)
+                && methodExpression.Method.DeclaringType == typeof(string))
+        {
+            var expressionStrings = methodExpression.Arguments.Skip(1).Select(expr => CreateExpressionString(expr)).ToArray();
+            var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
+            if (formatExpr == null)
+                throw new Exception("string.Format with non constant format string is not supported");
+            var formatString = (string)formatExpr.Value;
+            return string.Format(formatString, expressionStrings);
+        }
+
         if (!(member.Expression is MemberExpression))
             throw new Exception($"Only {nameof(MemberExpression)} expressions supported");
 
         var expression = member.Expression as MemberExpression;
 
-        var assignmentString = Traverse(expression).Split(".");
-        Array.Reverse(assignmentString);
-        return $"${{{string.Join('.', assignmentString)}}}";
+        return CreateExpressionString(expression);
+    }
+
+    private static string CreateExpressionString(Expression expression)
+    {
+        var expressionString = Traverse(expression).Split(".");
+        Array.Reverse(expressionString);
+        return $"${{{string.Join('.', expressionString)}}}";
     }
 
     private static string Traverse(Expression expr)
