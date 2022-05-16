@@ -173,5 +173,14 @@ namespace ConductorSharp.Engine.Builders
 
             AddTasks(builder.Build());
         }
+
+        public void AddTask<F, G>(
+          Expression<Func<TWorkflow, JsonJqTransformTaskModel<F, G>>> refference,
+          Expression<Func<TWorkflow, F>> input
+      ) where F : IRequest<G>
+        {
+            var tasks = new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body).Build();
+            AddTasks(tasks);
+        }
     }
 }
