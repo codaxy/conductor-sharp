@@ -173,6 +173,12 @@ namespace ConductorSharp.Client.Model.Common
             [JsonProperty("caseExpression")]
             public string CaseExpression { get; set; }
 
+            [JsonProperty("expression")]
+            public string Expression { get; set; }
+
+            [JsonProperty("evaluatorType")]
+            public string EvaluatorType { get; set; }
+
             [JsonProperty("scriptExpression")]
             public string ScriptExpression { get; set; }
 

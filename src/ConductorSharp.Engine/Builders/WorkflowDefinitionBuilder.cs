@@ -156,5 +156,22 @@ namespace ConductorSharp.Engine.Builders
 
             AddTasks(builder.Build());
         }
+
+        public void AddTask(
+          Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
+          Expression<Func<TWorkflow, SwitchTaskInput>> expression,
+          params (string, Action<SwitchTaskBuilder<TWorkflow>>)[] caseActions
+       )
+        {
+            var builder = new SwitchTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
+
+            foreach (var funcase in caseActions)
+            {
+                builder.AddCase(funcase.Item1);
+                funcase.Item2.Invoke(builder);
+            }
+
+            AddTasks(builder.Build());
+        }
     }
 }
