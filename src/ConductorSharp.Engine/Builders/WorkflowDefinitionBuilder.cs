@@ -133,10 +133,11 @@ namespace ConductorSharp.Engine.Builders
 
         public void AddTask<F, G>(
             Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> refference,
-            Expression<Func<TWorkflow, F>> input
+            Expression<Func<TWorkflow, F>> input,
+            AdditionalTaskParameters additionalParameters = null
         ) where F : IRequest<G>
         {
-            var tasks = new SimpleTaskBuilder<F, G>(refference.Body, input.Body).Build();
+            var tasks = new SimpleTaskBuilder<F, G>(refference.Body, input.Body, additionalParameters).Build();
             AddTasks(tasks);
         }
 

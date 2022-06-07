@@ -56,10 +56,11 @@ namespace ConductorSharp.Engine.Builders
 
         public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
             Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> taskSelector,
-            Expression<Func<TWorkflow, F>> expression
+            Expression<Func<TWorkflow, F>> expression,
+            AdditionalTaskParameters additionalParameters = null
         ) where F : IRequest<G>
         {
-            var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body);
+            var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body, additionalParameters);
             _caseDictionary[_currentCaseName].Add(builder);
 
             return this;
