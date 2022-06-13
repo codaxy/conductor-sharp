@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "ConductorSharp.Engine": {
+      "commandName": "Project"
+    }
+  }
+}

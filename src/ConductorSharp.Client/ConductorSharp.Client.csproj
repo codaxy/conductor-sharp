@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<Authors>Codaxy</Authors>
+		<Company>Codaxy</Company>
+		<PackageId>ConductorSharp.Client</PackageId>
+		<Version>1.0.1</Version>
+		<Description>Client library for Netflix Conductor, with some additional quality of life features.</Description>
+		<RepositoryUrl>https://github.com/codaxy/conductor-sharp</RepositoryUrl>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="RestSharp" Version="107.3.0" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="107.3.0" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <Authors>Codaxy</Authors>
+	<Company>Codaxy</Company>
+	<PackageId>ConductorSharp.Engine</PackageId>
+	<Version>1.0.1</Version>
+    <Description>Client library for Netflix Conductor, with some additional quality of life features.</Description>
+	<RepositoryUrl>https://github.com/codaxy/conductor-sharp</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.3.0" />
+    <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConductorSharp.Client\ConductorSharp.Client.csproj" />
+  </ItemGroup>
+
+</Project>
