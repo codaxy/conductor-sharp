@@ -72,7 +72,7 @@ namespace ConductorSharp.Engine.Util
                     && methodExpression.Method.Name == nameof(string.Format)
                     && methodExpression.Method.DeclaringType == typeof(string))
             {
-                var expressionStrings = methodExpression.Arguments.Skip(1).Select(expr => CreateExpressionString(expr)).ToArray();
+                var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileMemberOrNameExpressions).ToArray();
                 var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
                 if (formatExpr == null)
                     throw new Exception("string.Format with non constant format string is not supported");
@@ -80,12 +80,19 @@ namespace ConductorSharp.Engine.Util
                 return string.Format(formatString, expressionStrings);
             }
 
-            if (!(member.Expression is MemberExpression))
-                throw new Exception($"Only {nameof(MemberExpression)} expressions supported");
+            return CreateExpressionString(member.Expression);
+        }
 
-            var expression = member.Expression as MemberExpression;
-
-            return CreateExpressionString(expression);
+        private static string CompileMemberOrNameExpressions(Expression expr)
+        {
+            if (expr is MemberExpression)
+                return CreateExpressionString(expr);
+            else if (expr is MethodCallExpression methodExpr
+                && methodExpr.Method.DeclaringType == typeof(NamingUtil)
+                && methodExpr.Method.Name == nameof(NamingUtil.NameOf))
+                return (string)methodExpr.Method.Invoke(null, null);
+            else
+                throw new Exception($"Expression {expr.GetType().Name} not supported");
         }
 
         private static string CreateExpressionString(Expression expression)

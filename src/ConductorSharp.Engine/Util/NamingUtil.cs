@@ -1,11 +1,12 @@
-﻿using System;
+﻿using ConductorSharp.Engine.Interface;
+using System;
 
 namespace ConductorSharp.Engine.Util
 {
 
     public static class NamingUtil
     {
-        public static string DetermineRegistrationName(Type taskType)
+        internal static string DetermineRegistrationName(Type taskType)
         {
             var originalName = taskType.GetDocSection("originalName");
 
@@ -29,7 +30,10 @@ namespace ConductorSharp.Engine.Util
             //return $"{scope}_{name}";
         }
 
-        public static string DetermineReferenceName(string referenceName) =>
+        public static string NameOf<TNameable>() where TNameable : INameable
+            => DetermineRegistrationName(typeof(TNameable));
+
+        internal static string DetermineReferenceName(string referenceName) =>
             SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(referenceName);
     }
 }
