@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Client.Model.Response;
+﻿using ConductorSharp.Client.Exceptions;
+using ConductorSharp.Client.Model.Response;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RestSharp;
@@ -64,6 +65,9 @@ namespace ConductorSharp.Client.Service
 
                 if (response.StatusCode == HttpStatusCode.InternalServerError)
                     throw new Exception(response.Content);
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    throw new NotFoundException(error.Message);
             }
         }
 
