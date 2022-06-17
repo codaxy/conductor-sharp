@@ -96,7 +96,7 @@ namespace ConductorSharp.Engine.Util
                 return string.Format(formatString, expressionStrings);
             }
 
-            if (assignmentExpression is NewExpression)
+            if (assignmentExpression is NewExpression || assignmentExpression is MemberInitExpression)
                 return ParseToParameters(assignmentExpression);
 
             return CompileMemberOrNameExpressions(assignmentExpression);
