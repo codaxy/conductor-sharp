@@ -31,33 +31,46 @@ namespace ConductorSharp.Engine.Util
         {
             var inputParams = new JObject();
 
-            if (!(expression is MemberInitExpression initExpression))
-                throw new Exception($"Only {nameof(MemberInitExpression)} expressions supported");
-
-            foreach (var binding in initExpression.Bindings)
+            if (expression is MemberInitExpression initExpression)
             {
-                var assignmentValue = ParseToAssignmentString(binding);
-                var assignmentKey = GetMemberName(binding.Member as PropertyInfo);
+                foreach (var binding in initExpression.Bindings)
+                {
+                    if (binding.BindingType != MemberBindingType.Assignment)
+                        throw new Exception($"Only {nameof(MemberBindingType.Assignment)} binding type supported");
 
-                inputParams.Add(new JProperty(assignmentKey, assignmentValue));
+                    var assignmentBinding = (MemberAssignment)binding;
+                    var assignmentValue = ParseToAssignmentString(assignmentBinding.Expression);
+                    var assignmentKey = GetMemberName(binding.Member as PropertyInfo);
+
+                    inputParams.Add(new JProperty(assignmentKey, assignmentValue));
+                }
             }
+            // This case handles case when task has empty input parameters (e.g. new() or new TInput())
+            // Also this case allows us to handle anonymous types
+            else if (expression is NewExpression newExpression
+                // With this check we verify it is anonymous type
+                && newExpression.Arguments.Count == newExpression.Members.Count)
+            {
+                foreach (var member in newExpression.Arguments.Zip(newExpression.Members, (expression, memberInfo) => (expression, memberInfo)))
+                {
+                    var assignmentValue = ParseToAssignmentString(member.expression);
+                    var assignmentKey = GetMemberName(member.memberInfo as PropertyInfo);
+
+                    inputParams.Add(new JProperty(assignmentKey, assignmentValue));
+                }
+            }
+            else
+                throw new Exception($"Only {nameof(MemberInitExpression)} and {nameof(NewExpression)} without constructor arguments expressions are supported");
 
             return inputParams;
         }
 
-        private static object ParseToAssignmentString(MemberBinding mb)
+        private static object ParseToAssignmentString(Expression assignmentExpression)
         {
-            if (!(mb.BindingType is MemberBindingType.Assignment))
-                throw new Exception(
-                    $"Only {nameof(MemberBindingType.Assignment)} binding type supported"
-                );
-
-            var member = mb as MemberAssignment;
-
-            if (member.Expression is ConstantExpression cex)
+            if (assignmentExpression is ConstantExpression cex)
                 return Convert.ToString(cex.Value);
 
-            if (member.Expression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
+            if (assignmentExpression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
             {
                 var converted = Convert.ToString(ccex.Value);
 
@@ -67,10 +80,13 @@ namespace ConductorSharp.Engine.Util
                 return ccex.Value;
             }
 
-            // Handle interpolated strings containing references to wf inputs or task outputs
-            if (member.Expression is MethodCallExpression methodExpression
-                    && methodExpression.Method.Name == nameof(string.Format)
-                    && methodExpression.Method.DeclaringType == typeof(string))
+            // Handle boxing
+            if (assignmentExpression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
+                return CreateExpressionString(unaryEx.Operand);
+            
+            if (assignmentExpression is MethodCallExpression methodExpression 
+                && methodExpression.Method.Name == nameof(string.Format) 
+                && methodExpression.Method.DeclaringType == typeof(string))
             {
                 var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileMemberOrNameExpressions).ToArray();
                 var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
@@ -80,7 +96,10 @@ namespace ConductorSharp.Engine.Util
                 return string.Format(formatString, expressionStrings);
             }
 
-            return CreateExpressionString(member.Expression);
+            if (assignmentExpression is NewExpression)
+                return ParseToParameters(assignmentExpression);
+
+            return CompileMemberOrNameExpressions(assignmentExpression);
         }
 
         private static string CompileMemberOrNameExpressions(Expression expr)
