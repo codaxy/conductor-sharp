@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ConductorSharp.ApiEnabled.Models
 {

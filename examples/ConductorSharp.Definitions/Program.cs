@@ -1,12 +1,11 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using ConductorSharp.Engine.Extensions;
-using AutoMapper;
-using MediatR.Extensions.Autofac.DependencyInjection;
 using ConductorSharp.Definitions;
+using ConductorSharp.Engine.Extensions;
+using MediatR.Extensions.Autofac.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 
 IConfiguration? configuration = null;

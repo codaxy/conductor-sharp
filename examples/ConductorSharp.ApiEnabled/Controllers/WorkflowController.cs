@@ -1,13 +1,8 @@
-﻿using AutoMapper;
-using ConductorSharp.ApiEnabled.Handlers;
-using ConductorSharp.ApiEnabled.Models;
+﻿using ConductorSharp.ApiEnabled.Models;
 using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Client.Service;
-using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using  TaskDef = ConductorSharp.Client.Model.Common.TaskDefinition;
 
 namespace ConductorSharp.ApiEnabled.Controllers;
 

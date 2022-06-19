@@ -39,7 +39,7 @@ public class GetCustomerHandler : ITaskRequestHandler<GetCustomerRequest, GetCus
 
     public Task<GetCustomerResponse> Handle(GetCustomerRequest request, CancellationToken cancellationToken)
     {
-        var customer =  customers.First(a => a.Id == request.CustomerId);
+        var customer = customers.First(a => a.Id == request.CustomerId);
 
         return Task.FromResult(new GetCustomerResponse
         {

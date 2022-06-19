@@ -6,9 +6,10 @@
 		<Authors>Codaxy</Authors>
 		<Company>Codaxy</Company>
 		<PackageId>ConductorSharp.Client</PackageId>
-		<Version>1.0.1</Version>
+		<Version>1.0.0</Version>
 		<Description>Client library for Netflix Conductor, with some additional quality of life features.</Description>
 		<RepositoryUrl>https://github.com/codaxy/conductor-sharp</RepositoryUrl>
+		<PackageTags>netflix;conductor</PackageTags>
 	</PropertyGroup>
 
   <ItemGroup>

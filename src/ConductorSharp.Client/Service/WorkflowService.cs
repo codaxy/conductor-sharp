@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Client.Service
 {
-
     public class WorkflowService : IWorkflowService
     {
         private readonly IConductorClient _client;
