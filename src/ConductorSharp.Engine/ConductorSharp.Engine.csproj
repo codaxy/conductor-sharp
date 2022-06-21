@@ -12,6 +12,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Polyfills\trim.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Polyfills\trim.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="Lambda2Js.Signed" Version="3.1.4" />
     <PackageReference Include="MediatR" Version="10.0.1" />
