@@ -32,8 +32,11 @@ namespace ConductorSharp.Engine.JsExtensions
                     break;
 
                 case nameof(string.ToLowerInvariant):
-                    context.Write(expression.Object);
-                    context.Write(".toLowerCase()");
+                    {
+                        context.Write(expression.Object);
+                        using var op = context.Operation(JavascriptOperationTypes.Call);
+                        context.Write(".toLowerCase()");
+                    }
                     break;
                 default:
                     throw new NotSupportedException($"{expression.Method.Name} not supported");
