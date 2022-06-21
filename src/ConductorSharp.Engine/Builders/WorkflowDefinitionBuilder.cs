@@ -110,6 +110,13 @@ namespace ConductorSharp.Engine.Builders
             var tasks = new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body).Build();
             AddTasks(tasks);
         }
+
+        public void AddTask<F, G>(
+            Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence,
+            Expression<Func<TWorkflow, F>> input,
+            Expression<Func<F, G>> script) where F : IRequest<G>
+            => AddTask(referrence, input, ExpressionUtil.CompileScript(script));
+
         public void AddTask<F, G>(
             Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence,
             Expression<Func<TWorkflow, F>> input
