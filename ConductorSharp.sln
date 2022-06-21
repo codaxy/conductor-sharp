@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConductorSharp.NoApi", "exa
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{C398B7D9-C238-4169-86A8-B03D01FBB2BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConductorSharp.Tests", "..\ConductorSharp.Tests\ConductorSharp.Tests.csproj", "{D1B691ED-D26F-4115-9207-C5E30CE9FF0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{C398B7D9-C238-4169-86A8-B03D01FBB2BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C398B7D9-C238-4169-86A8-B03D01FBB2BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C398B7D9-C238-4169-86A8-B03D01FBB2BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1B691ED-D26F-4115-9207-C5E30CE9FF0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1B691ED-D26F-4115-9207-C5E30CE9FF0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1B691ED-D26F-4115-9207-C5E30CE9FF0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1B691ED-D26F-4115-9207-C5E30CE9FF0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

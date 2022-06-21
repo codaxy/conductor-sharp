@@ -10,6 +10,8 @@
     <Description>Client library for Netflix Conductor, with some additional quality of life features.</Description>
 	<RepositoryUrl>https://github.com/codaxy/conductor-sharp</RepositoryUrl>
 	<PackageTags>netflix;conductor</PackageTags>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
