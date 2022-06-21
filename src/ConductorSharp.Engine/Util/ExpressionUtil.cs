@@ -1,5 +1,7 @@
 ﻿using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.JsExtensions;
+using Lambda2Js;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -12,6 +14,16 @@ namespace ConductorSharp.Engine.Util
 
     public static class ExpressionUtil
     {
+
+        private static readonly JavascriptConversionExtension[] s_jsExtensions =
+            new JavascriptConversionExtension[]
+        {
+            new MemberInitExpressionExtension(),
+            new MemberExpressionExtension(),
+            new ParameterExpressionExtension(),
+            new StringMethodsExtension()
+        };
+        
         public static string ParseToReferenceName(Expression expression)
         {
             if (!(expression is MemberExpression taskSelectExpression))
@@ -145,7 +157,7 @@ namespace ConductorSharp.Engine.Util
             return false;
         }
 
-        private static string GetMemberName(PropertyInfo propertyInfo)
+        internal static string GetMemberName(PropertyInfo propertyInfo)
         {
             string memberName = default;
 
@@ -164,5 +176,8 @@ namespace ConductorSharp.Engine.Util
 
             return memberName;
         }
+
+        internal static string CompileScript<TInput, TOutput>(Expression<Func<TInput, TOutput>> script)
+           => $"return {script.CompileToJavascript(ScriptVersion.Es51, s_jsExtensions)}"; 
     }
 }
