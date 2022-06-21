@@ -7,10 +7,8 @@ namespace ConductorSharp.Engine.JsExtensions
     {
         public sealed override void ConvertToJavascript(JavascriptConversionContext context)
         {
-            if (context.Node is not TExpression)
-                return;
-
-            HandleExpression(context, (TExpression)context.Node);
+            if (context.Node is TExpression expression)
+                HandleExpression(context, expression);
         }
 
         public abstract void HandleExpression(JavascriptConversionContext context, TExpression expression);
