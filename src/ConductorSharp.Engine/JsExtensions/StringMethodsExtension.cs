@@ -1,5 +1,7 @@
-﻿using Lambda2Js;
+﻿using ConductorSharp.Engine.Util;
+using Lambda2Js;
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -49,9 +51,19 @@ namespace ConductorSharp.Engine.JsExtensions
 
                 case nameof(string.Trim):
                     {
-                        context.Write(expression.Object);
-                        using var op = context.Operation(JavascriptOperationTypes.Call);
-                        context.Write(".trim()");
+                        if (@params.Length == 0)
+                        {
+                            context.Write(expression.Object);
+                            using var op = context.Operation(JavascriptOperationTypes.Call);
+                            context.Write(".trim()");
+                        }
+                        else
+                        {
+                            var script = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/trim.js");
+                            using var op = context.Operation(JavascriptOperationTypes.Call);
+                            context.Write(script);
+                            context.WriteManyIsolated('(', ')', ',', Enumerable.Concat(new[] { expression.Object }, expression.Arguments));
+                        }
                     }
                     break;
 
