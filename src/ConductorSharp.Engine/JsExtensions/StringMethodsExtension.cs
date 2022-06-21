@@ -21,10 +21,10 @@ namespace ConductorSharp.Engine.JsExtensions
 
                 case nameof(string.Replace):
                     {
-                        context.Write(expression.Object);
                         if (@params.Length != 2)
                             throw new NotSupportedException($"{nameof(string.Replace)} method with more than 2 parameters not supported");
 
+                        context.Write(expression.Object);
                         using var op = context.Operation(JavascriptOperationTypes.Call);
                         context.Write(".replaceAll");
                         context.WriteManyIsolated('(', ')', ',', expression.Arguments);
@@ -36,6 +36,44 @@ namespace ConductorSharp.Engine.JsExtensions
                         context.Write(expression.Object);
                         using var op = context.Operation(JavascriptOperationTypes.Call);
                         context.Write(".toLowerCase()");
+                    }
+                    break;
+
+                case nameof(string.ToUpperInvariant):
+                    {
+                        context.Write(expression.Object);
+                        using var op = context.Operation(JavascriptOperationTypes.Call);
+                        context.Write(".toUpperCase()");
+                    }
+                    break;
+
+                case nameof(string.Trim):
+                    {
+                        context.Write(expression.Object);
+                        using var op = context.Operation(JavascriptOperationTypes.Call);
+                        context.Write(".trim()");
+                    }
+                    break;
+
+                case nameof(string.TrimStart):
+                    {
+                        if (@params.Length != 0)
+                            throw new NotSupportedException($"{nameof(string.TrimStart)} with parameters are not supported");
+
+                        context.Write(expression.Object);
+                        using var op = context.Operation(JavascriptOperationTypes.Call);
+                        context.Write(".trimStart()");
+                    }
+                    break;
+
+                case nameof(string.TrimEnd):
+                    {
+                        if (@params.Length != 0)
+                            throw new NotSupportedException($"{nameof(string.TrimEnd)} with parameters are not supported");
+
+                        context.Write(expression.Object);
+                        using var op = context.Operation(JavascriptOperationTypes.Call);
+                        context.Write(".trimEnd()");
                     }
                     break;
                 default:
