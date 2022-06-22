@@ -49,7 +49,7 @@ namespace ConductorSharp.Engine.Util
             // Also this case allows us to handle anonymous types
             else if (expression is NewExpression newExpression
                 // With this check we verify it is anonymous type
-                && newExpression.Arguments.Count == newExpression.Members.Count)
+                && newExpression.Arguments.Count == (newExpression.Members?.Count ?? 0))
             {
                 foreach (var member in newExpression.Arguments.Zip(newExpression.Members, (expression, memberInfo) => (expression, memberInfo)))
                 {
