@@ -62,7 +62,7 @@ namespace ConductorSharp.Engine.JsExtensions
                             var script = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/trim.js");
                             using var op = context.Operation(JavascriptOperationTypes.Call);
                             context.Write(script);
-                            context.WriteManyIsolated('(', ')', ',', Enumerable.Concat(new[] { expression.Object }, expression.Arguments));
+                            context.WriteManyIsolated('(', ')', ',', new[] { expression.Object }.Concat(expression.Arguments));
                         }
                     }
                     break;
