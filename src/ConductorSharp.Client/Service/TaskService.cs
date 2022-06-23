@@ -159,5 +159,7 @@ namespace ConductorSharp.Client.Service
                 ApiUrls.PollTasks(name, workerId, domain),
                 HttpMethod.Get
             );
+
+        public Task<GetTaskLogsResponse[]> GetLogsForTask(string taskId) => _client.ExecuteRequestAsync<GetTaskLogsResponse[]>(ApiUrls.GetLogsForTask(taskId), HttpMethod.Get);
     }
 }
