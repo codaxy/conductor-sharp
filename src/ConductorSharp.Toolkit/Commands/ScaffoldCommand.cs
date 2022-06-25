@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Toolkit.Models;
+using ConductorSharp.Toolkit.Service;
 
 namespace ConductorSharp.Toolkit.Commands
 {
