@@ -2,13 +2,13 @@
 {
     public class CommandRegistry
     {
-        private readonly IEnumerable<IWFECommand> commands;
+        private readonly IEnumerable<Command> commands;
 
-        public CommandRegistry(IEnumerable<IWFECommand> commands)
+        public CommandRegistry(IEnumerable<Command> commands)
         {
             this.commands = commands;
         }
 
-        public IWFECommand Get(string name) => commands.FirstOrDefault(a => a.GetName() == name);
+        public Command Get(string name) => commands.FirstOrDefault(a => a.GetName() == name);
     }
 }

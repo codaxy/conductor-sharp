@@ -13,7 +13,7 @@ namespace ConductorSharp.Toolkit
             builder.RegisterType<MetadataService>().As<IMetadataService>();
             builder.RegisterType<ScaffoldingService>().As<IScaffoldingService>();
             builder.RegisterType<CommandRegistry>();
-            builder.RegisterType<ScaffoldCommand>().As<IWFECommand>();
+            builder.RegisterType<ScaffoldCommand>().As<Command>();
         }
     }
 }

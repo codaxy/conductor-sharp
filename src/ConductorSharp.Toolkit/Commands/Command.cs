@@ -2,7 +2,7 @@
 
 namespace ConductorSharp.Toolkit.Commands
 {
-    public interface IWFECommand
+    public interface Command
     {
         public string GetName();
         public Task Execute(WFECommandInput input);

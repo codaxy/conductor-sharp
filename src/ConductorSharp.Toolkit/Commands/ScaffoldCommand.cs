@@ -3,7 +3,7 @@ using ConductorSharp.Toolkit.Service;
 
 namespace ConductorSharp.Toolkit.Commands
 {
-    public class ScaffoldCommand : IWFECommand
+    public class ScaffoldCommand : Command
     {
         private readonly IScaffoldingService scaffoldingService;
         public ScaffoldCommand(IScaffoldingService scaffoldingService)
