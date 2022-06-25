@@ -11,13 +11,9 @@ namespace ConductorSharp.Toolkit
         {
             builder.RegisterType<ConductorClient>().As<IConductorClient>();
             builder.RegisterType<MetadataService>().As<IMetadataService>();
-            builder.RegisterType<DllScraperService>().As<IDllScraperService>();
             builder.RegisterType<ScaffoldingService>().As<IScaffoldingService>();
-            builder.RegisterType<DocumentCreator>();
             builder.RegisterType<CommandRegistry>();
-            builder.RegisterType<DocumentCommand>().As<IWFECommand>();
             builder.RegisterType<ScaffoldCommand>().As<IWFECommand>();
-            builder.RegisterType<ScrapeDllCommand>().As<IWFECommand>();
         }
     }
 }
