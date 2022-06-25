@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Templates\TaskCollectionTemplate.default" />
+    <None Remove="Templates\WorkerTemplate.default" />
+    <None Remove="Templates\WorkflowCollectionTemplate.default" />
+    <None Remove="Templates\WorkflowTemplate.default" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\TaskCollectionTemplate.default" />
+    <EmbeddedResource Include="Templates\WorkerTemplate.default" />
+    <EmbeddedResource Include="Templates\WorkflowCollectionTemplate.default" />
+    <EmbeddedResource Include="Templates\WorkflowTemplate.default" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConductorSharp.Engine\ConductorSharp.Engine.csproj" />
+  </ItemGroup>
+
+</Project>
