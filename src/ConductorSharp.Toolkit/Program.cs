@@ -57,7 +57,6 @@ namespace ConductorSharp.Toolkit
             builder.Populate(serviceCollection);
             builder.AddWorkflowEngine(input.Host, input.Api);
             builder.RegisterModule(new WFEToolkitModule());
-            builder.RegisterType<YmlGenerator>();
 
             return builder.Build();
         }
