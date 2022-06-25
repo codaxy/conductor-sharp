@@ -1,5 +1,4 @@
-﻿using Vodafone.Frinx.Workflows.WFEToolkit.Models;
-using Vodafone.Frinx.Workflows.WFEToolkit.Service;
+﻿using ConductorSharp.Toolkit.Models;
 
 namespace ConductorSharp.Toolkit.Commands
 {
