@@ -1,6 +1,6 @@
 ﻿namespace ConductorSharp.Toolkit.Models
 {
-    public class WFECommandInput
+    public class CommandInput
     {
         public string Action { get; set; }
         public string Api { get; set; }

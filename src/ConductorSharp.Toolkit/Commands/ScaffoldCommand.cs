@@ -12,7 +12,7 @@ namespace ConductorSharp.Toolkit.Commands
         }
 
         public string GetName() => "scaffold";
-        public async Task Execute(WFECommandInput input)
+        public async Task Execute(CommandInput input)
         {
             await scaffoldingService.Scaffold();
         }

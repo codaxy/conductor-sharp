@@ -33,7 +33,7 @@ namespace ConductorSharp.Toolkit
 
         private static void PrintHelp() => Console.WriteLine("PLACEHOLDER HELP");
 
-        private static IContainer BuildContainer(WFECommandInput input)
+        private static IContainer BuildContainer(CommandInput input)
         {
             var serviceCollection = new ServiceCollection();
 
@@ -59,12 +59,12 @@ namespace ConductorSharp.Toolkit
             return builder.Build();
         }
 
-        private static WFECommandInput ParseInput(string[] args)
+        private static CommandInput ParseInput(string[] args)
         {
             var action = args[0];
             var inputParameters = args.Skip(1).Select(a => new KeyValuePair<string, string>(a.Split("=")[0], a.Split("=")[1])).ToList();
 
-            return new WFECommandInput
+            return new CommandInput
             {
                 Api = inputParameters.Where(a => a.Key == "path").Select(a => a.Value).FirstOrDefault(),
                 Namespace = inputParameters.Where(a => a.Key == "namespace").Select(a => a.Value).FirstOrDefault(),
