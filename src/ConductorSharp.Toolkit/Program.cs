@@ -68,6 +68,7 @@ namespace ConductorSharp.Toolkit
             {
                 Api = inputParameters.Where(a => a.Key == "path").Select(a => a.Value).FirstOrDefault(),
                 Namespace = inputParameters.Where(a => a.Key == "namespace").Select(a => a.Value).FirstOrDefault(),
+                Host = inputParameters.Where(a => a.Key == "host").Select(a => a.Value).FirstOrDefault(),
                 Dryrun = inputParameters.Where(a => a.Key == "dryrun").Select(a => bool.Parse(a.Value)).FirstOrDefault(),
                 Destination = inputParameters.Where(a => a.Key == "destination").Select(a => a.Value).FirstOrDefault()
             };
