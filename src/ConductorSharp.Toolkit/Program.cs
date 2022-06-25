@@ -1,11 +1,9 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Vodafone.Frinx.Workflows.WFEToolkit.Commands;
-using Vodafone.Frinx.Workflows.WFEToolkit.Models;
-using Vodafone.Frinx.Workflows.WFEToolkit.Service;
 using ConductorSharp.Engine.Extensions;
-using Vodafone.Frinx.Workflows.WFEToolkit;
+using ConductorSharp.Toolkit.Commands;
+using ConductorSharp.Toolkit.Models;
 
 namespace ConductorSharp.Toolkit
 {

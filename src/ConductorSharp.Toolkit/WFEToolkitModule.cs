@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using ConductorSharp.Client.Service;
-using Vodafone.Frinx.Workflows.WFEToolkit.Commands;
-using Vodafone.Frinx.Workflows.WFEToolkit.Service;
+using ConductorSharp.Toolkit.Commands;
+using ConductorSharp.Toolkit.Service;
 
 namespace ConductorSharp.Toolkit
 {
