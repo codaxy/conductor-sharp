@@ -5,7 +5,7 @@ using ConductorSharp.Toolkit.Service;
 
 namespace ConductorSharp.Toolkit
 {
-    public class WFEToolkitModule : Module
+    public class ToolkitModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

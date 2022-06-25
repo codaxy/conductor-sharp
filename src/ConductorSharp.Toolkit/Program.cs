@@ -54,7 +54,7 @@ namespace ConductorSharp.Toolkit
 
             builder.Populate(serviceCollection);
             builder.AddWorkflowEngine(input.Host, input.Api);
-            builder.RegisterModule(new WFEToolkitModule());
+            builder.RegisterModule(new ToolkitModule());
 
             return builder.Build();
         }
