@@ -1,0 +1,27 @@
+{
+  "ownerApp": "undefined",
+  "createTime": 1656663495488,
+  "createdBy": "",
+  "name": "EMAIL_prepare",
+  "description": "{\"description\":\"Missing description\"}",
+  "retryCount": 0,
+  "timeoutSeconds": 60,
+  "inputKeys": [
+    "customer_name",
+    "address"
+  ],
+  "outputKeys": [
+    "email_body"
+  ],
+  "timeoutPolicy": "TIME_OUT_WF",
+  "retryLogic": "FIXED",
+  "retryDelaySeconds": 0,
+  "responseTimeoutSeconds": 60,
+  "concurrentExecLimit": 0,
+  "inputTemplate": {},
+  "rateLimitPerFrequency": 0,
+  "rateLimitFrequencyInSeconds": 1,
+  "ownerEmail": "undefined@undefined.local",
+  "pollTimeoutSeconds": 0,
+  "backoffScaleFactor": 1
+}
