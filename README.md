@@ -5,7 +5,11 @@ A Conductor client library with some quality of life additions and a builder for
 
 ## Installing ConductorSharp
 
-[ToDo]
+If you require Conductor API client use:
+dotnet add package ConductorSharp.Client --version 1.0.3
+
+If you also require workflow and task registration, worker scheduling and execution, workflow builder, use:
+dotnet add package ConductorSharp.Engine --version 1.0.3
 
 ## Running the example
 
