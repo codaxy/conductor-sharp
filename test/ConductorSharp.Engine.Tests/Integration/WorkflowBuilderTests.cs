@@ -11,7 +11,6 @@ namespace ConductorSharp.Engine.Tests.Integration
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/SendCustomerNotification.json");
 
             Assert.Equal(expectedDefinition, definition);
-
         }
     }
 }
