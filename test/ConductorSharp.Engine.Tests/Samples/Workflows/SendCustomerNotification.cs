@@ -2,20 +2,20 @@
 
 public class SendCustomerNotificationInput : WorkflowInput<SendCustomerNotificationOutput>
 {
-    public dynamic? CustomerId { get; set; }
+    public dynamic CustomerId { get; set; }
 }
 
 public class SendCustomerNotificationOutput : WorkflowOutput
 {
-    public dynamic? EmailBody { get; set; }
+    public dynamic EmailBody { get; set; }
 }
 
 [OriginalName("NOTIFICATION_send_to_customer")]
 public class SendCustomerNotification
     : Workflow<SendCustomerNotificationInput, SendCustomerNotificationOutput>
 {
-    public CustomerGetV1? GetCustomer { get; set; }
-    public EmailPrepareV1? PrepareEmail { get; set; }
+    public CustomerGetV1 GetCustomer { get; set; }
+    public EmailPrepareV1 PrepareEmail { get; set; }
 
     public override WorkflowDefinition GetDefinition()
     {

@@ -5,7 +5,7 @@ public partial class CustomerGetV1Input : IRequest<CustomerGetV1Output>
     /// <originalName>
     /// customer_id
     /// </originalName>
-    public dynamic? CustomerId { get; set; }
+    public dynamic CustomerId { get; set; }
 }
 
 public partial class CustomerGetV1Output
@@ -13,12 +13,12 @@ public partial class CustomerGetV1Output
 /// <originalName>
 /// name
 /// </originalName>
-public dynamic? Name { get; set; }
+public dynamic Name { get; set; }
 
 /// <originalName>
 /// address
 /// </originalName>
-public dynamic? Address { get; set; }
+public dynamic Address { get; set; }
 }
 
 /// <originalName>

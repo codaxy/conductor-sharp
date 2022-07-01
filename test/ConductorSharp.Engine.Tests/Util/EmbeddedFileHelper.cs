@@ -35,6 +35,9 @@ namespace ConductorSharp.Engine.Util
 
             var contents = ReadAssemblyFile(typeof(EmbeddedFileHelper).Assembly, fileName);
 
+            if (contents == null)
+                throw new Exception();
+
             if (templateParams != null)
                 foreach (var (Key, Value) in templateParams)
                     contents = contents.Replace("{{" + Key + "}}", $"{Value}");
