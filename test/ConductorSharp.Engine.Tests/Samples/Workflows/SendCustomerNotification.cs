@@ -31,8 +31,8 @@ public class SendCustomerNotification
             b =>
                 new()
                 {
-                    Address = b.GetCustomer!.Output.Address,
-                    Name = b.GetCustomer!.Output.Name
+                    Address = b.GetCustomer.Output.Address,
+                    Name = b.GetCustomer.Output.Name
                 }
         );
 
