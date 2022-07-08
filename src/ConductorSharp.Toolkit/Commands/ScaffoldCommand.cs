@@ -5,16 +5,16 @@ namespace ConductorSharp.Toolkit.Commands
 {
     public class ScaffoldCommand : Command
     {
-        private readonly IScaffoldingService scaffoldingService;
+        private readonly IScaffoldingService _scaffoldingService;
         public ScaffoldCommand(IScaffoldingService scaffoldingService)
         {
-            this.scaffoldingService = scaffoldingService;
+            _scaffoldingService = scaffoldingService;
         }
 
         public string GetName() => "scaffold";
         public async Task Execute(CommandInput input)
         {
-            await scaffoldingService.Scaffold();
+            await _scaffoldingService.Scaffold();
         }
     }
 }

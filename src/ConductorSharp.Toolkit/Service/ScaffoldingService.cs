@@ -12,20 +12,20 @@ namespace ConductorSharp.Toolkit.Service
 {
     public class ScaffoldingService : IScaffoldingService
     {
-        private readonly IMetadataService metadataService;
-        private readonly ILogger<ScaffoldingService> logger;
-        private readonly ScaffoldingConfig config;
+        private readonly IMetadataService _metadataService;
+        private readonly ILogger<ScaffoldingService> _logger;
+        private readonly ScaffoldingConfig _config;
 
         public ScaffoldingService(IMetadataService metadataService, IOptions<ScaffoldingConfig> options, ILogger<ScaffoldingService> logger)
         {
-            this.metadataService = metadataService;
-            this.logger = logger;
-            config = options.Value;
+            _metadataService = metadataService;
+            _logger = logger;
+            _config = options.Value;
         }
 
         public async Task Scaffold()
         {
-            var workflowDefinitions = await metadataService.GetAllWorkflowDefinitions();
+            var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
             var workflowCollectionBuilder = new StringBuilder();
             foreach (var taskDefinition in workflowDefinitions)
             {
@@ -35,7 +35,7 @@ namespace ConductorSharp.Toolkit.Service
                     workflowCollectionBuilder.Append(workflowClass);
             }
 
-            var taskDefinitions = await metadataService.GetAllTaskDefinitions();
+            var taskDefinitions = await _metadataService.GetAllTaskDefinitions();
 
             var taskCollectionBuilder = new StringBuilder();
             foreach (var taskDefinition in taskDefinitions)
@@ -48,9 +48,9 @@ namespace ConductorSharp.Toolkit.Service
 
             var taskTemplate = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Templates/TaskCollectionTemplate.default");
             var taskCollection = taskCollectionBuilder.ToString();
-            taskTemplate = taskTemplate.Replace("{{namespace}}", config.BaseNamespace + ".Tasks");
+            taskTemplate = taskTemplate.Replace("{{namespace}}", _config.BaseNamespace + ".Tasks");
             taskTemplate = taskTemplate.Replace("{{taskCollection}}", taskCollection);
-            var dir = config.Destination + Path.DirectorySeparatorChar + "Tasks";
+            var dir = _config.Destination + Path.DirectorySeparatorChar + "Tasks";
 
             Directory.CreateDirectory(dir);
 
@@ -58,9 +58,9 @@ namespace ConductorSharp.Toolkit.Service
 
             var workflowTemplate = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Templates/WorkflowCollectionTemplate.default");
             var workflowCollection = workflowCollectionBuilder.ToString();
-            workflowTemplate = workflowTemplate.Replace("{{namespace}}", config.BaseNamespace + ".Workflows");
+            workflowTemplate = workflowTemplate.Replace("{{namespace}}", _config.BaseNamespace + ".Workflows");
             workflowTemplate = workflowTemplate.Replace("{{workflowCollection}}", workflowCollection);
-            var workflowDir = config.Destination + Path.DirectorySeparatorChar + "Workflows";
+            var workflowDir = _config.Destination + Path.DirectorySeparatorChar + "Workflows";
 
             Directory.CreateDirectory(workflowDir);
 
@@ -176,10 +176,10 @@ namespace ConductorSharp.Toolkit.Service
             }
 
             if (string.IsNullOrEmpty(workflowDefinition.OwnerEmail))
-                logger.LogWarning($"No owner email defined for task {workflowDefinition.Name}");
+                _logger.LogWarning($"No owner email defined for task {workflowDefinition.Name}");
 
             if (string.IsNullOrEmpty(workflowDefinition.OwnerApp))
-                logger.LogWarning($"No owner app defined for task {workflowDefinition.Name}");
+                _logger.LogWarning($"No owner app defined for task {workflowDefinition.Name}");
 
             lines = lines.Replace("{{inputProperties}}", inputLinesBuilder.ToString());
             lines = lines.Replace("{{workflowName}}", name);
@@ -190,7 +190,7 @@ namespace ConductorSharp.Toolkit.Service
             lines = lines.Replace("{{description}}", workflowDescription);
             lines = lines.Replace("{{commentDescription}}", workflowDescription?.Replace('\n', ','));
 
-            if (config.Dryrun)
+            if (_config.Dryrun)
                 return null;
 
             return lines;
@@ -244,7 +244,7 @@ namespace ConductorSharp.Toolkit.Service
                 outputLinesBuilder.AppendLine($"        public dynamic {propertyName} {{ get; set; }}");
             }
 
-            var generatedNamespace = config.BaseNamespace + ".Tasks" + (!string.IsNullOrEmpty(naspace) ? $".{naspace}" : "");
+            var generatedNamespace = _config.BaseNamespace + ".Tasks" + (!string.IsNullOrEmpty(naspace) ? $".{naspace}" : "");
 
             lines = lines.Replace("{{workerName}}", name);
             lines = lines.Replace("{{note}}", note);
@@ -262,22 +262,22 @@ namespace ConductorSharp.Toolkit.Service
             }
             catch (Exception)
             {
-                logger.LogWarning($"Invalid description '{taskDefinition.Description}' in task {taskDefinition.Name}");
+                _logger.LogWarning($"Invalid description '{taskDefinition.Description}' in task {taskDefinition.Name}");
             }
 
             var ownerEmail = taskDefinition.OwnerEmail;
             var ownerApp = taskDefinition.OwnerApp;
 
             if (string.IsNullOrEmpty(ownerEmail))
-                logger.LogWarning($"No owner email defined for task {taskDefinition.Name}");
+                _logger.LogWarning($"No owner email defined for task {taskDefinition.Name}");
 
             if (string.IsNullOrEmpty(ownerApp))
-                logger.LogWarning($"No owner app defined for task {taskDefinition.Name}");
+                _logger.LogWarning($"No owner app defined for task {taskDefinition.Name}");
 
             lines = lines.Replace("{{description}}", description);
             lines = lines.Replace("{{commentDescription}}", description.Replace('\n', ','));
 
-            if (config.Dryrun)
+            if (_config.Dryrun)
                 return null;
 
             return lines;

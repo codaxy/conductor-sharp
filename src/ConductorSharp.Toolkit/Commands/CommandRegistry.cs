@@ -2,13 +2,13 @@
 {
     public class CommandRegistry
     {
-        private readonly IEnumerable<Command> commands;
+        private readonly IEnumerable<Command> _commands;
 
         public CommandRegistry(IEnumerable<Command> commands)
         {
-            this.commands = commands;
+            _commands = commands;
         }
 
-        public Command Get(string name) => commands.FirstOrDefault(a => a.GetName() == name);
+        public Command Get(string name) => _commands.FirstOrDefault(a => a.GetName() == name);
     }
 }
