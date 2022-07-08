@@ -67,7 +67,7 @@ namespace ConductorSharp.Toolkit.Service
             File.WriteAllText(workflowDir + Path.DirectorySeparatorChar + "Workflows.scaff.cs", workflowTemplate);
         }
 
-        public async Task<string> CreateWorkflowClass(WorkflowDefinition workflowDefinition)
+        public string CreateWorkflowClass(WorkflowDefinition workflowDefinition)
         {
             var lines = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Templates/WorkflowTemplate.default");
 
