@@ -29,7 +29,7 @@ namespace ConductorSharp.Toolkit.Service
             var workflowCollectionBuilder = new StringBuilder();
             foreach (var workflowDefinition in workflowDefinitions)
             {
-                var workflowClass = await CreateWorkflowClass(workflowDefinition);
+                var workflowClass = CreateWorkflowClass(workflowDefinition);
 
                 if (workflowClass != null)
                     workflowCollectionBuilder.Append(workflowClass);
@@ -40,7 +40,7 @@ namespace ConductorSharp.Toolkit.Service
             var taskCollectionBuilder = new StringBuilder();
             foreach (var taskDefinition in taskDefinitions)
             {
-                var taskClass = await CreateTaskClass(taskDefinition);
+                var taskClass = CreateTaskClass(taskDefinition);
 
                 if (taskClass != null)
                     taskCollectionBuilder.Append(taskClass);
