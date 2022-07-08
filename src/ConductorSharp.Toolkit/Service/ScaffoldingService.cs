@@ -27,9 +27,9 @@ namespace ConductorSharp.Toolkit.Service
         {
             var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
             var workflowCollectionBuilder = new StringBuilder();
-            foreach (var taskDefinition in workflowDefinitions)
+            foreach (var workflowDefinition in workflowDefinitions)
             {
-                var workflowClass = await CreateWorkflowClass(taskDefinition);
+                var workflowClass = await CreateWorkflowClass(workflowDefinition);
 
                 if (workflowClass != null)
                     workflowCollectionBuilder.Append(workflowClass);
