@@ -194,7 +194,7 @@ namespace ConductorSharp.Toolkit.Service
 
             return lines;
         }
-        public async Task<string> CreateTaskClass(TaskDefinition taskDefinition)
+        public string CreateTaskClass(TaskDefinition taskDefinition)
         {
             var lines = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Templates/WorkerTemplate.default");
 
