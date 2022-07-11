@@ -9,12 +9,14 @@
   <ItemGroup>
     <None Remove="Samples\Tasks\CustomerGet.json" />
     <None Remove="Samples\Tasks\EmailPrepare.json" />
+    <None Remove="Samples\Workflows\CSharpLambda.json" />
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Samples\Tasks\CustomerGet.json" />
     <EmbeddedResource Include="Samples\Tasks\EmailPrepare.json" />
+    <EmbeddedResource Include="Samples\Workflows\CSharpLambda.json" />
 	<EmbeddedResource Include="Samples\Workflows\SendCustomerNotification.json" />
   </ItemGroup>
 
