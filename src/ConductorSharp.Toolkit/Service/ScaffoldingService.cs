@@ -132,10 +132,10 @@ namespace ConductorSharp.Toolkit.Service
                                 inputLinesBuilder.AppendLine($"        /// Example: {value}");
                                 inputLinesBuilder.AppendLine($"        /// </remark>");
                             }
-                            AppendClassProperty(inputLinesBuilder, param.Key);
+                            AppendClassProperty(inputLinesBuilder, "dynamic", param.Key);
                             break;
                         case "toggle":
-                            AppendClassProperty(inputLinesBuilder, param.Key);
+                            AppendClassProperty(inputLinesBuilder, "dynamic", param.Key);
                             break;
                         case "select":
                             var optionsToken = param.Value.SelectToken("options");
@@ -152,7 +152,7 @@ namespace ConductorSharp.Toolkit.Service
                                 inputLinesBuilder.AppendLine($"        /// Options: {string.Join(',', options)}");
                                 inputLinesBuilder.AppendLine($"        /// </remark>");
                             }
-                            AppendClassProperty(inputLinesBuilder, param.Key);
+                            AppendClassProperty(inputLinesBuilder, "dynamic", param.Key);
                             break;
                         default:
                             break;
@@ -190,11 +190,11 @@ namespace ConductorSharp.Toolkit.Service
             return lines;
         }
 
-        private void AppendClassProperty(StringBuilder inputLinesBuilder, string name)
+        private void AppendClassProperty(StringBuilder linesBuilder, string type, string name)
         {
-            inputLinesBuilder.AppendLine($"        [JsonProperty(\"{name}\")]");
+            linesBuilder.AppendLine($"        [JsonProperty(\"{name}\")]");
             LangUtils.MakeValidMemberName(SnakeCaseUtil.ToPascalCase(name), "A", out var propertyName);
-            inputLinesBuilder.AppendLine($"        public dynamic {propertyName} {{ get; set; }}");
+            linesBuilder.AppendLine($"        public {type} {propertyName} {{ get; set; }}");
         }
 
         public string CreateTaskClass(TaskDefinition taskDefinition)
@@ -222,15 +222,12 @@ namespace ConductorSharp.Toolkit.Service
             }
 
             var inputLinesBuilder = new StringBuilder();
-            string propertyName;
             foreach (var property in taskDefinition.InputKeys)
             {
                 inputLinesBuilder.AppendLine($"        /// <originalName>");
                 inputLinesBuilder.AppendLine($"        /// {property}");
                 inputLinesBuilder.AppendLine($"        /// </originalName>");
-                inputLinesBuilder.AppendLine($"        [JsonProperty(\"{property}\")]");
-                LangUtils.MakeValidMemberName(SnakeCaseUtil.ToPascalCase(property), "A", out propertyName);
-                inputLinesBuilder.AppendLine($"        public dynamic {propertyName} {{ get; set; }}");
+                AppendClassProperty(inputLinesBuilder, "dynamic", property);
             }
 
             var outputLinesBuilder = new StringBuilder();
@@ -239,9 +236,7 @@ namespace ConductorSharp.Toolkit.Service
                 outputLinesBuilder.AppendLine($"        /// <originalName>");
                 outputLinesBuilder.AppendLine($"        /// {property}");
                 outputLinesBuilder.AppendLine($"        /// </originalName>");
-                outputLinesBuilder.AppendLine($"        [JsonProperty(\"{property}\")]");
-                LangUtils.MakeValidMemberName(SnakeCaseUtil.ToPascalCase(property), "A", out propertyName);
-                outputLinesBuilder.AppendLine($"        public dynamic {propertyName} {{ get; set; }}");
+                AppendClassProperty(outputLinesBuilder, "dynamic", property);
             }
 
             var generatedNamespace = _config.BaseNamespace + ".Tasks" + (!string.IsNullOrEmpty(naspace) ? $".{naspace}" : "");
