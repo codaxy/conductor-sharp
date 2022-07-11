@@ -59,9 +59,8 @@ namespace ConductorSharp.Engine.JsExtensions
                         }
                         else
                         {
-                            var script = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Polyfills/trim.js");
                             using var op = context.Operation(JavascriptOperationTypes.Call);
-                            context.Write(script);
+                            context.WritePolyfillFunction("trim.js");
                             context.WriteManyIsolated('(', ')', ',', new[] { expression.Object }.Concat(expression.Arguments));
                         }
                     }

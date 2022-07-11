@@ -1,4 +1,4 @@
-﻿(function (str, chars) {
+﻿function (str, chars) {
     let map = {};
 
     if (typeof chars == 'string')
@@ -22,4 +22,4 @@
         return "";
     else
         return str.substring(front, back + 1);
-})
+}
