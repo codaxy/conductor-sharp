@@ -15,7 +15,7 @@ namespace ConductorSharp.Engine.Util
     public static class ExpressionUtil
     {
 
-        private static readonly JavascriptConversionExtension[] s_jsExtensions =
+        private static readonly JavascriptConversionExtension[] s_compilerExtensions =
             new JavascriptConversionExtension[]
         {
             new MemberInitExpressionExtension(),
@@ -197,6 +197,6 @@ namespace ConductorSharp.Engine.Util
         }
 
         internal static string CompileScript<TInput, TOutput>(Expression<Func<TInput, TOutput>> script)
-           => $"return {script.CompileToJavascript(ScriptVersion.Es51, s_jsExtensions)}"; 
+           => $"return {script.CompileToJavascript(ScriptVersion.Es51, s_compilerExtensions)}"; 
     }
 }
