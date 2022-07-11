@@ -92,7 +92,10 @@ namespace ConductorSharp.Toolkit.Service
                     labels = labelsArray.ToObject<string[]>();
                 }
             }
-            catch (Exception) { }
+            catch (Exception) 
+            {
+                _logger.LogWarning("Unable to parse description for workflow {0}", workflowDefinition.Name);
+            }
 
             var inputLinesBuilder = new StringBuilder();
             try
