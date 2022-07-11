@@ -92,7 +92,7 @@ namespace ConductorSharp.Toolkit.Service
                     labels = labelsArray.ToObject<string[]>();
                 }
             }
-            catch (Exception) 
+            catch (Exception)
             {
                 _logger.LogWarning("Unable to parse description for workflow {0}", workflowDefinition.Name);
             }
@@ -122,8 +122,6 @@ namespace ConductorSharp.Toolkit.Service
                         inputLinesBuilder.AppendLine($"        /// </summary>");
                     }
 
-                    string propertyName;
-
                     switch (type)
                     {
                         case "string":
@@ -134,14 +132,10 @@ namespace ConductorSharp.Toolkit.Service
                                 inputLinesBuilder.AppendLine($"        /// Example: {value}");
                                 inputLinesBuilder.AppendLine($"        /// </remark>");
                             }
-                            inputLinesBuilder.AppendLine($"        [JsonProperty(\"{param.Key}\")]");
-                            LangUtils.MakeValidMemberName(SnakeCaseUtil.ToPascalCase(param.Key), "A", out propertyName);
-                            inputLinesBuilder.AppendLine($"        public dynamic {propertyName} {{ get; set; }}");
+                            AppendClassProperty(inputLinesBuilder, param.Key);
                             break;
                         case "toggle":
-                            inputLinesBuilder.AppendLine($"        [JsonProperty(\"{param.Key}\")]");
-                            LangUtils.MakeValidMemberName(SnakeCaseUtil.ToPascalCase(param.Key), "A", out propertyName);
-                            inputLinesBuilder.AppendLine($"        public dynamic {propertyName} {{ get; set; }}");
+                            AppendClassProperty(inputLinesBuilder, param.Key);
                             break;
                         case "select":
                             var optionsToken = param.Value.SelectToken("options");
@@ -158,9 +152,7 @@ namespace ConductorSharp.Toolkit.Service
                                 inputLinesBuilder.AppendLine($"        /// Options: {string.Join(',', options)}");
                                 inputLinesBuilder.AppendLine($"        /// </remark>");
                             }
-                            inputLinesBuilder.AppendLine($"        [JsonProperty(\"{param.Key}\")]");
-                            LangUtils.MakeValidMemberName(SnakeCaseUtil.ToPascalCase(param.Key), "A", out propertyName);
-                            inputLinesBuilder.AppendLine($"        public dynamic {propertyName} {{ get; set; }}");
+                            AppendClassProperty(inputLinesBuilder, param.Key);
                             break;
                         default:
                             break;
@@ -197,6 +189,14 @@ namespace ConductorSharp.Toolkit.Service
 
             return lines;
         }
+
+        private void AppendClassProperty(StringBuilder inputLinesBuilder, string name)
+        {
+            inputLinesBuilder.AppendLine($"        [JsonProperty(\"{name}\")]");
+            LangUtils.MakeValidMemberName(SnakeCaseUtil.ToPascalCase(name), "A", out var propertyName);
+            inputLinesBuilder.AppendLine($"        public dynamic {propertyName} {{ get; set; }}");
+        }
+
         public string CreateTaskClass(TaskDefinition taskDefinition)
         {
             var lines = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Templates/WorkerTemplate.default");
