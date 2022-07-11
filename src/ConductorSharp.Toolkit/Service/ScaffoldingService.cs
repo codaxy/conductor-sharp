@@ -111,26 +111,18 @@ namespace ConductorSharp.Toolkit.Service
                     if (type == null)
                         type = "string";
 
-                    inputLinesBuilder.AppendLine($"        /// <originalName>");
-                    inputLinesBuilder.AppendLine($"        /// {param.Key}");
-                    inputLinesBuilder.AppendLine($"        /// </originalName>");
+                    AppendXmlComment(inputLinesBuilder, "originalName", param.Key);
 
                     if (!string.IsNullOrEmpty(description))
-                    {
-                        inputLinesBuilder.AppendLine($"        /// <summary>");
-                        inputLinesBuilder.AppendLine($"        /// {description}");
-                        inputLinesBuilder.AppendLine($"        /// </summary>");
-                    }
-
+                        AppendXmlComment(inputLinesBuilder, "summary", value);
+                    
                     switch (type)
                     {
                         case "string":
                         case "integer":
                             if (!string.IsNullOrEmpty(value))
                             {
-                                inputLinesBuilder.AppendLine($"        /// <remark>");
-                                inputLinesBuilder.AppendLine($"        /// Example: {value}");
-                                inputLinesBuilder.AppendLine($"        /// </remark>");
+                                AppendXmlComment(inputLinesBuilder, "remark", $"Example: {value}");
                             }
                             AppendClassProperty(inputLinesBuilder, "dynamic", param.Key);
                             break;
@@ -147,11 +139,8 @@ namespace ConductorSharp.Toolkit.Service
                                 options = optionsArray.ToObject<string[]>();
                             }
                             if (options != null && options.Length > 0)
-                            {
-                                inputLinesBuilder.AppendLine($"        /// <remark>");
-                                inputLinesBuilder.AppendLine($"        /// Options: {string.Join(',', options)}");
-                                inputLinesBuilder.AppendLine($"        /// </remark>");
-                            }
+                                AppendXmlComment(inputLinesBuilder, "remark", $"Options: {string.Join(',', options)}");
+                            
                             AppendClassProperty(inputLinesBuilder, "dynamic", param.Key);
                             break;
                         default:
@@ -197,6 +186,13 @@ namespace ConductorSharp.Toolkit.Service
             linesBuilder.AppendLine($"        public {type} {propertyName} {{ get; set; }}");
         }
 
+        private void AppendXmlComment(StringBuilder linesBuilder, string tag, string value)
+        {
+            linesBuilder.AppendLine($"        /// <{tag}>");
+            linesBuilder.AppendLine($"        /// {value}");
+            linesBuilder.AppendLine($"        /// </{tag}>");
+        }
+
         public string CreateTaskClass(TaskDefinition taskDefinition)
         {
             var lines = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Templates/WorkerTemplate.default");
@@ -222,18 +218,14 @@ namespace ConductorSharp.Toolkit.Service
             var inputLinesBuilder = new StringBuilder();
             foreach (var property in taskDefinition.InputKeys)
             {
-                inputLinesBuilder.AppendLine($"        /// <originalName>");
-                inputLinesBuilder.AppendLine($"        /// {property}");
-                inputLinesBuilder.AppendLine($"        /// </originalName>");
+                AppendXmlComment(inputLinesBuilder, "originalName", property);
                 AppendClassProperty(inputLinesBuilder, "dynamic", property);
             }
 
             var outputLinesBuilder = new StringBuilder();
             foreach (var property in taskDefinition.OutputKeys)
             {
-                outputLinesBuilder.AppendLine($"        /// <originalName>");
-                outputLinesBuilder.AppendLine($"        /// {property}");
-                outputLinesBuilder.AppendLine($"        /// </originalName>");
+                AppendXmlComment(outputLinesBuilder, "originalName", property);
                 AppendClassProperty(outputLinesBuilder, "dynamic", property);
             }
 
