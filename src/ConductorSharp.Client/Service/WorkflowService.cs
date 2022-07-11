@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Client.Service
 {
-
     public class WorkflowService : IWorkflowService
     {
         private readonly IConductorClient _client;
@@ -44,6 +43,9 @@ namespace ConductorSharp.Client.Service
                 // Endpoint return 406 Not Acceptable if this header is not set to given value
                 new Dictionary<string, string> { { "Accept", "*/*" } }
             );
+
+        public async Task<WorkflowSearchResponse> SearchWorkflows(WorkflowSearchRequest request)
+            => await _client.ExecuteRequestAsync<WorkflowSearchResponse>(ApiUrls.SearchWorkflows(request), HttpMethod.Get);
 
         public async Task<string> QueueWorkflowStringResponse(
             string workflowName,

@@ -1,5 +1,4 @@
 ﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Client.Model.Response;
 using ConductorSharp.Client.Util;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -8,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Client.Service
 {
-
     public class MetadataService : IMetadataService
     {
         private readonly RestConfig _restConfig;

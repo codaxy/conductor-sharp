@@ -31,5 +31,6 @@ namespace ConductorSharp.Client.Service
         );
         Task<PollTaskResponse> PollTasks(string name, string workerId);
         Task<PollTaskResponse> PollTasks(string name, string workerId, string domain);
+        Task<GetTaskLogsResponse[]> GetLogsForTask(string taskId);
     }
 }

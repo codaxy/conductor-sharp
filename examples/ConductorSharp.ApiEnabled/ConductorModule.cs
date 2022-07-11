@@ -21,6 +21,6 @@ public class ConductorModule : Module
 
     private static void RegisterWorkflows(ContainerBuilder builder)
     {
-    
+
     }
 }

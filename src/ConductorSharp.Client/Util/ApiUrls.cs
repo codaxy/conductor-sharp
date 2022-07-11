@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConductorSharp.Client.Model.Request;
+using System;
 
 namespace ConductorSharp.Client.Util
 {
@@ -36,6 +37,7 @@ namespace ConductorSharp.Client.Util
         public static Uri GetExternalStorage(string filename) =>
             "external/postgres/{0}".ToRelativeUri(filename);
         // Tasks
+        public static Uri GetLogsForTask(string taskId) => new Uri($"tasks/{taskId}/log", UriKind.Relative);
         public static Uri GetAllTaskDefinitions() => _getAllTaskDefinitions;
         public static Uri CreateTaskDefinitions() => _createTaskDefinitions;
         public static Uri GetTaskDefinition(string taskType) =>
@@ -81,6 +83,16 @@ namespace ConductorSharp.Client.Util
             );
 
         // Workflows
+        public static Uri SearchWorkflows(WorkflowSearchRequest request)
+        {
+            string sortWithDirection = null;
+
+            if (request.Sort != null)
+                sortWithDirection = request.SortAscending == true ? $"{request.Sort}:ASC" : $"{request.Sort}:DESC";
+
+            return $"workflow/search?start={request.Start}&size={request.Size}&sort={sortWithDirection}&freeText={request.FreeText}&query={request.Query}".ToRelativeUri();
+        }
+
         public static Uri CreateWorkflowDefinition() => _createWorkflowDefinition;
         public static Uri GetWorkflowDefinition(string name, int version) =>
             "metadata/workflow/{0}?version={1}".ToRelativeUri(name, version);
