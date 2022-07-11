@@ -206,15 +206,13 @@ namespace ConductorSharp.Toolkit.Service
             var matches = namespaceRegex.Match(taskDefinition.Name).Groups;
 
             string naspace = "";
-            string name = "";
-
             if (matches.Count > 1)
             {
                 naspace = matches[1].Value.ToLowerInvariant();
                 naspace = char.ToUpperInvariant(naspace[0]) + naspace[1..];
             }
 
-            name = SnakeCaseUtil.ToPascalCase(taskDefinition.Name).Trim();
+            string name = SnakeCaseUtil.ToPascalCase(taskDefinition.Name).Trim();
             string note = null;
             if (LangUtils.MakeValidMemberName(name, "A", out name))
             {
