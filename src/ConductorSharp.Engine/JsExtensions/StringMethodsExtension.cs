@@ -60,8 +60,7 @@ namespace ConductorSharp.Engine.JsExtensions
                         else
                         {
                             using var op = context.Operation(JavascriptOperationTypes.Call);
-                            context.WritePolyfillFunction("trim.js");
-                            context.WriteManyIsolated('(', ')', ',', new[] { expression.Object }.Concat(expression.Arguments));
+                            context.WritePolyfillFunction("trim.js", new[] { expression.Object }.Concat(expression.Arguments));
                         }
                     }
                     break;
