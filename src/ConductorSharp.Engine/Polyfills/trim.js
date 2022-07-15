@@ -1,4 +1,8 @@
 ﻿function (str, chars) {
+
+    if (chars == null)
+        chars = ' ';
+
     let map = {};
 
     if (typeof chars == 'string')
