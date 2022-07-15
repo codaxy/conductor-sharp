@@ -219,7 +219,7 @@
       "description": "{\"description\":null}",
       "inputParameters": {
         "input": "${workflow.input.input}",
-        "scriptExpression": "return {output:(function (str, chars) {\r\n    let map = {};\r\n\r\n    if (typeof chars == 'string')\r\n        chars = [chars];\r\n\r\n    for (let i = 0; i < chars.length; ++i) {\r\n        map[chars[i]] = true;\r\n    }\r\n\r\n    let front = 0;\r\n    let back = str.length - 1;\r\n\r\n    for (let i = 0; i <= Math.floor(str.length / 2); ++i) {\r\n        if (map[str[front]])\r\n            ++front;\r\n        if (map[str[back]])\r\n            --back;\r\n    }\r\n\r\n    if (back < front)\r\n        return \"\";\r\n    else\r\n        return str.substring(front, back + 1);\r\n})($.input,\"/\")}"
+        "scriptExpression": "return {output:(function (str, chars) {\n\n    if (chars == null)\n        chars = ' ';\n\r\n    let map = {};\r\n\r\n    if (typeof chars == 'string')\r\n        chars = [chars];\r\n\r\n    for (let i = 0; i < chars.length; ++i) {\r\n        map[chars[i]] = true;\r\n    }\r\n\r\n    let front = 0;\r\n    let back = str.length - 1;\r\n\r\n    for (let i = 0; i <= Math.floor(str.length / 2); ++i) {\r\n        if (map[str[front]])\r\n            ++front;\r\n        if (map[str[back]])\r\n            --back;\r\n    }\r\n\r\n    if (back < front)\r\n        return \"\";\r\n    else\r\n        return str.substring(front, back + 1);\r\n})($.input,\"/\")}"
       },
       "type": "LAMBDA",
       "dynamicTaskNameParam": null,
@@ -253,7 +253,41 @@
       "description": "{\"description\":null}",
       "inputParameters": {
         "input": "${workflow.input.input}",
-        "scriptExpression": "return {output:(function (str, chars) {\r\n    let map = {};\r\n\r\n    if (typeof chars == 'string')\r\n        chars = [chars];\r\n\r\n    for (let i = 0; i < chars.length; ++i) {\r\n        map[chars[i]] = true;\r\n    }\r\n\r\n    let front = 0;\r\n    let back = str.length - 1;\r\n\r\n    for (let i = 0; i <= Math.floor(str.length / 2); ++i) {\r\n        if (map[str[front]])\r\n            ++front;\r\n        if (map[str[back]])\r\n            --back;\r\n    }\r\n\r\n    if (back < front)\r\n        return \"\";\r\n    else\r\n        return str.substring(front, back + 1);\r\n})($.input,[\"/\",\".\"])}"
+        "scriptExpression": "return {output:(function (str, chars) {\n\n    if (chars == null)\n        chars = ' ';\n\r\n    let map = {};\r\n\r\n    if (typeof chars == 'string')\r\n        chars = [chars];\r\n\r\n    for (let i = 0; i < chars.length; ++i) {\r\n        map[chars[i]] = true;\r\n    }\r\n\r\n    let front = 0;\r\n    let back = str.length - 1;\r\n\r\n    for (let i = 0; i <= Math.floor(str.length / 2); ++i) {\r\n        if (map[str[front]])\r\n            ++front;\r\n        if (map[str[back]])\r\n            --back;\r\n    }\r\n\r\n    if (back < front)\r\n        return \"\";\r\n    else\r\n        return str.substring(front, back + 1);\r\n})($.input,[\"/\",\".\"])}"
+      },
+      "type": "LAMBDA",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": null,
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": null,
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    },
+    {
+      "queryExpression": null,
+      "name": "LAMBDA_trim_null",
+      "taskReferenceName": "trim_null",
+      "description": "{\"description\":null}",
+      "inputParameters": {
+        "input": "${workflow.input.input}",
+        "scriptExpression": "return {output:(function (str, chars) {\n\n    if (chars == null)\n        chars = ' ';\n\r\n    let map = {};\r\n\r\n    if (typeof chars == 'string')\r\n        chars = [chars];\r\n\r\n    for (let i = 0; i < chars.length; ++i) {\r\n        map[chars[i]] = true;\r\n    }\r\n\r\n    let front = 0;\r\n    let back = str.length - 1;\r\n\r\n    for (let i = 0; i <= Math.floor(str.length / 2); ++i) {\r\n        if (map[str[front]])\r\n            ++front;\r\n        if (map[str[back]])\r\n            --back;\r\n    }\r\n\r\n    if (back < front)\r\n        return \"\";\r\n    else\r\n        return str.substring(front, back + 1);\r\n})($.input,null)}"
       },
       "type": "LAMBDA",
       "dynamicTaskNameParam": null,
