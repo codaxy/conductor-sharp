@@ -67,23 +67,17 @@ namespace ConductorSharp.Engine.JsExtensions
 
                 case nameof(string.TrimStart):
                     {
-                        if (@params.Length != 0)
-                            throw new NotSupportedException($"{nameof(string.TrimStart)} with parameters are not supported");
-
                         context.Write(expression.Object);
                         using var op = context.Operation(JavascriptOperationTypes.Call);
-                        context.Write(".trimStart()");
+                        context.WritePolyfillFunction("trim.js", new[] { expression.Object }.Concat(expression.Arguments).Append(Expression.Constant("start")));
                     }
                     break;
 
                 case nameof(string.TrimEnd):
                     {
-                        if (@params.Length != 0)
-                            throw new NotSupportedException($"{nameof(string.TrimEnd)} with parameters are not supported");
-
                         context.Write(expression.Object);
                         using var op = context.Operation(JavascriptOperationTypes.Call);
-                        context.Write(".trimEnd()");
+                        context.WritePolyfillFunction("trim.js", new[] { expression.Object }.Concat(expression.Arguments).Append(Expression.Constant("end")));
                     }
                     break;
                 default:
