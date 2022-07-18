@@ -1,7 +1,16 @@
-﻿function (str, chars) {
+﻿(function (str, chars, mode) {
 
     if (chars == null)
         chars = ' ';
+
+    var trimStart = true;
+    var trimEnd = true;
+
+    if (mode)
+    {
+        trimStart = mode === "start";
+        trimEnd = mode === "end";
+    }
 
     var map = {};
 
@@ -16,9 +25,9 @@
     var back = str.length - 1;
 
     for (var i = 0; i <= Math.floor(str.length / 2); ++i) {
-        if (map[str[front]])
+        if (trimStart && map[str[front]])
             ++front;
-        if (map[str[back]])
+        if (trimEnd && map[str[back]])
             --back;
     }
 
