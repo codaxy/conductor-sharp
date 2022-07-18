@@ -3,19 +3,19 @@
     if (chars == null)
         chars = ' ';
 
-    let map = {};
+    var map = {};
 
     if (typeof chars == 'string')
         chars = [chars];
 
-    for (let i = 0; i < chars.length; ++i) {
+    for (var i = 0; i < chars.length; ++i) {
         map[chars[i]] = true;
     }
 
-    let front = 0;
-    let back = str.length - 1;
+    var front = 0;
+    var back = str.length - 1;
 
-    for (let i = 0; i <= Math.floor(str.length / 2); ++i) {
+    for (var i = 0; i <= Math.floor(str.length / 2); ++i) {
         if (map[str[front]])
             ++front;
         if (map[str[back]])
