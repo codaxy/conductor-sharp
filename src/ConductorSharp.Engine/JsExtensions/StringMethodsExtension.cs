@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Engine.Util;
 using Lambda2Js;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -69,7 +70,11 @@ namespace ConductorSharp.Engine.JsExtensions
                     {
                         context.Write(expression.Object);
                         using var op = context.Operation(JavascriptOperationTypes.Call);
-                        context.WritePolyfillFunction("trim.js", new[] { expression.Object }.Concat(expression.Arguments).Append(Expression.Constant("start")));
+                        IEnumerable<Expression> arguments = new[] { Expression.Constant(" ") };
+                        if(@params.Length != 0)
+                            arguments = expression.Arguments;
+                        
+                        context.WritePolyfillFunction("trim.js", new[] { expression.Object }.Concat(arguments).Append(Expression.Constant("start")));
                     }
                     break;
 
@@ -77,7 +82,11 @@ namespace ConductorSharp.Engine.JsExtensions
                     {
                         context.Write(expression.Object);
                         using var op = context.Operation(JavascriptOperationTypes.Call);
-                        context.WritePolyfillFunction("trim.js", new[] { expression.Object }.Concat(expression.Arguments).Append(Expression.Constant("end")));
+                        IEnumerable<Expression> arguments = new[] { Expression.Constant(" ") };
+                        if (@params.Length != 0)
+                            arguments = expression.Arguments;
+
+                        context.WritePolyfillFunction("trim.js", new[] { expression.Object }.Concat(arguments).Append(Expression.Constant("end")));
                     }
                     break;
                 default:
