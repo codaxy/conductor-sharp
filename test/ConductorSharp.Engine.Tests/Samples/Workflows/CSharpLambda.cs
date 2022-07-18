@@ -35,8 +35,12 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
     public LambdaTaskModel<StringInput, StringOutput> ToLowerInvariant { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> ToUpperInvariant { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> TrimStart { get; set; }
+    public LambdaTaskModel<StringInput, StringOutput> TrimStartSingleChar { get; set; }
+    public LambdaTaskModel<StringInput, StringOutput> TrimStartMultipleChars { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> TrimEnd { get; set; }
-    public LambdaTaskModel<StringInput, StringOutput> TrimNoArgs { get; set; }
+    public LambdaTaskModel<StringInput, StringOutput> TrimEndSingleChar { get; set; }
+    public LambdaTaskModel<StringInput, StringOutput> TrimEndMultipleChars { get; set; }
+    public LambdaTaskModel<StringInput, StringOutput> Trim { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> TrimSingleChar { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> TrimMultipleChars { get; set; }
 
@@ -64,12 +68,32 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
             Input = wf.WorkflowInput.Input
         }, input => new StringOutput { Output = input.Input.TrimStart() });
 
+        builder.AddTask(wf => wf.TrimStartSingleChar, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new StringOutput { Output = input.Input.TrimStart('/') });
+
+        builder.AddTask(wf => wf.TrimStartMultipleChars, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new StringOutput { Output = input.Input.TrimStart('/', '.') });
+
         builder.AddTask(wf => wf.TrimEnd, wf => new()
         {
             Input = wf.WorkflowInput.Input
         }, input => new StringOutput { Output = input.Input.TrimEnd() });
 
-        builder.AddTask(wf => wf.TrimNoArgs, wf => new()
+        builder.AddTask(wf => wf.TrimEndSingleChar, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new StringOutput { Output = input.Input.TrimEnd('/') });
+
+        builder.AddTask(wf => wf.TrimEndMultipleChars, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new StringOutput { Output = input.Input.TrimEnd('/', '.') });
+
+        builder.AddTask(wf => wf.Trim, wf => new()
         {
             Input = wf.WorkflowInput.Input
         }, input => new StringOutput { Output = input.Input.Trim() });
