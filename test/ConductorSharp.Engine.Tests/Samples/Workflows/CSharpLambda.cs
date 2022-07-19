@@ -52,6 +52,8 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
     public LambdaTaskModel<StringInput, StringOutput> SubstringTwoArgs { get; set; }
     public LambdaTaskModel<StringInput, BoolOutput> StartsWith { get; set; }
     public LambdaTaskModel<StringInput, BoolOutput> EndsWith { get; set; }
+    public LambdaTaskModel<StringInput, StringOutput> RemoveSingleArg { get; set; }
+    public LambdaTaskModel<StringInput, StringOutput> RemoveTwoArgs { get; set; }
 
     public override WorkflowDefinition GetDefinition()
     {
@@ -141,6 +143,16 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
         {
             Input = wf.WorkflowInput.Input
         }, input => new BoolOutput { Output = input.Input.EndsWith("test") });
+
+        builder.AddTask(wf => wf.RemoveSingleArg, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new StringOutput { Output = input.Input.Remove(4) });
+
+        builder.AddTask(wf => wf.RemoveTwoArgs, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new StringOutput { Output = input.Input.Remove(4, 2).Substring(2) });
 
         return builder.Build(opts => opts.Version = 1);
     }
