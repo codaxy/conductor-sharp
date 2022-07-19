@@ -68,7 +68,6 @@ namespace ConductorSharp.Engine.JsExtensions
 
                 case nameof(string.TrimStart):
                     {
-                        context.Write(expression.Object);
                         using var op = context.Operation(JavascriptOperationTypes.Call);
                         IEnumerable<Expression> arguments = new[] { Expression.Constant(" ") };
                         if(@params.Length != 0)
@@ -80,7 +79,6 @@ namespace ConductorSharp.Engine.JsExtensions
 
                 case nameof(string.TrimEnd):
                     {
-                        context.Write(expression.Object);
                         using var op = context.Operation(JavascriptOperationTypes.Call);
                         IEnumerable<Expression> arguments = new[] { Expression.Constant(" ") };
                         if (@params.Length != 0)
