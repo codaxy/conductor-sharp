@@ -43,6 +43,8 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
     public LambdaTaskModel<StringInput, StringOutput> Trim { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> TrimSingleChar { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> TrimMultipleChars { get; set; }
+    public LambdaTaskModel<StringInput, StringOutput> SubstringSingleArg { get; set; }
+    public LambdaTaskModel<StringInput, StringOutput> SubstringTwoArgs { get; set; }
 
     public override WorkflowDefinition GetDefinition()
     {
@@ -107,6 +109,16 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
         {
             Input = wf.WorkflowInput.Input
         }, input => new StringOutput { Output = input.Input.Trim('/', '.') });
+
+        builder.AddTask(wf => wf.SubstringSingleArg, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new StringOutput { Output = input.Input.Substring(2) });
+
+        builder.AddTask(wf => wf.TrimMultipleChars, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new StringOutput { Output = input.Input.Substring(2, 5) });
 
         return builder.Build(opts => opts.Version = 1);
     }

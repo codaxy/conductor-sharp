@@ -87,6 +87,25 @@ namespace ConductorSharp.Engine.JsExtensions
                         context.WritePolyfillFunction("trim.js", new[] { expression.Object }.Concat(arguments).Append(Expression.Constant("end")));
                     }
                     break;
+
+                case nameof(string.Substring):
+                    {
+                        context.Write(expression.Object);
+                        using var op = context.Operation(JavascriptOperationTypes.Call);
+                        if (@params.Length == 1)
+                        {
+                            context.Write(".substring");
+                            context.WriteManyIsolated('(', ')', ',', expression.Arguments);
+                        }
+                        else
+                        {
+                            var args = new[] { expression.Arguments[0], Expression.MakeBinary(ExpressionType.Add, expression.Arguments[0], expression.Arguments[1]) };
+                            context.Write(".substring");
+                            context.WriteManyIsolated('(', ')', ',', args);
+                        }
+                    }
+                    break;
+
                 default:
                     throw new NotSupportedException($"{expression.Method.Name} not supported");
             }
