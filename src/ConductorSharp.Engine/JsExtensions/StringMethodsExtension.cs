@@ -25,7 +25,7 @@ namespace ConductorSharp.Engine.JsExtensions
                 case nameof(string.Replace):
                     {
                         if (@params.Length != 2)
-                            throw new NotSupportedException($"{nameof(string.Replace)} method with more than 2 parameters not supported");
+                            throw new NotSupportedException($"{nameof(string.Replace)} method with more than 2 parameters is not supported");
 
                         context.Write(expression.Object);
                         using var op = context.Operation(JavascriptOperationTypes.Call);
@@ -103,6 +103,30 @@ namespace ConductorSharp.Engine.JsExtensions
                             context.Write(".substring");
                             context.WriteManyIsolated('(', ')', ',', args);
                         }
+                    }
+                    break;
+
+                case nameof(string.StartsWith):
+                    {
+                        if (@params.Length != 1)
+                            throw new NotSupportedException($"{nameof(string.StartsWith)} method with more than one parameters is not supported");
+
+                        context.Write(expression.Object);
+                        using var op = context.Operation(JavascriptOperationTypes.Call);
+                        context.Write(".startsWith");
+                        context.WriteManyIsolated('(', ')', ',', expression.Arguments);
+                    }
+                    break;
+
+                case nameof(string.EndsWith):
+                    {
+                        if(@params.Length != 1)
+                            throw new NotSupportedException($"{nameof(string.EndsWith)} method with more than one parameters is not supported");
+
+                        context.Write(expression.Object);
+                        using var op = context.Operation(JavascriptOperationTypes.Call);
+                        context.Write(".endsWith");
+                        context.WriteManyIsolated('(', ')', ',', expression.Arguments);
                     }
                     break;
 

@@ -20,7 +20,7 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
         public string Input { get; set; }
     }
 
-    internal class StringInput : IRequest<StringOutput>
+    internal class StringInput : IRequest<StringOutput>, IRequest<BoolOutput>
     {
         public string Input { get; set; }
     }
@@ -28,6 +28,11 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
     internal class StringOutput
     {
         public string Output { get; set; }
+    }
+
+    internal class BoolOutput
+    {
+        public bool Output { get; set; }
     }
     #endregion
 
@@ -45,6 +50,8 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
     public LambdaTaskModel<StringInput, StringOutput> TrimMultipleChars { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> SubstringSingleArg { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> SubstringTwoArgs { get; set; }
+    public LambdaTaskModel<StringInput, BoolOutput> StartsWith { get; set; }
+    public LambdaTaskModel<StringInput, BoolOutput> EndsWith { get; set; }
 
     public override WorkflowDefinition GetDefinition()
     {
@@ -119,6 +126,21 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
         {
             Input = wf.WorkflowInput.Input
         }, input => new StringOutput { Output = input.Input.Substring(2, 5) });
+
+        builder.AddTask(wf => wf.TrimMultipleChars, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new StringOutput { Output = input.Input.Substring(2, 5) });
+
+        builder.AddTask(wf => wf.StartsWith, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new BoolOutput { Output = input.Input.StartsWith("test") });
+
+        builder.AddTask(wf => wf.EndsWith, wf => new()
+        {
+            Input = wf.WorkflowInput.Input
+        }, input => new BoolOutput { Output = input.Input.EndsWith("test") });
 
         return builder.Build(opts => opts.Version = 1);
     }
