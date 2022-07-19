@@ -13,5 +13,17 @@ namespace ConductorSharp.Engine.Util
             context.WriteManyIsolated('(', ')', ',', arguments);
             return context;
         }
+
+        public static JavascriptConversionContext WriteMethodCall(this JavascriptConversionContext context, Expression obj, string method, IEnumerable<Expression> arguments)
+        {
+            using var op = context.Operation(JavascriptOperationTypes.Call);
+            context.Write(obj);
+            context.Write($".{method}");
+            context.WriteManyIsolated('(', ')', ',', arguments);
+            return context;
+        }
+
+        public static JavascriptConversionContext WriteMethodCall(this JavascriptConversionContext context, Expression obj, string method, params Expression[] arguments)
+            => context.WriteMethodCall(obj, method, (IEnumerable<Expression>)arguments);
     }
 }
