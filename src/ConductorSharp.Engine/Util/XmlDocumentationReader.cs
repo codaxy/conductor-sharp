@@ -8,7 +8,6 @@ using System.Xml.Linq;
 
 namespace ConductorSharp.Engine.Util
 {
-
     public static class XmlDocumentationReader
     {
         private static string GetDirectoryPath(this Assembly assembly)
@@ -21,6 +20,7 @@ namespace ConductorSharp.Engine.Util
         }
 
         private static HashSet<Assembly> loadedAssemblies = new HashSet<Assembly>();
+
         public static void LoadXmlDocumentation(Assembly assembly)
         {
             if (loadedAssemblies.Contains(assembly))
@@ -35,10 +35,8 @@ namespace ConductorSharp.Engine.Util
             }
         }
 
-        private static Dictionary<string, XElement> loadedXmlDocumentation = new Dictionary<
-            string,
-            XElement
-        >();
+        private static Dictionary<string, XElement> loadedXmlDocumentation = new Dictionary<string, XElement>();
+
         private static void LoadXmlDocumentation(string xmlDocumentation)
         {
             var doc = XDocument.Parse(xmlDocumentation);
@@ -48,10 +46,8 @@ namespace ConductorSharp.Engine.Util
                 loadedXmlDocumentation.Add(xmlName, element);
             }
         }
-        private static string XmlDocumentationKeyHelper(
-            string typeFullNameString,
-            string memberNameString
-        )
+
+        private static string XmlDocumentationKeyHelper(string typeFullNameString, string memberNameString)
         {
             var key = Regex.Replace(typeFullNameString, @"\[.*\]", string.Empty).Replace('+', '.');
             if (memberNameString != null)
@@ -68,9 +64,7 @@ namespace ConductorSharp.Engine.Util
 
         public static string GetDocSection(this PropertyInfo propertyInfo, string name)
         {
-            var key =
-                "P:"
-                + XmlDocumentationKeyHelper(propertyInfo.DeclaringType.FullName, propertyInfo.Name);
+            var key = "P:" + XmlDocumentationKeyHelper(propertyInfo.DeclaringType.FullName, propertyInfo.Name);
             return GetByKey(key, name);
         }
 
@@ -79,9 +73,7 @@ namespace ConductorSharp.Engine.Util
             loadedXmlDocumentation.TryGetValue(key, out var documentation);
             var ownerEmail = documentation?.Element(name)?.Value?.Trim();
 
-            return !string.IsNullOrEmpty(ownerEmail)
-                ? string.Join('\n', ownerEmail.Split("\n").Select(a => a.TrimStart()))
-                : null;
+            return !string.IsNullOrEmpty(ownerEmail) ? string.Join('\n', ownerEmail.Split("\n").Select(a => a.TrimStart())) : null;
         }
     }
 }

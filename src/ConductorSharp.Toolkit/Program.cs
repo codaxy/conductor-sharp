@@ -41,16 +41,14 @@ namespace ConductorSharp.Toolkit
 
             var builder = new ContainerBuilder();
 
-            serviceCollection.Configure<ScaffoldingConfig>(
-                config =>
-                {
-                    config.ApiUrl = input.Api;
-                    config.BaseUrl = input.Host;
-                    config.BaseNamespace = input.Namespace;
-                    config.Dryrun = input.Dryrun;
-                    config.Destination = input.Destination;
-                }
-            );
+            serviceCollection.Configure<ScaffoldingConfig>(config =>
+            {
+                config.ApiUrl = input.Api;
+                config.BaseUrl = input.Host;
+                config.BaseNamespace = input.Namespace;
+                config.Dryrun = input.Dryrun;
+                config.Destination = input.Destination;
+            });
 
             builder.Populate(serviceCollection);
             builder.AddWorkflowEngine(input.Host, input.Api);

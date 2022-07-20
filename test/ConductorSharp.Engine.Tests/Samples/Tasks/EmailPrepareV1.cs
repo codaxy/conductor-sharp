@@ -6,6 +6,7 @@ public partial class EmailPrepareV1Input : IRequest<EmailPrepareV1Output>
     /// address
     /// </originalName>
     public dynamic Address { get; set; }
+
     /// <originalName>
     /// name
     /// </originalName>
@@ -24,6 +25,4 @@ public partial class EmailPrepareV1Output
 /// EMAIL_prepare
 /// </originalName>
 [OriginalName("EMAIL_prepare")]
-public partial class EmailPrepareV1 : SimpleTaskModel<EmailPrepareV1Input, EmailPrepareV1Output>
-{
-}
+public partial class EmailPrepareV1 : SimpleTaskModel<EmailPrepareV1Input, EmailPrepareV1Output> { }

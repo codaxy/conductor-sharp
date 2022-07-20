@@ -115,7 +115,7 @@ namespace ConductorSharp.Toolkit.Service
 
                     if (!string.IsNullOrEmpty(description))
                         AppendXmlComment(inputLinesBuilder, "summary", value);
-                    
+
                     switch (type)
                     {
                         case "string":
@@ -140,7 +140,7 @@ namespace ConductorSharp.Toolkit.Service
                             }
                             if (options != null && options.Length > 0)
                                 AppendXmlComment(inputLinesBuilder, "remark", $"Options: {string.Join(',', options)}");
-                            
+
                             AppendClassProperty(inputLinesBuilder, "dynamic", param.Key);
                             break;
                         default:

@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 
 namespace ConductorSharp.Engine.Util
 {
-
     public class WorkflowOptions
     {
         private readonly static string _labelRegexString = "[A-Z0-9]{1,25}";
@@ -66,10 +65,7 @@ namespace ConductorSharp.Engine.Util
                     throw new ArgumentException("Value cannot be empty", nameof(OwnerApp));
 
                 if (value.Length > 255)
-                    throw new ArgumentException(
-                        "Value cannot be longer than 255 characters",
-                        nameof(OwnerApp)
-                    );
+                    throw new ArgumentException("Value cannot be longer than 255 characters", nameof(OwnerApp));
 
                 _ownerApp = value;
             }
@@ -86,10 +82,7 @@ namespace ConductorSharp.Engine.Util
                 }
                 catch (Exception)
                 {
-                    throw new ArgumentException(
-                        "Value must be a valid email address",
-                        nameof(OwnerEmail)
-                    );
+                    throw new ArgumentException("Value must be a valid email address", nameof(OwnerEmail));
                 }
             }
         }

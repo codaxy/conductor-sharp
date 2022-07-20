@@ -2,8 +2,5 @@
 
 namespace ConductorSharp.Engine.Model
 {
-
-    public class NoWorkflowOutput : WorkflowOutput
-    {
-    }
+    public class NoWorkflowOutput : WorkflowOutput { }
 }

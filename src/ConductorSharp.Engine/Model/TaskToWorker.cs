@@ -2,7 +2,6 @@
 
 namespace ConductorSharp.Engine.Model
 {
-
     public class TaskToWorker
     {
         public string TaskName { get; set; }

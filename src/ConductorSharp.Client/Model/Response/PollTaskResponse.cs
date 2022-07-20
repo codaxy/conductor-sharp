@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Client.Model.Response
 {
-
     public class PollTaskResponse
     {
         [JsonProperty("taskType")]
@@ -104,6 +103,7 @@ namespace ConductorSharp.Client.Model.Response
 
         [JsonProperty("domain")]
         public string Domain { get; set; }
+
         [JsonProperty("externalInputPayloadStoragePath")]
         public string ExternalInputPayloadStorage { get; set; }
     }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace ConductorSharp.Client.Model.Common
 {
-
     public class TaskDefinition
     {
         [JsonProperty("ownerApp")]

@@ -2,7 +2,6 @@
 
 namespace ConductorSharp.Client.Util
 {
-
     internal static class StringExtensions
     {
         public static Uri ToRelativeUri(this string pattern, params object[] args)

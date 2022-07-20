@@ -7,9 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-
 IConfiguration? configuration = null;
-
 
 var builder = Host.CreateDefaultBuilder()
     .ConfigureAppConfiguration(
@@ -29,17 +27,14 @@ var builder = Host.CreateDefaultBuilder()
     .ConfigureContainer<ContainerBuilder>(
         (container, builder) =>
         {
-            builder.AddWorkflowEngine(
+            builder
+                .AddWorkflowEngine(
                     baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"),
                     apiPath: configuration.GetValue<string>("Conductor:ApiUrl"),
-                    preventErrorOnBadRequest: configuration.GetValue<bool>(
-                        "Conductor:PreventErrorOnBadRequest"
-                    )
+                    preventErrorOnBadRequest: configuration.GetValue<bool>("Conductor:PreventErrorOnBadRequest")
                 )
                 .AddExecutionManager(
-                    maxConcurrentWorkers: configuration.GetValue<int>(
-                        "Conductor:MaxConcurrentWorkers"
-                    ),
+                    maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
                     domain: configuration.GetValue<string>("Conductor:WorkerDomain")
@@ -49,7 +44,6 @@ var builder = Host.CreateDefaultBuilder()
             builder.RegisterModule<ConductorModule>();
         }
     );
-
 
 using var host = builder.Build();
 await host.RunAsync();

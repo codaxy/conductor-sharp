@@ -4,7 +4,6 @@ namespace ConductorSharp.Toolkit.Util
 {
     internal static class LangUtils
     {
-
         // There are more characters, so far this is enough
         private const string InvalidCharactersRegex = @" |@|,|:|\||;|\||\(|\)|\[|\]|\.";
 

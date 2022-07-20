@@ -2,7 +2,6 @@
 
 namespace ConductorSharp.Engine.Model
 {
-
     public class TaskDefinitionOptions
     {
         public string OwnerApp { get; set; } = "undefined";

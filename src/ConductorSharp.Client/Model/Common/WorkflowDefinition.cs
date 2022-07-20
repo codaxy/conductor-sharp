@@ -2,11 +2,11 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+
 //using System.Text.Json.Serialization;
 
 namespace ConductorSharp.Client.Model.Common
 {
-
     public class WorkflowDefinition
     {
         public class SubWorkflowParam
@@ -102,18 +102,25 @@ namespace ConductorSharp.Client.Model.Common
 
             [JsonIgnore]
             public string ResumableTaskName { get; set; }
+
             [JsonIgnore]
             public string ResumableTaskCramerServiceId { get; set; }
+
             [JsonIgnore]
             public string ResumableTaskType { get; set; }
+
             [JsonProperty("queryExpression")]
             public string QueryExpression { get; set; }
+
             [JsonProperty("name")]
             public string Name { get; set; }
+
             [JsonProperty("taskReferenceName")]
             public string TaskReferenceName { get; set; }
+
             [JsonProperty("description")]
             public string Description { get; set; }
+
             [JsonProperty("inputParameters")]
             public JObject InputParameters
             {
@@ -129,30 +136,14 @@ namespace ConductorSharp.Client.Model.Common
                     else
                         return inputParameters;
 
-                    if (
-                        !inputParameters.ContainsKey("task_type")
-                        && !string.IsNullOrEmpty(ResumableTaskType)
-                    )
+                    if (!inputParameters.ContainsKey("task_type") && !string.IsNullOrEmpty(ResumableTaskType))
                         inputParameters.Add(new JProperty("task_type", ResumableTaskType));
 
-                    if (
-                        !inputParameters.ContainsKey("resumable_task_cramer_service_id")
-                        && !string.IsNullOrEmpty(ResumableTaskCramerServiceId)
-                    )
-                        inputParameters.Add(
-                            new JProperty(
-                                "resumable_task_cramer_service_id",
-                                ResumableTaskCramerServiceId
-                            )
-                        );
+                    if (!inputParameters.ContainsKey("resumable_task_cramer_service_id") && !string.IsNullOrEmpty(ResumableTaskCramerServiceId))
+                        inputParameters.Add(new JProperty("resumable_task_cramer_service_id", ResumableTaskCramerServiceId));
 
-                    if (
-                        !inputParameters.ContainsKey("resumable_task_name")
-                        && !string.IsNullOrEmpty(ResumableTaskName)
-                    )
-                        inputParameters.Add(
-                            new JProperty("resumable_task_name", ResumableTaskName)
-                        );
+                    if (!inputParameters.ContainsKey("resumable_task_name") && !string.IsNullOrEmpty(ResumableTaskName))
+                        inputParameters.Add(new JProperty("resumable_task_name", ResumableTaskName));
 
                     return inputParameters;
                 }
@@ -268,18 +259,12 @@ namespace ConductorSharp.Client.Model.Common
         [JsonProperty("inputParameters")]
         public string[] InputParametersJSON
         {
-            get
-            {
-                return InputParameters != null
-                    ? new[] { InputParameters.ToString(Formatting.None) }
-                    : null;
-            }
+            get { return InputParameters != null ? new[] { InputParameters.ToString(Formatting.None) } : null; }
             set
             {
                 try
                 {
-                    InputParameters =
-                        value != null && value.Length > 0 ? JObject.Parse(value[0]) : null;
+                    InputParameters = value != null && value.Length > 0 ? JObject.Parse(value[0]) : null;
                 }
                 catch (Exception)
                 {

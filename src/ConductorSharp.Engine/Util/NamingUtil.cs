@@ -3,7 +3,6 @@ using System;
 
 namespace ConductorSharp.Engine.Util
 {
-
     public static class NamingUtil
     {
         internal static string DetermineRegistrationName(Type taskType)
@@ -13,10 +12,7 @@ namespace ConductorSharp.Engine.Util
             if (originalName != null)
                 return originalName;
 
-            var originalNameAttribute = (OriginalNameAttribute)Attribute.GetCustomAttribute(
-                taskType,
-                typeof(OriginalNameAttribute)
-            );
+            var originalNameAttribute = (OriginalNameAttribute)Attribute.GetCustomAttribute(taskType, typeof(OriginalNameAttribute));
 
             if (originalNameAttribute != null)
                 return originalNameAttribute.OriginalName;
@@ -30,10 +26,8 @@ namespace ConductorSharp.Engine.Util
             //return $"{scope}_{name}";
         }
 
-        public static string NameOf<TNameable>() where TNameable : INameable
-            => DetermineRegistrationName(typeof(TNameable));
+        public static string NameOf<TNameable>() where TNameable : INameable => DetermineRegistrationName(typeof(TNameable));
 
-        internal static string DetermineReferenceName(string referenceName) =>
-            SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(referenceName);
+        internal static string DetermineReferenceName(string referenceName) => SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(referenceName);
     }
 }

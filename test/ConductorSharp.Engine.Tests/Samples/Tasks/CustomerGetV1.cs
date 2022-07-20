@@ -10,15 +10,15 @@ public partial class CustomerGetV1Input : IRequest<CustomerGetV1Output>
 
 public partial class CustomerGetV1Output
 {
-/// <originalName>
-/// name
-/// </originalName>
-public dynamic Name { get; set; }
+    /// <originalName>
+    /// name
+    /// </originalName>
+    public dynamic Name { get; set; }
 
-/// <originalName>
-/// address
-/// </originalName>
-public dynamic Address { get; set; }
+    /// <originalName>
+    /// address
+    /// </originalName>
+    public dynamic Address { get; set; }
 }
 
 /// <originalName>
@@ -26,6 +26,4 @@ public dynamic Address { get; set; }
 /// </originalName>
 ///
 [OriginalName("CUSTOMER_get")]
-public partial class CustomerGetV1 : SimpleTaskModel<CustomerGetV1Input, CustomerGetV1Output>
-{
-}
+public partial class CustomerGetV1 : SimpleTaskModel<CustomerGetV1Input, CustomerGetV1Output> { }

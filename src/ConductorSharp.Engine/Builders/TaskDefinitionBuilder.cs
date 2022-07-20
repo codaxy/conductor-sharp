@@ -8,16 +8,11 @@ using System.Linq;
 
 namespace ConductorSharp.Engine.Builders
 {
-
     public class TaskDefinitionBuilder
     {
-        public static TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) =>
-            Build(typeof(T), updateOptions);
+        public static TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
 
-        public static TaskDefinition Build(
-            Type taskType,
-            Action<TaskDefinitionOptions> updateOptions = null
-        )
+        public static TaskDefinition Build(Type taskType, Action<TaskDefinitionOptions> updateOptions = null)
         {
             var options = new TaskDefinitionOptions();
 
@@ -25,9 +20,7 @@ namespace ConductorSharp.Engine.Builders
 
             XmlDocumentationReader.LoadXmlDocumentation(taskType.Assembly);
 
-            var interfaces = taskType.GetInterfaces()
-                .Where(a => a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
-                .First();
+            var interfaces = taskType.GetInterfaces().Where(a => a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>)).First();
             var genericArguments = interfaces.GetGenericArguments();
 
             var inputType = genericArguments[0];
@@ -39,23 +32,16 @@ namespace ConductorSharp.Engine.Builders
             {
                 OwnerApp = options.OwnerApp,
                 Name = originalName,
-                Description =
-                    options.Description ?? DetermineDescription(taskType.GetDocSection("summary")),
+                Description = options.Description ?? DetermineDescription(taskType.GetDocSection("summary")),
                 RetryCount = options.RetryCount,
                 TimeoutSeconds = options.TimeoutSeconds,
-                InputKeys = inputType.GetProperties()
-                    .Select(
-                        a =>
-                            a.GetDocSection("originalName")
-                            ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name)
-                    )
+                InputKeys = inputType
+                    .GetProperties()
+                    .Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name))
                     .ToList(),
-                OutputKeys = outputType.GetProperties()
-                    .Select(
-                        a =>
-                            a.GetDocSection("originalName")
-                            ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name)
-                    )
+                OutputKeys = outputType
+                    .GetProperties()
+                    .Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name))
                     .ToList(),
                 TimeoutPolicy = options.TimeoutPolicy,
                 RetryLogic = options.RetryLogic,
