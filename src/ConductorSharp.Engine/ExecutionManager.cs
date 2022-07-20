@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine
 {
-
     public class ExecutionManager
     {
         private readonly SemaphoreSlim _semaphore;
@@ -53,16 +52,12 @@ namespace ConductorSharp.Engine
             while (!cancellationToken.IsCancellationRequested)
             {
                 var scheduleQueue = await _taskManager.GetAllQueues();
-                var scheduledWorkers = _registeredWorkers.Where(
-                        a => scheduleQueue.ContainsKey(a.TaskName) && scheduleQueue[a.TaskName] > 0
-                    )
-                    .ToList();
+                var scheduledWorkers = _registeredWorkers.Where(a => scheduleQueue.ContainsKey(a.TaskName) && scheduleQueue[a.TaskName] > 0).ToList();
 
                 foreach (var scheduledWorker in scheduledWorkers)
                 {
                     await _semaphore.WaitAsync(cancellationToken);
-                    _ = PollAndHandle(scheduledWorker, cancellationToken)
-                        .ContinueWith(_ => _semaphore.Release());
+                    _ = PollAndHandle(scheduledWorker, cancellationToken).ContinueWith(_ => _semaphore.Release());
                 }
 
                 await Task.Delay(_configuration.SleepInterval, cancellationToken);
@@ -71,9 +66,7 @@ namespace ConductorSharp.Engine
 
         private Type GetInputType(Type workerType)
         {
-            var interfaces = workerType.GetInterfaces()
-                .Where(a => a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
-                .First();
+            var interfaces = workerType.GetInterfaces().Where(a => a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>)).First();
             var genericArguments = interfaces.GetGenericArguments();
 
             var inputType = genericArguments[0];
@@ -82,10 +75,7 @@ namespace ConductorSharp.Engine
             return inputType;
         }
 
-        private async Task PollAndHandle(
-            TaskToWorker scheduledWorker,
-            CancellationToken cancellationToken
-        )
+        private async Task PollAndHandle(TaskToWorker scheduledWorker, CancellationToken cancellationToken)
         {
             var workerId = Guid.NewGuid().ToString();
             PollTaskResponse pollResponse;
@@ -93,41 +83,24 @@ namespace ConductorSharp.Engine
             if (string.IsNullOrEmpty(_configuration.Domain))
                 pollResponse = await _taskManager.PollTasks(scheduledWorker.TaskName, workerId);
             else
-                pollResponse = await _taskManager.PollTasks(
-                    scheduledWorker.TaskName,
-                    workerId,
-                    _configuration.Domain
-                );
+                pollResponse = await _taskManager.PollTasks(scheduledWorker.TaskName, workerId, _configuration.Domain);
 
             if (pollResponse == null)
                 return;
 
             if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStorage))
             {
-                _logger.LogDebug(
-                    $"Fetching storage location {pollResponse.ExternalInputPayloadStorage}"
-                );
-                var externalStorageLocation = await _taskManager.FetchExternalStorageLocation(
-                    pollResponse.ExternalInputPayloadStorage
-                );
-                pollResponse.InputData = await _taskManager.FetchExternalStorage(
-                    externalStorageLocation.Path
-                );
+                _logger.LogDebug($"Fetching storage location {pollResponse.ExternalInputPayloadStorage}");
+                var externalStorageLocation = await _taskManager.FetchExternalStorageLocation(pollResponse.ExternalInputPayloadStorage);
+                pollResponse.InputData = await _taskManager.FetchExternalStorage(externalStorageLocation.Path);
             }
 
             try
             {
                 var inputType = GetInputType(scheduledWorker.TaskType);
-                var inputData = pollResponse.InputData.ToObject(
-                    inputType,
-                    ConductorConstants.IoJsonSerializer
-                );
+                var inputData = pollResponse.InputData.ToObject(inputType, ConductorConstants.IoJsonSerializer);
                 var response = await _mediator.Send(inputData, cancellationToken);
-                await _taskManager.UpdateTaskCompleted(
-                    response,
-                    pollResponse.TaskId,
-                    pollResponse.WorkflowInstanceId
-                );
+                await _taskManager.UpdateTaskCompleted(response, pollResponse.TaskId, pollResponse.WorkflowInstanceId);
             }
             catch (Exception exception)
             {
@@ -138,12 +111,7 @@ namespace ConductorSharp.Engine
                     pollResponse.WorkflowType,
                     pollResponse.WorkflowInstanceId
                 );
-                await _taskManager.UpdateTaskFailed(
-                    pollResponse.TaskId,
-                    pollResponse.WorkflowInstanceId,
-                    exception.Message,
-                    exception.StackTrace
-                );
+                await _taskManager.UpdateTaskFailed(pollResponse.TaskId, pollResponse.WorkflowInstanceId, exception.Message, exception.StackTrace);
             }
         }
     }

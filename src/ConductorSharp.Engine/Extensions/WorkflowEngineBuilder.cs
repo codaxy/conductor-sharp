@@ -7,20 +7,12 @@ using Microsoft.Extensions.Hosting;
 
 namespace ConductorSharp.Engine.Extensions
 {
-
     public interface IWorkflowEngineBuilder
     {
-        IWorkflowEngineExecutionManager AddExecutionManager(
-            int maxConcurrentWorkers,
-            int sleepInterval,
-            int longPollInterval,
-            string domain = null
-        );
+        IWorkflowEngineExecutionManager AddExecutionManager(int maxConcurrentWorkers, int sleepInterval, int longPollInterval, string domain = null);
     }
 
-    public interface IWorkflowEngineExecutionManager
-    {
-    }
+    public interface IWorkflowEngineExecutionManager { }
 
     public class WorkflowEngineBuilder : IWorkflowEngineBuilder, IWorkflowEngineExecutionManager
     {
@@ -53,8 +45,7 @@ namespace ConductorSharp.Engine.Extensions
 
             _builder.RegisterType<ExecutionManager>().SingleInstance();
 
-            _builder.RegisterGeneric(typeof(ValidationBehavior<,>))
-                .As(typeof(IPipelineBehavior<,>));
+            _builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
             //_builder.RegisterGeneric(typeof(ErrorHandlingBehavior<, >)).As(typeof(IPipelineBehavior<, >));
 

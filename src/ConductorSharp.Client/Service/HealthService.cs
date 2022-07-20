@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Client.Service
 {
-
     public class HealthService : IHealthService
     {
         private readonly IConductorClient _conductorClient;
@@ -13,9 +12,6 @@ namespace ConductorSharp.Client.Service
         public HealthService(IConductorClient client) => _conductorClient = client;
 
         public async Task<HealthResponse> CheckHealth() =>
-            await _conductorClient.ExecuteRequestAsync<HealthResponse>(
-                ApiUrls.Health(),
-                HttpMethod.Get
-            );
+            await _conductorClient.ExecuteRequestAsync<HealthResponse>(ApiUrls.Health(), HttpMethod.Get);
     }
 }

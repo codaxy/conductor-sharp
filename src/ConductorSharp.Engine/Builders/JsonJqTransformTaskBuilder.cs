@@ -7,10 +7,7 @@ namespace ConductorSharp.Engine.Builders
 {
     public class JsonJqTransformTaskBuilder<A, B> : BaseTaskBuilder<A, B> where A : IRequest<B>
     {
-        public JsonJqTransformTaskBuilder(
-            Expression taskExpression,
-            Expression inputExpression
-        ) : base(taskExpression, inputExpression)
+        public JsonJqTransformTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression)
         {
             var queryExpressionValue = _inputParameters.GetValue("query_expression");
 

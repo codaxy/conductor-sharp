@@ -9,7 +9,6 @@ using System.Reflection;
 
 namespace ConductorSharp.Engine.Util
 {
-
     public static class ExpressionUtil
     {
         public static string ParseToReferenceName(Expression expression)
@@ -19,6 +18,7 @@ namespace ConductorSharp.Engine.Util
 
             return SnakeCaseUtil.ToSnakeCase(taskSelectExpression.Member.Name);
         }
+
         public static Type ParseToType(Expression expression)
         {
             if (!(expression is MemberExpression taskSelectExpression))
@@ -47,9 +47,11 @@ namespace ConductorSharp.Engine.Util
             }
             // This case handles case when task has empty input parameters (e.g. new() or new TInput())
             // Also this case allows us to handle anonymous types
-            else if (expression is NewExpression newExpression
+            else if (
+                expression is NewExpression newExpression
                 // With this check we verify it is anonymous type
-                && newExpression.Arguments.Count == (newExpression.Members?.Count ?? 0))
+                && newExpression.Arguments.Count == (newExpression.Members?.Count ?? 0)
+            )
             {
                 foreach (var member in newExpression.Arguments.Zip(newExpression.Members, (expression, memberInfo) => (expression, memberInfo)))
                 {
@@ -60,7 +62,9 @@ namespace ConductorSharp.Engine.Util
                 }
             }
             else
-                throw new Exception($"Only {nameof(MemberInitExpression)} and {nameof(NewExpression)} without constructor arguments expressions are supported");
+                throw new Exception(
+                    $"Only {nameof(MemberInitExpression)} and {nameof(NewExpression)} without constructor arguments expressions are supported"
+                );
 
             return inputParams;
         }
@@ -83,10 +87,12 @@ namespace ConductorSharp.Engine.Util
             // Handle boxing
             if (assignmentExpression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
                 return CreateExpressionString(unaryEx.Operand);
-            
-            if (assignmentExpression is MethodCallExpression methodExpression 
-                && methodExpression.Method.Name == nameof(string.Format) 
-                && methodExpression.Method.DeclaringType == typeof(string))
+
+            if (
+                assignmentExpression is MethodCallExpression methodExpression
+                && methodExpression.Method.Name == nameof(string.Format)
+                && methodExpression.Method.DeclaringType == typeof(string)
+            )
             {
                 var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileMemberOrNameExpressions).ToArray();
                 var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
@@ -106,9 +112,11 @@ namespace ConductorSharp.Engine.Util
         {
             if (expr is MemberExpression)
                 return CreateExpressionString(expr);
-            else if (expr is MethodCallExpression methodExpr
+            else if (
+                expr is MethodCallExpression methodExpr
                 && methodExpr.Method.DeclaringType == typeof(NamingUtil)
-                && methodExpr.Method.Name == nameof(NamingUtil.NameOf))
+                && methodExpr.Method.Name == nameof(NamingUtil.NameOf)
+            )
                 return (string)methodExpr.Method.Invoke(null, null);
             else
                 throw new Exception($"Expression {expr.GetType().Name} not supported");
@@ -152,9 +160,7 @@ namespace ConductorSharp.Engine.Util
         {
             while (toCheck != null && toCheck != typeof(object))
             {
-                var cur = toCheck.GetTypeInfo().IsGenericType
-                    ? toCheck.GetGenericTypeDefinition()
-                    : toCheck;
+                var cur = toCheck.GetTypeInfo().IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
                 if (generic == cur)
                 {
                     return true;
@@ -174,9 +180,7 @@ namespace ConductorSharp.Engine.Util
                     memberName = propertyInfo.GetDocSection("originalName");
 
             if (memberName == null)
-                memberName = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>(
-                    true
-                )?.PropertyName;
+                memberName = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>(true)?.PropertyName;
 
             if (memberName == null)
                 memberName = SnakeCaseUtil.ToLowercasedPrefixSnakeCase(propertyInfo.Name);

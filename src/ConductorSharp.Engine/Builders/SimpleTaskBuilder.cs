@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
-
     public class SimpleTaskBuilder<A, B> : BaseTaskBuilder<A, B> where A : IRequest<B>
     {
         private readonly AdditionalTaskParameters _additionalParameters;
@@ -26,10 +25,7 @@ namespace ConductorSharp.Engine.Builders
                     TaskReferenceName = _taskRefferenceName,
                     Type = "SIMPLE",
                     InputParameters = _inputParameters,
-                    Description = new JObject
-                    {
-                        new JProperty("description", _description)
-                    }.ToString(Newtonsoft.Json.Formatting.None),
+                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
                     Optional = _additionalParameters != null ? _additionalParameters.Optional : false
                 }
             };

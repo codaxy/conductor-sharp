@@ -29,11 +29,6 @@ public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, Prep
         emailBodyBuilder.AppendLine($"Customer: {request.CustomerName}");
         emailBodyBuilder.AppendLine($"Address: {request.Address}");
 
-        return Task.FromResult(
-            new PrepareEmailResponse
-            {
-                EmailBody = emailBodyBuilder.ToString()
-            }
-        );
+        return Task.FromResult(new PrepareEmailResponse { EmailBody = emailBodyBuilder.ToString() });
     }
 }

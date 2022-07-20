@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 namespace ConductorSharp.Client.Model.Request
 {
-
     public class UpdateTaskRequest
     {
         public class LogData
@@ -16,6 +15,7 @@ namespace ConductorSharp.Client.Model.Request
             [JsonProperty("createdTime")]
             public long CreatedTime { get; set; }
         }
+
         [JsonProperty("workflowInstanceId")]
         public string WorkflowInstanceId { get; set; }
 

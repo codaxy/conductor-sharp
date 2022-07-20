@@ -7,7 +7,5 @@ namespace ConductorSharp.Engine.Model
         public dynamic SwitchCaseValue { get; set; }
     }
 
-    public class SwitchTaskModel : TaskModel<SwitchTaskInput, NoOutput>
-    {
-    }
+    public class SwitchTaskModel : TaskModel<SwitchTaskInput, NoOutput> { }
 }

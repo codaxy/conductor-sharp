@@ -1,6 +1,5 @@
 ﻿namespace ConductorSharp.Client.Model.Response
 {
-
     public class ExternalStorageResponse
     {
         public string Uri { get; set; }

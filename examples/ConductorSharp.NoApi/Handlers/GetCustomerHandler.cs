@@ -31,7 +31,7 @@ public class GetCustomerHandler : ITaskRequestHandler<GetCustomerRequest, GetCus
     {
         new Customer
         {
-            Id =1,
+            Id = 1,
             Address = "Baker Street 221b",
             Name = "Sherlock Holmes"
         }
@@ -41,10 +41,6 @@ public class GetCustomerHandler : ITaskRequestHandler<GetCustomerRequest, GetCus
     {
         var customer = customers.First(a => a.Id == request.CustomerId);
 
-        return Task.FromResult(new GetCustomerResponse
-        {
-            Name = customer.Name,
-            Address = customer.Address
-        });
+        return Task.FromResult(new GetCustomerResponse { Name = customer.Name, Address = customer.Address });
     }
 }

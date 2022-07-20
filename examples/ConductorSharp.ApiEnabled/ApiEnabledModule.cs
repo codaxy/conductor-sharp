@@ -9,12 +9,10 @@ public class ApiEnabledModule : Module
     {
         base.Load(builder);
         builder.RegisterType<Mediator>().As<IMediator>().InstancePerLifetimeScope();
-        builder.Register<ServiceFactory>(
-                context =>
-                {
-                    var c = context.Resolve<IComponentContext>();
-                    return t => c.Resolve(t);
-                }
-            );
+        builder.Register<ServiceFactory>(context =>
+        {
+            var c = context.Resolve<IComponentContext>();
+            return t => c.Resolve(t);
+        });
     }
 }
