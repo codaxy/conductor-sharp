@@ -1,0 +1,30 @@
+﻿    public partial class {{workflowName}}Input : IRequest<{{workflowName}}Output>
+    {
+{{inputProperties}}
+    }
+
+    public partial class {{workflowName}}Output
+    {
+    }
+
+    /// <summary>
+    /// {{commentDescription}}
+    /// </summary>
+    /// <originalName>
+    /// {{originalName}}
+    /// </originalName>
+    /// <ownerEmail>
+    /// {{ownerEmail}}
+    /// </ownerEmail>
+    /// <ownerApp>
+    /// {{ownerApp}}
+    /// </ownerApp>
+    /// <note>
+    /// {{note}}
+    /// </note>
+    [OriginalName("{{originalName}}")]
+    public partial class {{workflowName}} : SubWorkflowTaskModel<{{workflowName}}Input, {{workflowName}}Output>
+    {
+    }
+
+
