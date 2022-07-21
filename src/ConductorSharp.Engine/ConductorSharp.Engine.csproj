@@ -16,10 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Polyfills\pad.js" />
     <None Remove="Polyfills\trim.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Polyfills\pad.js" />
     <EmbeddedResource Include="Polyfills\trim.js" />
   </ItemGroup>
 
