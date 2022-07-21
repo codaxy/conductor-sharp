@@ -19,6 +19,12 @@ namespace ConductorSharp.Engine.Util
             return context;
         }
 
+        public static JavascriptConversionContext WritePolyfillFunction(
+            this JavascriptConversionContext context,
+            string functionFile,
+            params Expression[] arguments
+        ) => context.WritePolyfillFunction(functionFile, (IEnumerable<Expression>)arguments);
+
         public static JavascriptConversionContext WriteMethodCall(
             this JavascriptConversionContext context,
             Expression obj,
