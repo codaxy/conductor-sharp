@@ -96,12 +96,10 @@ namespace ConductorSharp.Engine.JsExtensions
                     else
                     {
                         using var addOp = context.Operation(JavascriptOperationTypes.AddSubtract);
-                        {
-                            context.WriteMethodCall(expression.Object, "slice", Expression.Constant(0), expression.Arguments[0]);
-                            context.Write('+');
-                            var startIndex = Expression.MakeBinary(ExpressionType.Add, expression.Arguments[0], expression.Arguments[1]);
-                            context.WriteMethodCall(expression.Object, "slice", startIndex);
-                        }
+                        context.WriteMethodCall(expression.Object, "slice", Expression.Constant(0), expression.Arguments[0]);
+                        context.Write('+');
+                        var startIndex = Expression.MakeBinary(ExpressionType.Add, expression.Arguments[0], expression.Arguments[1]);
+                        context.WriteMethodCall(expression.Object, "slice", startIndex);
                     }
                     break;
 
