@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace ConductorSharp.Engine.Service
 {
-
     public class ModuleDeployment : Deployment
     {
         public ModuleDeployment(

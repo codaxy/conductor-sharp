@@ -1,6 +1,5 @@
 ﻿namespace ConductorSharp.Engine
 {
-
     public class WorkerSetConfig
     {
         public string Domain { get; set; }

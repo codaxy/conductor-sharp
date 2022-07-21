@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Client.Service
 {
-
     public class ConductorClient : IConductorClient
     {
         private readonly ILogger<ConductorClient> _logger;
@@ -36,13 +35,8 @@ namespace ConductorSharp.Client.Service
 
         private void CheckResponse(RestResponse response)
         {
-            var bodyParameter = response.Request.Parameters.FirstOrDefault(
-                a => a.Type == ParameterType.RequestBody
-            );
-            var body =
-                bodyParameter?.Value == null
-                    ? ""
-                    : JsonConvert.SerializeObject(bodyParameter.Value);
+            var bodyParameter = response.Request.Parameters.FirstOrDefault(a => a.Type == ParameterType.RequestBody);
+            var body = bodyParameter?.Value == null ? "" : JsonConvert.SerializeObject(bodyParameter.Value);
 
             if (!response.IsSuccessful)
             {
@@ -57,10 +51,7 @@ namespace ConductorSharp.Client.Service
 
                 _logger.LogError("{@conductorError}", error);
 
-                if (
-                    !_restConfig.IgnoreValidationErrors
-                    && error?.Message?.Contains("Validation failed") == true
-                )
+                if (!_restConfig.IgnoreValidationErrors && error?.Message?.Contains("Validation failed") == true)
                     throw new Exception(response.Content);
 
                 if (response.StatusCode == HttpStatusCode.InternalServerError)
@@ -78,9 +69,7 @@ namespace ConductorSharp.Client.Service
             if (relativeUrl.IsAbsoluteUri)
                 uri = relativeUrl;
             else
-                uri = new Uri(
-                    $"{_restConfig.BaseUrl}/{_restConfig.ApiPath}/{relativeUrl.OriginalString}"
-                );
+                uri = new Uri($"{_restConfig.BaseUrl}/{_restConfig.ApiPath}/{relativeUrl.OriginalString}");
 
             var request = new RestRequest(uri, (Method)Enum.Parse(typeof(Method), method.Method, true))
             {
@@ -97,11 +86,7 @@ namespace ConductorSharp.Client.Service
             return request;
         }
 
-        public async Task<T> ExecuteRequestAsync<T>(
-            Uri relativeUrl,
-            HttpMethod method,
-            object resource
-        )
+        public async Task<T> ExecuteRequestAsync<T>(Uri relativeUrl, HttpMethod method, object resource)
         {
             var request = CreateRequest(relativeUrl, method, resource);
             var response = await _restClient.ExecuteAsync<T>(request);
@@ -138,12 +123,7 @@ namespace ConductorSharp.Client.Service
             CheckResponse(response);
         }
 
-        public async Task<T> ExecuteRequestAsync<T>(
-            Uri relativeUrl,
-            HttpMethod method,
-            object resource,
-            Dictionary<string, string> headers
-        )
+        public async Task<T> ExecuteRequestAsync<T>(Uri relativeUrl, HttpMethod method, object resource, Dictionary<string, string> headers)
         {
             var request = CreateRequest(relativeUrl, method, resource);
             request.AddHeaders(headers);
@@ -154,12 +134,7 @@ namespace ConductorSharp.Client.Service
             return response.Data;
         }
 
-        public async Task<string> ExecuteRequestAsync(
-            Uri relativeUrl,
-            HttpMethod method,
-            object resource,
-            Dictionary<string, string> headers
-        )
+        public async Task<string> ExecuteRequestAsync(Uri relativeUrl, HttpMethod method, object resource, Dictionary<string, string> headers)
         {
             var request = CreateRequest(relativeUrl, method, resource);
             request.AddHeaders(headers);

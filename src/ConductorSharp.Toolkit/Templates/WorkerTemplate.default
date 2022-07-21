@@ -1,0 +1,31 @@
+﻿    public partial class {{workerName}}Input : IRequest<{{workerName}}Output>
+    {
+{{inputProperties}}
+    }
+
+    public partial class {{workerName}}Output
+    {
+{{outputProperties}}
+    }
+
+    /// <summary>
+    /// {{commentDescription}}
+    /// </summary>
+    /// <originalName>
+    /// {{originalName}}
+    /// </originalName>
+    /// <ownerEmail>
+    /// {{ownerEmail}}
+    /// </ownerEmail>
+    /// <ownerApp>
+    /// {{ownerApp}}
+    /// </ownerApp>
+    /// <note>
+    /// {{note}}
+    /// </note>
+    [OriginalName("{{originalName}}")]
+    public partial class {{workerName}} : SimpleTaskModel<{{workerName}}Input, {{workerName}}Output>
+    {
+    }
+
+

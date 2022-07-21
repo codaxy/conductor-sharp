@@ -10,10 +10,7 @@ namespace ConductorSharp.Client
         public static JsonSerializer IoJsonSerializer { get; } =
             new()
             {
-                ContractResolver = new DefaultContractResolver
-                {
-                    NamingStrategy = new SnakeCaseNamingStrategy()
-                },
+                ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
                 TypeNameHandling = TypeNameHandling.Auto

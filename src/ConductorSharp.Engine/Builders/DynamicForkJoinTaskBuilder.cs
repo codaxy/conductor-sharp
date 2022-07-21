@@ -5,13 +5,9 @@ using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
-
     public class DynamicForkJoinTaskBuilder : BaseTaskBuilder<DynamicForkJoinInput, NoOutput>
     {
-        public DynamicForkJoinTaskBuilder(
-            Expression taskExpression,
-            Expression inputExpression
-        ) : base(taskExpression, inputExpression) { }
+        public DynamicForkJoinTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }
 
         public override WorkflowDefinition.Task[] Build()
         {
@@ -28,19 +24,14 @@ namespace ConductorSharp.Engine.Builders
                     DynamicForkTasksParam = "dynamic_tasks",
                     DynamicForkTasksInputParamName = "dynamic_tasks_i",
                     InputParameters = _inputParameters,
-                    Description = new JObject
-                    {
-                        new JProperty("description", "A dynamic fork.")
-                    }.ToString(Newtonsoft.Json.Formatting.None)
+                    Description = new JObject { new JProperty("description", "A dynamic fork.") }.ToString(Newtonsoft.Json.Formatting.None)
                 },
                 new WorkflowDefinition.Task
                 {
                     Name = joinTaskName,
                     TaskReferenceName = joinTaskName,
                     Type = "JOIN",
-                    Description = new JObject { new JProperty("description", "Join.") }.ToString(
-                        Newtonsoft.Json.Formatting.None
-                    )
+                    Description = new JObject { new JProperty("description", "Join.") }.ToString(Newtonsoft.Json.Formatting.None)
                 }
             };
         }

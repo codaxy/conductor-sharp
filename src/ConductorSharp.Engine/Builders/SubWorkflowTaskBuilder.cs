@@ -5,12 +5,9 @@ using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
-
-    public class SubWorkflowTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput>
-        where TInput : IRequest<TOutput>
+    public class SubWorkflowTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput> where TInput : IRequest<TOutput>
     {
-        public SubWorkflowTaskBuilder(Expression taskExpression, Expression inputExpression)
-            : base(taskExpression, inputExpression) { }
+        public SubWorkflowTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }
 
         public override WorkflowDefinition.Task[] Build() =>
             new WorkflowDefinition.Task[]
@@ -21,15 +18,8 @@ namespace ConductorSharp.Engine.Builders
                     TaskReferenceName = _taskRefferenceName,
                     Type = "SUB_WORKFLOW",
                     InputParameters = _inputParameters,
-                    SubWorkflowParam = new WorkflowDefinition.SubWorkflowParam
-                    {
-                        Name = _taskName,
-                        Version = 1
-                    },
-                    Description = new JObject
-                    {
-                        new JProperty("description", _description)
-                    }.ToString(Newtonsoft.Json.Formatting.None),
+                    SubWorkflowParam = new WorkflowDefinition.SubWorkflowParam { Name = _taskName, Version = 1 },
+                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
                 }
             };
     }

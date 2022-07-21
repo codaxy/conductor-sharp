@@ -11,8 +11,7 @@ public class SendCustomerNotificationOutput : WorkflowOutput
 }
 
 [OriginalName("NOTIFICATION_send_to_customer")]
-public class SendCustomerNotification
-    : Workflow<SendCustomerNotificationInput, SendCustomerNotificationOutput>
+public class SendCustomerNotification : Workflow<SendCustomerNotificationInput, SendCustomerNotificationOutput>
 {
     public CustomerGetV1 GetCustomer { get; set; }
     public EmailPrepareV1 PrepareEmail { get; set; }
@@ -21,27 +20,14 @@ public class SendCustomerNotification
     {
         var builder = new WorkflowDefinitionBuilder<SendCustomerNotification>();
 
-        builder.AddTask(
-            a => a.GetCustomer,
-            b => new() { CustomerId = b.WorkflowInput.CustomerId }
-        );
+        builder.AddTask(a => a.GetCustomer, b => new() { CustomerId = b.WorkflowInput.CustomerId });
 
-        builder.AddTask(
-            a => a.PrepareEmail,
-            b =>
-                new()
-                {
-                    Address = b.GetCustomer.Output.Address,
-                    Name = b.GetCustomer.Output.Name
-                }
-        );
+        builder.AddTask(a => a.PrepareEmail, b => new() { Address = b.GetCustomer.Output.Address, Name = b.GetCustomer.Output.Name });
 
-        return builder.Build(
-            options =>
-            {
-                options.Version = 1;
-                options.OwnerEmail = "example@example.local";
-            }
-        );
+        return builder.Build(options =>
+        {
+            options.Version = 1;
+            options.OwnerEmail = "example@example.local";
+        });
     }
 }

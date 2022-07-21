@@ -14,7 +14,6 @@ using System.Reflection;
 
 namespace ConductorSharp.Engine.Builders
 {
-
     public class WorkflowDefinitionBuilder<TWorkflow> where TWorkflow : ITypedWorkflow
     {
         private readonly Type _workflowType;
@@ -22,8 +21,7 @@ namespace ConductorSharp.Engine.Builders
         private JObject _inputs = new();
         private WorkflowOptions _workflowOptions;
 
-        public List<WorkflowDefinition.Task> WorkflowTasks { get; set; } =
-            new List<WorkflowDefinition.Task>();
+        public List<WorkflowDefinition.Task> WorkflowTasks { get; set; } = new List<WorkflowDefinition.Task>();
 
         public WorkflowDefinitionBuilder()
         {
@@ -61,18 +59,13 @@ namespace ConductorSharp.Engine.Builders
                 var isRequired = prop.GetCustomAttribute<RequiredAttribute>();
                 var description = prop.GetDocSection("summary");
 
-                var propertyName =
-                    prop.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(prop.Name);
+                var propertyName = prop.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(prop.Name);
 
                 var requiredString = isRequired != null ? "(required)" : "(optional)";
                 _inputs.Add(
                     new JProperty(
                         propertyName,
-                        new JObject
-                        {
-                            new JProperty("value", ""),
-                            new JProperty("description", $"{description} {requiredString}"),
-                        }
+                        new JObject { new JProperty("value", ""), new JProperty("description", $"{description} {requiredString}"), }
                     )
                 );
             }
@@ -87,9 +80,7 @@ namespace ConductorSharp.Engine.Builders
                 Name = _name,
                 Tasks = WorkflowTasks,
                 FailureWorkflow =
-                    _workflowOptions.FailureWorkflow != null
-                        ? NamingUtil.DetermineRegistrationName(_workflowOptions.FailureWorkflow)
-                        : null,
+                    _workflowOptions.FailureWorkflow != null ? NamingUtil.DetermineRegistrationName(_workflowOptions.FailureWorkflow) : null,
                 Description = new JObject()
                 {
                     new JProperty("description", _workflowOptions.Description),
@@ -101,11 +92,8 @@ namespace ConductorSharp.Engine.Builders
             };
         }
 
-        public void AddTask<F, G>(
-            Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence,
-            Expression<Func<TWorkflow, F>> input,
-            string script
-        ) where F : IRequest<G>
+        public void AddTask<F, G>(Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence, Expression<Func<TWorkflow, F>> input, string script)
+            where F : IRequest<G>
         {
             var tasks = new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body).Build();
             AddTasks(tasks);
@@ -114,29 +102,23 @@ namespace ConductorSharp.Engine.Builders
         public void AddTask<F, G>(
             Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence,
             Expression<Func<TWorkflow, F>> input,
-            Expression<Func<F, G>> script) where F : IRequest<G>
-            => AddTask(referrence, input, ExpressionUtil.CompileScript(script));
+            Expression<Func<F, G>> script
+        ) where F : IRequest<G> => AddTask(referrence, input, ExpressionUtil.CompileScript(script));
 
-        public void AddTask<F, G>(
-            Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence,
-            Expression<Func<TWorkflow, F>> input
-        ) where F : IRequest<G>
+        public void AddTask<F, G>(Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence, Expression<Func<TWorkflow, F>> input)
+            where F : IRequest<G>
         {
             var tasks = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body).Build();
             AddTasks(tasks);
         }
 
-        public void AddTask(
-            Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> refference,
-            Expression<Func<TWorkflow, DynamicForkJoinInput>> input
-        )
+        public void AddTask(Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> refference, Expression<Func<TWorkflow, DynamicForkJoinInput>> input)
         {
             var tasks = new DynamicForkJoinTaskBuilder(refference.Body, input.Body).Build();
             AddTasks(tasks);
         }
 
-        public void AddTasks(params WorkflowDefinition.Task[] taskDefinitions) =>
-            WorkflowTasks.AddRange(taskDefinitions);
+        public void AddTasks(params WorkflowDefinition.Task[] taskDefinitions) => WorkflowTasks.AddRange(taskDefinitions);
 
         public void AddTask<F, G>(
             Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> refference,
@@ -166,10 +148,10 @@ namespace ConductorSharp.Engine.Builders
         }
 
         public void AddTask(
-          Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
-          Expression<Func<TWorkflow, SwitchTaskInput>> expression,
-          params (string, Action<SwitchTaskBuilder<TWorkflow>>)[] caseActions
-       )
+            Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
+            Expression<Func<TWorkflow, SwitchTaskInput>> expression,
+            params (string, Action<SwitchTaskBuilder<TWorkflow>>)[] caseActions
+        )
         {
             var builder = new SwitchTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
 
@@ -182,10 +164,8 @@ namespace ConductorSharp.Engine.Builders
             AddTasks(builder.Build());
         }
 
-        public void AddTask<F, G>(
-          Expression<Func<TWorkflow, JsonJqTransformTaskModel<F, G>>> refference,
-          Expression<Func<TWorkflow, F>> input
-      ) where F : IRequest<G>
+        public void AddTask<F, G>(Expression<Func<TWorkflow, JsonJqTransformTaskModel<F, G>>> refference, Expression<Func<TWorkflow, F>> input)
+            where F : IRequest<G>
         {
             var tasks = new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body).Build();
             AddTasks(tasks);

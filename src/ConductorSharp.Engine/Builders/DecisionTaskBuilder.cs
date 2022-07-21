@@ -10,16 +10,13 @@ using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
-
-    public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput>
-        where TWorkflow : ITypedWorkflow
+    public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput> where TWorkflow : ITypedWorkflow
     {
         private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
 
         private string _currentCaseName;
 
-        public DecisionTaskBuilder(Expression taskExpression, Expression inputExpression)
-            : base(taskExpression, inputExpression) { }
+        public DecisionTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }
 
         public DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
         {
@@ -100,13 +97,7 @@ namespace ConductorSharp.Engine.Builders
                     CaseValueParam = "case_value_param",
                     DecisionCases = new Newtonsoft.Json.Linq.JObject
                     {
-                        _caseDictionary.Select(
-                            a =>
-                                new JProperty(
-                                    a.Key,
-                                    JArray.FromObject(a.Value.SelectMany(a => a.Build()))
-                                )
-                        )
+                        _caseDictionary.Select(a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(a => a.Build()))))
                     }
                 }
             };

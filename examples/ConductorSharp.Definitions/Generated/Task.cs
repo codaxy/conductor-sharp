@@ -10,6 +10,7 @@ namespace ConductorSharp.Definitions.Generated
         /// address
         /// </originalName>
         public dynamic? Address { get; set; }
+
         /// <originalName>
         /// name
         /// </originalName>
@@ -28,9 +29,7 @@ namespace ConductorSharp.Definitions.Generated
     /// EMAIL_prepare
     /// </originalName>
     [OriginalName("EMAIL_prepare")]
-    public partial class EmailPrepareV1 : SimpleTaskModel<EmailPrepareV1Input, EmailPrepareV1Output>
-    {
-    }
+    public partial class EmailPrepareV1 : SimpleTaskModel<EmailPrepareV1Input, EmailPrepareV1Output> { }
 
     public partial class CustomerGetV1Input : IRequest<CustomerGetV1Output>
     {
@@ -58,7 +57,5 @@ namespace ConductorSharp.Definitions.Generated
     /// </originalName>
     ///
     [OriginalName("CUSTOMER_get")]
-    public partial class CustomerGetV1 : SimpleTaskModel<CustomerGetV1Input, CustomerGetV1Output>
-    {
-    }
+    public partial class CustomerGetV1 : SimpleTaskModel<CustomerGetV1Input, CustomerGetV1Output> { }
 }

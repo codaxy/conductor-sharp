@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Service
 {
-
     public class WorkflowEngineBackgroundService : IHostedService
     {
         private readonly IDeploymentService _deploymentService;
@@ -13,11 +12,7 @@ namespace ConductorSharp.Engine.Service
         private readonly ModuleDeployment _deployment;
         private Task _executingTask;
 
-        public WorkflowEngineBackgroundService(
-            IDeploymentService deploymentService,
-            ExecutionManager executionManager,
-            ModuleDeployment deployment
-        )
+        public WorkflowEngineBackgroundService(IDeploymentService deploymentService, ExecutionManager executionManager, ModuleDeployment deployment)
         {
             _deploymentService = deploymentService;
             _executionManager = executionManager;

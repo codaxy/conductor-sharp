@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 
 namespace ConductorSharp.Client.Model.Response
 {
-
     public class GetWorkflowDefinitionResponse
     {
         [JsonProperty("result")]

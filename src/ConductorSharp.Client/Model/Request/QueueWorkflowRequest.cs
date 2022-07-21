@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Client.Model.Request
 {
-
     public class QueueWorkflowRequest
     {
         [JsonProperty("input")]

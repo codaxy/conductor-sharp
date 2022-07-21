@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 namespace ConductorSharp.Engine.Service
 {
-
     public class DeploymentValidator
     {
         public class Result
@@ -26,20 +25,14 @@ namespace ConductorSharp.Engine.Service
             return result;
         }
 
-        void ValidateWorkflow(
-            WorkflowDefinition workflowDefinition,
-            Deployment deployment,
-            Result result
-        )
+        void ValidateWorkflow(WorkflowDefinition workflowDefinition, Deployment deployment, Result result)
         {
             foreach (var task in workflowDefinition.Tasks)
             {
                 var def = deployment.FindTaskByName(task.Name);
                 if (def == null)
                 {
-                    result.Warnings.Add(
-                        $"Task {task.Name} cannot be validated as its definition is not a part of the deployment."
-                    );
+                    result.Warnings.Add($"Task {task.Name} cannot be validated as its definition is not a part of the deployment.");
                     continue;
                 }
                 foreach (var pair in task.InputParameters)
@@ -49,19 +42,11 @@ namespace ConductorSharp.Engine.Service
                     var value = (string)pair.Value;
                     if (value.StartsWith("${") && value.EndsWith("}"))
                     {
-                        ValidateTaskInputParameterBinding(
-                            value,
-                            task.Name,
-                            workflowDefinition,
-                            deployment,
-                            result
-                        );
+                        ValidateTaskInputParameterBinding(value, task.Name, workflowDefinition, deployment, result);
                     }
                     else
                     {
-                        result.Errors.Add(
-                            $"Task {task.Name} parameter {pair.Key} is not a binding. Value: {value}"
-                        );
+                        result.Errors.Add($"Task {task.Name} parameter {pair.Key} is not a binding. Value: {value}");
                     }
                 }
             }
@@ -95,18 +80,14 @@ namespace ConductorSharp.Engine.Service
                     result.Errors.Add(
                         $"The parameter binding {binding} in task {parentTaskName} is not valid. The workflow does not contain the input parameter {paramName}."
                     );
-                if (
-                    inOut == "output" && !workflowDefinition.OutputParameters.ContainsKey(paramName)
-                )
+                if (inOut == "output" && !workflowDefinition.OutputParameters.ContainsKey(paramName))
                     result.Errors.Add(
                         $"The parameter binding {binding} in task {parentTaskName} is not valid. The workflow does not contain the output parameter {paramName}."
                     );
             }
             else
             {
-                var task = workflowDefinition.Tasks.Find(
-                    t => t.TaskReferenceName == taskReferenceName
-                );
+                var task = workflowDefinition.Tasks.Find(t => t.TaskReferenceName == taskReferenceName);
                 if (task == null)
                 {
                     result.Errors.Add(

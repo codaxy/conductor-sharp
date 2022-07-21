@@ -25,7 +25,6 @@ public class WorkflowController : ControllerBase
         this.taskService = taskService;
     }
 
-
     [HttpGet("get-workflows")]
     public async Task<ActionResult<WorkflowDefinition[]>> GetRegisteredWorkflows() => await metadataService.GetAllWorkflowDefinitions();
 
@@ -33,14 +32,14 @@ public class WorkflowController : ControllerBase
     public async Task<ActionResult<GetTaskLogsResponse[]>> GetTaskLogs(string taskId) => await taskService.GetLogsForTask(taskId);
 
     [HttpGet("get-executions")]
-    public async Task<ActionResult<WorkflowSearchResponse>> SearchWorkflows([FromQuery]WorkflowSearchRequest request) 
-        => await workflowService.SearchWorkflows(request);
+    public async Task<ActionResult<WorkflowSearchResponse>> SearchWorkflows([FromQuery] WorkflowSearchRequest request) =>
+        await workflowService.SearchWorkflows(request);
 
     [HttpPost("send-notification")]
-    public async Task<ActionResult<string>> QueueWorkflow([FromBody] SendNotificationRequest request) => await workflowService.QueueWorkflowStringResponse(NotificationWorfklowName, 1, new JObject
-    {
-        new JProperty("customer_id", request.CustomerId)
-    });
-
-
+    public async Task<ActionResult<string>> QueueWorkflow([FromBody] SendNotificationRequest request) =>
+        await workflowService.QueueWorkflowStringResponse(
+            NotificationWorfklowName,
+            1,
+            new JObject { new JProperty("customer_id", request.CustomerId) }
+        );
 }

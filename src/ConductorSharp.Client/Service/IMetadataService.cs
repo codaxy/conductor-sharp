@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Client.Service
 {
-
     public interface IMetadataService
     {
         Task<TaskDefinition[]> GetAllTaskDefinitions();

@@ -36,5 +36,5 @@
   <ItemGroup>
     <ProjectReference Include="..\ConductorSharp.Client\ConductorSharp.Client.csproj" />
   </ItemGroup>
-
+	
 </Project>

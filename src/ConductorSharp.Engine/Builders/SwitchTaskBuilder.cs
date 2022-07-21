@@ -10,15 +10,13 @@ using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public class SwitchTaskBuilder<TWorkflow> : BaseTaskBuilder<SwitchTaskInput, NoOutput>
-        where TWorkflow : ITypedWorkflow
+    public class SwitchTaskBuilder<TWorkflow> : BaseTaskBuilder<SwitchTaskInput, NoOutput> where TWorkflow : ITypedWorkflow
     {
         private Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = new();
 
         private string _currentCaseName;
 
-        public SwitchTaskBuilder(Expression taskExpression, Expression inputExpression)
-            : base(taskExpression, inputExpression) { }
+        public SwitchTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }
 
         public SwitchTaskBuilder<TWorkflow> AddCase(string caseName)
         {
@@ -112,13 +110,7 @@ namespace ConductorSharp.Engine.Builders
                     EvaluatorType = "value-param",
                     DecisionCases = new Newtonsoft.Json.Linq.JObject
                     {
-                        _caseDictionary.Select(
-                            a =>
-                                new JProperty(
-                                    a.Key,
-                                    JArray.FromObject(a.Value.SelectMany(b => b.Build()))
-                                )
-                        )
+                        _caseDictionary.Select(a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(b => b.Build()))))
                     }
                 }
             };
@@ -126,7 +118,6 @@ namespace ConductorSharp.Engine.Builders
 
         private void AddBuilder(ITaskBuilder builder)
         {
-
             if (_caseDictionary.ContainsKey(_currentCaseName))
             {
                 _caseDictionary[_currentCaseName].Add(builder);
@@ -135,7 +126,6 @@ namespace ConductorSharp.Engine.Builders
             {
                 _caseDictionary.Add(_currentCaseName, new List<ITaskBuilder>() { builder });
             }
-
         }
     }
 }

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Util
 {
-
     internal static class EmbeddedFileHelper
     {
         private static string ReadAssemblyFile(Assembly assembly, string name)
@@ -22,16 +21,9 @@ namespace ConductorSharp.Engine.Util
             return reader.ReadToEnd();
         }
 
-        public static T GetObjectFromEmbeddedFile<T>(
-            string fileName,
-            params (string Key, object Value)[] templateParams
-        )
+        public static T GetObjectFromEmbeddedFile<T>(string fileName, params (string Key, object Value)[] templateParams)
         {
-            fileName = fileName.Replace(
-                    "~/",
-                    typeof(EmbeddedFileHelper).Assembly.GetName().Name + "."
-                )
-                .Replace("/", ".");
+            fileName = fileName.Replace("~/", typeof(EmbeddedFileHelper).Assembly.GetName().Name + ".").Replace("/", ".");
 
             var contents = ReadAssemblyFile(typeof(EmbeddedFileHelper).Assembly, fileName);
 
@@ -47,26 +39,17 @@ namespace ConductorSharp.Engine.Util
 
         public static string GetLinesFromEmbeddedFile(string fileName)
         {
-            fileName = fileName.Replace(
-                    "~/",
-                    typeof(EmbeddedFileHelper).Assembly.GetName().Name + "."
-                )
-                .Replace("/", ".");
+            fileName = fileName.Replace("~/", typeof(EmbeddedFileHelper).Assembly.GetName().Name + ".").Replace("/", ".");
 
             var contents = ReadAssemblyFile(typeof(EmbeddedFileHelper).Assembly, fileName);
 
             return contents;
         }
 
-        public static Task<T> GetObjectFromEmbeddedFileAsync<T>(
-            string fileName,
-            params (string Key, object Value)[] templateParams
-        ) => Task.FromResult(GetObjectFromEmbeddedFile<T>(fileName, templateParams));
+        public static Task<T> GetObjectFromEmbeddedFileAsync<T>(string fileName, params (string Key, object Value)[] templateParams) =>
+            Task.FromResult(GetObjectFromEmbeddedFile<T>(fileName, templateParams));
 
-        public static string Reserialize<T>(
-            string fileName,
-            params (string Key, object Value)[] templateParams
-        )
+        public static string Reserialize<T>(string fileName, params (string Key, object Value)[] templateParams)
         {
             var file = GetObjectFromEmbeddedFile<T>(fileName, templateParams);
             return JsonConvert.SerializeObject(file);

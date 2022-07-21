@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace ConductorSharp.Engine.Util
 {
-
     public class ObjectValidator
     {
         public static void Validate(object obj)
@@ -14,12 +13,7 @@ namespace ConductorSharp.Engine.Util
             var validationResults = new List<ValidationResult>();
 
             if (!Validator.TryValidateObject(obj, context, validationResults, true))
-                throw new ValidationException(
-                    string.Join(
-                        ",",
-                        validationResults.Select(a => a.ErrorMessage.Replace('.', ' '))
-                    )
-                );
+                throw new ValidationException(string.Join(",", validationResults.Select(a => a.ErrorMessage.Replace('.', ' '))));
         }
     }
 }
