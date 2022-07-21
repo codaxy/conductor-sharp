@@ -1,4 +1,4 @@
-﻿(function (str, chars, mode) {
+﻿function (str, chars, mode) {
 
     if (chars == null)
         chars = ' ';
