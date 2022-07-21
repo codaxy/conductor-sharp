@@ -105,6 +105,14 @@ namespace ConductorSharp.Engine.JsExtensions
                     }
                     break;
 
+                case nameof(string.PadLeft):
+                case nameof(string.PadRight):
+                    var paddingCharExpr = expression.Arguments.Count == 2 ? expression.Arguments[1] : Expression.Constant(" ");
+                    var paddingModeExpr =
+                        expression.Method.Name == nameof(string.PadLeft) ? Expression.Constant("left") : Expression.Constant("right");
+                    context.WritePolyfillFunction("pad.js", expression.Object, expression.Arguments[0], paddingCharExpr, paddingModeExpr);
+                    break;
+
                 default:
                     throw new NotSupportedException($"{expression.Method.Name} not supported");
             }
