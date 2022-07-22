@@ -15,7 +15,7 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
         public string Input { get; set; }
     }
 
-    internal class StringInput : IRequest<StringOutput>, IRequest<BoolOutput>
+    internal class StringInput : IRequest<StringOutput>, IRequest<BoolOutput>, IRequest<int>
     {
         public string Input { get; set; }
     }
@@ -53,6 +53,8 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
     public LambdaTaskModel<StringInput, StringOutput> PadLeftTwoArgs { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> PadRightSingleArg { get; set; }
     public LambdaTaskModel<StringInput, StringOutput> PadRightTwoArgs { get; set; }
+    public LambdaTaskModel<StringInput, int> LastIndexOfSingleArg { get; set; }
+    public LambdaTaskModel<StringInput, int> LastIndexOfTwoArgs { get; set; }
 
     public override WorkflowDefinition GetDefinition()
     {
@@ -187,6 +189,10 @@ internal class CSharpLambda : Workflow<CSharpLambdaInput, CSharpLambdaOutput>
             wf => new() { Input = wf.WorkflowInput.Input, },
             input => new StringOutput { Output = input.Input.PadRight(10, 'x') }
         );
+
+        builder.AddTask(wf => wf.LastIndexOfSingleArg, wf => new() { Input = wf.WorkflowInput.Input, }, input => input.Input.LastIndexOf("test"));
+
+        builder.AddTask(wf => wf.LastIndexOfTwoArgs, wf => new() { Input = wf.WorkflowInput.Input, }, input => input.Input.LastIndexOf("test", 6));
 
         return builder.Build(opts => opts.Version = 1);
     }

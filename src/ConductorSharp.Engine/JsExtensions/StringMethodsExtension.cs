@@ -111,6 +111,17 @@ namespace ConductorSharp.Engine.JsExtensions
                     context.WritePolyfillFunction("pad.js", expression.Object, expression.Arguments[0], paddingCharExpr, paddingModeExpr);
                     break;
 
+                case nameof(string.LastIndexOf):
+                    if (@params.Length == 1)
+                        context.WriteMethodCall(expression.Object, "lastIndexOf", expression.Arguments);
+                    else if (@params.Length == 2 && @params[1].ParameterType == typeof(int))
+                    {
+                        var lengthExpr = Expression.MakeMemberAccess(expression.Object, typeof(string).GetProperty(nameof(string.Length)));
+                        var subtractExpr = Expression.MakeBinary(ExpressionType.Subtract, expression.Arguments[1], lengthExpr);
+                        var positionExpr = Expression.MakeBinary(ExpressionType.Add, subtractExpr, Expression.Constant(1));
+                        context.WriteMethodCall(expression.Object, "lastIndexOf", expression.Arguments[0], positionExpr);
+                    }
+                    break;
                 default:
                     throw new NotSupportedException($"{expression.Method.Name} not supported");
             }
