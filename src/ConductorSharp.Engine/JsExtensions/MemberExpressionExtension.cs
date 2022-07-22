@@ -10,8 +10,8 @@ namespace ConductorSharp.Engine.JsExtensions
         public override void HandleExpression(JavascriptConversionContext context, MemberExpression expression)
         {
             context.PreventDefault();
-            context.Write(expression.Expression);
             using var operation = context.Operation(JavascriptOperationTypes.IndexerProperty);
+            context.Write(expression.Expression);
             context.Write(".");
             context.Write(ExpressionUtil.GetMemberName(expression.Member as PropertyInfo));
         }
