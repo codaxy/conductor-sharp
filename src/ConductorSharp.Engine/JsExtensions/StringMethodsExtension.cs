@@ -121,6 +121,19 @@ namespace ConductorSharp.Engine.JsExtensions
                         var positionExpr = Expression.MakeBinary(ExpressionType.Add, subtractExpr, Expression.Constant(1));
                         context.WriteMethodCall(expression.Object, "lastIndexOf", expression.Arguments[0], positionExpr);
                     }
+                    else if (@params.Length == 3 && @params[2].ParameterType == typeof(int))
+                    {
+                        var lengthExpr = Expression.MakeMemberAccess(expression.Object, typeof(string).GetProperty(nameof(string.Length)));
+                        var subtractExpr = Expression.MakeBinary(ExpressionType.Subtract, expression.Arguments[1], lengthExpr);
+                        var positionExpr = Expression.MakeBinary(ExpressionType.Add, subtractExpr, Expression.Constant(1));
+                        var removeExpr = Expression.Call(
+                            expression.Object,
+                            typeof(string).GetMethod(nameof(string.Remove), new[] { typeof(int), typeof(int) }),
+                            Expression.Constant(0),
+                            positionExpr
+                        );
+                        context.WriteMethodCall(removeExpr, "lastIndexOf", expression.Arguments[0], positionExpr);
+                    }
                     break;
                 default:
                     throw new NotSupportedException($"{expression.Method.Name} not supported");
