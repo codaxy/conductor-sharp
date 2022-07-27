@@ -1,7 +1,7 @@
 ﻿using ConductorSharp.Engine.Tests.Samples.Workflows;
 using Newtonsoft.Json;
 
-namespace ConductorSharp.Engine.Tests.Unit;
+namespace ConductorSharp.Engine.Tests.Integration;
 
 public class CSharpLambdaTaskBuilderTest
 {
