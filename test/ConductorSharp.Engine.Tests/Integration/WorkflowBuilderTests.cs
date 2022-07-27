@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Engine.Tests.Samples.Workflows;
+using ConductorSharp.Engine.Tests.Util;
 
 namespace ConductorSharp.Engine.Tests.Integration
 {
@@ -7,7 +8,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         [Fact]
         public void BuilderReturnsCorrectDefinition()
         {
-            var definition = JsonConvert.SerializeObject(new SendCustomerNotification().GetDefinition(), Formatting.Indented);
+            var definition = SerializationUtil.SerializeObject(new SendCustomerNotification().GetDefinition());
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/SendCustomerNotification.json");
 
             Assert.Equal(expectedDefinition, definition);
