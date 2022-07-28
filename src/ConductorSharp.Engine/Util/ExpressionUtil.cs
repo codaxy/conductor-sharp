@@ -29,45 +29,20 @@ namespace ConductorSharp.Engine.Util
 
         public static JObject ParseToParameters(Expression expression)
         {
-            var inputParams = new JObject();
-
-            if (expression is MemberInitExpression initExpression)
-            {
-                foreach (var binding in initExpression.Bindings)
-                {
-                    if (binding.BindingType != MemberBindingType.Assignment)
-                        throw new Exception($"Only {nameof(MemberBindingType.Assignment)} binding type supported");
-
-                    var assignmentBinding = (MemberAssignment)binding;
-                    var assignmentValue = ParseToAssignmentString(assignmentBinding.Expression);
-                    var assignmentKey = GetMemberName(binding.Member as PropertyInfo);
-
-                    inputParams.Add(new JProperty(assignmentKey, assignmentValue));
-                }
-            }
-            // This case handles case when task has empty input parameters (e.g. new() or new TInput())
-            // Also this case allows us to handle anonymous types
-            else if (
-                expression is NewExpression newExpression
-                // With this check we verify it is anonymous type
-                && newExpression.Arguments.Count == (newExpression.Members?.Count ?? 0)
-            )
-            {
-                foreach (var member in newExpression.Arguments.Zip(newExpression.Members, (expression, memberInfo) => (expression, memberInfo)))
-                {
-                    var assignmentValue = ParseToAssignmentString(member.expression);
-                    var assignmentKey = GetMemberName(member.memberInfo as PropertyInfo);
-
-                    inputParams.Add(new JProperty(assignmentKey, assignmentValue));
-                }
-            }
+            if (expression is MemberInitExpression || IsValidNewExpression(expression))
+                return ParseObjectInitalizatin(expression);
             else
                 throw new Exception(
                     $"Only {nameof(MemberInitExpression)} and {nameof(NewExpression)} without constructor arguments expressions are supported"
                 );
-
-            return inputParams;
         }
+
+        // This case handles case when task has empty input parameters (e.g. new() or new TInput())
+        // Also this case allows us to handle anonymous types
+        private static bool IsValidNewExpression(Expression expression) =>
+            expression is NewExpression newExpression
+            // With this check we verify it is anonymous type
+            && newExpression.Arguments.Count == (newExpression.Members?.Count ?? 0);
 
         private static object ParseToAssignmentString(Expression assignmentExpression)
         {
@@ -106,6 +81,44 @@ namespace ConductorSharp.Engine.Util
                 return ParseToParameters(assignmentExpression);
 
             return CompileMemberOrNameExpressions(assignmentExpression);
+        }
+
+        private static JObject ParseObjectInitalizatin(Expression expression)
+        {
+            var inputParams = new JObject();
+
+            if (expression is MemberInitExpression initExpression)
+            {
+                foreach (var binding in initExpression.Bindings)
+                {
+                    if (binding.BindingType != MemberBindingType.Assignment)
+                        throw new Exception($"Only {nameof(MemberBindingType.Assignment)} binding type supported");
+
+                    var assignmentBinding = (MemberAssignment)binding;
+                    var assignmentValue = ParseToAssignmentString(assignmentBinding.Expression);
+                    var assignmentKey = GetMemberName(binding.Member as PropertyInfo);
+
+                    inputParams.Add(new JProperty(assignmentKey, assignmentValue));
+                }
+            }
+            // This case handles case when task has empty input parameters (e.g. new() or new TInput())
+            // Also this case allows us to handle anonymous types
+            else if (
+                expression is NewExpression newExpression
+                // With this check we verify it is anonymous type
+                && newExpression.Arguments.Count == (newExpression.Members?.Count ?? 0)
+            )
+            {
+                foreach (var member in newExpression.Arguments.Zip(newExpression.Members, (expression, memberInfo) => (expression, memberInfo)))
+                {
+                    var assignmentValue = ParseToAssignmentString(member.expression);
+                    var assignmentKey = GetMemberName(member.memberInfo as PropertyInfo);
+
+                    inputParams.Add(new JProperty(assignmentKey, assignmentValue));
+                }
+            }
+
+            return inputParams;
         }
 
         private static string CompileMemberOrNameExpressions(Expression expr)
