@@ -10,12 +10,14 @@
     <None Remove="Samples\Tasks\CustomerGet.json" />
     <None Remove="Samples\Tasks\EmailPrepare.json" />
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
+    <None Remove="Samples\Workflows\StringInterpolation.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Samples\Tasks\CustomerGet.json" />
     <EmbeddedResource Include="Samples\Tasks\EmailPrepare.json" />
 	<EmbeddedResource Include="Samples\Workflows\SendCustomerNotification.json" />
+	<EmbeddedResource Include="Samples\Workflows\StringInterpolation.json" />
   </ItemGroup>
 
   <ItemGroup>
