@@ -117,6 +117,10 @@ namespace ConductorSharp.Engine.Util
                     inputParams.Add(new JProperty(assignmentKey, assignmentValue));
                 }
             }
+            else
+                throw new Exception(
+                    $"Only {nameof(MemberInitExpression)} and {nameof(NewExpression)} without constructor arguments expressions are supported"
+                );
 
             return inputParams;
         }
