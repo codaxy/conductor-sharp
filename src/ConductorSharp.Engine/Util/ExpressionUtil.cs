@@ -27,15 +27,7 @@ namespace ConductorSharp.Engine.Util
             return ((PropertyInfo)taskSelectExpression.Member).PropertyType;
         }
 
-        public static JObject ParseToParameters(Expression expression)
-        {
-            if (expression is MemberInitExpression || IsValidNewExpression(expression))
-                return ParseObjectInitalizatin(expression);
-            else
-                throw new Exception(
-                    $"Only {nameof(MemberInitExpression)} and {nameof(NewExpression)} without constructor arguments expressions are supported"
-                );
-        }
+        public static JObject ParseToParameters(Expression expression) => ParseObjectInitialization(expression);
 
         // This case handles case when task has empty input parameters (e.g. new() or new TInput())
         // Also this case allows us to handle anonymous types
@@ -44,12 +36,12 @@ namespace ConductorSharp.Engine.Util
             // With this check we verify it is anonymous type
             && newExpression.Arguments.Count == (newExpression.Members?.Count ?? 0);
 
-        private static object ParseToAssignmentString(Expression assignmentExpression)
+        private static object ParseExpression(Expression expression)
         {
-            if (assignmentExpression is ConstantExpression cex)
+            if (expression is ConstantExpression cex)
                 return Convert.ToString(cex.Value);
 
-            if (assignmentExpression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
+            if (expression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
             {
                 var converted = Convert.ToString(ccex.Value);
 
@@ -60,11 +52,11 @@ namespace ConductorSharp.Engine.Util
             }
 
             // Handle boxing
-            if (assignmentExpression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
+            if (expression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
                 return CreateExpressionString(unaryEx.Operand);
 
             if (
-                assignmentExpression is MethodCallExpression methodExpression
+                expression is MethodCallExpression methodExpression
                 && methodExpression.Method.Name == nameof(string.Format)
                 && methodExpression.Method.DeclaringType == typeof(string)
             )
@@ -77,13 +69,24 @@ namespace ConductorSharp.Engine.Util
                 return string.Format(formatString, expressionStrings);
             }
 
-            if (assignmentExpression is NewExpression || assignmentExpression is MemberInitExpression)
-                return ParseToParameters(assignmentExpression);
+            if (expression is NewExpression || expression is MemberInitExpression)
+                return ParseObjectInitialization(expression);
 
-            return CompileMemberOrNameExpressions(assignmentExpression);
+            if (expression is NewArrayExpression newArrayExpression)
+                return ParseArrayInitalization(newArrayExpression);
+
+            return CompileMemberOrNameExpressions(expression);
         }
 
-        private static JObject ParseObjectInitalizatin(Expression expression)
+        private static JArray ParseArrayInitalization(NewArrayExpression newArrayExpression)
+        {
+            if (newArrayExpression.NodeType != ExpressionType.NewArrayInit)
+                throw new Exception("Only dimensionless array initialization is supported");
+
+            return new JArray(newArrayExpression.Expressions.Select(ParseExpression));
+        }
+
+        private static JObject ParseObjectInitialization(Expression expression)
         {
             var inputParams = new JObject();
 
@@ -95,7 +98,7 @@ namespace ConductorSharp.Engine.Util
                         throw new Exception($"Only {nameof(MemberBindingType.Assignment)} binding type supported");
 
                     var assignmentBinding = (MemberAssignment)binding;
-                    var assignmentValue = ParseToAssignmentString(assignmentBinding.Expression);
+                    var assignmentValue = ParseExpression(assignmentBinding.Expression);
                     var assignmentKey = GetMemberName(binding.Member as PropertyInfo);
 
                     inputParams.Add(new JProperty(assignmentKey, assignmentValue));
@@ -111,7 +114,7 @@ namespace ConductorSharp.Engine.Util
             {
                 foreach (var member in newExpression.Arguments.Zip(newExpression.Members, (expression, memberInfo) => (expression, memberInfo)))
                 {
-                    var assignmentValue = ParseToAssignmentString(member.expression);
+                    var assignmentValue = ParseExpression(member.expression);
                     var assignmentKey = GetMemberName(member.memberInfo as PropertyInfo);
 
                     inputParams.Add(new JProperty(assignmentKey, assignmentValue));
