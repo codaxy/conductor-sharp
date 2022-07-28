@@ -13,5 +13,32 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             Assert.Equal(expectedDefinition, definition);
         }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionStringInterpolation()
+        {
+            var definition = SerializationUtil.SerializeObject(new StringInterpolation().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/StringInterpolation.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionNestedObjects()
+        {
+            var definition = SerializationUtil.SerializeObject(new Samples.Workflows.NestedObjects().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/NestedObjects.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuildersReturnSameDefinitionsTaskInitialization()
+        {
+            var explicitDef = SerializationUtil.SerializeObject(new TaskInputInitializationNew().GetDefinition());
+            var targetTypedDef = SerializationUtil.SerializeObject(new TaskInputInitializationMemberInit().GetDefinition());
+
+            Assert.True(explicitDef == targetTypedDef, "Definitions are not equal");
+        }
     }
 }
