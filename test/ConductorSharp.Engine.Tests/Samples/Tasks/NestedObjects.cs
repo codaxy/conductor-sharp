@@ -14,5 +14,5 @@ namespace ConductorSharp.Engine.Tests.Samples.Tasks
     public class TaskNestedObjectsOutput { }
 
     [OriginalName("TEST_task_nested_objects")]
-    public class TaskNestedObjects : SimpleTaskModel<TaskNestedObjectsInput, TaskNestedObjectsOutput> { }
+    public class NestedObjects : SimpleTaskModel<TaskNestedObjectsInput, TaskNestedObjectsOutput> { }
 }

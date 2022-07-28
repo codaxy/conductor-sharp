@@ -26,7 +26,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         [Fact]
         public void BuilderReturnsCorrectDefinitionNestedObjects()
         {
-            var definition = SerializationUtil.SerializeObject(new NestedObjects().GetDefinition());
+            var definition = SerializationUtil.SerializeObject(new Samples.Workflows.NestedObjects().GetDefinition());
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/NestedObjects.json");
 
             Assert.Equal(expectedDefinition, definition);

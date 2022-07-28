@@ -19,7 +19,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
             public object Object { get; set; }
         }
 
-        public TaskNestedObjects TaskNestedObjects { get; set; }
+        public Tasks.NestedObjects TaskNestedObjects { get; set; }
 
         public override WorkflowDefinition GetDefinition()
         {
