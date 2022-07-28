@@ -3,6 +3,8 @@ using ConductorSharp.Engine.Interface;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -53,7 +55,12 @@ namespace ConductorSharp.Engine.Util
                 && newExpression.Arguments.Count == (newExpression.Members?.Count ?? 0)
             )
             {
-                foreach (var member in newExpression.Arguments.Zip(newExpression.Members, (expression, memberInfo) => (expression, memberInfo)))
+                foreach (
+                    var member in newExpression.Arguments.Zip(
+                        newExpression.Members ?? (IEnumerable<MemberInfo>)new List<MemberInfo>(),
+                        (expression, memberInfo) => (expression, memberInfo)
+                    )
+                )
                 {
                     var assignmentValue = ParseToAssignmentString(member.expression);
                     var assignmentKey = GetMemberName(member.memberInfo as PropertyInfo);
