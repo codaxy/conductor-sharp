@@ -36,9 +36,18 @@ namespace ConductorSharp.Engine.Tests.Integration
         public void BuildersReturnSameDefinitionsTaskInitialization()
         {
             var explicitDef = SerializationUtil.SerializeObject(new TaskInputInitializationNew().GetDefinition());
-            var targetTypedDef = SerializationUtil.SerializeObject(new TaskInputInitializationMemberInit().GetDefinition());
+            var memberInitDef = SerializationUtil.SerializeObject(new TaskInputInitializationMemberInit().GetDefinition());
 
-            Assert.True(explicitDef == targetTypedDef, "Definitions are not equal");
+            Assert.True(explicitDef == memberInitDef, "Definitions are not equal");
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionArrayTask()
+        {
+            var definition = SerializationUtil.SerializeObject(new Arrays().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/Arrays.json");
+
+            Assert.Equal(expectedDefinition, definition);
         }
     }
 }
