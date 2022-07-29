@@ -1,5 +1,8 @@
 ﻿using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Model;
+using MediatR;
 using System;
+using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Util
 {
@@ -27,6 +30,9 @@ namespace ConductorSharp.Engine.Util
         }
 
         public static string NameOf<TNameable>() where TNameable : INameable => DetermineRegistrationName(typeof(TNameable));
+
+        public static string NameOf<TWorkflow>(Expression<Func<TWorkflow, ITaskModel>> reference) where TWorkflow : ITypedWorkflow =>
+            ExpressionUtil.ParseToReferenceName(reference.Body);
 
         internal static string DetermineReferenceName(string referenceName) => SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(referenceName);
     }
