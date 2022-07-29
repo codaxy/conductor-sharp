@@ -15,5 +15,9 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal("TEST_StringInterpolation", NamingUtil.NameOf<StringInterpolation>());
             Assert.Equal("CUSTOMER_get", NamingUtil.NameOf<CustomerGetV1>());
         }
+
+        [Fact]
+        public void NamingUtilShouldReturnCorrectTaskReferenceName() =>
+            Assert.Equal("get_customer", NamingUtil.NameOf<SendCustomerNotification>(wf => wf.GetCustomer));
     }
 }
