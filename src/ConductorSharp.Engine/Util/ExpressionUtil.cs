@@ -34,7 +34,7 @@ namespace ConductorSharp.Engine.Util
         private static object ParseExpression(Expression expression)
         {
             if (expression is ConstantExpression cex)
-                return Convert.ToString(cex.Value);
+                return cex.Value;
 
             if (expression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
             {
