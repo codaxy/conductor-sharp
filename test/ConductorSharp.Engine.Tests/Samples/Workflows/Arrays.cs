@@ -12,14 +12,15 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class Arrays : Workflow<ArrayInput, ArrayOutput>
     {
-        public ArrayTask ArrayTask { get; set; }
+        public ArrayTask ArrayTask1 { get; set; }
+        public ArrayTask ArrayTask2 { get; set; }
 
         public override WorkflowDefinition GetDefinition()
         {
             var builder = new WorkflowDefinitionBuilder<Arrays>();
 
             builder.AddTask(
-                wf => wf.ArrayTask,
+                wf => wf.ArrayTask1,
                 wf =>
                     new()
                     {
@@ -34,7 +35,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
             );
 
             builder.AddTask(
-                wf => wf.ArrayTask,
+                wf => wf.ArrayTask2,
                 wf =>
                     new()
                     {

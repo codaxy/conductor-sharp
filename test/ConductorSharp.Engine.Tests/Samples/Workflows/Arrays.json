@@ -11,7 +11,7 @@
     {
       "queryExpression": null,
       "name": "array_task",
-      "taskReferenceName": "array_task",
+      "taskReferenceName": "array_task1",
       "description": "{\"description\":null}",
       "inputParameters": {
         "integers": [
@@ -64,7 +64,7 @@
     {
       "queryExpression": null,
       "name": "array_task",
-      "taskReferenceName": "array_task",
+      "taskReferenceName": "array_task2",
       "description": "{\"description\":null}",
       "inputParameters": {
         "integers": [],
