@@ -31,13 +31,6 @@ namespace ConductorSharp.Engine.Util
 
         public static JObject ParseToParameters(Expression expression) => ParseObjectInitialization(expression);
 
-        // This case handles case when task has empty input parameters (e.g. new() or new TInput())
-        // Also this case allows us to handle anonymous types
-        private static bool IsValidNewExpression(Expression expression) =>
-            expression is NewExpression newExpression
-            // With this check we verify it is anonymous type
-            && newExpression.Arguments.Count == (newExpression.Members?.Count ?? 0);
-
         private static object ParseExpression(Expression expression)
         {
             if (expression is ConstantExpression cex)
