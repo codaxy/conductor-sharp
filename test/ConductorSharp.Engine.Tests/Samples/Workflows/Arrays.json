@@ -15,9 +15,9 @@
       "description": "{\"description\":null}",
       "inputParameters": {
         "integers": [
-          "1",
-          "2",
-          "3"
+          1,
+          2,
+          3
         ],
         "models": [
           {

@@ -15,10 +15,10 @@
       "description": "{\"description\":null}",
       "inputParameters": {
         "nested_objects": {
-          "integer": "1",
+          "integer": 1,
           "string": "test",
           "object": {
-            "integer": "1",
+            "integer": 1,
             "string": "string",
             "object": {
               "nested_input": "1"
