@@ -29,7 +29,59 @@ namespace ConductorSharp.Engine.Util
             return ((PropertyInfo)taskSelectExpression.Member).PropertyType;
         }
 
-        public static JObject ParseToParameters(Expression expression)
+        public static JObject ParseToParameters(Expression expression) => ParseObjectInitialization(expression);
+
+        private static object ParseExpression(Expression expression)
+        {
+            if (expression is ConstantExpression cex)
+                return Convert.ToString(cex.Value);
+
+            if (expression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
+            {
+                var converted = Convert.ToString(ccex.Value);
+
+                //if (ccex.Value is bool)
+                //    return converted.ToLowerInvariant();
+
+                return ccex.Value;
+            }
+
+            // Handle boxing
+            if (expression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
+                return CreateExpressionString(unaryEx.Operand);
+
+            if (
+                expression is MethodCallExpression methodExpression
+                && methodExpression.Method.Name == nameof(string.Format)
+                && methodExpression.Method.DeclaringType == typeof(string)
+            )
+            {
+                var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileMemberOrNameExpressions).ToArray();
+                var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
+                if (formatExpr == null)
+                    throw new Exception("string.Format with non constant format string is not supported");
+                var formatString = (string)formatExpr.Value;
+                return string.Format(formatString, expressionStrings);
+            }
+
+            if (expression is NewExpression || expression is MemberInitExpression)
+                return ParseObjectInitialization(expression);
+
+            if (expression is NewArrayExpression newArrayExpression)
+                return ParseArrayInitalization(newArrayExpression);
+
+            return CompileMemberOrNameExpressions(expression);
+        }
+
+        private static JArray ParseArrayInitalization(NewArrayExpression newArrayExpression)
+        {
+            if (newArrayExpression.NodeType != ExpressionType.NewArrayInit)
+                throw new Exception("Only dimensionless array initialization is supported");
+
+            return new JArray(newArrayExpression.Expressions.Select(ParseExpression));
+        }
+
+        private static JObject ParseObjectInitialization(Expression expression)
         {
             var inputParams = new JObject();
 
@@ -41,7 +93,7 @@ namespace ConductorSharp.Engine.Util
                         throw new Exception($"Only {nameof(MemberBindingType.Assignment)} binding type supported");
 
                     var assignmentBinding = (MemberAssignment)binding;
-                    var assignmentValue = ParseToAssignmentString(assignmentBinding.Expression);
+                    var assignmentValue = ParseExpression(assignmentBinding.Expression);
                     var assignmentKey = GetMemberName(binding.Member as PropertyInfo);
 
                     inputParams.Add(new JProperty(assignmentKey, assignmentValue));
@@ -62,7 +114,7 @@ namespace ConductorSharp.Engine.Util
                     )
                 )
                 {
-                    var assignmentValue = ParseToAssignmentString(member.expression);
+                    var assignmentValue = ParseExpression(member.expression);
                     var assignmentKey = GetMemberName(member.memberInfo as PropertyInfo);
 
                     inputParams.Add(new JProperty(assignmentKey, assignmentValue));
@@ -74,45 +126,6 @@ namespace ConductorSharp.Engine.Util
                 );
 
             return inputParams;
-        }
-
-        private static object ParseToAssignmentString(Expression assignmentExpression)
-        {
-            if (assignmentExpression is ConstantExpression cex)
-                return Convert.ToString(cex.Value);
-
-            if (assignmentExpression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
-            {
-                var converted = Convert.ToString(ccex.Value);
-
-                //if (ccex.Value is bool)
-                //    return converted.ToLowerInvariant();
-
-                return ccex.Value;
-            }
-
-            // Handle boxing
-            if (assignmentExpression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
-                return CreateExpressionString(unaryEx.Operand);
-
-            if (
-                assignmentExpression is MethodCallExpression methodExpression
-                && methodExpression.Method.Name == nameof(string.Format)
-                && methodExpression.Method.DeclaringType == typeof(string)
-            )
-            {
-                var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileMemberOrNameExpressions).ToArray();
-                var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
-                if (formatExpr == null)
-                    throw new Exception("string.Format with non constant format string is not supported");
-                var formatString = (string)formatExpr.Value;
-                return string.Format(formatString, expressionStrings);
-            }
-
-            if (assignmentExpression is NewExpression || assignmentExpression is MemberInitExpression)
-                return ParseToParameters(assignmentExpression);
-
-            return CompileMemberOrNameExpressions(assignmentExpression);
         }
 
         private static string CompileMemberOrNameExpressions(Expression expr)

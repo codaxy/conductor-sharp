@@ -1,0 +1,112 @@
+{
+  "ownerApp": null,
+  "createTime": 0,
+  "updateTime": 0,
+  "createdBy": null,
+  "updatedBy": null,
+  "name": "arrays",
+  "description": "{\"description\":null,\"labels\":null}",
+  "version": 1,
+  "tasks": [
+    {
+      "queryExpression": null,
+      "name": "array_task",
+      "taskReferenceName": "array_task1",
+      "description": "{\"description\":null}",
+      "inputParameters": {
+        "integers": [
+          "1",
+          "2",
+          "3"
+        ],
+        "models": [
+          {
+            "string": "Test1"
+          },
+          {
+            "string": "Test2"
+          }
+        ],
+        "objects": [
+          {
+            "anonymous_obj_prop": "Prop"
+          },
+          {
+            "test": "Prop"
+          }
+        ]
+      },
+      "type": "SIMPLE",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": null,
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": null,
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    },
+    {
+      "queryExpression": null,
+      "name": "array_task",
+      "taskReferenceName": "array_task2",
+      "description": "{\"description\":null}",
+      "inputParameters": {
+        "integers": [],
+        "models": [],
+        "objects": []
+      },
+      "type": "SIMPLE",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": null,
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": null,
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    }
+  ],
+  "inputParameters": [
+    "{}"
+  ],
+  "outputParameters": null,
+  "failureWorkflow": null,
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": true,
+  "ownerEmail": null,
+  "timeoutPolicy": null,
+  "timeoutSeconds": 0,
+  "variables": null
+}
