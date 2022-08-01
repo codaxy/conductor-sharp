@@ -29,6 +29,17 @@ namespace ConductorSharp.Engine.Builders
         }
 
         public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
+            Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence,
+            Expression<Func<TWorkflow, F>> input
+        ) where F : IRequest<G>
+        {
+            var builder = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body);
+            _caseDictionary[_currentCaseName].Add(builder);
+
+            return this;
+        }
+
+        public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
             Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> taskSelector,
             Expression<Func<TWorkflow, F>> expression,
             string script
