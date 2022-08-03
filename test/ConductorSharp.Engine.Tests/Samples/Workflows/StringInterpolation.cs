@@ -29,7 +29,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     new()
                     {
                         Address = $"{wf.WorkflowInput.FirstInput},{wf.WorkflowInput.SecondInput}",
-                        Name = $"Workflow name: {NamingUtil.NameOf<StringInterpolation>()}"
+                        Name =
+                            $"Workflow name: {NamingUtil.NameOf<StringInterpolation>()}, TaskReferenceName: {NamingUtil.NameOf<StringInterpolation>(wf => wf.EmailPrepare)}"
                     }
             );
 

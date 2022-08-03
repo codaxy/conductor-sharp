@@ -15,7 +15,7 @@
       "description": "{\"description\":null}",
       "inputParameters": {
         "address": "${workflow.input.first_input},${workflow.input.second_input}",
-        "name": "Workflow name: TEST_StringInterpolation"
+        "name": "Workflow name: TEST_StringInterpolation, TaskReferenceName: email_prepare"
       },
       "type": "SIMPLE",
       "dynamicTaskNameParam": null,
