@@ -101,7 +101,7 @@ namespace ConductorSharp.Engine.Util
                 && methodExpression.Method.DeclaringType == typeof(string)
             )
             {
-                var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileMemberOrNameExpressions).ToArray();
+                var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileMemberOrMethodExpressions).ToArray();
                 var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
                 if (formatExpr == null)
                     throw new Exception("string.Format with non constant format string is not supported");
@@ -112,21 +112,39 @@ namespace ConductorSharp.Engine.Util
             if (assignmentExpression is NewExpression || assignmentExpression is MemberInitExpression)
                 return ParseToParameters(assignmentExpression);
 
-            return CompileMemberOrNameExpressions(assignmentExpression);
+            return CompileMemberOrMethodExpressions(assignmentExpression);
         }
 
-        private static string CompileMemberOrNameExpressions(Expression expr)
+        private static string CompileMemberOrMethodExpressions(Expression expr)
         {
             if (expr is MemberExpression)
                 return CreateExpressionString(expr);
-            else if (
-                expr is MethodCallExpression methodExpr
-                && methodExpr.Method.DeclaringType == typeof(NamingUtil)
-                && methodExpr.Method.Name == nameof(NamingUtil.NameOf)
-            )
-                return (string)methodExpr.Method.Invoke(null, null);
+            else if (expr is MethodCallExpression methodExpr)
+                return HandleMethodExpressions(methodExpr);
             else
                 throw new Exception($"Expression {expr.GetType().Name} not supported");
+        }
+
+        private static string HandleMethodExpressions(MethodCallExpression expression)
+        {
+            static LambdaExpression ExtractLambdaExpression(Expression expression)
+            {
+                var unaryExpression = (UnaryExpression)expression;
+                return (LambdaExpression)unaryExpression.Operand;
+            }
+
+            if (expression.Method.DeclaringType == typeof(NamingUtil))
+            {
+                return expression.Method.Name switch
+                {
+                    nameof(NamingUtil.NameOf) when expression.Method.GetParameters().Length == 1
+                        => (string)expression.Method.Invoke(null, new[] { ExtractLambdaExpression(expression.Arguments[0]) }),
+                    nameof(NamingUtil.NameOf) => (string)expression.Method.Invoke(null, null),
+                    _ => throw new NotSupportedException("Unsupported NameOf method"),
+                };
+            }
+            else
+                throw new NotSupportedException($"Unsupported method call {expression.Method.Name} of type {expression.Method.DeclaringType.Name}");
         }
 
         private static string CreateExpressionString(Expression expression)
