@@ -11,7 +11,7 @@ namespace ConductorSharp.Engine.Builders
     {
         protected readonly JObject _inputParameters;
         protected readonly string _taskRefferenceName;
-        protected readonly string _taskName;
+        protected string _taskName;
         protected string _description;
 
         public BaseTaskBuilder(Expression taskExpression, Expression memberExpression)
