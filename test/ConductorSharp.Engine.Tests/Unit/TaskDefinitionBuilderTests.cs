@@ -9,7 +9,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         public void ReturnsCorrectDefinition()
         {
             var definition = SerializationUtil.SerializeObject(TaskDefinitionBuilder.Build<GetCustomerHandler>(null));
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Tasks/CustomerGet.json");
+            var expectedDefinition = Util.EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Tasks/CustomerGet.json");
 
             Assert.Equal(expectedDefinition, definition);
         }

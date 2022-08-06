@@ -9,7 +9,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         public void BuilderReturnsCorrectDefinition()
         {
             var definition = SerializationUtil.SerializeObject(new SendCustomerNotification().GetDefinition());
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/SendCustomerNotification.json");
+            var expectedDefinition = Util.EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/SendCustomerNotification.json");
 
             Assert.Equal(expectedDefinition, definition);
         }
@@ -18,7 +18,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         public void BuilderReturnsCorrectDefinitionStringInterpolation()
         {
             var definition = SerializationUtil.SerializeObject(new StringInterpolation().GetDefinition());
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/StringInterpolation.json");
+            var expectedDefinition = Util.EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/StringInterpolation.json");
 
             Assert.Equal(expectedDefinition, definition);
         }
@@ -27,7 +27,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         public void BuilderReturnsCorrectDefinitionNestedObjects()
         {
             var definition = SerializationUtil.SerializeObject(new Samples.Workflows.NestedObjects().GetDefinition());
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/NestedObjects.json");
+            var expectedDefinition = Util.EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/NestedObjects.json");
 
             Assert.Equal(expectedDefinition, definition);
         }
@@ -45,7 +45,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         public void BuilderReturnsCorrectDefinitionArrayTask()
         {
             var definition = SerializationUtil.SerializeObject(new Arrays().GetDefinition());
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/Arrays.json");
+            var expectedDefinition = Util.EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/Arrays.json");
 
             Assert.Equal(expectedDefinition, definition);
         }
