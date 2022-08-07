@@ -1,6 +1,8 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util;
 using MediatR;
 using System;
 using System.Linq.Expressions;
@@ -12,8 +14,13 @@ namespace ConductorSharp.Engine.Builders
         public CSharpLambdaSimpleTaskBuilder(
             Expression taskExpression,
             Expression inputExpression,
-            string taskName,
+            Func<TInput, TOutput> handlerFunc,
+            string workflowName,
             AdditionalTaskParameters additionalParameters
-        ) : base(taskExpression, inputExpression, additionalParameters) => _taskName = taskName;
+        ) : base(taskExpression, inputExpression, additionalParameters)
+        {
+            _taskName = $"{workflowName}.{_taskRefferenceName}";
+            DynamicHandlerBuilder.DefaultBuilder.AddDynamicHandler(handlerFunc, _taskName);
+        }
     }
 }

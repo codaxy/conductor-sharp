@@ -176,11 +176,11 @@ namespace ConductorSharp.Engine.Builders
             var tasks = new CSharpLambdaSimpleTaskBuilder<TInput, TOutput>(
                 reference.Body,
                 input.Body,
-                handlerFunc.GetHash(),
+                handlerFunc,
+                _name,
                 additionalTaskParameters
             ).Build();
             AddTasks(tasks);
-            DynamicHandlerBuilder.DefaultBuilder.AddDynamicHandler(handlerFunc, handlerFunc.GetHash());
         }
     }
 }
