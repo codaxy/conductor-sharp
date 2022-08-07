@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
@@ -163,6 +164,23 @@ namespace ConductorSharp.Engine.Builders
         {
             var tasks = new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body).Build();
             AddTasks(tasks);
+        }
+
+        public void AddTask<TInput, TOutput>(
+            Expression<Func<TWorkflow, SimpleTaskModel<TInput, TOutput>>> reference,
+            Expression<Func<TWorkflow, TInput>> input,
+            Func<TInput, TOutput> handlerFunc,
+            AdditionalTaskParameters additionalTaskParameters = null
+        ) where TInput : IRequest<TOutput>
+        {
+            var tasks = new CSharpLambdaSimpleTaskBuilder<TInput, TOutput>(
+                reference.Body,
+                input.Body,
+                handlerFunc.GetHash(),
+                additionalTaskParameters
+            ).Build();
+            AddTasks(tasks);
+            DynamicHandlerBuilder.DefaultBuilder.AddDynamicHandler(handlerFunc, handlerFunc.GetHash());
         }
     }
 }
