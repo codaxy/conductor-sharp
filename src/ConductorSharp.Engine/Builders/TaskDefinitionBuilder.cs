@@ -18,7 +18,9 @@ namespace ConductorSharp.Engine.Builders
 
             updateOptions?.Invoke(options);
 
-            XmlDocumentationReader.LoadXmlDocumentation(taskType.Assembly);
+            // Only load xml documentation if handler is non dynamic one
+            if (!typeof(IDynamicHandler).IsAssignableFrom(taskType))
+                XmlDocumentationReader.LoadXmlDocumentation(taskType.Assembly);
 
             var interfaces = taskType.GetInterfaces().Where(a => a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>)).First();
             var genericArguments = interfaces.GetGenericArguments();
