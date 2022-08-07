@@ -5,10 +5,12 @@ using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -73,6 +75,20 @@ namespace ConductorSharp.Engine.Extensions
             builder.RegisterInstance(new TWorkflow().GetDefinition());
 
         public static void RegisterTaskDefinition(this ContainerBuilder builder, TaskDefinition definition) => builder.RegisterInstance(definition);
+
         // TODO: add RegisterEventHandlerDefinition
+
+        public static void RegisterDynamicHandlers(this ContainerBuilder builder)
+        {
+            var handlers = DynamicHandlerBuilder.DefaultBuilder.Handlers;
+            foreach (var handler in handlers)
+            {
+                var instance = handler.CreateInstance();
+                var taskDefinition = TaskDefinitionBuilder.Build(instance.GetType());
+                builder.RegisterInstance(taskDefinition);
+                builder.RegisterInstance(new TaskToWorker { TaskName = taskDefinition.Name, TaskType = instance.GetType() });
+                builder.RegisterInstance(instance).AsImplementedInterfaces();
+            }
+        }
     }
 }
