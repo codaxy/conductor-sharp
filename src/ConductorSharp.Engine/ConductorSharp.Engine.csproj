@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ConductorSharp.Client\ConductorSharp.Client.csproj" />
+	  <InternalsVisibleTo Include="ConductorSharp.Engine.Tests" />
   </ItemGroup>
 	
 </Project>
