@@ -26,6 +26,11 @@ namespace ConductorSharp.Engine.Tests.Unit
             Assert.Single(dynamicHandlerBuilder.Handlers);
             var handler = dynamicHandlerBuilder.Handlers[0];
             var obj = handler.CreateInstance();
+
+            var originalNameAttribute = obj.GetType().GetCustomAttribute<OriginalNameAttribute>();
+            Assert.NotNull(originalNameAttribute);
+            Assert.Equal(expectedTaskName, originalNameAttribute.OriginalName);
+
             var methodInfo = obj.GetType().GetMethod(nameof(ITaskRequestHandler<Input, Output>.Handle));
             var output = await (Task<Output>)
                 methodInfo.Invoke(
@@ -38,10 +43,6 @@ namespace ConductorSharp.Engine.Tests.Unit
                 );
 
             Assert.Equal(1, output.Number);
-
-            var originalNameAttribute = obj.GetType().GetCustomAttribute<OriginalNameAttribute>();
-            Assert.NotNull(originalNameAttribute);
-            Assert.Equal(expectedTaskName, originalNameAttribute.OriginalName);
         }
     }
 }
