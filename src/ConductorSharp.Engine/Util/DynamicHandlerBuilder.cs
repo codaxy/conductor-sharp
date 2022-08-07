@@ -53,7 +53,7 @@ namespace ConductorSharp.Engine.Util
                 Guid.NewGuid().ToString(),
                 TypeAttributes.Public,
                 null,
-                new[] { typeof(ITaskRequestHandler<TInput, TOutput>) }
+                new[] { typeof(ITaskRequestHandler<TInput, TOutput>), typeof(IDynamicHandler) }
             );
             var attributeBuilder = new CustomAttributeBuilder(
                 typeof(OriginalNameAttribute).GetConstructor(new[] { typeof(string) }),
