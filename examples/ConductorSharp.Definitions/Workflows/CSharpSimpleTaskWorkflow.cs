@@ -25,6 +25,7 @@ namespace ConductorSharp.Definitions.Workflows
         }
 
         public SimpleTaskModel<CSharpSimpleTaskInput, CSharpSimpleTaskOutput> CSharpSimpleTask { get; set; }
+        public SimpleTaskModel<CSharpSimpleTaskInput, CSharpSimpleTaskOutput> CSharpSimpleTask2 { get; set; }
 
         public override WorkflowDefinition GetDefinition()
         {
@@ -39,6 +40,17 @@ namespace ConductorSharp.Definitions.Workflows
                     return output;
                 }
             );
+
+            //builder.AddTask(
+            //    wf => wf.CSharpSimpleTask2,
+            //    wf => new() { Input = wf.WorkflowInput.Input },
+            //    input =>
+            //    {
+            //        var output = new CSharpSimpleTaskOutput { Output = input.Input.Length < 5 ? "<5" : ">=5" };
+
+            //        return output;
+            //    }
+            //);
 
             return builder.Build(opts =>
             {
