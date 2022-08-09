@@ -6,7 +6,7 @@
 		<Authors>Codaxy</Authors>
 		<Company>Codaxy</Company>
 		<PackageId>ConductorSharp.Client</PackageId>
-		<Version>1.0.3</Version>
+		<Version>1.1.0</Version>
 		<Description>Client library for Netflix Conductor, with some additional quality of life features.</Description>
 		<RepositoryUrl>https://github.com/codaxy/conductor-sharp</RepositoryUrl>
 		<PackageTags>netflix;conductor</PackageTags>
@@ -23,7 +23,7 @@
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="107.3.0" />
   </ItemGroup>
 	<Target Name="husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">
-		<Exec Command="dotnet tool restore"  StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="../../" />
+		<Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="../../" />
 		<Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="../../" />
 	</Target>
 </Project>
