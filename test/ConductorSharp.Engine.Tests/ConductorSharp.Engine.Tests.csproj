@@ -10,6 +10,7 @@
     <None Remove="Samples\Tasks\CustomerGet.json" />
     <None Remove="Samples\Tasks\EmailPrepare.json" />
     <None Remove="Samples\Workflows\Arrays.json" />
+    <None Remove="Samples\Workflows\ConditionallySendCustomerNotificationOutput.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
     <None Remove="Samples\Workflows\StringInterpolation.json" />
@@ -39,6 +40,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ConductorSharp.Engine\ConductorSharp.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Samples\Workflows\ConditionallySendCustomerNotificationOutput.json" />
   </ItemGroup>
 
 </Project>
