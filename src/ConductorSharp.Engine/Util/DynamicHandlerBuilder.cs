@@ -82,5 +82,43 @@ namespace ConductorSharp.Engine.Util
             ilGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod(nameof(Task.FromResult)).MakeGenericMethod(typeof(TOutput)));
             ilGenerator.Emit(OpCodes.Ret);
         }
+
+        private Type GenerateProxyInputType<TInput>()
+        {
+            var inputType = typeof(TInput);
+            var typeBuilder = _moduleBuilder.DefineType(inputType.Name + "Proxy");
+
+            var inputProperties = inputType.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty);
+
+            foreach (var property in inputProperties) { }
+        }
+
+        private void CreateProxyProperty(TypeBuilder typeBuilder, PropertyInfo property)
+        {
+            var propertyBuilder = typeBuilder.DefineProperty(property.Name, PropertyAttributes.None, property.PropertyType, null);
+            var getMethod = GenerateGetMethod(typeBuilder, property);
+            var setMethod = GenerateSetMethod(typeBuilder, property);
+            propertyBuilder.SetGetMethod(getMethod);
+        }
+
+        private MethodBuilder GenerateGetMethod(TypeBuilder typeBuilder, PropertyInfo property)
+        {
+            var methodBuilder = typeBuilder.DefineMethod(
+                $"get_{property.Name}",
+                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName,
+                property.PropertyType,
+                null
+            );
+        }
+
+        private MethodBuilder GenerateSetMethod(TypeBuilder typeBuilder, PropertyInfo property)
+        {
+            var methodBuilder = typeBuilder.DefineMethod(
+                $"set_{property.Name}",
+                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName,
+                typeof(void),
+                new[] { property.PropertyType }
+            );
+        }
     }
 }
