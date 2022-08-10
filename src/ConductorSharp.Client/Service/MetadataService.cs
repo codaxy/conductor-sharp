@@ -1,6 +1,5 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Client.Util;
-using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -9,14 +8,9 @@ namespace ConductorSharp.Client.Service
 {
     public class MetadataService : IMetadataService
     {
-        private readonly RestConfig _restConfig;
         private readonly IConductorClient _conductorClient;
 
-        public MetadataService(IConductorClient client, IOptions<RestConfig> restConfig)
-        {
-            _restConfig = restConfig.Value;
-            _conductorClient = client;
-        }
+        public MetadataService(IConductorClient client) => _conductorClient = client;
 
         public async Task<TaskDefinition[]> GetAllTaskDefinitions() =>
             (await _conductorClient.ExecuteRequestAsync<TaskDefinition[]>(ApiUrls.GetAllTaskDefinitions(), HttpMethod.Get));
