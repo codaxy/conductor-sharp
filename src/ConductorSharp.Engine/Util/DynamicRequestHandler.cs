@@ -19,8 +19,13 @@ namespace ConductorSharp.Engine.Util
 
         private TRequest MapRequest(TRequestProxy requestProxy)
         {
-            var proxyProperties = typeof(TRequestProxy).GetProperties().Where(prop => prop.CanRead && prop.CanWrite);
-            var requestProperties = typeof(TRequest).GetProperties().Where(prop => prop.CanRead && prop.CanWrite).ToDictionary(prop => prop.Name);
+            var proxyProperties = typeof(TRequestProxy)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(prop => prop.CanRead && prop.CanWrite);
+            var requestProperties = typeof(TRequest)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(prop => prop.CanRead && prop.CanWrite)
+                .ToDictionary(prop => prop.Name);
             var request = new TRequest();
 
             foreach (var proxyProp in proxyProperties)

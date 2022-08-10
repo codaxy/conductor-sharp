@@ -74,7 +74,7 @@ namespace ConductorSharp.Engine.Util
                 new[] { typeof(IRequest<TOutput>) }
             );
 
-            var inputProperties = inputType.GetProperties().Where(prop => prop.CanRead && prop.CanWrite);
+            var inputProperties = inputType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(prop => prop.CanRead && prop.CanWrite);
 
             foreach (var property in inputProperties)
                 CreateProxyProperty(typeBuilder, property);
