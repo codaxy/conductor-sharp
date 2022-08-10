@@ -41,16 +41,16 @@ namespace ConductorSharp.Definitions.Workflows
                 }
             );
 
-            //builder.AddTask(
-            //    wf => wf.CSharpSimpleTask2,
-            //    wf => new() { Input = wf.WorkflowInput.Input },
-            //    input =>
-            //    {
-            //        var output = new CSharpSimpleTaskOutput { Output = input.Input.Length < 5 ? "<5" : ">=5" };
+            builder.AddTask(
+                wf => wf.CSharpSimpleTask2,
+                wf => new() { Input = wf.WorkflowInput.Input },
+                input =>
+                {
+                    var output = new CSharpSimpleTaskOutput { Output = input.Input.Length < 5 ? "<5" : ">=5" };
 
-            //        return output;
-            //    }
-            //);
+                    return output;
+                }
+            );
 
             return builder.Build(opts =>
             {
