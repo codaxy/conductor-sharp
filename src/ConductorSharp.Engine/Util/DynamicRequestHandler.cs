@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ConductorSharp.Engine.Interface;
+using MediatR;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Util
 {
-    internal sealed class DynamicRequestHandler<TRequestProxy, TRequest, TResponse> : IRequestHandler<TRequestProxy, TResponse>
+    internal sealed class DynamicRequestHandler<TRequestProxy, TRequest, TResponse> : IRequestHandler<TRequestProxy, TResponse>, IDynamicHandler
         where TRequestProxy : IRequest<TResponse>
         where TRequest : new()
     {
