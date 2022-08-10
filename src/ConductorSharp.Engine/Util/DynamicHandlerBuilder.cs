@@ -1,8 +1,11 @@
 ﻿using ConductorSharp.Engine.Interface;
 using MediatR;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
@@ -49,59 +52,60 @@ namespace ConductorSharp.Engine.Util
 
         public void AddDynamicHandler<TInput, TOutput>(Func<TInput, TOutput> handlerFunc, string taskName) where TInput : IRequest<TOutput>
         {
-            var typeBuilder = _moduleBuilder.DefineType(
-                Guid.NewGuid().ToString(),
-                TypeAttributes.Public,
-                null,
-                new[] { typeof(ITaskRequestHandler<TInput, TOutput>), typeof(IDynamicHandler) }
-            );
+            var proxyInputType = GenerateProxyInputType<TInput, TOutput>(taskName);
+            var requestHandlerType = typeof(DynamicRequestHandler<,,>).MakeGenericType(new[] { proxyInputType, typeof(TInput), typeof(TOutput) });
+            var typeBuilder = _moduleBuilder.DefineType(taskName + "RequestHandler", TypeAttributes.Public, requestHandlerType);
             var attributeBuilder = new CustomAttributeBuilder(
                 typeof(OriginalNameAttribute).GetConstructor(new[] { typeof(string) }),
                 new[] { taskName }
             );
             typeBuilder.SetCustomAttribute(attributeBuilder);
-            var handlerFuncField = typeBuilder.DefineField(LambdaFieldName, handlerFunc.GetType(), FieldAttributes.Public);
-            var methodBuilder = typeBuilder.DefineMethod(
-                nameof(IRequestHandler<TInput, TOutput>.Handle),
-                MethodAttributes.Public | MethodAttributes.Virtual,
-                CallingConventions.Standard,
-                typeof(Task<TOutput>),
-                new[] { typeof(TInput), typeof(CancellationToken) }
-            );
-            GenerateMethodIL<TInput, TOutput>(methodBuilder, handlerFuncField);
+
             _handlers.Add(new DynamicHandler(typeBuilder.CreateType(), handlerFunc));
         }
 
-        private void GenerateMethodIL<TInput, TOutput>(MethodBuilder methodBuilder, FieldBuilder handlerFuncField)
-        {
-            var ilGenerator = methodBuilder.GetILGenerator();
-            ilGenerator.Emit(OpCodes.Ldarg_0);
-            ilGenerator.Emit(OpCodes.Ldfld, handlerFuncField);
-            ilGenerator.Emit(OpCodes.Ldarg_1);
-            ilGenerator.Emit(OpCodes.Callvirt, typeof(Func<TInput, TOutput>).GetMethod(nameof(Func<TInput, TOutput>.Invoke)));
-            ilGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod(nameof(Task.FromResult)).MakeGenericMethod(typeof(TOutput)));
-            ilGenerator.Emit(OpCodes.Ret);
-        }
-
-        private Type GenerateProxyInputType<TInput>()
+        private Type GenerateProxyInputType<TInput, TOutput>(string taskName)
         {
             var inputType = typeof(TInput);
-            var typeBuilder = _moduleBuilder.DefineType(inputType.Name + "Proxy");
+            var typeBuilder = _moduleBuilder.DefineType(
+                taskName + inputType.Name + "Proxy",
+                TypeAttributes.Public,
+                null,
+                new[] { typeof(IRequest<TOutput>) }
+            );
 
-            var inputProperties = inputType.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty);
+            var inputProperties = inputType.GetProperties().Where(prop => prop.CanRead && prop.CanWrite);
 
-            foreach (var property in inputProperties) { }
+            foreach (var property in inputProperties)
+                CreateProxyProperty(typeBuilder, property);
+
+            return typeBuilder.CreateType();
         }
+
+        private FieldBuilder GenerateField(TypeBuilder typeBuilder, PropertyInfo property) =>
+            typeBuilder.DefineField($"_{property.Name}", property.PropertyType, FieldAttributes.Private);
 
         private void CreateProxyProperty(TypeBuilder typeBuilder, PropertyInfo property)
         {
             var propertyBuilder = typeBuilder.DefineProperty(property.Name, PropertyAttributes.None, property.PropertyType, null);
-            var getMethod = GenerateGetMethod(typeBuilder, property);
-            var setMethod = GenerateSetMethod(typeBuilder, property);
+            var fieldBuilder = GenerateField(typeBuilder, property);
+            var getMethod = GenerateGetMethod(typeBuilder, property, fieldBuilder);
+            var setMethod = GenerateSetMethod(typeBuilder, property, fieldBuilder);
             propertyBuilder.SetGetMethod(getMethod);
+            propertyBuilder.SetSetMethod(setMethod);
+            var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+
+            if (attribute != null)
+            {
+                var attributeBuilder = new CustomAttributeBuilder(
+                    typeof(JsonPropertyAttribute).GetConstructor(new[] { typeof(string) }),
+                    new[] { attribute.PropertyName }
+                );
+                propertyBuilder.SetCustomAttribute(attributeBuilder);
+            }
         }
 
-        private MethodBuilder GenerateGetMethod(TypeBuilder typeBuilder, PropertyInfo property)
+        private MethodBuilder GenerateGetMethod(TypeBuilder typeBuilder, PropertyInfo property, FieldBuilder fieldBuilder)
         {
             var methodBuilder = typeBuilder.DefineMethod(
                 $"get_{property.Name}",
@@ -109,9 +113,16 @@ namespace ConductorSharp.Engine.Util
                 property.PropertyType,
                 null
             );
+
+            var ilGen = methodBuilder.GetILGenerator();
+            ilGen.Emit(OpCodes.Ldarg_0);
+            ilGen.Emit(OpCodes.Ldfld, fieldBuilder);
+            ilGen.Emit(OpCodes.Ret);
+
+            return methodBuilder;
         }
 
-        private MethodBuilder GenerateSetMethod(TypeBuilder typeBuilder, PropertyInfo property)
+        private MethodBuilder GenerateSetMethod(TypeBuilder typeBuilder, PropertyInfo property, FieldBuilder fieldBuilder)
         {
             var methodBuilder = typeBuilder.DefineMethod(
                 $"set_{property.Name}",
@@ -119,6 +130,14 @@ namespace ConductorSharp.Engine.Util
                 typeof(void),
                 new[] { property.PropertyType }
             );
+
+            var ilGen = methodBuilder.GetILGenerator();
+            ilGen.Emit(OpCodes.Ldarg_0);
+            ilGen.Emit(OpCodes.Ldarg_1);
+            ilGen.Emit(OpCodes.Stfld, fieldBuilder);
+            ilGen.Emit(OpCodes.Ret);
+
+            return methodBuilder;
         }
     }
 }
