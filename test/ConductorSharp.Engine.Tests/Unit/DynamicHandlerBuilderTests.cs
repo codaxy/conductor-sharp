@@ -5,8 +5,11 @@ namespace ConductorSharp.Engine.Tests.Unit
 {
     public class DynamicHandlerBuilderTests
     {
+        private const string PropName = "MyVar";
+
         public class Input : IRequest<Output>
         {
+            [JsonProperty(PropName)]
             public int Number { get; set; }
         }
 
@@ -31,18 +34,18 @@ namespace ConductorSharp.Engine.Tests.Unit
             Assert.NotNull(originalNameAttribute);
             Assert.Equal(expectedTaskName, originalNameAttribute.OriginalName);
 
-            var methodInfo = obj.GetType().GetMethod(nameof(ITaskRequestHandler<Input, Output>.Handle));
-            var output = await (Task<Output>)
-                methodInfo.Invoke(
-                    obj,
-                    new object[]
-                    {
-                        new Input { Number = 0 },
-                        new CancellationToken()
-                    }
-                );
+            var proxyInputType = obj.GetType().BaseType.GetGenericArguments()[0];
+            var inputObj = Activator.CreateInstance(proxyInputType);
+            var inputProp = proxyInputType.GetProperty(nameof(Input.Number));
+            var jsonPropAttr = inputProp.GetCustomAttribute<JsonPropertyAttribute>();
+            Assert.NotNull(jsonPropAttr);
+            Assert.Equal(PropName, jsonPropAttr.PropertyName);
+            inputProp.SetValue(inputObj, 1);
 
-            Assert.Equal(1, output.Number);
+            var methodInfo = obj.GetType().GetMethod(nameof(ITaskRequestHandler<Input, Output>.Handle));
+            var output = await (Task<Output>)methodInfo.Invoke(obj, new object[] { inputObj, new CancellationToken() });
+
+            Assert.Equal(2, output.Number);
         }
     }
 }
