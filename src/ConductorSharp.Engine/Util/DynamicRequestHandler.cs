@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Util
 {
-    public class DynamicRequestHandler<TRequestProxy, TRequest, TResponse> : IRequestHandler<TRequestProxy, TResponse>, IDynamicHandler
+    public class DynamicRequestHandler<TRequestProxy, TRequest, TResponse> : ITaskRequestHandler<TRequestProxy, TResponse>, IDynamicHandler
         where TRequestProxy : IRequest<TResponse>
         where TRequest : new()
     {
