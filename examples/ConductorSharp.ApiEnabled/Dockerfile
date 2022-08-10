@@ -5,6 +5,9 @@ WORKDIR /app
 EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+
+ENV HUSKY 0
+
 WORKDIR /src
 COPY ["examples/ConductorSharp.ApiEnabled/ConductorSharp.ApiEnabled.csproj", "examples/ConductorSharp.ApiEnabled/"]
 COPY ["src/ConductorSharp.Engine/ConductorSharp.Engine.csproj", "src/ConductorSharp.Engine/"]

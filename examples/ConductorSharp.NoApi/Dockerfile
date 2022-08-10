@@ -4,6 +4,9 @@ FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+
+ENV HUSKY 0
+
 WORKDIR /src
 COPY ["examples/ConductorSharp.NoApi/ConductorSharp.NoApi.csproj", "examples/ConductorSharp.NoApi/"]
 COPY ["src/ConductorSharp.Engine/ConductorSharp.Engine.csproj", "src/ConductorSharp.Engine/"]
