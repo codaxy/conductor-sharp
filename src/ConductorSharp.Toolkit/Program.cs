@@ -17,7 +17,7 @@ namespace ConductorSharp.Toolkit
         public async static Task Main(string[] args)
         {
             var parseResult = new Parser(opts => opts.HelpWriter = null).ParseArguments<ToolkitOptions>(args);
-            var withParsed = await parseResult.WithParsedAsync(Scaffold);
+            var withParsed = await parseResult.WithParsedAsync(RunToolkit);
             withParsed.WithNotParsed(err =>
             {
                 var versionText = new HeadingInfo("conductorsharp", GetVersionString());
@@ -49,7 +49,7 @@ namespace ConductorSharp.Toolkit
             return $"version {version.Major}.{version.Minor}.{version.Build}";
         }
 
-        private static async Task Scaffold(ToolkitOptions options)
+        private static async Task RunToolkit(ToolkitOptions options)
         {
             Console.WriteLine(options.ConfiugrationFilePath);
 
