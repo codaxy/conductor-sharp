@@ -2,7 +2,7 @@
 {
     public class Configuration
     {
-        public string ApiPath { get; set; }
+        public string ApiPath { get; set; } = "api";
         public string Namespace { get; set; }
         public string BaseUrl { get; set; }
         public string Destination { get; set; }
