@@ -61,6 +61,9 @@ namespace ConductorSharp.Toolkit
                 }
 
                 var config = await ParseConfigurationFile(options.ConfigurationFilePath);
+                if (!ValidateConfiguration(config))
+                    return;
+
                 var container = BuildContainer(config);
                 var commandRegistry = container.Resolve<CommandRegistry>();
                 // Currently only scaffolding is supported
@@ -78,6 +81,18 @@ namespace ConductorSharp.Toolkit
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build()
                 .Deserialize<Configuration>(await File.ReadAllTextAsync(configFilePath));
+
+        private static bool ValidateConfiguration(Configuration config)
+        {
+            if (config.BaseUrl == null)
+                Console.Error.WriteLine("baseUrl property missing in configuration");
+            if (config.Namespace == null)
+                Console.Error.WriteLine("namespace property missing in configuration");
+            if (config.Destination == null)
+                Console.Error.WriteLine("destination property missing in configuration");
+
+            return config.BaseUrl != null && config.Destination != null && config.Namespace != null;
+        }
 
         private static IContainer BuildContainer(Configuration config)
         {
