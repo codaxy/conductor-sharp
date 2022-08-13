@@ -1,6 +1,6 @@
 ﻿namespace ConductorSharp.Toolkit.Models
 {
-    public class CommandInput
+    public class Configuration
     {
         public string Api { get; set; }
         public string Namespace { get; set; }
