@@ -83,15 +83,15 @@ namespace ConductorSharp.Toolkit
 
             serviceCollection.Configure<ScaffoldingConfig>(config =>
             {
-                config.ApiUrl = input.Api;
-                config.BaseUrl = input.Host;
+                config.ApiUrl = input.ApiPath;
+                config.BaseUrl = input.BaseUrl;
                 config.BaseNamespace = input.Namespace;
                 config.Dryrun = input.Dryrun;
                 config.Destination = input.Destination;
             });
 
             builder.Populate(serviceCollection);
-            builder.AddWorkflowEngine(input.Host, input.Api);
+            builder.AddWorkflowEngine(input.BaseUrl, input.ApiPath);
             builder.RegisterModule(new ToolkitModule());
 
             return builder.Build();

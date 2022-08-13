@@ -2,9 +2,9 @@
 {
     public class Configuration
     {
-        public string Api { get; set; }
+        public string ApiPath { get; set; }
         public string Namespace { get; set; }
-        public string Host { get; set; }
+        public string BaseUrl { get; set; }
         public bool Dryrun { get; set; }
         public string Destination { get; set; }
     }
