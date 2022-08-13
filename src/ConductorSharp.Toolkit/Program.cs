@@ -86,7 +86,6 @@ namespace ConductorSharp.Toolkit
                 config.ApiUrl = input.ApiPath;
                 config.BaseUrl = input.BaseUrl;
                 config.BaseNamespace = input.Namespace;
-                config.Dryrun = input.Dryrun;
                 config.Destination = input.Destination;
             });
 
