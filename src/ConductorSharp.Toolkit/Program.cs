@@ -47,7 +47,6 @@ namespace ConductorSharp.Toolkit
         private static string GetVersionString()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-
             return $"version {version.Major}.{version.Minor}.{version.Build}";
         }
 
