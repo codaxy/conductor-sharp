@@ -9,6 +9,8 @@ using CommandLine.Text;
 using System.Reflection;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using RestSharp;
+using RestSharp.Serializers.NewtonsoftJson;
 
 namespace ConductorSharp.Toolkit
 {
@@ -51,8 +53,6 @@ namespace ConductorSharp.Toolkit
 
         private static async Task RunToolkit(ToolkitOptions options)
         {
-            Console.WriteLine(options.ConfiugrationFilePath);
-
             if (!File.Exists(options.ConfiugrationFilePath))
             {
                 Console.Error.WriteLine($"Configuration file {options.ConfiugrationFilePath} does not exists");
@@ -73,7 +73,7 @@ namespace ConductorSharp.Toolkit
                 .Build()
                 .Deserialize<Configuration>(await File.ReadAllTextAsync(configFilePath));
 
-        private static IContainer BuildContainer(Configuration input)
+        private static IContainer BuildContainer(Configuration config)
         {
             var serviceCollection = new ServiceCollection();
 
@@ -81,16 +81,26 @@ namespace ConductorSharp.Toolkit
 
             var builder = new ContainerBuilder();
 
-            serviceCollection.Configure<ScaffoldingConfig>(config =>
+            serviceCollection.Configure<ScaffoldingConfig>(scaffoldingConfig =>
             {
-                config.ApiUrl = input.ApiPath;
-                config.BaseUrl = input.BaseUrl;
-                config.BaseNamespace = input.Namespace;
-                config.Destination = input.Destination;
+                scaffoldingConfig.ApiUrl = config.ApiPath;
+                scaffoldingConfig.BaseUrl = config.BaseUrl;
+                scaffoldingConfig.BaseNamespace = config.Namespace;
+                scaffoldingConfig.Destination = config.Destination;
             });
 
             builder.Populate(serviceCollection);
-            builder.AddWorkflowEngine(input.BaseUrl, input.ApiPath);
+            builder.AddWorkflowEngine(
+                config.BaseUrl,
+                config.ApiPath,
+                createClient: () =>
+                {
+                    var client = new RestClient();
+                    client.UseNewtonsoftJson();
+                    client.AddDefaultHeaders(config.Headers);
+                    return client;
+                }
+            );
             builder.RegisterModule(new ToolkitModule());
 
             return builder.Build();
