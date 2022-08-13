@@ -54,13 +54,13 @@ namespace ConductorSharp.Toolkit
         {
             try
             {
-                if (!File.Exists(options.ConfiugrationFilePath))
+                if (!File.Exists(options.ConfigurationFilePath))
                 {
-                    Console.Error.WriteLine($"Configuration file {options.ConfiugrationFilePath} does not exists");
+                    Console.Error.WriteLine($"Configuration file {options.ConfigurationFilePath} does not exists");
                     return;
                 }
 
-                var config = await ParseConfigurationFile(options.ConfiugrationFilePath);
+                var config = await ParseConfigurationFile(options.ConfigurationFilePath);
                 var container = BuildContainer(config);
                 var commandRegistry = container.Resolve<CommandRegistry>();
                 // Currently only scaffolding is supported
