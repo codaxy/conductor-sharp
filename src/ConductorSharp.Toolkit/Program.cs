@@ -4,6 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Toolkit.Commands;
 using ConductorSharp.Toolkit.Models;
+using CommandLine;
+using CommandLine.Text;
+using System.Reflection;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace ConductorSharp.Toolkit
 {
@@ -11,29 +16,64 @@ namespace ConductorSharp.Toolkit
     {
         public async static Task Main(string[] args)
         {
-            try
+            var parseResult = new Parser(opts => opts.HelpWriter = null).ParseArguments<ToolkitOptions>(args);
+            var withParsed = await parseResult.WithParsedAsync(Scaffold);
+            withParsed.WithNotParsed(err =>
             {
-                var action = args[0];
+                var versionText = new HeadingInfo("conductorsharp", GetVersionString());
+                var writer = err.IsHelp() || err.IsVersion() ? Console.Out : Console.Error;
+                string textToWrite;
+                if (err.IsVersion())
+                    textToWrite = versionText;
+                else
+                {
+                    textToWrite = HelpText.AutoBuild(
+                        parseResult,
+                        help =>
+                        {
+                            help.AddPreOptionsLine("Usage: dotnet conductorsharp [options]");
+                            help.Heading = versionText;
+                            return help;
+                        }
+                    );
+                }
 
-                var input = ParseInput(args);
-
-                var container = BuildContainer(input);
-
-                var commandRegistry = container.Resolve<CommandRegistry>();
-
-                var command = commandRegistry.Get(action);
-
-                await command.Execute(input);
-            }
-            catch (Exception exc)
-            {
-                PrintHelp();
-            }
+                writer.WriteLine(textToWrite);
+            });
         }
 
-        private static void PrintHelp() => Console.WriteLine("PLACEHOLDER HELP");
+        private static string GetVersionString()
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
 
-        private static IContainer BuildContainer(CommandInput input)
+            return $"version {version.Major}.{version.Minor}.{version.Build}";
+        }
+
+        private static async Task Scaffold(ToolkitOptions options)
+        {
+            Console.WriteLine(options.ConfiugrationFilePath);
+
+            if (!File.Exists(options.ConfiugrationFilePath))
+            {
+                Console.Error.WriteLine($"Configuration file {options.ConfiugrationFilePath} does not exists");
+                return;
+            }
+
+            var config = await ParseConfigurationFile(options.ConfiugrationFilePath);
+            var container = BuildContainer(config);
+            var commandRegistry = container.Resolve<CommandRegistry>();
+            // Currently only scaffolding is supported
+            var command = commandRegistry.Get("scaffold");
+            await command.Execute(config);
+        }
+
+        private static async Task<Configuration> ParseConfigurationFile(string configFilePath) =>
+            new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build()
+                .Deserialize<Configuration>(await File.ReadAllTextAsync(configFilePath));
+
+        private static IContainer BuildContainer(Configuration input)
         {
             var serviceCollection = new ServiceCollection();
 
@@ -57,12 +97,12 @@ namespace ConductorSharp.Toolkit
             return builder.Build();
         }
 
-        private static CommandInput ParseInput(string[] args)
+        private static Configuration ParseInput(string[] args)
         {
             var action = args[0];
             var inputParameters = args.Skip(1).Select(a => new KeyValuePair<string, string>(a.Split("=")[0], a.Split("=")[1])).ToList();
 
-            return new CommandInput
+            return new Configuration
             {
                 Api = inputParameters.Where(a => a.Key == "path").Select(a => a.Value).FirstOrDefault(),
                 Namespace = inputParameters.Where(a => a.Key == "namespace").Select(a => a.Value).FirstOrDefault(),
