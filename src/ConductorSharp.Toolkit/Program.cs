@@ -52,18 +52,25 @@ namespace ConductorSharp.Toolkit
 
         private static async Task RunToolkit(ToolkitOptions options)
         {
-            if (!File.Exists(options.ConfiugrationFilePath))
+            try
             {
-                Console.Error.WriteLine($"Configuration file {options.ConfiugrationFilePath} does not exists");
-                return;
-            }
+                if (!File.Exists(options.ConfiugrationFilePath))
+                {
+                    Console.Error.WriteLine($"Configuration file {options.ConfiugrationFilePath} does not exists");
+                    return;
+                }
 
-            var config = await ParseConfigurationFile(options.ConfiugrationFilePath);
-            var container = BuildContainer(config);
-            var commandRegistry = container.Resolve<CommandRegistry>();
-            // Currently only scaffolding is supported
-            var command = commandRegistry.Get("scaffold");
-            await command.Execute(config);
+                var config = await ParseConfigurationFile(options.ConfiugrationFilePath);
+                var container = BuildContainer(config);
+                var commandRegistry = container.Resolve<CommandRegistry>();
+                // Currently only scaffolding is supported
+                var command = commandRegistry.Get("scaffold");
+                await command.Execute(config);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Exception occured with message: {ex.Message}");
+            }
         }
 
         private static async Task<Configuration> ParseConfigurationFile(string configFilePath) =>
