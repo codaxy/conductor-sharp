@@ -60,7 +60,7 @@ namespace ConductorSharp.Toolkit
                     return;
                 }
 
-                var config = await ParseConfigurationFile(options.ConfigurationFilePath);
+                var config = ParseConfigurationFile(options.ConfigurationFilePath);
                 if (!ValidateConfiguration(config))
                     return;
 
@@ -77,11 +77,11 @@ namespace ConductorSharp.Toolkit
             }
         }
 
-        private static async Task<Configuration> ParseConfigurationFile(string configFilePath) =>
+        private static Configuration ParseConfigurationFile(string configFilePath) =>
             new DeserializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build()
-                .Deserialize<Configuration>(await File.ReadAllTextAsync(configFilePath));
+                .Deserialize<Configuration>(File.ReadAllText(configFilePath));
 
         private static bool ValidateConfiguration(Configuration config)
         {
