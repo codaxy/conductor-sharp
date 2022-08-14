@@ -70,6 +70,7 @@ namespace ConductorSharp.Toolkit
                 var command = commandRegistry.Get("scaffold");
                 await command.Execute(config);
             }
+            // TODO: Improve error handling
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Exception occured with message: {ex.Message}");
