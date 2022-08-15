@@ -82,14 +82,24 @@ namespace ConductorSharp.Toolkit
 
         private static bool ValidateConfiguration(Configuration config)
         {
-            if (config.BaseUrl == null)
+            bool validConfiguration = true;
+            if (string.IsNullOrEmpty(config.BaseUrl))
+            {
                 Console.Error.WriteLine("baseUrl property missing in configuration");
-            if (config.Namespace == null)
+                validConfiguration = false;
+            }
+            if (string.IsNullOrEmpty(config.Namespace))
+            {
                 Console.Error.WriteLine("namespace property missing in configuration");
-            if (config.Destination == null)
+                validConfiguration = false;
+            }
+            if (string.IsNullOrEmpty(config.Destination))
+            {
                 Console.Error.WriteLine("destination property missing in configuration");
+                validConfiguration = false;
+            }
 
-            return config.BaseUrl != null && config.Destination != null && config.Namespace != null;
+            return validConfiguration;
         }
 
         private static IContainer BuildContainer(Configuration config)
