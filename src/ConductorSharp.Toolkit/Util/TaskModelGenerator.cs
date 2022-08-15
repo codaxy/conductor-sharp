@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Text;
 
 namespace ConductorSharp.Toolkit.Util
 {
@@ -25,12 +26,12 @@ namespace ConductorSharp.Toolkit.Util
         public string OwnerApp { get; set; }
         public string OwnerEmail { get; set; }
         public string Summary { get; set; }
-        public string Note { get; private set; } = string.Empty;
 
         protected CompilationUnitSyntax _compilationUnit = SyntaxFactory.CompilationUnit();
         private readonly ModelType _modelType;
         private List<PropertyData> _inputProperties = new();
         private List<PropertyData> _outputProperties = new();
+        private StringBuilder _noteBuilder = new StringBuilder();
 
         public TaskModelGenerator(string @namespace, string className, ModelType modelType)
         {
@@ -39,7 +40,7 @@ namespace ConductorSharp.Toolkit.Util
             _modelType = modelType;
         }
 
-        public void AppendNote(string note) => Note += note;
+        public void AppendNoteLine(string note) => _noteBuilder.AppendLine(note);
 
         public void AddInputProperty(string propName, string originalName, string type)
         {
