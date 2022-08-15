@@ -33,6 +33,7 @@ namespace ConductorSharp.Toolkit
                         parseResult,
                         help =>
                         {
+                            help.Copyright = new CopyrightInfo("Codaxy", 2022);
                             help.AddPreOptionsLine("Usage: dotnet conductorsharp [options]");
                             help.Heading = versionText;
                             return help;
