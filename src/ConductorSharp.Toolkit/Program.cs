@@ -16,13 +16,15 @@ namespace ConductorSharp.Toolkit
 {
     class Program
     {
+        public const string Version = "0.0.1";
+
         public async static Task Main(string[] args)
         {
             var parseResult = new Parser(opts => opts.HelpWriter = null).ParseArguments<ToolkitOptions>(args);
             var withParsed = await parseResult.WithParsedAsync(RunToolkit);
             withParsed.WithNotParsed(err =>
             {
-                var versionText = new HeadingInfo("conductorsharp", GetVersionString());
+                var versionText = new HeadingInfo("conductorsharp", Version);
                 var writer = err.IsHelp() || err.IsVersion() ? Console.Out : Console.Error;
                 string textToWrite;
                 if (err.IsVersion())
@@ -43,12 +45,6 @@ namespace ConductorSharp.Toolkit
 
                 writer.WriteLine(textToWrite);
             });
-        }
-
-        private static string GetVersionString()
-        {
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            return $"version {version.Major}.{version.Minor}.{version.Build}";
         }
 
         private static async Task RunToolkit(ToolkitOptions options)
