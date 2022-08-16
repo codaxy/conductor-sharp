@@ -24,15 +24,13 @@ namespace ConductorSharp.Toolkit.Util
         public string Namespace { get; set; }
         public string ClassName { get; set; }
         public string OriginalName { get; set; }
-        public string OwnerApp { get; set; }
-        public string OwnerEmail { get; set; }
         public string Summary { get; set; }
 
         protected CompilationUnitSyntax _compilationUnit = SyntaxFactory.CompilationUnit();
         private readonly ModelType _modelType;
         private List<PropertyData> _inputProperties = new();
         private List<PropertyData> _outputProperties = new();
-        private StringBuilder _noteBuilder = new StringBuilder();
+        private readonly Dictionary<string, string> _xmlComments = new();
 
         public TaskModelGenerator(string @namespace, string className, ModelType modelType)
         {
@@ -40,8 +38,6 @@ namespace ConductorSharp.Toolkit.Util
             ClassName = className;
             _modelType = modelType;
         }
-
-        public void AppendNoteLine(string note) => _noteBuilder.AppendLine(note);
 
         public void AddInputProperty(PropertyData propData)
         {
@@ -52,6 +48,8 @@ namespace ConductorSharp.Toolkit.Util
         {
             _outputProperties.Add(propData);
         }
+
+        public void AddXmlComment(string tag, string value) => _xmlComments[tag] = value;
 
         public string Build()
         {
@@ -122,7 +120,23 @@ namespace ConductorSharp.Toolkit.Util
                 SyntaxFactory.SingletonSeparatedList(CreateInputPropertyAttribute(inputData.OriginalName))
             );
             propertyDeclaration = propertyDeclaration.AddAttributeLists(attributeList);
+            propertyDeclaration = propertyDeclaration.WithLeadingTrivia(GenerateXmlDocComment(inputData.XmlComments));
+
             return propertyDeclaration;
+        }
+
+        private SyntaxTriviaList GenerateXmlDocComment(Dictionary<string, string> xmlComments)
+        {
+            var list = new SyntaxTriviaList();
+
+            foreach (var elem in xmlComments)
+            {
+                list = list.Add(SyntaxFactory.Comment($"/// <{elem.Key}>"));
+                list = list.Add(SyntaxFactory.Comment($"/// {elem.Value}"));
+                list = list.Add(SyntaxFactory.Comment($"/// </{elem.Key}>"));
+            }
+
+            return list;
         }
 
         private ClassDeclarationSyntax CreateInputClass()
@@ -167,7 +181,8 @@ namespace ConductorSharp.Toolkit.Util
             var classDeclaration = SyntaxFactory
                 .ClassDeclaration(ClassName)
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.PartialKeyword))
-                .WithBaseList(baseList);
+                .WithBaseList(baseList)
+                .WithLeadingTrivia(GenerateXmlDocComment(_xmlComments));
 
             return classDeclaration;
         }
