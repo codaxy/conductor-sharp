@@ -14,7 +14,7 @@ namespace ConductorSharp.Toolkit.Commands
 
         public string GetName() => "scaffold";
 
-        public async Task Execute(CommandInput input)
+        public async Task Execute(Configuration input)
         {
             await _scaffoldingService.Scaffold();
         }

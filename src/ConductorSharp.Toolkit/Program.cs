@@ -4,36 +4,105 @@ using Microsoft.Extensions.DependencyInjection;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Toolkit.Commands;
 using ConductorSharp.Toolkit.Models;
+using CommandLine;
+using CommandLine.Text;
+using System.Reflection;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+using RestSharp;
+using RestSharp.Serializers.NewtonsoftJson;
 
 namespace ConductorSharp.Toolkit
 {
     class Program
     {
+        public const string Version = "0.0.1";
+
         public async static Task Main(string[] args)
+        {
+            var parseResult = new Parser(opts => opts.HelpWriter = null).ParseArguments<ToolkitOptions>(args);
+            var withParsed = await parseResult.WithParsedAsync(RunToolkit);
+            withParsed.WithNotParsed(err =>
+            {
+                var versionText = new HeadingInfo("conductorsharp", Version);
+                var writer = err.IsHelp() || err.IsVersion() ? Console.Out : Console.Error;
+                string textToWrite;
+                if (err.IsVersion())
+                    textToWrite = versionText;
+                else
+                {
+                    textToWrite = HelpText.AutoBuild(
+                        parseResult,
+                        help =>
+                        {
+                            help.Copyright = new CopyrightInfo("Codaxy", 2022);
+                            help.AddPreOptionsLine("Usage: dotnet conductorsharp [options]");
+                            help.Heading = versionText;
+                            return help;
+                        }
+                    );
+                }
+
+                writer.WriteLine(textToWrite);
+            });
+        }
+
+        private static async Task RunToolkit(ToolkitOptions options)
         {
             try
             {
-                var action = args[0];
+                if (!File.Exists(options.ConfigurationFilePath))
+                {
+                    Console.Error.WriteLine($"Configuration file {options.ConfigurationFilePath} does not exists");
+                    return;
+                }
 
-                var input = ParseInput(args);
+                var config = ParseConfigurationFile(options.ConfigurationFilePath);
+                if (!ValidateConfiguration(config))
+                    return;
 
-                var container = BuildContainer(input);
-
+                var container = BuildContainer(config);
                 var commandRegistry = container.Resolve<CommandRegistry>();
-
-                var command = commandRegistry.Get(action);
-
-                await command.Execute(input);
+                // Currently only scaffolding is supported
+                var command = commandRegistry.Get("scaffold");
+                await command.Execute(config);
             }
-            catch (Exception exc)
+            // TODO: Improve error handling
+            catch (Exception ex)
             {
-                PrintHelp();
+                Console.Error.WriteLine($"Exception occured with message: {ex.Message}");
             }
         }
 
-        private static void PrintHelp() => Console.WriteLine("PLACEHOLDER HELP");
+        private static Configuration ParseConfigurationFile(string configFilePath) =>
+            new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build()
+                .Deserialize<Configuration>(File.ReadAllText(configFilePath));
 
-        private static IContainer BuildContainer(CommandInput input)
+        private static bool ValidateConfiguration(Configuration config)
+        {
+            bool validConfiguration = true;
+            if (string.IsNullOrEmpty(config.BaseUrl))
+            {
+                Console.Error.WriteLine("baseUrl property missing in configuration");
+                validConfiguration = false;
+            }
+            if (string.IsNullOrEmpty(config.Namespace))
+            {
+                Console.Error.WriteLine("namespace property missing in configuration");
+                validConfiguration = false;
+            }
+            if (string.IsNullOrEmpty(config.Destination))
+            {
+                Console.Error.WriteLine("destination property missing in configuration");
+                validConfiguration = false;
+            }
+
+            return validConfiguration;
+        }
+
+        private static IContainer BuildContainer(Configuration config)
         {
             var serviceCollection = new ServiceCollection();
 
@@ -41,35 +110,29 @@ namespace ConductorSharp.Toolkit
 
             var builder = new ContainerBuilder();
 
-            serviceCollection.Configure<ScaffoldingConfig>(config =>
+            serviceCollection.Configure<ScaffoldingConfig>(scaffoldingConfig =>
             {
-                config.ApiUrl = input.Api;
-                config.BaseUrl = input.Host;
-                config.BaseNamespace = input.Namespace;
-                config.Dryrun = input.Dryrun;
-                config.Destination = input.Destination;
+                scaffoldingConfig.ApiUrl = config.ApiPath;
+                scaffoldingConfig.BaseUrl = config.BaseUrl;
+                scaffoldingConfig.BaseNamespace = config.Namespace;
+                scaffoldingConfig.Destination = config.Destination;
             });
 
             builder.Populate(serviceCollection);
-            builder.AddWorkflowEngine(input.Host, input.Api);
+            builder.AddWorkflowEngine(
+                config.BaseUrl,
+                config.ApiPath,
+                createClient: () =>
+                {
+                    var client = new RestClient();
+                    client.UseNewtonsoftJson();
+                    client.AddDefaultHeaders(config.Headers);
+                    return client;
+                }
+            );
             builder.RegisterModule(new ToolkitModule());
 
             return builder.Build();
-        }
-
-        private static CommandInput ParseInput(string[] args)
-        {
-            var action = args[0];
-            var inputParameters = args.Skip(1).Select(a => new KeyValuePair<string, string>(a.Split("=")[0], a.Split("=")[1])).ToList();
-
-            return new CommandInput
-            {
-                Api = inputParameters.Where(a => a.Key == "path").Select(a => a.Value).FirstOrDefault(),
-                Namespace = inputParameters.Where(a => a.Key == "namespace").Select(a => a.Value).FirstOrDefault(),
-                Host = inputParameters.Where(a => a.Key == "host").Select(a => a.Value).FirstOrDefault(),
-                Dryrun = inputParameters.Where(a => a.Key == "dryrun").Select(a => bool.Parse(a.Value)).FirstOrDefault(),
-                Destination = inputParameters.Where(a => a.Key == "destination").Select(a => a.Value).FirstOrDefault()
-            };
         }
     }
 }
