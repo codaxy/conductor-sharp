@@ -28,6 +28,7 @@ namespace ConductorSharp.Toolkit.Service
             var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
             var workflowCollectionBuilder = new StringBuilder();
             var workflowDirectory = Path.Combine(_config.Destination, "Workflows");
+            Directory.CreateDirectory(workflowDirectory);
             foreach (var workflowDefinition in workflowDefinitions)
             {
                 (var contents, var modelClassName) = CreateWorkflowClass(workflowDefinition);
@@ -42,6 +43,7 @@ namespace ConductorSharp.Toolkit.Service
             var taskDefinitions = await _metadataService.GetAllTaskDefinitions();
             var taskCollectionBuilder = new StringBuilder();
             var tasksDirectory = Path.Combine(_config.Destination, "Tasks");
+            Directory.CreateDirectory(tasksDirectory);
             foreach (var taskDefinition in taskDefinitions)
             {
                 (var contents, var modelClassName) = CreateTaskClass(taskDefinition);
@@ -52,26 +54,6 @@ namespace ConductorSharp.Toolkit.Service
                     File.WriteAllText(filePath, contents);
                 }
             }
-
-            //var taskTemplate = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Templates/TaskCollectionTemplate.default");
-            //var taskCollection = taskCollectionBuilder.ToString();
-            //taskTemplate = taskTemplate.Replace("{{namespace}}", _config.BaseNamespace + ".Tasks");
-            //taskTemplate = taskTemplate.Replace("{{taskCollection}}", taskCollection);
-            //var dir = _config.Destination + Path.DirectorySeparatorChar + "Tasks";
-
-            //Directory.CreateDirectory(dir);
-
-            //File.WriteAllText(dir + Path.DirectorySeparatorChar + "Tasks.scaff.cs", taskTemplate);
-
-            //var workflowTemplate = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Templates/WorkflowCollectionTemplate.default");
-            //var workflowCollection = workflowCollectionBuilder.ToString();
-            //workflowTemplate = workflowTemplate.Replace("{{namespace}}", _config.BaseNamespace + ".Workflows");
-            //workflowTemplate = workflowTemplate.Replace("{{workflowCollection}}", workflowCollection);
-            //var workflowDir = _config.Destination + Path.DirectorySeparatorChar + "Workflows";
-
-            //Directory.CreateDirectory(workflowDir);
-
-            //File.WriteAllText(workflowDir + Path.DirectorySeparatorChar + "Workflows.scaff.cs", workflowTemplate);
         }
 
         public (string contents, string modelClassName) CreateWorkflowClass(WorkflowDefinition workflowDefinition)
