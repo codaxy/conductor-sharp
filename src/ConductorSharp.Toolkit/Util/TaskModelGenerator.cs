@@ -24,7 +24,6 @@ namespace ConductorSharp.Toolkit.Util
         public string Namespace { get; set; }
         public string ClassName { get; set; }
         public string OriginalName { get; set; }
-        public string Summary { get; set; }
 
         protected CompilationUnitSyntax _compilationUnit = SyntaxFactory.CompilationUnit();
         private readonly ModelType _modelType;
