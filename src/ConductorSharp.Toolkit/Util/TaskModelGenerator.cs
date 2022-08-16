@@ -54,7 +54,13 @@ namespace ConductorSharp.Toolkit.Util
         public string Build()
         {
             _compilationUnit = _compilationUnit.AddUsings(
-                CreateUsings("ConductorSharp.Engine.Model", "ConductorSharp.Engine.Util", "MediatR", "Newtonsoft.Json")
+                CreateUsings(
+                    "ConductorSharp.Engine.Model",
+                    "ConductorSharp.Engine.Util",
+                    "MediatR",
+                    "Newtonsoft.Json",
+                    "ConductorSharp.Engine.Builders"
+                )
             );
             var namespaceDeclaration = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(Namespace));
             namespaceDeclaration = namespaceDeclaration.AddMembers(CreateInputClass(), CreateOutputClass(), CreateModelClass());
