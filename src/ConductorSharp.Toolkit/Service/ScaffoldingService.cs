@@ -26,7 +26,6 @@ namespace ConductorSharp.Toolkit.Service
         public async Task Scaffold()
         {
             var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
-            var workflowCollectionBuilder = new StringBuilder();
             var workflowDirectory = Path.Combine(_config.Destination, "Workflows");
             Directory.CreateDirectory(workflowDirectory);
             foreach (var workflowDefinition in workflowDefinitions)
@@ -41,7 +40,6 @@ namespace ConductorSharp.Toolkit.Service
             }
 
             var taskDefinitions = await _metadataService.GetAllTaskDefinitions();
-            var taskCollectionBuilder = new StringBuilder();
             var tasksDirectory = Path.Combine(_config.Destination, "Tasks");
             Directory.CreateDirectory(tasksDirectory);
             foreach (var taskDefinition in taskDefinitions)
