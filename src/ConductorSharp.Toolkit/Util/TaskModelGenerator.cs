@@ -98,6 +98,18 @@ namespace ConductorSharp.Toolkit.Util
             return attribute;
         }
 
+        private AttributeSyntax CreateOriginalNameAttribute(string originalName)
+        {
+            var attribute = SyntaxFactory
+                .Attribute(SyntaxFactory.ParseName("OriginalName"))
+                .AddArgumentListArguments(
+                    SyntaxFactory.AttributeArgument(
+                        SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(originalName))
+                    )
+                );
+            return attribute;
+        }
+
         private PropertyDeclarationSyntax CreateProperty(PropertyData inputData)
         {
             var propertyDeclaration = SyntaxFactory
@@ -174,9 +186,12 @@ namespace ConductorSharp.Toolkit.Util
                     .WithTypeArgumentList(typeArgumentList)
             );
             var baseList = SyntaxFactory.BaseList(SyntaxFactory.SingletonSeparatedList<BaseTypeSyntax>(baseType));
+
+            var attributeList = SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(CreateOriginalNameAttribute(OriginalName)));
             var classDeclaration = SyntaxFactory
                 .ClassDeclaration(ClassName)
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.PartialKeyword))
+                .AddAttributeLists(attributeList)
                 .WithBaseList(baseList)
                 .WithLeadingTrivia(GenerateXmlDocComment(_xmlComments));
 
