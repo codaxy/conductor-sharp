@@ -25,10 +25,10 @@ namespace ConductorSharp.Toolkit.Util
         public string ClassName { get; set; }
         public string OriginalName { get; set; }
 
-        protected CompilationUnitSyntax _compilationUnit = SyntaxFactory.CompilationUnit();
+        private CompilationUnitSyntax _compilationUnit = SyntaxFactory.CompilationUnit();
         private readonly ModelType _modelType;
-        private List<PropertyData> _inputProperties = new();
-        private List<PropertyData> _outputProperties = new();
+        private readonly List<PropertyData> _inputProperties = new();
+        private readonly List<PropertyData> _outputProperties = new();
         private readonly Dictionary<string, string> _xmlComments = new();
 
         public TaskModelGenerator(string @namespace, string className, ModelType modelType)
@@ -38,15 +38,9 @@ namespace ConductorSharp.Toolkit.Util
             _modelType = modelType;
         }
 
-        public void AddInputProperty(PropertyData propData)
-        {
-            _inputProperties.Add(propData);
-        }
+        public void AddInputProperty(PropertyData propData) => _inputProperties.Add(propData);
 
-        public void AddOutputProperty(PropertyData propData)
-        {
-            _outputProperties.Add(propData);
-        }
+        public void AddOutputProperty(PropertyData propData) => _outputProperties.Add(propData);
 
         public void AddXmlComment(string tag, string value) => _xmlComments[tag] = value;
 
@@ -150,7 +144,7 @@ namespace ConductorSharp.Toolkit.Util
         private ClassDeclarationSyntax CreateInputClass()
         {
             var typeArgumentList = SyntaxFactory.TypeArgumentList(
-                SyntaxFactory.SingletonSeparatedList<TypeSyntax>(SyntaxFactory.ParseTypeName($"{ClassName}Output"))
+                SyntaxFactory.SingletonSeparatedList(SyntaxFactory.ParseTypeName($"{ClassName}Output"))
             );
             var baseType = SyntaxFactory.SimpleBaseType(SyntaxFactory.GenericName("IRequest").WithTypeArgumentList(typeArgumentList));
             var baseList = SyntaxFactory.BaseList(SyntaxFactory.SingletonSeparatedList<BaseTypeSyntax>(baseType));
