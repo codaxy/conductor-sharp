@@ -71,6 +71,8 @@ namespace ConductorSharp.Toolkit
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Exception occured with message: {ex.Message}");
+                Console.Error.WriteLine("Stack trace:");
+                Console.Error.WriteLine(ex.StackTrace);
             }
         }
 
