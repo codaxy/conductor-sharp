@@ -26,7 +26,7 @@ namespace ConductorSharp.Engine.Builders
                     Type = "SIMPLE",
                     InputParameters = _inputParameters,
                     Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
-                    Optional = _additionalParameters != null ? _additionalParameters.Optional : false
+                    Optional = _additionalParameters?.Optional == true
                 }
             };
     }
