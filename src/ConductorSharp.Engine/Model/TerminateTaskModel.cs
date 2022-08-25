@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Newtonsoft.Json;
 
 namespace ConductorSharp.Engine.Model
 {
@@ -11,7 +12,10 @@ namespace ConductorSharp.Engine.Model
 
     public class TerminateTaskInput : IRequest<NoOutput>
     {
+        [JsonProperty("workflowOutput")]
         public dynamic WorkflowOutput { get; set; }
+
+        [JsonProperty("terminationStatus")]
         public string TerminationStatus { get; set; }
     }
 
