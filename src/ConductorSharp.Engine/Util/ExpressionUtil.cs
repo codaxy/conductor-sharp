@@ -36,19 +36,9 @@ namespace ConductorSharp.Engine.Util
             if (expression is ConstantExpression cex)
                 return cex.Value;
 
-            if (expression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
-            {
-                var converted = Convert.ToString(ccex.Value);
-
-                //if (ccex.Value is bool)
-                //    return converted.ToLowerInvariant();
-
-                return ccex.Value;
-            }
-
             // Handle boxing
             if (expression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
-                return CreateExpressionString(unaryEx.Operand);
+                return ParseExpression(unaryEx.Operand);
 
             if (
                 expression is MethodCallExpression methodExpression
