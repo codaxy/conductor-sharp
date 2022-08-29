@@ -38,6 +38,7 @@ namespace ConductorSharp.Engine.Util
                 var type = cex.Value.GetType();
                 if (type.IsEnum)
                 {
+                    // Handle enum constants
                     var field = type.GetField(type.GetEnumName(cex.Value));
                     return field.GetCustomAttribute<EnumValueAttribute>()?.Value ?? cex.Value.ToString();
                 }
