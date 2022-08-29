@@ -34,7 +34,16 @@ namespace ConductorSharp.Engine.Util
         private static object ParseExpression(Expression expression)
         {
             if (expression is ConstantExpression cex)
-                return cex.Value;
+            {
+                var type = cex.Value.GetType();
+                if (type.IsEnum)
+                {
+                    var field = type.GetField(type.GetEnumName(cex.Value));
+                    return field.GetCustomAttribute<EnumValueAttribute>()?.Value ?? cex.Value.ToString();
+                }
+                else
+                    return cex.Value;
+            }
 
             if (expression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
             {
