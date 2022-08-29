@@ -1,14 +1,17 @@
-﻿using MediatR;
+﻿using ConductorSharp.Engine.Util;
+using MediatR;
 using Newtonsoft.Json;
 
 namespace ConductorSharp.Engine.Model
 {
-    // TODO: Replace this with enum
-    public static class TerminationStatus
+    public enum TerminationStatus
     {
-        public const string Completed = "COMPLETED";
-        public const string Failed = "FAILED";
-    }
+        [EnumValue("COMPLETED")]
+        Completed,
+
+        [EnumValue("FAILED")]
+        Failed
+    };
 
     public class TerminateTaskInput : IRequest<NoOutput>
     {
@@ -16,7 +19,7 @@ namespace ConductorSharp.Engine.Model
         public dynamic WorkflowOutput { get; set; }
 
         [JsonProperty("terminationStatus")]
-        public string TerminationStatus { get; set; }
+        public TerminationStatus TerminationStatus { get; set; }
     }
 
     public class TerminateTaskModel : TaskModel<TerminateTaskInput, NoOutput> { }
