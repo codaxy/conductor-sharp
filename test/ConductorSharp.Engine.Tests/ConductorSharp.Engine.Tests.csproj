@@ -14,6 +14,7 @@
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
     <None Remove="Samples\Workflows\StringInterpolation.json" />
+    <None Remove="Samples\Workflows\TerminateTaskWorkflow.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +24,7 @@
     <EmbeddedResource Include="Samples\Workflows\NestedObjects.json" />
 	<EmbeddedResource Include="Samples\Workflows\SendCustomerNotification.json" />
 	<EmbeddedResource Include="Samples\Workflows\StringInterpolation.json" />
+	<EmbeddedResource Include="Samples\Workflows\TerminateTaskWorkflow.json" />
   </ItemGroup>
 
   <ItemGroup>

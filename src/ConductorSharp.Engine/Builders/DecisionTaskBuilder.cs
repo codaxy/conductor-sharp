@@ -74,6 +74,17 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
+        public DecisionTaskBuilder<TWorkflow> WithTask(
+            Expression<Func<TWorkflow, TerminateTaskModel>> taskSelector,
+            Expression<Func<TWorkflow, TerminateTaskInput>> expression
+        )
+        {
+            var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body);
+            _caseDictionary[_currentCaseName].Add(builder);
+
+            return this;
+        }
+
         public DecisionTaskBuilder<TWorkflow> WithTask<F>(
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
             Expression<Func<TWorkflow, F>> expression,

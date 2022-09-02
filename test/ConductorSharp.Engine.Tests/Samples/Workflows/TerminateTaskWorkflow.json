@@ -1,0 +1,204 @@
+{
+  "ownerApp": null,
+  "createTime": 0,
+  "updateTime": 0,
+  "createdBy": null,
+  "updatedBy": null,
+  "name": "terminate_task_worfklow",
+  "description": "{\"description\":null,\"labels\":null}",
+  "version": 1,
+  "tasks": [
+    {
+      "queryExpression": null,
+      "name": "DECISION_decision_task",
+      "taskReferenceName": "decision_task",
+      "description": null,
+      "inputParameters": {
+        "case_value_param": "value"
+      },
+      "type": "DECISION",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": "case_value_param",
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": {
+        "value": [
+          {
+            "queryExpression": null,
+            "name": "TERMINATE_decision_terminate",
+            "taskReferenceName": "decision_terminate",
+            "description": "{\"description\":null}",
+            "inputParameters": {
+              "workflowOutput": {
+                "property": "Test"
+              },
+              "terminationStatus": "COMPLETED"
+            },
+            "type": "TERMINATE",
+            "dynamicTaskNameParam": null,
+            "caseValueParam": null,
+            "caseExpression": null,
+            "expression": null,
+            "evaluatorType": null,
+            "scriptExpression": null,
+            "decisionCases": null,
+            "dynamicForkJoinTasksParam": null,
+            "dynamicForkTasksParam": null,
+            "dynamicForkTasksInputParamName": null,
+            "defaultCase": null,
+            "forkTasks": null,
+            "startDelay": 0,
+            "subWorkflowParam": null,
+            "joinOn": null,
+            "sink": null,
+            "optional": false,
+            "taskDefinition": null,
+            "rateLimited": false,
+            "defaultExclusiveJoinTask": null,
+            "asyncComplete": false,
+            "loopCondition": null,
+            "loopOver": null
+          }
+        ]
+      },
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    },
+    {
+      "queryExpression": null,
+      "name": "SWITCH_switch_task",
+      "taskReferenceName": "switch_task",
+      "description": null,
+      "inputParameters": {
+        "switch_case_value": "value"
+      },
+      "type": "SWITCH",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": null,
+      "caseExpression": null,
+      "expression": "switch_case_value",
+      "evaluatorType": "value-param",
+      "scriptExpression": null,
+      "decisionCases": {
+        "value": [
+          {
+            "queryExpression": null,
+            "name": "TERMINATE_switch_terminate",
+            "taskReferenceName": "switch_terminate",
+            "description": "{\"description\":null}",
+            "inputParameters": {
+              "workflowOutput": {
+                "property": "Test"
+              },
+              "terminationStatus": "FAILED"
+            },
+            "type": "TERMINATE",
+            "dynamicTaskNameParam": null,
+            "caseValueParam": null,
+            "caseExpression": null,
+            "expression": null,
+            "evaluatorType": null,
+            "scriptExpression": null,
+            "decisionCases": null,
+            "dynamicForkJoinTasksParam": null,
+            "dynamicForkTasksParam": null,
+            "dynamicForkTasksInputParamName": null,
+            "defaultCase": null,
+            "forkTasks": null,
+            "startDelay": 0,
+            "subWorkflowParam": null,
+            "joinOn": null,
+            "sink": null,
+            "optional": false,
+            "taskDefinition": null,
+            "rateLimited": false,
+            "defaultExclusiveJoinTask": null,
+            "asyncComplete": false,
+            "loopCondition": null,
+            "loopOver": null
+          }
+        ]
+      },
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    },
+    {
+      "queryExpression": null,
+      "name": "TERMINATE_terminate",
+      "taskReferenceName": "terminate",
+      "description": "{\"description\":null}",
+      "inputParameters": {
+        "terminationStatus": "FAILED",
+        "workflowOutput": {
+          "property": "Test"
+        }
+      },
+      "type": "TERMINATE",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": null,
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": null,
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    }
+  ],
+  "inputParameters": [
+    "{}"
+  ],
+  "outputParameters": null,
+  "failureWorkflow": null,
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": true,
+  "ownerEmail": null,
+  "timeoutPolicy": null,
+  "timeoutSeconds": 0,
+  "variables": null
+}

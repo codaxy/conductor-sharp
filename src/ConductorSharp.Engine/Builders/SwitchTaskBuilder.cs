@@ -75,6 +75,16 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
+        public SwitchTaskBuilder<TWorkflow> WithTask(
+            Expression<Func<TWorkflow, TerminateTaskModel>> taskSelector,
+            Expression<Func<TWorkflow, TerminateTaskInput>> expression
+        )
+        {
+            var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body);
+            AddBuilder(builder);
+            return this;
+        }
+
         //public SwitchTaskBuilder<TWorkflow> WithTask<F>(
         //    Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
         //    Expression<Func<TWorkflow, F>> expression,

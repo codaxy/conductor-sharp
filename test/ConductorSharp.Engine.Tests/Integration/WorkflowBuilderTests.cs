@@ -60,5 +60,14 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             Assert.Equal(expectedDefinition, definition);
         }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionTerminateTask()
+        {
+            var definition = SerializationUtil.SerializeObject(new TerminateTaskWorfklow().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/TerminateTaskWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
     }
 }
