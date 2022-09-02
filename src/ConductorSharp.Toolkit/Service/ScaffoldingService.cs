@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Toolkit.Filters;
 using ConductorSharp.Toolkit.Util;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -28,7 +29,11 @@ namespace ConductorSharp.Toolkit.Service
 
         public async Task Scaffold()
         {
+            var taskFilters = CreateTaskFilters();
+            var workflowFilters = CreateWorkflowFilters();
+
             var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
+            workflowDefinitions = FilterWorkflows(workflowDefinitions, workflowFilters).ToArray();
             var workflowDirectory = Path.Combine(_config.Destination, "Workflows");
             Directory.CreateDirectory(workflowDirectory);
             foreach (var workflowDefinition in workflowDefinitions)
@@ -43,6 +48,7 @@ namespace ConductorSharp.Toolkit.Service
             }
 
             var taskDefinitions = await _metadataService.GetAllTaskDefinitions();
+            taskDefinitions = FilterTasks(taskDefinitions, taskFilters).ToArray();
             var tasksDirectory = Path.Combine(_config.Destination, "Tasks");
             Directory.CreateDirectory(tasksDirectory);
             foreach (var taskDefinition in taskDefinitions)
@@ -240,5 +246,17 @@ namespace ConductorSharp.Toolkit.Service
 
             return (modelGenerator.Build(), name);
         }
+
+        private ITaskFilter[] CreateTaskFilters() => _config.Names.Select(name => new NameTaskFilter(name)).ToArray();
+
+        private IWorkflowFilter[] CreateWorkflowFilters() => _config.Names.Select(name => new NameWorkflowFilter(name)).ToArray();
+
+        // If filter list is empty then all workflows/tasks are returned
+
+        private IEnumerable<WorkflowDefinition> FilterWorkflows(IEnumerable<WorkflowDefinition> workflows, IWorkflowFilter[] filters) =>
+            workflows.Where(wf => filters.All(filter => filter.Test(wf)));
+
+        private IEnumerable<TaskDefinition> FilterTasks(IEnumerable<TaskDefinition> tasks, ITaskFilter[] filters) =>
+            tasks.Where(task => filters.All(filter => filter.Test(task)));
     }
 }
