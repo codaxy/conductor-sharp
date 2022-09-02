@@ -7,5 +7,6 @@
         public string BaseUrl { get; set; }
         public bool Dryrun { get; set; }
         public string Destination { get; set; }
+        public string[] Names { get; set; }
     }
 }
