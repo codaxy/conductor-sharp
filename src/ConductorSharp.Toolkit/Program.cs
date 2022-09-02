@@ -16,7 +16,7 @@ namespace ConductorSharp.Toolkit
 {
     class Program
     {
-        public const string Version = "0.0.1";
+        public const string Version = "1.0.0";
 
         public async static Task Main(string[] args)
         {
