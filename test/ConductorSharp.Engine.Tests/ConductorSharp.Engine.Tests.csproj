@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -11,10 +11,15 @@
     <None Remove="Samples\Tasks\EmailPrepare.json" />
     <None Remove="Samples\Workflows\Arrays.json" />
     <None Remove="Samples\Workflows\ConditionallySendCustomerNotificationOutput.json" />
+    <None Remove="Samples\Workflows\DecisionInDecision.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
     <None Remove="Samples\Workflows\StringInterpolation.json" />
     <None Remove="Samples\Workflows\TerminateTaskWorkflow.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Samples\Workflows\DecisionInDecision.json" />
   </ItemGroup>
 
   <ItemGroup>
