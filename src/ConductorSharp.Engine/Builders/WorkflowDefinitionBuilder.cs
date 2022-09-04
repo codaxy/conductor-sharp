@@ -151,19 +151,18 @@ namespace ConductorSharp.Engine.Builders
             return builder;
         }
 
-        public void AddTask<F, G>(Expression<Func<TWorkflow, JsonJqTransformTaskModel<F, G>>> refference, Expression<Func<TWorkflow, F>> input)
-            where F : IRequest<G> => AddAndReturnBuilder(new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body));
+        public ITaskOptionsBuilder AddTask<F, G>(
+            Expression<Func<TWorkflow, JsonJqTransformTaskModel<F, G>>> refference,
+            Expression<Func<TWorkflow, F>> input
+        ) where F : IRequest<G> => AddAndReturnBuilder(new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body));
+
+        public void AddTask(Expression<Func<TWorkflow, TerminateTaskModel>> reference, Expression<Func<TWorkflow, TerminateTaskInput>> input) =>
+            AddAndReturnBuilder(new TerminateTaskBuilder(reference.Body, input.Body));
 
         private ITaskOptionsBuilder AddAndReturnBuilder<T>(T builder) where T : ITaskOptionsBuilder, ITaskBuilder
         {
             _taskBuilders.Add(builder);
             return builder;
-        }
-
-        public void AddTask(Expression<Func<TWorkflow, TerminateTaskModel>> reference, Expression<Func<TWorkflow, TerminateTaskInput>> input)
-        {
-            var tasks = new TerminateTaskBuilder(reference.Body, input.Body).Build();
-            AddTasks(tasks);
         }
     }
 }
