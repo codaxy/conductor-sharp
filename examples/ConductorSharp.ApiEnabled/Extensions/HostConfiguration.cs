@@ -21,7 +21,9 @@ public static class HostConfiguration
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
                     domain: configuration.GetValue<string>("Conductor:WorkerDomain")
-                );
+                )
+                .AddRequestResponseLogging();
+
             builder.RegisterMediatR(typeof(Program).Assembly);
             builder.RegisterModule<ConductorModule>();
         });

@@ -2,6 +2,7 @@
 using ConductorSharp.Engine.Behaviors;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Service;
+using ConductorSharp.Engine.Util;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 
@@ -12,7 +13,10 @@ namespace ConductorSharp.Engine.Extensions
         IWorkflowEngineExecutionManager AddExecutionManager(int maxConcurrentWorkers, int sleepInterval, int longPollInterval, string domain = null);
     }
 
-    public interface IWorkflowEngineExecutionManager { }
+    public interface IWorkflowEngineExecutionManager
+    {
+        IWorkflowEngineExecutionManager AddRequestResponseLogging();
+    }
 
     public class WorkflowEngineBuilder : IWorkflowEngineBuilder, IWorkflowEngineExecutionManager
     {
@@ -45,9 +49,18 @@ namespace ConductorSharp.Engine.Extensions
 
             _builder.RegisterType<ExecutionManager>().SingleInstance();
 
+            _builder.RegisterType<ConductorSharpExecutionContext>().InstancePerLifetimeScope();
+
             _builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
             //_builder.RegisterGeneric(typeof(ErrorHandlingBehavior<, >)).As(typeof(IPipelineBehavior<, >));
+
+            return this;
+        }
+
+        public IWorkflowEngineExecutionManager AddRequestResponseLogging()
+        {
+            _builder.RegisterGeneric(typeof(RequestResponseLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
             return this;
         }
