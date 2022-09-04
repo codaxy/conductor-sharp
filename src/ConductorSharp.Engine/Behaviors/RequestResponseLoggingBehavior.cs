@@ -31,12 +31,12 @@ namespace ConductorSharp.Engine.Behaviors
 
             try
             {
-                _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}} in {{@context}}", request, _executionContext);
+                _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}} in {{@conductorSharpContext}}", request, _executionContext);
                 var response = await next();
                 stopwatch.Stop();
 
                 _logger.LogInformation(
-                    $"Received response {{@{typeof(TResponse).Name}}} in {{@context}} in {{ellapsedMilliseconds}}",
+                    $"Received response {{@{typeof(TResponse).Name}}} in {{@conductorSharpContext}} in {{ellapsedMilliseconds}}",
                     response,
                     _executionContext,
                     stopwatch.ElapsedMilliseconds
@@ -48,7 +48,7 @@ namespace ConductorSharp.Engine.Behaviors
             {
                 stopwatch.Stop();
                 _logger.LogInformation(
-                    $"Exception {{exceptionMessage}} in {{@context}} in {{elapsedMilliseconds}}",
+                    $"Exception {{exceptionMessage}} in {{@conductorSharpContext}} in {{elapsedMilliseconds}}",
                     exc.Message,
                     _executionContext,
                     stopwatch.ElapsedMilliseconds
