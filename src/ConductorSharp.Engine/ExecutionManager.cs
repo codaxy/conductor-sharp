@@ -115,6 +115,7 @@ namespace ConductorSharp.Engine
                     context.WorkflowId = pollResponse.WorkflowInstanceId;
                     context.CorrelationId = pollResponse.CorrelationId;
                     context.TaskId = pollResponse.TaskId;
+                    context.WorkerId = workerId;
                 }
 
                 var response = await mediator.Send(inputData, cancellationToken);

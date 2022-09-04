@@ -12,5 +12,6 @@ namespace ConductorSharp.Engine.Util
         public string TaskId { get; set; }
         public string TaskRefferenceName { get; set; }
         public string CorrelationId { get; set; }
+        public string WorkerId { get; set; }
     }
 }
