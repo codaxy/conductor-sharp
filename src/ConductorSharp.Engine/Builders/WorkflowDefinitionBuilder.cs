@@ -159,5 +159,11 @@ namespace ConductorSharp.Engine.Builders
             _taskBuilders.Add(builder);
             return builder;
         }
+
+        public void AddTask(Expression<Func<TWorkflow, TerminateTaskModel>> reference, Expression<Func<TWorkflow, TerminateTaskInput>> input)
+        {
+            var tasks = new TerminateTaskBuilder(reference.Body, input.Body).Build();
+            AddTasks(tasks);
+        }
     }
 }

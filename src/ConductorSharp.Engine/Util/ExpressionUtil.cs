@@ -34,21 +34,11 @@ namespace ConductorSharp.Engine.Util
         private static object ParseExpression(Expression expression)
         {
             if (expression is ConstantExpression cex)
-                return cex.Value;
-
-            if (expression is UnaryExpression uex && uex.Operand is ConstantExpression ccex)
-            {
-                var converted = Convert.ToString(ccex.Value);
-
-                //if (ccex.Value is bool)
-                //    return converted.ToLowerInvariant();
-
-                return ccex.Value;
-            }
+                return ParseConstantExpression(cex);
 
             // Handle boxing
             if (expression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
-                return CreateExpressionString(unaryEx.Operand);
+                return ParseExpression(unaryEx.Operand);
 
             if (
                 expression is MethodCallExpression methodExpression
@@ -71,6 +61,19 @@ namespace ConductorSharp.Engine.Util
                 return ParseArrayInitalization(newArrayExpression);
 
             return CompileMemberOrNameExpressions(expression);
+        }
+
+        private static object ParseConstantExpression(ConstantExpression cex)
+        {
+            var type = cex.Type;
+            if (type.IsEnum)
+            {
+                // Handle enum constants
+                var field = type.GetField(type.GetEnumName(cex.Value));
+                return field.GetCustomAttribute<EnumValueAttribute>()?.Value ?? cex.Value.ToString();
+            }
+            else
+                return cex.Value;
         }
 
         private static JArray ParseArrayInitalization(NewArrayExpression newArrayExpression)
