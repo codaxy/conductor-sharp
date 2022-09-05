@@ -68,7 +68,8 @@ namespace ConductorSharp.Toolkit.Service
 
             var modelGenerator = new TaskModelGenerator(_config.BaseNamespace + ".Workflows", name, TaskModelGenerator.ModelType.Workflow)
             {
-                OriginalName = workflowDefinition.Name
+                OriginalName = workflowDefinition.Name,
+                Version = workflowDefinition.Version
             };
             string workflowDescription = workflowDefinition.Description;
             string[] labels;
