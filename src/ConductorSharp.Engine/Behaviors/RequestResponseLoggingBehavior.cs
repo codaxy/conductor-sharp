@@ -27,11 +27,11 @@ namespace ConductorSharp.Engine.Behaviors
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             var stopwatch = new Stopwatch();
+            _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}} in {{@conductorSharpContext}}", request, _executionContext);
             stopwatch.Start();
 
             try
             {
-                _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}} in {{@conductorSharpContext}}", request, _executionContext);
                 var response = await next();
                 stopwatch.Stop();
 
