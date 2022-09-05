@@ -9,6 +9,6 @@ namespace ConductorSharp.Toolkit.Filters
         public OwnerEmailWorkflowFilter(string ownerEmail) => _ownerEmail = ownerEmail;
 
         public bool Test(WorkflowDefinition workflowDefinition) =>
-            workflowDefinition.OwnerEmail != null || workflowDefinition.OwnerEmail == _ownerEmail;
+            workflowDefinition.OwnerEmail != null && workflowDefinition.OwnerEmail == _ownerEmail;
     }
 }
