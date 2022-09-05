@@ -111,7 +111,7 @@ namespace ConductorSharp.Engine
                 {
                     context.WorkflowName = pollResponse.WorkflowType;
                     context.TaskName = pollResponse.TaskDefName;
-                    context.TaskRefferenceName = pollResponse.ReferenceTaskName;
+                    context.TaskReferenceName = pollResponse.ReferenceTaskName;
                     context.WorkflowId = pollResponse.WorkflowInstanceId;
                     context.CorrelationId = pollResponse.CorrelationId;
                     context.TaskId = pollResponse.TaskId;
