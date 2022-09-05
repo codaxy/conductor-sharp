@@ -62,6 +62,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
+        public void BuilderReturnsCorrectDefinitionOptionalTask()
+        {
+            var definition = SerializationUtil.SerializeObject(new OptionalTaskWorkflow().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/OptionalTaskWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
         public void BuilderReturnsCorrectDefinitionTerminateTask()
         {
             var definition = SerializationUtil.SerializeObject(new TerminateTaskWorfklow().GetDefinition());
