@@ -33,7 +33,7 @@ namespace ConductorSharp.Toolkit.Service
             var workflowFilters = CreateWorkflowFilters();
 
             var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
-            workflowDefinitions = FilterWorkflows(workflowDefinitions, workflowFilters).ToArray();
+            workflowDefinitions = Filter(workflowDefinitions, workflowFilters).ToArray();
             var workflowDirectory = Path.Combine(_config.Destination, "Workflows");
             Directory.CreateDirectory(workflowDirectory);
             foreach (var workflowDefinition in workflowDefinitions)
@@ -48,7 +48,7 @@ namespace ConductorSharp.Toolkit.Service
             }
 
             var taskDefinitions = await _metadataService.GetAllTaskDefinitions();
-            taskDefinitions = FilterTasks(taskDefinitions, taskFilters).ToArray();
+            taskDefinitions = Filter(taskDefinitions, taskFilters).ToArray();
             var tasksDirectory = Path.Combine(_config.Destination, "Tasks");
             Directory.CreateDirectory(tasksDirectory);
             foreach (var taskDefinition in taskDefinitions)
@@ -253,10 +253,10 @@ namespace ConductorSharp.Toolkit.Service
 
         // If filter list is empty then all workflows/tasks are returned
 
-        private IEnumerable<WorkflowDefinition> FilterWorkflows(IEnumerable<WorkflowDefinition> workflows, IWorkflowFilter[] filters) =>
+        private IEnumerable<WorkflowDefinition> Filter(IEnumerable<WorkflowDefinition> workflows, IWorkflowFilter[] filters) =>
             workflows.Where(wf => filters.All(filter => filter.Test(wf)));
 
-        private IEnumerable<TaskDefinition> FilterTasks(IEnumerable<TaskDefinition> tasks, ITaskFilter[] filters) =>
+        private IEnumerable<TaskDefinition> Filter(IEnumerable<TaskDefinition> tasks, ITaskFilter[] filters) =>
             tasks.Where(task => filters.All(filter => filter.Test(task)));
     }
 }
