@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -16,6 +16,7 @@
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
     <None Remove="Samples\Workflows\StringInterpolation.json" />
     <None Remove="Samples\Workflows\TerminateTaskWorkflow.json" />
+    <None Remove="Samples\Workflows\VersionAttributeWorkflow.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,7 @@
 	<EmbeddedResource Include="Samples\Workflows\SendCustomerNotification.json" />
 	<EmbeddedResource Include="Samples\Workflows\StringInterpolation.json" />
 	<EmbeddedResource Include="Samples\Workflows\TerminateTaskWorkflow.json" />
+	<EmbeddedResource Include="Samples\Workflows\VersionAttributeWorkflow.json" />
   </ItemGroup>
 
   <ItemGroup>
