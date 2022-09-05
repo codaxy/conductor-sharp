@@ -8,12 +8,10 @@ namespace ConductorSharp.Engine.Builders
 {
     public class SimpleTaskBuilder<A, B> : BaseTaskBuilder<A, B> where A : IRequest<B>
     {
-        private readonly AdditionalTaskParameters _additionalParameters;
-
         public SimpleTaskBuilder(Expression taskExpression, Expression inputExpression, AdditionalTaskParameters additionalParameters)
             : base(taskExpression, inputExpression)
         {
-            _additionalParameters = additionalParameters;
+            _additionalParameters = additionalParameters ?? _additionalParameters;
         }
 
         public override WorkflowDefinition.Task[] Build() =>
@@ -26,7 +24,7 @@ namespace ConductorSharp.Engine.Builders
                     Type = "SIMPLE",
                     InputParameters = _inputParameters,
                     Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
-                    Optional = _additionalParameters != null ? _additionalParameters.Optional : false
+                    Optional = _additionalParameters?.Optional == true,
                 }
             };
     }

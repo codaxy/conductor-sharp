@@ -24,6 +24,7 @@ namespace ConductorSharp.Toolkit.Util
         public string Namespace { get; set; }
         public string ClassName { get; set; }
         public string OriginalName { get; set; }
+        public int Version { get; set; }
 
         private CompilationUnitSyntax _compilationUnit = SyntaxFactory.CompilationUnit();
         private readonly ModelType _modelType;
@@ -91,7 +92,7 @@ namespace ConductorSharp.Toolkit.Util
             return attribute;
         }
 
-        private AttributeSyntax CreateOriginalNameAttribute(string originalName)
+        private AttributeListSyntax CreateOriginalNameAttribute(string originalName)
         {
             var attribute = SyntaxFactory
                 .Attribute(SyntaxFactory.ParseName("OriginalName"))
@@ -100,7 +101,7 @@ namespace ConductorSharp.Toolkit.Util
                         SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(originalName))
                     )
                 );
-            return attribute;
+            return SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(attribute));
         }
 
         private PropertyDeclarationSyntax CreateProperty(PropertyData inputData)
@@ -180,15 +181,33 @@ namespace ConductorSharp.Toolkit.Util
             );
             var baseList = SyntaxFactory.BaseList(SyntaxFactory.SingletonSeparatedList<BaseTypeSyntax>(baseType));
 
-            var attributeList = SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(CreateOriginalNameAttribute(OriginalName)));
+            var attributeSyntaxList = new List<AttributeListSyntax>();
+            attributeSyntaxList.Add(CreateOriginalNameAttribute(OriginalName));
+
+            if (_modelType == ModelType.Workflow)
+                attributeSyntaxList.Add(CreateVersionAttribute(Version));
+
+            //var attributeList = SyntaxFactory.AttributeList(attributeSeparatedList);
             var classDeclaration = SyntaxFactory
                 .ClassDeclaration(ClassName)
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.PartialKeyword))
-                .AddAttributeLists(attributeList)
+                .AddAttributeLists(attributeSyntaxList.ToArray())
                 .WithBaseList(baseList)
                 .WithLeadingTrivia(GenerateXmlDocComment(_xmlComments));
 
             return classDeclaration;
+        }
+
+        private AttributeListSyntax CreateVersionAttribute(int version)
+        {
+            var attribute = SyntaxFactory
+                .Attribute(SyntaxFactory.ParseName("Version"))
+                .AddArgumentListArguments(
+                    SyntaxFactory.AttributeArgument(
+                        SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(version))
+                    )
+                );
+            return SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(attribute));
         }
     }
 }

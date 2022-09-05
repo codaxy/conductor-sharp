@@ -62,6 +62,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
+        public void BuilderReturnsCorrectDefinitionOptionalTask()
+        {
+            var definition = SerializationUtil.SerializeObject(new OptionalTaskWorkflow().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/OptionalTaskWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
         public void BuilderReturnsCorrectDefinitionTerminateTask()
         {
             var definition = SerializationUtil.SerializeObject(new TerminateTaskWorfklow().GetDefinition());
@@ -75,6 +84,14 @@ namespace ConductorSharp.Engine.Tests.Integration
         {
             var definition = SerializationUtil.SerializeObject(new DecisionInDecision().GetDefinition());
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/DecisionInDecision.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        public void BuilderReturnsCorrectDefinitionSubworkflowVersionAttribute()
+        {
+            var definition = SerializationUtil.SerializeObject(new VersionAttributeWorkflow().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/VersionAttributeWorkflow.json");
 
             Assert.Equal(expectedDefinition, definition);
         }

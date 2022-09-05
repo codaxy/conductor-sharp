@@ -21,7 +21,7 @@ namespace ConductorSharp.Engine.Builders
         private JObject _inputs = new();
         private WorkflowOptions _workflowOptions;
 
-        public List<WorkflowDefinition.Task> WorkflowTasks { get; set; } = new List<WorkflowDefinition.Task>();
+        private List<ITaskBuilder> _taskBuilders = new();
 
         public WorkflowDefinitionBuilder()
         {
@@ -29,7 +29,6 @@ namespace ConductorSharp.Engine.Builders
             _workflowOptions = new WorkflowOptions();
 
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
-
             _name = NamingUtil.DetermineRegistrationName(_workflowType);
 
             var summary = _workflowType.GetDocSection("summary");
@@ -78,7 +77,7 @@ namespace ConductorSharp.Engine.Builders
             return new WorkflowDefinition
             {
                 Name = _name,
-                Tasks = WorkflowTasks,
+                Tasks = _taskBuilders.SelectMany(a => a.Build()).ToList(),
                 FailureWorkflow =
                     _workflowOptions.FailureWorkflow != null ? NamingUtil.DetermineRegistrationName(_workflowOptions.FailureWorkflow) : null,
                 Description = new JObject()
@@ -92,39 +91,31 @@ namespace ConductorSharp.Engine.Builders
             };
         }
 
-        public void AddTask<F, G>(Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence, Expression<Func<TWorkflow, F>> input, string script)
-            where F : IRequest<G>
-        {
-            var tasks = new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body).Build();
-            AddTasks(tasks);
-        }
+        public ITaskOptionsBuilder AddTask<F, G>(
+            Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence,
+            Expression<Func<TWorkflow, F>> input,
+            string script
+        ) where F : IRequest<G> => AddAndReturnBuilder(new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body));
 
-        public void AddTask<F, G>(Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence, Expression<Func<TWorkflow, F>> input)
-            where F : IRequest<G>
-        {
-            var tasks = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body).Build();
-            AddTasks(tasks);
-        }
+        public ITaskOptionsBuilder AddTask<F, G>(
+            Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence,
+            Expression<Func<TWorkflow, F>> input
+        ) where F : IRequest<G> => AddAndReturnBuilder(new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body));
 
-        public void AddTask(Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> refference, Expression<Func<TWorkflow, DynamicForkJoinInput>> input)
-        {
-            var tasks = new DynamicForkJoinTaskBuilder(refference.Body, input.Body).Build();
-            AddTasks(tasks);
-        }
+        public ITaskOptionsBuilder AddTask(
+            Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> refference,
+            Expression<Func<TWorkflow, DynamicForkJoinInput>> input
+        ) => AddAndReturnBuilder(new DynamicForkJoinTaskBuilder(refference.Body, input.Body));
 
-        public void AddTasks(params WorkflowDefinition.Task[] taskDefinitions) => WorkflowTasks.AddRange(taskDefinitions);
+        public void AddTasks(params WorkflowDefinition.Task[] taskDefinitions) => _taskBuilders.Add(new PassThroughTaskBuilder(taskDefinitions));
 
-        public void AddTask<F, G>(
+        public ITaskOptionsBuilder AddTask<F, G>(
             Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> refference,
             Expression<Func<TWorkflow, F>> input,
             AdditionalTaskParameters additionalParameters = null
-        ) where F : IRequest<G>
-        {
-            var tasks = new SimpleTaskBuilder<F, G>(refference.Body, input.Body, additionalParameters).Build();
-            AddTasks(tasks);
-        }
+        ) where F : IRequest<G> => AddAndReturnBuilder(new SimpleTaskBuilder<F, G>(refference.Body, input.Body, additionalParameters));
 
-        public void AddTask(
+        public ITaskOptionsBuilder AddTask(
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
             Expression<Func<TWorkflow, DecisionTaskInput>> expression,
             params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
@@ -138,10 +129,11 @@ namespace ConductorSharp.Engine.Builders
                 funcase.Item2.Invoke(builder);
             }
 
-            AddTasks(builder.Build());
+            _taskBuilders.Add(builder);
+            return builder;
         }
 
-        public void AddTask(
+        public ITaskOptionsBuilder AddTask(
             Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
             Expression<Func<TWorkflow, SwitchTaskInput>> expression,
             params (string, Action<SwitchTaskBuilder<TWorkflow>>)[] caseActions
@@ -155,20 +147,24 @@ namespace ConductorSharp.Engine.Builders
                 funcase.Item2.Invoke(builder);
             }
 
-            AddTasks(builder.Build());
+            _taskBuilders.Add(builder);
+            return builder;
         }
 
-        public void AddTask<F, G>(Expression<Func<TWorkflow, JsonJqTransformTaskModel<F, G>>> refference, Expression<Func<TWorkflow, F>> input)
-            where F : IRequest<G>
-        {
-            var tasks = new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body).Build();
-            AddTasks(tasks);
-        }
+        public ITaskOptionsBuilder AddTask<F, G>(
+            Expression<Func<TWorkflow, JsonJqTransformTaskModel<F, G>>> refference,
+            Expression<Func<TWorkflow, F>> input
+        ) where F : IRequest<G> => AddAndReturnBuilder(new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body));
 
-        public void AddTask(Expression<Func<TWorkflow, TerminateTaskModel>> reference, Expression<Func<TWorkflow, TerminateTaskInput>> input)
+        public ITaskOptionsBuilder AddTask(
+            Expression<Func<TWorkflow, TerminateTaskModel>> reference,
+            Expression<Func<TWorkflow, TerminateTaskInput>> input
+        ) => AddAndReturnBuilder(new TerminateTaskBuilder(reference.Body, input.Body));
+
+        private ITaskOptionsBuilder AddAndReturnBuilder<T>(T builder) where T : ITaskOptionsBuilder, ITaskBuilder
         {
-            var tasks = new TerminateTaskBuilder(reference.Body, input.Body).Build();
-            AddTasks(tasks);
+            _taskBuilders.Add(builder);
+            return builder;
         }
     }
 }
