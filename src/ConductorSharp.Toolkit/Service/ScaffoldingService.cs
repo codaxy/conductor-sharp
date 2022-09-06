@@ -250,8 +250,8 @@ namespace ConductorSharp.Toolkit.Service
         private ITaskFilter[] CreateTaskFilters()
         {
             var taskFilters = new List<ITaskFilter>();
-            if (_config.Names.Length != 0)
-                taskFilters.Add(new NameTaskFilter(_config.Names));
+            if (_config.NameFilters.Length != 0)
+                taskFilters.Add(new NameTaskFilter(_config.NameFilters));
 
             return taskFilters.ToArray();
         }
@@ -259,8 +259,8 @@ namespace ConductorSharp.Toolkit.Service
         private IWorkflowFilter[] CreateWorkflowFilters()
         {
             var workflowFilters = new List<IWorkflowFilter>();
-            if (_config.Names.Length != 0)
-                workflowFilters.Add(new NameWorkflowFilter(_config.Names));
+            if (_config.NameFilters.Length != 0)
+                workflowFilters.Add(new NameWorkflowFilter(_config.NameFilters));
 
             return workflowFilters.ToArray();
         }

@@ -8,6 +8,6 @@ namespace ConductorSharp.Toolkit.Models
         public string ConfigurationFilePath { get; set; }
 
         [Option('n', "name", HelpText = "Specifies names of the tasks and workflows to scaffold")]
-        public IEnumerable<string> Names { get; set; }
+        public IEnumerable<string> NameFilters { get; set; }
     }
 }
