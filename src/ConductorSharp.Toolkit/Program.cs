@@ -119,6 +119,8 @@ namespace ConductorSharp.Toolkit
                 scaffoldingConfig.BaseNamespace = config.Namespace;
                 scaffoldingConfig.Destination = config.Destination;
                 scaffoldingConfig.NameFilters = options.NameFilters.ToArray();
+                scaffoldingConfig.OwnerAppFilters = options.OwnerAppFilters.ToArray();
+                scaffoldingConfig.OwnerEmailFilters = options.OwnerEmailFilters.ToArray();
             });
 
             builder.Populate(serviceCollection);

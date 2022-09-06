@@ -8,5 +8,7 @@
         public bool Dryrun { get; set; }
         public string Destination { get; set; }
         public string[] NameFilters { get; set; }
+        public string[] OwnerAppFilters { get; set; }
+        public string[] OwnerEmailFilters { get; set; }
     }
 }
