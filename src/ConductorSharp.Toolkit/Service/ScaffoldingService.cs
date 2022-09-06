@@ -252,6 +252,10 @@ namespace ConductorSharp.Toolkit.Service
             var taskFilters = new List<ITaskFilter>();
             if (_config.NameFilters.Length != 0)
                 taskFilters.Add(new NameTaskFilter(_config.NameFilters));
+            if (_config.OwnerAppFilters.Length != 0)
+                taskFilters.Add(new OwnerAppTaskFilter(_config.OwnerAppFilters));
+            if (_config.OwnerEmailFilters.Length != 0)
+                taskFilters.Add(new OwnerEmailTaskFilter(_config.OwnerEmailFilters));
 
             return taskFilters.ToArray();
         }
