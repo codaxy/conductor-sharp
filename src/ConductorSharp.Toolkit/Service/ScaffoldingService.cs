@@ -32,33 +32,39 @@ namespace ConductorSharp.Toolkit.Service
             var taskFilters = CreateTaskFilters();
             var workflowFilters = CreateWorkflowFilters();
 
-            var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
-            workflowDefinitions = Filter(workflowDefinitions, workflowFilters).ToArray();
-            var workflowDirectory = Path.Combine(_config.Destination, "Workflows");
-            Directory.CreateDirectory(workflowDirectory);
-            foreach (var workflowDefinition in workflowDefinitions)
+            if (!_config.IgnoreWorkflows)
             {
-                (var contents, var modelClassName) = CreateWorkflowClass(workflowDefinition);
-
-                if (contents != null)
+                var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
+                workflowDefinitions = Filter(workflowDefinitions, workflowFilters).ToArray();
+                var workflowDirectory = Path.Combine(_config.Destination, "Workflows");
+                Directory.CreateDirectory(workflowDirectory);
+                foreach (var workflowDefinition in workflowDefinitions)
                 {
-                    var filePath = Path.Combine(workflowDirectory, $"{modelClassName}.scaff.cs");
-                    File.WriteAllText(filePath, contents);
+                    (var contents, var modelClassName) = CreateWorkflowClass(workflowDefinition);
+
+                    if (contents != null)
+                    {
+                        var filePath = Path.Combine(workflowDirectory, $"{modelClassName}.scaff.cs");
+                        File.WriteAllText(filePath, contents);
+                    }
                 }
             }
 
-            var taskDefinitions = await _metadataService.GetAllTaskDefinitions();
-            taskDefinitions = Filter(taskDefinitions, taskFilters).ToArray();
-            var tasksDirectory = Path.Combine(_config.Destination, "Tasks");
-            Directory.CreateDirectory(tasksDirectory);
-            foreach (var taskDefinition in taskDefinitions)
+            if (!_config.IgnoreTasks)
             {
-                (var contents, var modelClassName) = CreateTaskClass(taskDefinition);
-
-                if (contents != null)
+                var taskDefinitions = await _metadataService.GetAllTaskDefinitions();
+                taskDefinitions = Filter(taskDefinitions, taskFilters).ToArray();
+                var tasksDirectory = Path.Combine(_config.Destination, "Tasks");
+                Directory.CreateDirectory(tasksDirectory);
+                foreach (var taskDefinition in taskDefinitions)
                 {
-                    var filePath = Path.Combine(tasksDirectory, $"{modelClassName}.scaff.cs");
-                    File.WriteAllText(filePath, contents);
+                    (var contents, var modelClassName) = CreateTaskClass(taskDefinition);
+
+                    if (contents != null)
+                    {
+                        var filePath = Path.Combine(tasksDirectory, $"{modelClassName}.scaff.cs");
+                        File.WriteAllText(filePath, contents);
+                    }
                 }
             }
         }

@@ -121,6 +121,8 @@ namespace ConductorSharp.Toolkit
                 scaffoldingConfig.NameFilters = options.NameFilters.ToArray();
                 scaffoldingConfig.OwnerAppFilters = options.OwnerAppFilters.ToArray();
                 scaffoldingConfig.OwnerEmailFilters = options.OwnerEmailFilters.ToArray();
+                scaffoldingConfig.IgnoreTasks = options.IgnoreTasks;
+                scaffoldingConfig.IgnoreWorkflows = options.IgnoreWorkflows;
             });
 
             builder.Populate(serviceCollection);

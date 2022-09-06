@@ -10,5 +10,7 @@
         public string[] NameFilters { get; set; }
         public string[] OwnerAppFilters { get; set; }
         public string[] OwnerEmailFilters { get; set; }
+        public bool IgnoreTasks { get; set; }
+        public bool IgnoreWorkflows { get; set; }
     }
 }
