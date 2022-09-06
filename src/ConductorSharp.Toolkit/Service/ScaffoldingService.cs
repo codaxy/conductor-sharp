@@ -247,9 +247,23 @@ namespace ConductorSharp.Toolkit.Service
             return (modelGenerator.Build(), name);
         }
 
-        private ITaskFilter[] CreateTaskFilters() => _config.Names.Select(name => new NameTaskFilter(name)).ToArray();
+        private ITaskFilter[] CreateTaskFilters()
+        {
+            var taskFilters = new List<ITaskFilter>();
+            if (_config.Names.Length != 0)
+                taskFilters.Add(new NameTaskFilter(_config.Names));
 
-        private IWorkflowFilter[] CreateWorkflowFilters() => _config.Names.Select(name => new NameWorkflowFilter(name)).ToArray();
+            return taskFilters.ToArray();
+        }
+
+        private IWorkflowFilter[] CreateWorkflowFilters()
+        {
+            var workflowFilters = new List<IWorkflowFilter>();
+            if (_config.Names.Length != 0)
+                workflowFilters.Add(new NameWorkflowFilter(_config.Names));
+
+            return workflowFilters.ToArray();
+        }
 
         // If filter list is empty then all workflows/tasks are returned
 

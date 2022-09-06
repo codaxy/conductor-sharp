@@ -6,10 +6,10 @@ namespace ConductorSharp.Toolkit.Filters
 {
     public class NameWorkflowFilter : IWorkflowFilter
     {
-        private readonly Regex _regex;
+        private readonly Regex[] _regexes;
 
-        public NameWorkflowFilter(string name) => _regex = RegexUtil.CreateNameRegex(name);
+        public NameWorkflowFilter(IEnumerable<string> names) => _regexes = names.Select(name => RegexUtil.CreateNameRegex(name)).ToArray();
 
-        public bool Test(WorkflowDefinition workflowDefinition) => _regex.IsMatch(workflowDefinition.Name);
+        public bool Test(WorkflowDefinition workflowDefinition) => _regexes.Any(regex => regex.IsMatch(workflowDefinition.Name));
     }
 }
