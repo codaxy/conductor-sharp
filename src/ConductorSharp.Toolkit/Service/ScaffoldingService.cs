@@ -261,6 +261,10 @@ namespace ConductorSharp.Toolkit.Service
             var workflowFilters = new List<IWorkflowFilter>();
             if (_config.NameFilters.Length != 0)
                 workflowFilters.Add(new NameWorkflowFilter(_config.NameFilters));
+            if (_config.OwnerAppFilters.Length != 0)
+                workflowFilters.Add(new OwnerAppWorkflowFilter(_config.OwnerAppFilters));
+            if (_config.OwnerEmailFilters.Length != 0)
+                workflowFilters.Add(new OwnerEmailWorkflowFilter(_config.OwnerEmailFilters));
 
             return workflowFilters.ToArray();
         }
