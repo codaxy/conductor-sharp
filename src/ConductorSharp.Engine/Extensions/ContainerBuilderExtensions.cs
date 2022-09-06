@@ -57,7 +57,7 @@ namespace ConductorSharp.Engine.Extensions
             return new WorkflowEngineBuilder(builder);
         }
 
-        public static IConfigurableWorkflowEngineBuilder AddConductorSharp(
+        public static IConductorSharpBuilder AddConductorSharp(
             this ContainerBuilder builder,
             string baseUrl,
             string apiPath,
@@ -85,7 +85,7 @@ namespace ConductorSharp.Engine.Extensions
 
             builder.RegisterType<WorkflowService>().As<IWorkflowService>();
 
-            return new ConfigurableWorkflowEngineBuilder(builder);
+            return new ConductorSharpBuilder(builder);
         }
 
         public static void RegisterWorkerTask<TWorkerTask>(this ContainerBuilder builder, Action<TaskDefinitionOptions> updateOptions = null)

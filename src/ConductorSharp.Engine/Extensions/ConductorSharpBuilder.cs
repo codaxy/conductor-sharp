@@ -11,18 +11,13 @@ using System.Text;
 
 namespace ConductorSharp.Engine.Extensions
 {
-    public class ConfigurableWorkflowEngineBuilder : IConfigurableWorkflowEngineBuilder, IConfigurableWorkflowEngineExecutionManager, IPipelineBuilder
+    public class ConductorSharpBuilder : IConductorSharpBuilder, IExecutionManagerBuilder, IPipelineBuilder
     {
         private readonly ContainerBuilder _builder;
 
-        public ConfigurableWorkflowEngineBuilder(ContainerBuilder builder) => _builder = builder;
+        public ConductorSharpBuilder(ContainerBuilder builder) => _builder = builder;
 
-        public IConfigurableWorkflowEngineExecutionManager AddExecutionManager(
-            int maxConcurrentWorkers,
-            int sleepInterval,
-            int longPollInterval,
-            string domain = null
-        )
+        public IExecutionManagerBuilder AddExecutionManager(int maxConcurrentWorkers, int sleepInterval, int longPollInterval, string domain = null)
         {
             var workerConfig = new WorkerSetConfig
             {
@@ -47,7 +42,7 @@ namespace ConductorSharp.Engine.Extensions
             return this;
         }
 
-        public IConfigurableWorkflowEngineExecutionManager AddPipelines(Action<IPipelineBuilder> behaviorBuilder)
+        public IExecutionManagerBuilder AddPipelines(Action<IPipelineBuilder> behaviorBuilder)
         {
             behaviorBuilder(this);
             return this;
