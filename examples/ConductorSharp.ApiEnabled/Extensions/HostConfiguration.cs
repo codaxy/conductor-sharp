@@ -11,7 +11,7 @@ public static class HostConfiguration
         return hostBuilder.ConfigureContainer<ContainerBuilder>(builder =>
         {
             builder
-                .AddWorkflowEngine(
+                .AddConductorSharp(
                     baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"),
                     apiPath: configuration.GetValue<string>("Conductor:ApiUrl"),
                     preventErrorOnBadRequest: configuration.GetValue<bool>("Conductor:PreventErrorOnBadRequest")
@@ -22,7 +22,11 @@ public static class HostConfiguration
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
                     domain: configuration.GetValue<string>("Conductor:WorkerDomain")
                 )
-                .AddRequestResponseLogging();
+                .AddPipelines(pipelines =>
+                {
+                    pipelines.AddRequestResponseLogging();
+                    pipelines.AddValidation();
+                });
 
             builder.RegisterMediatR(typeof(Program).Assembly);
             builder.RegisterModule<ConductorModule>();
