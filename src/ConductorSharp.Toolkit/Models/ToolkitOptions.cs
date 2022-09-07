@@ -16,10 +16,10 @@ namespace ConductorSharp.Toolkit.Models
         [Option('e', "email", HelpText = "Specifies owner emails of the tasks and workflows to scaffold")]
         public IEnumerable<string> OwnerEmailFilters { get; set; }
 
-        [Option("no-tasks", Default = false, SetName = "no-tasks")]
+        [Option("no-tasks", Default = false, SetName = "no-tasks", HelpText = "Skip task scaffolding")]
         public bool IgnoreTasks { get; set; }
 
-        [Option("no-workflows", Default = false, SetName = "no-workflows")]
+        [Option("no-workflows", Default = false, SetName = "no-workflows", HelpText = "Skip workflow scaffolding")]
         public bool IgnoreWorkflows { get; set; }
     }
 }
