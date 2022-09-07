@@ -61,7 +61,7 @@ namespace ConductorSharp.Toolkit
                 if (!ValidateConfiguration(config))
                     return;
 
-                var container = BuildContainer(config);
+                var container = BuildContainer(config, options);
                 var commandRegistry = container.Resolve<CommandRegistry>();
                 // Currently only scaffolding is supported
                 var command = commandRegistry.Get("scaffold");
@@ -104,7 +104,7 @@ namespace ConductorSharp.Toolkit
             return validConfiguration;
         }
 
-        private static IContainer BuildContainer(Configuration config)
+        private static IContainer BuildContainer(Configuration config, ToolkitOptions options)
         {
             var serviceCollection = new ServiceCollection();
 
@@ -118,6 +118,12 @@ namespace ConductorSharp.Toolkit
                 scaffoldingConfig.BaseUrl = config.BaseUrl;
                 scaffoldingConfig.BaseNamespace = config.Namespace;
                 scaffoldingConfig.Destination = config.Destination;
+                scaffoldingConfig.NameFilters = options.NameFilters.ToArray();
+                scaffoldingConfig.OwnerAppFilters = options.OwnerAppFilters.ToArray();
+                scaffoldingConfig.OwnerEmailFilters = options.OwnerEmailFilters.ToArray();
+                scaffoldingConfig.IgnoreTasks = options.IgnoreTasks;
+                scaffoldingConfig.IgnoreWorkflows = options.IgnoreWorkflows;
+                scaffoldingConfig.DryRun = options.DryRun;
             });
 
             builder.Populate(serviceCollection);

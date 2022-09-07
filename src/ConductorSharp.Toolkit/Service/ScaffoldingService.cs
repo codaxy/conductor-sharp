@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Toolkit.Filters;
 using ConductorSharp.Toolkit.Util;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -28,31 +29,50 @@ namespace ConductorSharp.Toolkit.Service
 
         public async Task Scaffold()
         {
-            var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
-            var workflowDirectory = Path.Combine(_config.Destination, "Workflows");
-            Directory.CreateDirectory(workflowDirectory);
-            foreach (var workflowDefinition in workflowDefinitions)
-            {
-                (var contents, var modelClassName) = CreateWorkflowClass(workflowDefinition);
+            var taskFilters = CreateTaskFilters();
+            var workflowFilters = CreateWorkflowFilters();
 
-                if (contents != null)
+            if (!_config.IgnoreWorkflows)
+            {
+                var workflowDefinitions = await _metadataService.GetAllWorkflowDefinitions();
+                workflowDefinitions = Filter(workflowDefinitions, workflowFilters).ToArray();
+                var workflowDirectory = Path.Combine(_config.Destination, "Workflows");
+                Directory.CreateDirectory(workflowDirectory);
+                foreach (var workflowDefinition in workflowDefinitions)
                 {
-                    var filePath = Path.Combine(workflowDirectory, $"{modelClassName}.scaff.cs");
-                    File.WriteAllText(filePath, contents);
+                    Console.WriteLine($"Scaffolding workflow {workflowDefinition.Name}");
+                    if (_config.DryRun)
+                        continue;
+
+                    (var contents, var modelClassName) = CreateWorkflowClass(workflowDefinition);
+
+                    if (contents != null && !_config.DryRun)
+                    {
+                        var filePath = Path.Combine(workflowDirectory, $"{modelClassName}.scaff.cs");
+                        File.WriteAllText(filePath, contents);
+                    }
                 }
             }
 
-            var taskDefinitions = await _metadataService.GetAllTaskDefinitions();
-            var tasksDirectory = Path.Combine(_config.Destination, "Tasks");
-            Directory.CreateDirectory(tasksDirectory);
-            foreach (var taskDefinition in taskDefinitions)
+            if (!_config.IgnoreTasks)
             {
-                (var contents, var modelClassName) = CreateTaskClass(taskDefinition);
-
-                if (contents != null)
+                var taskDefinitions = await _metadataService.GetAllTaskDefinitions();
+                taskDefinitions = Filter(taskDefinitions, taskFilters).ToArray();
+                var tasksDirectory = Path.Combine(_config.Destination, "Tasks");
+                Directory.CreateDirectory(tasksDirectory);
+                foreach (var taskDefinition in taskDefinitions)
                 {
-                    var filePath = Path.Combine(tasksDirectory, $"{modelClassName}.scaff.cs");
-                    File.WriteAllText(filePath, contents);
+                    Console.WriteLine($"Scaffolding task {taskDefinition.Name}");
+                    if (_config.DryRun)
+                        continue;
+
+                    (var contents, var modelClassName) = CreateTaskClass(taskDefinition);
+
+                    if (contents != null)
+                    {
+                        var filePath = Path.Combine(tasksDirectory, $"{modelClassName}.scaff.cs");
+                        File.WriteAllText(filePath, contents);
+                    }
                 }
             }
         }
@@ -168,9 +188,6 @@ namespace ConductorSharp.Toolkit.Service
             modelGenerator.AddXmlComment("ownerEmail", workflowDefinition.OwnerEmail);
             modelGenerator.AddXmlComment("note", note);
 
-            if (_config.Dryrun)
-                return (null, null);
-
             return (modelGenerator.Build(), name);
         }
 
@@ -236,10 +253,42 @@ namespace ConductorSharp.Toolkit.Service
                 _logger.LogWarning($"No owner app defined for task {taskDefinition.Name}");
 
             modelGenerator.AddXmlComment("summary", description.Replace('\n', ','));
-            if (_config.Dryrun)
-                return (null, null);
 
             return (modelGenerator.Build(), name);
         }
+
+        private ITaskFilter[] CreateTaskFilters()
+        {
+            var taskFilters = new List<ITaskFilter>();
+            if (_config.NameFilters.Length != 0)
+                taskFilters.Add(new NameTaskFilter(_config.NameFilters));
+            if (_config.OwnerAppFilters.Length != 0)
+                taskFilters.Add(new OwnerAppTaskFilter(_config.OwnerAppFilters));
+            if (_config.OwnerEmailFilters.Length != 0)
+                taskFilters.Add(new OwnerEmailTaskFilter(_config.OwnerEmailFilters));
+
+            return taskFilters.ToArray();
+        }
+
+        private IWorkflowFilter[] CreateWorkflowFilters()
+        {
+            var workflowFilters = new List<IWorkflowFilter>();
+            if (_config.NameFilters.Length != 0)
+                workflowFilters.Add(new NameWorkflowFilter(_config.NameFilters));
+            if (_config.OwnerAppFilters.Length != 0)
+                workflowFilters.Add(new OwnerAppWorkflowFilter(_config.OwnerAppFilters));
+            if (_config.OwnerEmailFilters.Length != 0)
+                workflowFilters.Add(new OwnerEmailWorkflowFilter(_config.OwnerEmailFilters));
+
+            return workflowFilters.ToArray();
+        }
+
+        // If filter list is empty then all workflows/tasks are returned
+
+        private IEnumerable<WorkflowDefinition> Filter(IEnumerable<WorkflowDefinition> workflows, IWorkflowFilter[] filters) =>
+            workflows.Where(wf => filters.All(filter => filter.Test(wf)));
+
+        private IEnumerable<TaskDefinition> Filter(IEnumerable<TaskDefinition> tasks, ITaskFilter[] filters) =>
+            tasks.Where(task => filters.All(filter => filter.Test(task)));
     }
 }
