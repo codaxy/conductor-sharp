@@ -85,11 +85,11 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
-        public DecisionTaskBuilder<TWorkflow> WithTask<F>(
+        public DecisionTaskBuilder<TWorkflow> WithTask(
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
-            Expression<Func<TWorkflow, F>> expression,
+            Expression<Func<TWorkflow, DecisionTaskInput>> expression,
             params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
-        ) where F : IRequest<NoOutput>
+        )
         {
             var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
 

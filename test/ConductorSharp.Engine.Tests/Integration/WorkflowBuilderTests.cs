@@ -80,6 +80,14 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
+        public void BuilderReturnsCorrectDefinitionDecisionInDecision()
+        {
+            var definition = SerializationUtil.SerializeObject(new DecisionInDecision().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/DecisionInDecision.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
         public void BuilderReturnsCorrectDefinitionSubworkflowVersionAttribute()
         {
             var definition = SerializationUtil.SerializeObject(new VersionAttributeWorkflow().GetDefinition());
