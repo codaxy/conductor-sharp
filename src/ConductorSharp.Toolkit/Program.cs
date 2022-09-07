@@ -123,6 +123,7 @@ namespace ConductorSharp.Toolkit
                 scaffoldingConfig.OwnerEmailFilters = options.OwnerEmailFilters.ToArray();
                 scaffoldingConfig.IgnoreTasks = options.IgnoreTasks;
                 scaffoldingConfig.IgnoreWorkflows = options.IgnoreWorkflows;
+                scaffoldingConfig.DryRun = options.DryRun;
             });
 
             builder.Populate(serviceCollection);

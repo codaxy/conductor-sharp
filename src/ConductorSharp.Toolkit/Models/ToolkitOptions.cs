@@ -21,5 +21,8 @@ namespace ConductorSharp.Toolkit.Models
 
         [Option("no-workflows", Default = false, SetName = "no-workflows", HelpText = "Skip workflow scaffolding")]
         public bool IgnoreWorkflows { get; set; }
+
+        [Option("dry-run", Default = false, HelpText = "Print which workflows would be scaffolded")]
+        public bool DryRun { get; set; }
     }
 }
