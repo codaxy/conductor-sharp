@@ -40,9 +40,13 @@ namespace ConductorSharp.Toolkit.Service
                 Directory.CreateDirectory(workflowDirectory);
                 foreach (var workflowDefinition in workflowDefinitions)
                 {
+                    Console.WriteLine($"Scaffolding workflow {workflowDefinition.Name}");
+                    if (_config.DryRun)
+                        continue;
+
                     (var contents, var modelClassName) = CreateWorkflowClass(workflowDefinition);
 
-                    if (contents != null)
+                    if (contents != null && !_config.DryRun)
                     {
                         var filePath = Path.Combine(workflowDirectory, $"{modelClassName}.scaff.cs");
                         File.WriteAllText(filePath, contents);
@@ -58,6 +62,10 @@ namespace ConductorSharp.Toolkit.Service
                 Directory.CreateDirectory(tasksDirectory);
                 foreach (var taskDefinition in taskDefinitions)
                 {
+                    Console.WriteLine($"Scaffolding task {taskDefinition.Name}");
+                    if (_config.DryRun)
+                        continue;
+
                     (var contents, var modelClassName) = CreateTaskClass(taskDefinition);
 
                     if (contents != null)
@@ -179,9 +187,6 @@ namespace ConductorSharp.Toolkit.Service
             modelGenerator.AddXmlComment("ownerEmail", workflowDefinition.OwnerEmail);
             modelGenerator.AddXmlComment("note", note);
 
-            if (_config.Dryrun)
-                return (null, null);
-
             return (modelGenerator.Build(), name);
         }
 
@@ -247,8 +252,6 @@ namespace ConductorSharp.Toolkit.Service
                 _logger.LogWarning($"No owner app defined for task {taskDefinition.Name}");
 
             modelGenerator.AddXmlComment("summary", description.Replace('\n', ','));
-            if (_config.Dryrun)
-                return (null, null);
 
             return (modelGenerator.Build(), name);
         }
