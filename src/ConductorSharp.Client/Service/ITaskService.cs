@@ -17,6 +17,7 @@ namespace ConductorSharp.Client.Service
         Task UpdateTaskCompleted(object outputData, string taskId, string workflowId);
         Task UpdateTaskFailed(string taskId, string workflowId, string reasonForIncompletion);
         Task UpdateTaskFailed(string taskId, string workflowId, string reasonForIncompletion, string logMessage);
+        Task UpdateTaskFailed(object outputData, string taskId, string workflowId, string reasonForIncompletion, string logMessage);
         Task<PollTaskResponse> PollTasks(string name, string workerId);
         Task<PollTaskResponse> PollTasks(string name, string workerId, string domain);
         Task<GetTaskLogsResponse[]> GetLogsForTask(string taskId);

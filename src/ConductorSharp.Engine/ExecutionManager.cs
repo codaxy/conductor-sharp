@@ -130,7 +130,16 @@ namespace ConductorSharp.Engine
                     pollResponse.WorkflowType,
                     pollResponse.WorkflowInstanceId
                 );
-                await _taskManager.UpdateTaskFailed(pollResponse.TaskId, pollResponse.WorkflowInstanceId, exception.Message, exception.StackTrace);
+
+                var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
+
+                await _taskManager.UpdateTaskFailed(
+                    errorMessage,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowInstanceId,
+                    exception.Message,
+                    exception.StackTrace
+                );
             }
         }
     }
