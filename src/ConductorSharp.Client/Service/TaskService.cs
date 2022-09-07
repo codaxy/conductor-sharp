@@ -97,5 +97,22 @@ namespace ConductorSharp.Client.Service
 
         public Task<GetTaskLogsResponse[]> GetLogsForTask(string taskId) =>
             _client.ExecuteRequestAsync<GetTaskLogsResponse[]>(ApiUrls.GetLogsForTask(taskId), HttpMethod.Get);
+
+        public Task UpdateTaskFailed(object outputData, string taskId, string workflowId, string reasonForIncompletion, string logMessage) =>
+            UpdateTask(
+                new UpdateTaskRequest
+                {
+                    Status = "FAILED",
+                    TaskId = taskId,
+                    OutputData = JObject.FromObject(outputData, ConductorConstants.IoJsonSerializer),
+                    WorkflowInstanceId = workflowId,
+                    ReasonForIncompletion = reasonForIncompletion,
+                    Logs = new List<LogData>
+                    {
+                        new LogData { Log = reasonForIncompletion, CreatedTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() },
+                        new LogData { Log = logMessage, CreatedTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() }
+                    }
+                }
+            );
     }
 }
