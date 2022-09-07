@@ -127,7 +127,7 @@ namespace ConductorSharp.Toolkit
             });
 
             builder.Populate(serviceCollection);
-            builder.AddWorkflowEngine(
+            builder.AddConductorSharp(
                 config.BaseUrl,
                 config.ApiPath,
                 createClient: () =>

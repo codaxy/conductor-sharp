@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
+using ConductorSharp.Engine.Util;
 
 namespace ConductorSharp.Engine
 {
@@ -20,7 +22,7 @@ namespace ConductorSharp.Engine
         private readonly ILogger<ExecutionManager> _logger;
         private readonly ITaskService _taskManager;
         private readonly IEnumerable<TaskToWorker> _registeredWorkers;
-        private readonly IMediator _mediator;
+        private readonly ILifetimeScope _lifetimeScope;
 
         // TODO: Implement polling strategy so that if there
         // are no requests incoming we poll less, and when queues are full
@@ -36,7 +38,7 @@ namespace ConductorSharp.Engine
             ILogger<ExecutionManager> logger,
             ITaskService taskService,
             IEnumerable<TaskToWorker> workerMappings,
-            IMediator mediator
+            ILifetimeScope lifetimeScope
         )
         {
             _configuration = options;
@@ -44,7 +46,7 @@ namespace ConductorSharp.Engine
             _logger = logger;
             _taskManager = taskService;
             _registeredWorkers = workerMappings;
-            _mediator = mediator;
+            _lifetimeScope = lifetimeScope;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -99,7 +101,24 @@ namespace ConductorSharp.Engine
             {
                 var inputType = GetInputType(scheduledWorker.TaskType);
                 var inputData = pollResponse.InputData.ToObject(inputType, ConductorConstants.IoJsonSerializer);
-                var response = await _mediator.Send(inputData, cancellationToken);
+
+                using var scope = _lifetimeScope.BeginLifetimeScope();
+
+                var context = scope.ResolveOptional<ConductorSharpExecutionContext>();
+                var mediator = scope.Resolve<IMediator>();
+
+                if (context != null)
+                {
+                    context.WorkflowName = pollResponse.WorkflowType;
+                    context.TaskName = pollResponse.TaskDefName;
+                    context.TaskReferenceName = pollResponse.ReferenceTaskName;
+                    context.WorkflowId = pollResponse.WorkflowInstanceId;
+                    context.CorrelationId = pollResponse.CorrelationId;
+                    context.TaskId = pollResponse.TaskId;
+                    context.WorkerId = workerId;
+                }
+
+                var response = await mediator.Send(inputData, cancellationToken);
                 await _taskManager.UpdateTaskCompleted(response, pollResponse.TaskId, pollResponse.WorkflowInstanceId);
             }
             catch (Exception exception)

@@ -1,8 +1,11 @@
 using Autofac.Extensions.DependencyInjection;
 using ConductorSharp.ApiEnabled.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console());
 
 // Add services to the container.
 builder.Services.AddControllers();

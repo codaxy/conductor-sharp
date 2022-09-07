@@ -19,6 +19,13 @@ public class PrepareEmailResponse
 [OriginalName("EMAIL_prepare")]
 public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
 {
+    private readonly ConductorSharpExecutionContext _context;
+
+    public PrepareEmailHandler(ConductorSharpExecutionContext context)
+    {
+        _context = context;
+    }
+
     public Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
     {
         var emailBodyBuilder = new StringBuilder();
@@ -28,6 +35,9 @@ public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, Prep
         emailBodyBuilder.AppendLine($"ProvisionDateTime: {DateTimeOffset.Now.ToString("r")}");
         emailBodyBuilder.AppendLine($"Customer: {request.CustomerName}");
         emailBodyBuilder.AppendLine($"Address: {request.Address}");
+        emailBodyBuilder.AppendLine("------------------");
+        emailBodyBuilder.AppendLine($"WorkflowId : {_context.WorkflowId}");
+        emailBodyBuilder.AppendLine($"WorkflowName: {_context.WorkflowName}");
 
         return Task.FromResult(new PrepareEmailResponse { EmailBody = emailBodyBuilder.ToString() });
     }

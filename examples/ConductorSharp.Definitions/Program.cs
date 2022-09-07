@@ -28,7 +28,7 @@ var builder = Host.CreateDefaultBuilder()
         (container, builder) =>
         {
             builder
-                .AddWorkflowEngine(
+                .AddConductorSharp(
                     baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"),
                     apiPath: configuration.GetValue<string>("Conductor:ApiUrl"),
                     preventErrorOnBadRequest: configuration.GetValue<bool>("Conductor:PreventErrorOnBadRequest")
@@ -38,7 +38,12 @@ var builder = Host.CreateDefaultBuilder()
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
                     domain: configuration.GetValue<string>("Conductor:WorkerDomain")
-                );
+                )
+                .AddPipelines(pipelines =>
+                {
+                    pipelines.AddRequestResponseLogging();
+                    pipelines.AddValidation();
+                });
 
             builder.RegisterMediatR(typeof(Program).Assembly);
             builder.RegisterModule<ConductorModule>();

@@ -6,21 +6,18 @@ using ConductorSharp.Engine.Util;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ConductorSharp.Engine.Extensions
 {
-    public class WorkflowEngineBuilder : IWorkflowEngineBuilder, IWorkflowEngineExecutionManager
+    public class ConductorSharpBuilder : IConductorSharpBuilder, IExecutionManagerBuilder, IPipelineBuilder
     {
         private readonly ContainerBuilder _builder;
 
-        public WorkflowEngineBuilder(ContainerBuilder builder) => _builder = builder;
+        public ConductorSharpBuilder(ContainerBuilder builder) => _builder = builder;
 
-        public IWorkflowEngineExecutionManager AddExecutionManager(
-            int maxConcurrentWorkers,
-            int sleepInterval,
-            int longPollInterval,
-            string domain = null
-        )
+        public IExecutionManagerBuilder AddExecutionManager(int maxConcurrentWorkers, int sleepInterval, int longPollInterval, string domain = null)
         {
             var workerConfig = new WorkerSetConfig
             {
@@ -42,9 +39,18 @@ namespace ConductorSharp.Engine.Extensions
 
             _builder.RegisterType<ConductorSharpExecutionContext>().InstancePerLifetimeScope();
 
-            _builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
-
             return this;
         }
+
+        public IExecutionManagerBuilder AddPipelines(Action<IPipelineBuilder> behaviorBuilder)
+        {
+            behaviorBuilder(this);
+            return this;
+        }
+
+        public void AddRequestResponseLogging() =>
+            _builder.RegisterGeneric(typeof(RequestResponseLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+
+        public void AddValidation() => _builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
     }
 }
