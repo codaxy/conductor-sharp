@@ -8,7 +8,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
     public class OptionalTaskWorkflowInput : WorkflowInput<OptionalTaskWorkflowOutput>
     {
-        public dynamic CustomerId { get; set; }
+        public int CustomerId { get; set; }
     }
 
     public class OptionalTaskWorkflowOutput : WorkflowOutput { }

@@ -1,9 +1,11 @@
-﻿namespace ConductorSharp.Engine.Tests.Samples.Workflows;
+﻿using ConductorSharp.Engine.Tests.Samples.Workers;
+
+namespace ConductorSharp.Engine.Tests.Samples.Workflows;
 
 #region models
 public class SendCustomerNotificationInput : WorkflowInput<SendCustomerNotificationOutput>
 {
-    public dynamic CustomerId { get; set; }
+    public int CustomerId { get; set; }
 }
 
 public class SendCustomerNotificationOutput : WorkflowOutput
@@ -14,7 +16,7 @@ public class SendCustomerNotificationOutput : WorkflowOutput
 [OriginalName("NOTIFICATION_send_to_customer")]
 public class SendCustomerNotification : Workflow<SendCustomerNotificationInput, SendCustomerNotificationOutput>
 {
-    public CustomerGetV1 GetCustomer { get; set; }
+    public GetCustomerHandler GetCustomer { get; set; }
     public EmailPrepareV1 PrepareEmail { get; set; }
 
     public override WorkflowDefinition GetDefinition()

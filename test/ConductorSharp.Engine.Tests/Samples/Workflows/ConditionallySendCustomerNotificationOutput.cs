@@ -3,8 +3,8 @@
 #region models
 public class ConditionallySendCustomerNotificationInput : WorkflowInput<ConditionallySendCustomerNotificationOutput>
 {
-    public dynamic ShouldSendNotification { get; set; }
-    public dynamic CustomerId { get; set; }
+    public bool ShouldSendNotification { get; set; }
+    public int CustomerId { get; set; }
 }
 
 public class ConditionallySendCustomerNotificationOutput : WorkflowOutput { }

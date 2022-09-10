@@ -20,7 +20,10 @@ namespace ConductorSharp.Engine.Builders
 
             XmlDocumentationReader.LoadXmlDocumentation(taskType.Assembly);
 
-            var interfaces = taskType.GetInterfaces().Where(a => a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>)).First();
+            var interfaces = taskType
+                .GetInterfaces()
+                .Where(a => a.IsGenericType && a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
+                .First();
             var genericArguments = interfaces.GetGenericArguments();
 
             var inputType = genericArguments[0];
