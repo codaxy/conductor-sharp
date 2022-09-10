@@ -19,7 +19,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     {
         public DecisionTaskModel SendNotificationDecision { get; set; }
         public DecisionTaskModel SecondSendNotificationDecision { get; set; }
-        public SendCustomerNotificationV1 SendNotificationSubworkflow { get; set; }
+        public SendCustomerNotification SendNotificationSubworkflow { get; set; }
 
         public override WorkflowDefinition GetDefinition()
         {

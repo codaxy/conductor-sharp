@@ -13,7 +13,7 @@ public class ConditionallySendCustomerNotificationOutput : WorkflowOutput { }
 public class ConditionallySendCustomerNotification : Workflow<ConditionallySendCustomerNotificationInput, ConditionallySendCustomerNotificationOutput>
 {
     public DecisionTaskModel SendNotificationDecision { get; set; }
-    public SendCustomerNotificationV1 SendNotificationSubworkflow { get; set; }
+    public SendCustomerNotification SendNotificationSubworkflow { get; set; }
 
     public override WorkflowDefinition GetDefinition()
     {

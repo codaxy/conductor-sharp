@@ -1,16 +1,6 @@
 ﻿namespace ConductorSharp.Engine.Tests.Samples.Workflows;
 
 #region models
-public class SendNotificationInput : IRequest<SendNotificationOutput>
-{
-    public dynamic CustomerId { get; set; }
-}
-
-public class SendNotificationOutput { }
-
-[OriginalName("NOTIFICATION_send_to_customer")]
-public class SendCustomerNotificationV1 : SubWorkflowTaskModel<SendNotificationInput, SendNotificationOutput> { }
-
 public class SendCustomerNotificationInput : WorkflowInput<SendCustomerNotificationOutput>
 {
     public dynamic CustomerId { get; set; }
