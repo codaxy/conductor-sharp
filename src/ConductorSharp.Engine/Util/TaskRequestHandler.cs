@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConductorSharp.Engine
+namespace ConductorSharp.Engine.Util
 {
     public abstract class TaskRequestHandler<TInput, TOutput> : SimpleTaskModel<TInput, TOutput>, ITaskRequestHandler<TInput, TOutput>
         where TInput : IRequest<TOutput>
