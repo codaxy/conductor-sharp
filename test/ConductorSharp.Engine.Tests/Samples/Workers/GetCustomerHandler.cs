@@ -22,7 +22,8 @@ public class Customer
 }
 
 [OriginalName("CUSTOMER_get")]
-public class GetCustomerHandler : ITaskRequestHandler<GetCustomerRequest, GetCustomerResponse>
+public class GetCustomerHandler : TaskRequestHandler<GetCustomerRequest, GetCustomerResponse>
 {
-    public Task<GetCustomerResponse> Handle(GetCustomerRequest request, CancellationToken cancellationToken) => throw new NotImplementedException();
+    public override Task<GetCustomerResponse> Handle(GetCustomerRequest request, CancellationToken cancellationToken) =>
+        throw new NotImplementedException();
 }

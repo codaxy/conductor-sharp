@@ -8,8 +8,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
     public class DecisionInDecisionInput : WorkflowInput<DecisionInDecisionOutput>
     {
-        public dynamic ShouldSendNotification { get; set; }
-        public dynamic CustomerId { get; set; }
+        public bool ShouldSendNotification { get; set; }
+        public int CustomerId { get; set; }
     }
 
     public class DecisionInDecisionOutput : WorkflowOutput { }
@@ -19,7 +19,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     {
         public DecisionTaskModel SendNotificationDecision { get; set; }
         public DecisionTaskModel SecondSendNotificationDecision { get; set; }
-        public SendCustomerNotificationV1 SendNotificationSubworkflow { get; set; }
+        public SendCustomerNotification SendNotificationSubworkflow { get; set; }
 
         public override WorkflowDefinition GetDefinition()
         {

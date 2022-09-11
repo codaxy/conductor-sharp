@@ -8,7 +8,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
     public class OptionalTaskWorkflowInput : WorkflowInput<OptionalTaskWorkflowOutput>
     {
-        public dynamic CustomerId { get; set; }
+        public int CustomerId { get; set; }
     }
 
     public class OptionalTaskWorkflowOutput : WorkflowOutput { }
@@ -16,7 +16,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     [OriginalName("TEST_optional_task_workflow")]
     public class OptionalTaskWorkflow : Workflow<OptionalTaskWorkflowInput, OptionalTaskWorkflowOutput>
     {
-        public SendCustomerNotificationV1 SendNotificationSubworkflow { get; set; }
+        public SendCustomerNotification SendNotificationSubworkflow { get; set; }
 
         public override WorkflowDefinition GetDefinition()
         {

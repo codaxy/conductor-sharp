@@ -14,6 +14,7 @@
     <None Remove="Samples\Workflows\DecisionInDecision.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\OptionalTaskWorkflow.json" />
+    <None Remove="Samples\Workflows\ScaffoldedWorkflows.json" />
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
     <None Remove="Samples\Workflows\StringInterpolation.json" />
     <None Remove="Samples\Workflows\TerminateTaskWorkflow.json" />
@@ -28,6 +29,7 @@
     <EmbeddedResource Include="Samples\Tasks\CustomerGet.json" />
     <EmbeddedResource Include="Samples\Tasks\EmailPrepare.json" />
     <EmbeddedResource Include="Samples\Workflows\Arrays.json" />
+    <EmbeddedResource Include="Samples\Workflows\ScaffoldedWorkflows.json" />
     <EmbeddedResource Include="Samples\Workflows\OptionalTaskWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\NestedObjects.json" />
 	<EmbeddedResource Include="Samples\Workflows\SendCustomerNotification.json" />
