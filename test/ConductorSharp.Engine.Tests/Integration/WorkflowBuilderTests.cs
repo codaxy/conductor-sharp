@@ -97,6 +97,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal(expectedDefinition, definition);
         }
 
+        [Fact]
         public void BuilderReturnsCorrectDefinitionSubworkflowVersionAttribute()
         {
             var definition = SerializationUtil.SerializeObject(new VersionAttributeWorkflow().GetDefinition());
