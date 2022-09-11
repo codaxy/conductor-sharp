@@ -88,6 +88,15 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal(expectedDefinition, definition);
         }
 
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionSubWorkflowModelsOnly()
+        {
+            var definition = SerializationUtil.SerializeObject(new ScaffoldedWorkflows().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/ScaffoldedWorkflows.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
         public void BuilderReturnsCorrectDefinitionSubworkflowVersionAttribute()
         {
             var definition = SerializationUtil.SerializeObject(new VersionAttributeWorkflow().GetDefinition());
