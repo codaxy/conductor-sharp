@@ -68,7 +68,10 @@ namespace ConductorSharp.Engine
 
         private Type GetInputType(Type workerType)
         {
-            var interfaces = workerType.GetInterfaces().Where(a => a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>)).First();
+            var interfaces = workerType
+                .GetInterfaces()
+                .Where(a => a.IsGenericType && a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
+                .First();
             var genericArguments = interfaces.GetGenericArguments();
 
             var inputType = genericArguments[0];
