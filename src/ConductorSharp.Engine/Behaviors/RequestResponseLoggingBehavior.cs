@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Engine.Util;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,6 +15,7 @@ namespace ConductorSharp.Engine.Behaviors
     {
         private readonly ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> _logger;
         private readonly ConductorSharpExecutionContext _executionContext;
+        private const string LoggerPropertyName = "ConductorContext";
 
         public RequestResponseLoggingBehavior(
             ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> logger,
@@ -26,34 +28,32 @@ namespace ConductorSharp.Engine.Behaviors
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            var stopwatch = new Stopwatch();
-            _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}} in {{@conductorSharpContext}}", request, _executionContext);
-            stopwatch.Start();
-
-            try
+            using (LogContext.PushProperty(LoggerPropertyName, _executionContext, true))
             {
-                var response = await next();
-                stopwatch.Stop();
+                var stopwatch = new Stopwatch();
+                _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}}", request);
+                stopwatch.Start();
 
-                _logger.LogInformation(
-                    $"Received response {{@{typeof(TResponse).Name}}} in {{@conductorSharpContext}} in {{ellapsedMilliseconds}}",
-                    response,
-                    _executionContext,
-                    stopwatch.ElapsedMilliseconds
-                );
+                try
+                {
+                    var response = await next();
 
-                return response;
-            }
-            catch (Exception exc)
-            {
-                stopwatch.Stop();
-                _logger.LogInformation(
-                    $"Exception {{exceptionMessage}} in {{@conductorSharpContext}} in {{elapsedMilliseconds}}",
-                    exc.Message,
-                    _executionContext,
-                    stopwatch.ElapsedMilliseconds
-                );
-                throw;
+                    stopwatch.Stop();
+
+                    _logger.LogInformation(
+                        $"Received response {{@{typeof(TResponse).Name}}} in {{ellapsedMilliseconds}}",
+                        response,
+                        stopwatch.ElapsedMilliseconds
+                    );
+
+                    return response;
+                }
+                catch (Exception exc)
+                {
+                    stopwatch.Stop();
+                    _logger.LogInformation($"Exception {{exceptionMessage}} in {{elapsedMilliseconds}}", exc.Message, stopwatch.ElapsedMilliseconds);
+                    throw;
+                }
             }
         }
     }
