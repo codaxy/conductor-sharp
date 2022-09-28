@@ -41,6 +41,7 @@ var builder = Host.CreateDefaultBuilder()
                 )
                 .AddPipelines(pipelines =>
                 {
+                    pipelines.AddContextLogging();
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
                 });
