@@ -4,18 +4,22 @@
   "updateTime": 0,
   "createdBy": null,
   "updatedBy": null,
-  "name": "version_attribute_workflow",
+  "name": "TEST_dynamic_task",
   "description": "{\"description\":null,\"labels\":null}",
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
-      "name": "TEST_subworkflow",
-      "taskReferenceName": "test_subworkflow",
-      "description": "{\"description\":null}",
-      "inputParameters": {},
-      "type": "SUB_WORKFLOW",
-      "dynamicTaskNameParam": null,
+      "name": "dynamic_handler",
+      "taskReferenceName": "dynamic_handler",
+      "description": "{\"description\":\"A dynamic task\"}",
+      "inputParameters": {
+        "count": "${workflow.input.count}",
+        "should_use_next": "${workflow.input.should_use_next}",
+        "task_to_execute": "${workflow.input.task_name}"
+      },
+      "type": "DYNAMIC",
+      "dynamicTaskNameParam": "task_to_execute",
       "caseValueParam": null,
       "caseExpression": null,
       "expression": null,
@@ -29,8 +33,8 @@
       "forkTasks": null,
       "startDelay": 0,
       "subWorkflowParam": {
-        "name": "TEST_subworkflow",
-        "version": "3",
+        "name": "${workflow.input.task_name}",
+        "version": "${workflow.input.workflow_version}",
         "taskToDomain": null,
         "workflowDefinition": null
       },
@@ -46,7 +50,7 @@
     }
   ],
   "inputParameters": [
-    "{}"
+    "{\"task_name\":{\"value\":\"\",\"description\":\" (optional)\"},\"workflow_version\":{\"value\":\"\",\"description\":\" (optional)\"},\"count\":{\"value\":\"\",\"description\":\" (optional)\"},\"should_use_next\":{\"value\":\"\",\"description\":\" (optional)\"}}"
   ],
   "outputParameters": null,
   "failureWorkflow": null,
