@@ -52,5 +52,7 @@ namespace ConductorSharp.Engine.Extensions
             _builder.RegisterGeneric(typeof(RequestResponseLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
         public void AddValidation() => _builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+
+        public void AddContextLogging() => _builder.RegisterGeneric(typeof(ContextLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
     }
 }

@@ -8,5 +8,6 @@ namespace ConductorSharp.Engine.Extensions
     {
         void AddRequestResponseLogging();
         void AddValidation();
+        void AddContextLogging();
     }
 }

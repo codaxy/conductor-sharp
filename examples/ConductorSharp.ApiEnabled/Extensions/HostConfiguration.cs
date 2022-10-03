@@ -24,6 +24,7 @@ public static class HostConfiguration
                 )
                 .AddPipelines(pipelines =>
                 {
+                    pipelines.AddContextLogging();
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
                 });
