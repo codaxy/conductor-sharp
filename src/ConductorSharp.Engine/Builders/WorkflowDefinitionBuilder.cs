@@ -157,9 +157,9 @@ namespace ConductorSharp.Engine.Builders
         ) where F : IRequest<G> => AddAndReturnBuilder(new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body));
 
         public ITaskOptionsBuilder AddTask<F, G>(
-            Expression<Func<TWorkflow, DynamicTaskModel<F, G>>> refference,
+            Expression<Func<TWorkflow, DynamicTaskModel<F, G>>> reference,
             Expression<Func<TWorkflow, DynamicTaskInput<F, G>>> input
-        ) => AddAndReturnBuilder(new DynamicTaskBuilder<F, G>(refference.Body, input.Body));
+        ) => AddAndReturnBuilder(new DynamicTaskBuilder<F, G>(reference.Body, input.Body));
 
         public ITaskOptionsBuilder AddTask(
             Expression<Func<TWorkflow, TerminateTaskModel>> reference,
