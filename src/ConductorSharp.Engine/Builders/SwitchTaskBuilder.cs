@@ -85,6 +85,16 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
+        public SwitchTaskBuilder<TWorkflow> WithTask<F, G>(
+            Expression<Func<TWorkflow, DynamicTaskModel<F, G>>> taskSelector,
+            Expression<Func<TWorkflow, DynamicTaskInput<F, G>>> expression
+        ) where F : IRequest<G>
+        {
+            var builder = new DynamicTaskBuilder<F, G>(taskSelector.Body, expression.Body);
+            AddBuilder(builder);
+            return this;
+        }
+
         //public SwitchTaskBuilder<TWorkflow> WithTask<F>(
         //    Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
         //    Expression<Func<TWorkflow, F>> expression,
