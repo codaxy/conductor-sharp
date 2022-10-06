@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using ConductorSharp.Engine.Behaviors;
 using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Polling;
 using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
 using MediatR;
@@ -38,6 +39,10 @@ namespace ConductorSharp.Engine.Extensions
             _builder.RegisterType<ExecutionManager>().SingleInstance();
 
             _builder.RegisterType<ConductorSharpExecutionContext>().InstancePerLifetimeScope();
+
+            _builder.RegisterType<InverseExponentialBackoff>().As<IPollTimingStrategy>();
+
+            _builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
 
             return this;
         }
