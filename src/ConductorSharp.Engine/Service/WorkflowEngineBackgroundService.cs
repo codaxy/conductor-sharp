@@ -14,7 +14,6 @@ namespace ConductorSharp.Engine.Service
         private readonly IDeploymentService _deploymentService;
         private readonly ExecutionManager _executionManager;
         private readonly ModuleDeployment _deployment;
-        private Task _executingTask;
 
         public WorkflowEngineBackgroundService(
             ILogger<WorkflowEngineBackgroundService> logger,
