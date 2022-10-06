@@ -55,6 +55,10 @@ namespace ConductorSharp.Engine.Service
             }
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken) => await _executingTask;
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _logger.LogDebug("Stopping Workflow Engine Background Service");
+            return Task.CompletedTask;
+        }
     }
 }
