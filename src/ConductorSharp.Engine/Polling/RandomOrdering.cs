@@ -8,7 +8,7 @@ namespace ConductorSharp.Engine.Polling
 {
     public class RandomOrdering : IPollOrderStrategy
     {
-        private readonly Random _random;
+        private readonly Random _random = new Random();
 
         public List<TaskToWorker> CalculateOrder(IDictionary<string, int> taskQueue, List<TaskToWorker> taskToWorkerList)
         {
