@@ -7,6 +7,6 @@ namespace ConductorSharp.Engine.Polling
 {
     public interface IPollOrderStrategy
     {
-        List<TaskToWorker> CalculateOrder(IDictionary<string, int> taskQueue, List<TaskToWorker> taskToWorkerList);
+        List<TaskToWorker> CalculateOrder(IDictionary<string, int> taskQueue, List<TaskToWorker> taskToWorkerList, int limit);
     }
 }

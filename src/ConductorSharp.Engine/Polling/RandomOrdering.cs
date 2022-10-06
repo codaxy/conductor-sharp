@@ -10,9 +10,9 @@ namespace ConductorSharp.Engine.Polling
     {
         private readonly Random _random = new Random();
 
-        public List<TaskToWorker> CalculateOrder(IDictionary<string, int> taskQueue, List<TaskToWorker> taskToWorkerList)
+        public List<TaskToWorker> CalculateOrder(IDictionary<string, int> taskQueue, List<TaskToWorker> taskToWorkerList, int limit)
         {
-            return taskToWorkerList.OrderBy(a => _random.Next()).ToList();
+            return taskToWorkerList.OrderBy(a => _random.Next()).Take(limit).ToList();
         }
     }
 }

@@ -66,7 +66,7 @@ namespace ConductorSharp.Engine
                     currentSleepInterval
                 );
 
-                scheduledWorkers = _pollOrderStrategy.CalculateOrder(queuedTasks, scheduledWorkers);
+                scheduledWorkers = _pollOrderStrategy.CalculateOrder(queuedTasks, scheduledWorkers, _semaphore.CurrentCount);
 
                 foreach (var scheduledWorker in scheduledWorkers)
                 {
@@ -75,6 +75,7 @@ namespace ConductorSharp.Engine
                 }
 
                 await Task.Delay(currentSleepInterval, cancellationToken);
+                Console.WriteLine(currentSleepInterval);
             }
         }
 
