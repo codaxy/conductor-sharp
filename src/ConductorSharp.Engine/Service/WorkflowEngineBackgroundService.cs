@@ -1,5 +1,7 @@
 ﻿using ConductorSharp.Engine.Interface;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,13 +9,23 @@ namespace ConductorSharp.Engine.Service
 {
     public class WorkflowEngineBackgroundService : IHostedService
     {
+        private readonly ILogger<WorkflowEngineBackgroundService> _logger;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IDeploymentService _deploymentService;
         private readonly ExecutionManager _executionManager;
         private readonly ModuleDeployment _deployment;
         private Task _executingTask;
 
-        public WorkflowEngineBackgroundService(IDeploymentService deploymentService, ExecutionManager executionManager, ModuleDeployment deployment)
+        public WorkflowEngineBackgroundService(
+            ILogger<WorkflowEngineBackgroundService> logger,
+            IHostApplicationLifetime hostApplicationLifetime,
+            IDeploymentService deploymentService,
+            ExecutionManager executionManager,
+            ModuleDeployment deployment
+        )
         {
+            _logger = logger;
+            _hostApplicationLifetime = hostApplicationLifetime;
             _deploymentService = deploymentService;
             _executionManager = executionManager;
             _deployment = deployment;
@@ -27,8 +39,20 @@ namespace ConductorSharp.Engine.Service
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            await _deploymentService.Deploy(_deployment);
-            await _executionManager.StartAsync(cancellationToken);
+            try
+            {
+                await _deploymentService.Deploy(_deployment);
+                await _executionManager.StartAsync(cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogCritical(exception, "Workflow Engine Background Service encountered an error");
+                throw;
+            }
+            finally
+            {
+                _hostApplicationLifetime.StopApplication();
+            }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken) => await _executingTask;
