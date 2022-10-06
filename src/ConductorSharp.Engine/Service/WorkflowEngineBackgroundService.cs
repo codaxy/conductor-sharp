@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Service
 {
-    public class WorkflowEngineBackgroundService : IHostedService
+    public class WorkflowEngineBackgroundService : IHostedService, IDisposable
     {
         private readonly ILogger<WorkflowEngineBackgroundService> _logger;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
@@ -15,6 +15,7 @@ namespace ConductorSharp.Engine.Service
         private readonly ExecutionManager _executionManager;
         private readonly ModuleDeployment _deployment;
         private Task _executingTask;
+        private readonly CancellationTokenSource _stoppingCts = new();
 
         public WorkflowEngineBackgroundService(
             ILogger<WorkflowEngineBackgroundService> logger,
@@ -33,7 +34,13 @@ namespace ConductorSharp.Engine.Service
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _executingTask = RunAsync(cancellationToken);
+            _executingTask = RunAsync(_stoppingCts.Token);
+
+            if (_executingTask.IsCompleted)
+            {
+                return _executingTask;
+            }
+
             return Task.CompletedTask;
         }
 
@@ -55,10 +62,27 @@ namespace ConductorSharp.Engine.Service
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogDebug("Stopping Workflow Engine Background Service");
-            return Task.CompletedTask;
+            if (_executingTask == null)
+            {
+                return;
+            }
+
+            try
+            {
+                _stoppingCts.Cancel();
+            }
+            finally
+            {
+                _logger.LogDebug("Stopping Workflow Engine Background Service");
+                await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
+            }
+        }
+
+        public virtual void Dispose()
+        {
+            _stoppingCts.Cancel();
         }
     }
 }
