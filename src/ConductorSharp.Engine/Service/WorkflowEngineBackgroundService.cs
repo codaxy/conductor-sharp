@@ -15,12 +15,12 @@ namespace ConductorSharp.Engine.Service
         private readonly IDeploymentService _deploymentService;
         private readonly ExecutionManager _executionManager;
         private readonly ModuleDeployment _deployment;
-        private readonly IConductorSharpHealthUpdater _healthUpdater;
+        private readonly IConductorSharpHealthService _healthService;
         private Task _executingTask;
         private readonly CancellationTokenSource _stoppingCts = new();
 
         public WorkflowEngineBackgroundService(
-            IConductorSharpHealthUpdater healthUpdater,
+            IConductorSharpHealthService healthService,
             ILogger<WorkflowEngineBackgroundService> logger,
             IHostApplicationLifetime hostApplicationLifetime,
             IDeploymentService deploymentService,
@@ -33,7 +33,7 @@ namespace ConductorSharp.Engine.Service
             _deploymentService = deploymentService;
             _executionManager = executionManager;
             _deployment = deployment;
-            _healthUpdater = healthUpdater;
+            _healthService = healthService;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -52,14 +52,14 @@ namespace ConductorSharp.Engine.Service
         {
             try
             {
-                await _healthUpdater.ResetHealthData(cancellationToken);
+                _healthService.RemoveHealthData();
                 await _deploymentService.Deploy(_deployment);
-                await _healthUpdater.SetExecutionManagerRunning(cancellationToken);
+                await _healthService.SetExecutionManagerRunning(cancellationToken);
                 await _executionManager.StartAsync(cancellationToken);
             }
             catch (Exception exception)
             {
-                await _healthUpdater.UnsetExecutionManagerRunning();
+                await _healthService.UnsetExecutionManagerRunning();
                 _logger.LogCritical(exception, "Workflow Engine Background Service encountered an error");
                 throw;
             }
@@ -71,7 +71,7 @@ namespace ConductorSharp.Engine.Service
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _healthUpdater.RemoveHealthData();
+            _healthService.RemoveHealthData();
             if (_executingTask == null)
             {
                 return;

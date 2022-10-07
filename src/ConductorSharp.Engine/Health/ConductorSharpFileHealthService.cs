@@ -13,7 +13,7 @@ namespace ConductorSharp.Engine.Health
         public bool IsExecutionManagerRunning { get; set; }
     }
 
-    public class ConductorSharpHealthService : IConductorSharpHealthService, IConductorSharpHealthUpdater
+    public class ConductorSharpFileHealthService : IConductorSharpHealthService
     {
         private static readonly SemaphoreSlim _semaphore = new(1);
 

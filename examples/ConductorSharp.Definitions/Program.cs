@@ -2,6 +2,7 @@
 using Autofac.Extensions.DependencyInjection;
 using ConductorSharp.Definitions;
 using ConductorSharp.Engine.Extensions;
+using ConductorSharp.Engine.Health;
 using MediatR.Extensions.Autofac.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,7 @@ var builder = Host.CreateDefaultBuilder()
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
                     domain: configuration.GetValue<string>("Conductor:WorkerDomain")
                 )
+                .SetHealthCheckService<ConductorSharpFileHealthService>()
                 .AddPipelines(pipelines =>
                 {
                     pipelines.AddRequestResponseLogging();

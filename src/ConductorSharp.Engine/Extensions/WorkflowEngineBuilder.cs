@@ -46,7 +46,6 @@ namespace ConductorSharp.Engine.Extensions
 
             _builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
-            _builder.RegisterType<ConductorSharpHealthService>().AsImplementedInterfaces();
             _builder.RegisterType<InverseExponentialBackoff>().As<IPollTimingStrategy>();
 
             _builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
