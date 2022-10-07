@@ -7,9 +7,11 @@ namespace ConductorSharp.Engine.Polling
 {
     public class InverseExponentialBackoff : IPollTimingStrategy
     {
-        private const int _backoffRatio = 4;
-        private const int _minimalSleepInterval = 50;
-        private const float _bounceBackRatio = 0.1f;
+        private const int _backoffRatio = 2;
+        private const int _recoveryValue = 50;
+        private readonly TimeSpan _recoveryInterval = TimeSpan.FromMilliseconds(5000);
+
+        private DateTimeOffset _lastRecoveryTime = DateTimeOffset.UtcNow;
 
         public int CalculateDelay(
             IDictionary<string, int> taskQueue,
@@ -19,11 +21,16 @@ namespace ConductorSharp.Engine.Polling
         )
         {
             if (taskToWorkerList.Count > 0)
-                return currentSleepInterval / _backoffRatio;
+            {
+                currentSleepInterval /= _backoffRatio;
+            }
+            else if (DateTimeOffset.UtcNow - _lastRecoveryTime > _recoveryInterval)
+            {
+                currentSleepInterval += 100;
+                _lastRecoveryTime = DateTimeOffset.UtcNow;
+            }
 
-            currentSleepInterval = (int)Math.Max(_minimalSleepInterval, currentSleepInterval + currentSleepInterval * _bounceBackRatio);
-
-            return Math.Min(currentSleepInterval, baseSleepInterval);
+            return Math.Clamp(currentSleepInterval, _recoveryValue, baseSleepInterval);
         }
     }
 }
