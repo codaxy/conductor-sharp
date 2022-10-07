@@ -35,7 +35,7 @@ namespace ConductorSharp.Engine
             ITaskService taskService,
             IEnumerable<TaskToWorker> workerMappings,
             ILifetimeScope lifetimeScope,
-            IConductorSharpHealthUpdater healthUpdater
+            IConductorSharpHealthUpdater healthUpdater,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy
         )
