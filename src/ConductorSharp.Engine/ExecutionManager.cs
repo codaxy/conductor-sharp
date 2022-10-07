@@ -25,7 +25,6 @@ namespace ConductorSharp.Engine
         private readonly ITaskService _taskManager;
         private readonly IEnumerable<TaskToWorker> _registeredWorkers;
         private readonly ILifetimeScope _lifetimeScope;
-        private readonly IConductorSharpHealthUpdater _healthUpdater;
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
 
@@ -35,7 +34,6 @@ namespace ConductorSharp.Engine
             ITaskService taskService,
             IEnumerable<TaskToWorker> workerMappings,
             ILifetimeScope lifetimeScope,
-            IConductorSharpHealthUpdater healthUpdater,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy
         )
@@ -46,14 +44,12 @@ namespace ConductorSharp.Engine
             _taskManager = taskService;
             _registeredWorkers = workerMappings;
             _lifetimeScope = lifetimeScope;
-            _healthUpdater = healthUpdater;
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await _healthUpdater.SetExecutionManagerStarted();
             var currentSleepInterval = _configuration.SleepInterval;
 
             while (!cancellationToken.IsCancellationRequested)

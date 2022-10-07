@@ -8,15 +8,9 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Health
 {
-    internal interface One { }
-
-    public interface Two { }
-
     public class HealthData
     {
-        public bool IsDeploymentStarted { get; set; }
-        public bool IsDeploymentCompleted { get; set; }
-        public bool IsExecutionManagerStarted { get; set; }
+        public bool IsExecutionManagerRunning { get; set; }
     }
 
     public class ConductorSharpHealthService : IConductorSharpHealthService, IConductorSharpHealthUpdater
@@ -25,41 +19,32 @@ namespace ConductorSharp.Engine.Health
 
         private const string HealthFileName = "CONDUCTORSHARP_HEALTH.json";
 
-        public async Task SetDeploymentCompleted() => await UpdateData(data => data.IsDeploymentCompleted = true);
+        public async Task UnsetExecutionManagerRunning(CancellationToken cancellationToken = default) =>
+            await UpdateData(data => data.IsExecutionManagerRunning = false, cancellationToken);
 
-        public async Task SetDeploymentStarted() => await UpdateData(data => data.IsDeploymentStarted = true);
+        public async Task SetExecutionManagerRunning(CancellationToken cancellationToken = default) =>
+            await UpdateData(data => data.IsExecutionManagerRunning = true, cancellationToken);
 
-        public async Task SetExecutionManagerStarted() => await UpdateData(data => data.IsExecutionManagerStarted = true);
-
-        private async Task UpdateData(Action<HealthData> updateHealthData)
+        private async Task UpdateData(Action<HealthData> updateHealthData, CancellationToken cancellationToken = default)
         {
-            await _semaphore.WaitAsync();
-
-            try
-            {
-                var data = await GetHealthData();
-                updateHealthData(data);
-                await WriteHealthData(data);
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
+            var data = await GetHealthData(cancellationToken);
+            updateHealthData(data);
+            await WriteHealthData(data, cancellationToken);
         }
 
-        public async Task<HealthData> GetHealthData()
+        public async Task<HealthData> GetHealthData(CancellationToken cancellationToken = default)
         {
-            await _semaphore.WaitAsync();
-
             try
             {
+                await _semaphore.WaitAsync(cancellationToken);
                 if (!File.Exists(HealthFileName))
                 {
                     return new HealthData();
                 }
                 else
                 {
-                    return JsonConvert.DeserializeObject<HealthData>(await File.ReadAllTextAsync(HealthFileName)) ?? new HealthData();
+                    return JsonConvert.DeserializeObject<HealthData>(await File.ReadAllTextAsync(HealthFileName, cancellationToken))
+                        ?? new HealthData();
                 }
             }
             finally
@@ -68,17 +53,28 @@ namespace ConductorSharp.Engine.Health
             }
         }
 
-        private async Task WriteHealthData(HealthData healthData) =>
-            await File.WriteAllTextAsync(HealthFileName, JsonConvert.SerializeObject(healthData));
+        private async Task WriteHealthData(HealthData healthData, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await _semaphore.WaitAsync(cancellationToken);
+                await File.WriteAllTextAsync(HealthFileName, JsonConvert.SerializeObject(healthData), cancellationToken);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
 
-        public async Task ResetHealthData() => await WriteHealthData(new HealthData());
+        public async Task ResetHealthData(CancellationToken cancellationToken = default) =>
+            await WriteHealthData(new HealthData(), cancellationToken);
 
-        public Task RemoveHealthData()
+        public void RemoveHealthData()
         {
             if (File.Exists(HealthFileName))
                 File.Delete(HealthFileName);
 
-            return Task.CompletedTask;
+            return;
         }
     }
 }

@@ -13,7 +13,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks().AddCheck<DeploymentHealthCheck>("deployment");
+builder.Services.AddHealthChecks().AddCheck<ConductorSharpHealthCheck>("running");
 
 //Autofac dependency injection
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureApiEnabled(configuration);

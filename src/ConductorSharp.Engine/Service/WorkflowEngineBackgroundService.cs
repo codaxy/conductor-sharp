@@ -52,12 +52,14 @@ namespace ConductorSharp.Engine.Service
         {
             try
             {
-                await _healthUpdater.ResetHealthData();
+                await _healthUpdater.ResetHealthData(cancellationToken);
                 await _deploymentService.Deploy(_deployment);
+                await _healthUpdater.SetExecutionManagerRunning(cancellationToken);
                 await _executionManager.StartAsync(cancellationToken);
             }
             catch (Exception exception)
             {
+                await _healthUpdater.UnsetExecutionManagerRunning();
                 _logger.LogCritical(exception, "Workflow Engine Background Service encountered an error");
                 throw;
             }
@@ -69,7 +71,7 @@ namespace ConductorSharp.Engine.Service
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _healthUpdater.RemoveHealthData().Wait();
+            _healthUpdater.RemoveHealthData();
             if (_executingTask == null)
             {
                 return;

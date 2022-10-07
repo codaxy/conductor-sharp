@@ -12,18 +12,15 @@ namespace ConductorSharp.Engine.Service
         private readonly IMetadataService _metadataService;
 
         private readonly ILogger<DeploymentService> _logger;
-        private readonly IConductorSharpHealthUpdater _healthUpdater;
 
-        public DeploymentService(IMetadataService metadataService, ILogger<DeploymentService> logger, IConductorSharpHealthUpdater healthUpdater)
+        public DeploymentService(IMetadataService metadataService, ILogger<DeploymentService> logger)
         {
             _metadataService = metadataService;
             _logger = logger;
-            _healthUpdater = healthUpdater;
         }
 
         public async Task Deploy(Deployment deployment)
         {
-            await _healthUpdater.SetDeploymentStarted();
             _logger.LogInformation("Deploying conductor definitions");
 
             if (deployment.TaskDefinitions.Count > 0)
@@ -39,7 +36,6 @@ namespace ConductorSharp.Engine.Service
             // TODO: Add registration for event handlers
 
             _logger.LogInformation("Finished deploying conductor definitions");
-            await _healthUpdater.SetDeploymentCompleted();
         }
 
         public async Task Remove(Deployment deployment)
