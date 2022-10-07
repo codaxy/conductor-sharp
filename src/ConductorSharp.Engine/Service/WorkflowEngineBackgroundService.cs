@@ -20,7 +20,7 @@ namespace ConductorSharp.Engine.Service
         private readonly CancellationTokenSource _stoppingCts = new();
 
         public WorkflowEngineBackgroundService(
-            IConductorSharpHealthUpdater healthUpdater
+            IConductorSharpHealthUpdater healthUpdater,
             ILogger<WorkflowEngineBackgroundService> logger,
             IHostApplicationLifetime hostApplicationLifetime,
             IDeploymentService deploymentService,
