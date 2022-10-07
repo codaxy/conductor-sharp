@@ -13,9 +13,9 @@ namespace ConductorSharp.Engine.Health
         public bool IsExecutionManagerRunning { get; set; }
     }
 
-    public class ConductorSharpFileHealthService : IConductorSharpHealthService
+    public class FileHealthService : IConductorSharpHealthService
     {
-        private static readonly SemaphoreSlim _semaphore = new(1);
+        private readonly SemaphoreSlim _semaphore = new(1);
 
         private const string HealthFileName = "CONDUCTORSHARP_HEALTH.json";
 

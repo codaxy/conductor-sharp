@@ -41,7 +41,7 @@ namespace ConductorSharp.Engine.Extensions
 
             _builder.RegisterType<ConductorSharpExecutionContext>().InstancePerLifetimeScope();
 
-            _builder.RegisterType<InMemoryHealthService>().As<IConductorSharpHealthService>();
+            _builder.RegisterType<InMemoryHealthService>().As<IConductorSharpHealthService>().SingleInstance();
 
             _builder.RegisterType<InverseExponentialBackoff>().As<IPollTimingStrategy>();
 
@@ -65,7 +65,7 @@ namespace ConductorSharp.Engine.Extensions
 
         public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
         {
-            _builder.RegisterType<T>().As<IConductorSharpHealthService>();
+            _builder.RegisterType<T>().As<IConductorSharpHealthService>().SingleInstance();
             return this;
         }
     }

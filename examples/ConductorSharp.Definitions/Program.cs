@@ -40,7 +40,7 @@ var builder = Host.CreateDefaultBuilder()
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
                     domain: configuration.GetValue<string>("Conductor:WorkerDomain")
                 )
-                .SetHealthCheckService<ConductorSharpFileHealthService>()
+                .SetHealthCheckService<FileHealthService>()
                 .AddPipelines(pipelines =>
                 {
                     pipelines.AddRequestResponseLogging();
