@@ -12,10 +12,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Health;
 
 namespace ConductorSharp.Engine
 {
-    public class ExecutionManager
+    internal class ExecutionManager
     {
         private readonly SemaphoreSlim _semaphore;
         private readonly WorkerSetConfig _configuration;
@@ -23,6 +24,7 @@ namespace ConductorSharp.Engine
         private readonly ITaskService _taskManager;
         private readonly IEnumerable<TaskToWorker> _registeredWorkers;
         private readonly ILifetimeScope _lifetimeScope;
+        private readonly IConductorSharpHealthUpdater _healthUpdater;
 
         // TODO: Implement polling strategy so that if there
         // are no requests incoming we poll less, and when queues are full
@@ -38,7 +40,8 @@ namespace ConductorSharp.Engine
             ILogger<ExecutionManager> logger,
             ITaskService taskService,
             IEnumerable<TaskToWorker> workerMappings,
-            ILifetimeScope lifetimeScope
+            ILifetimeScope lifetimeScope,
+            IConductorSharpHealthUpdater healthUpdater
         )
         {
             _configuration = options;
@@ -47,10 +50,12 @@ namespace ConductorSharp.Engine
             _taskManager = taskService;
             _registeredWorkers = workerMappings;
             _lifetimeScope = lifetimeScope;
+            _healthUpdater = healthUpdater;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            await _healthUpdater.SetExecutionManagerStarted();
             while (!cancellationToken.IsCancellationRequested)
             {
                 var scheduleQueue = await _taskManager.GetAllQueues();

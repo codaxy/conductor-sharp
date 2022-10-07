@@ -12,3 +12,4 @@ dist
 *.user
 .env
 *.xmldocs.xml
+**/CONDUCTORSHARP_HEALTH.json

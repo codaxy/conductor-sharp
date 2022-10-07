@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using ConductorSharp.Engine.Behaviors;
+using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
@@ -38,6 +39,8 @@ namespace ConductorSharp.Engine.Extensions
             _builder.RegisterType<ExecutionManager>().SingleInstance();
 
             _builder.RegisterType<ConductorSharpExecutionContext>().InstancePerLifetimeScope();
+
+            _builder.RegisterType<ConductorSharpHealthService>().AsImplementedInterfaces();
 
             return this;
         }

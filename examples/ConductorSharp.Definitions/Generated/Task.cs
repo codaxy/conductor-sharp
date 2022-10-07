@@ -28,7 +28,7 @@ namespace ConductorSharp.Definitions.Generated
     /// <originalName>
     /// EMAIL_prepare
     /// </originalName>
-    [OriginalName("EMAIL_prepare")]
+    [OriginalName("EMAILs_prepare")]
     public partial class EmailPrepareV1 : SimpleTaskModel<EmailPrepareV1Input, EmailPrepareV1Output> { }
 
     public partial class CustomerGetV1Input : IRequest<CustomerGetV1Output>
