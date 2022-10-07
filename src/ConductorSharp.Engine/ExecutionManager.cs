@@ -75,7 +75,6 @@ namespace ConductorSharp.Engine
                 }
 
                 await Task.Delay(currentSleepInterval, cancellationToken);
-                Console.WriteLine(currentSleepInterval);
             }
         }
 
