@@ -12,11 +12,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Polling;
 
 namespace ConductorSharp.Engine
 {
-    public class ExecutionManager
+    internal class ExecutionManager
     {
         private readonly SemaphoreSlim _semaphore;
         private readonly WorkerSetConfig _configuration;

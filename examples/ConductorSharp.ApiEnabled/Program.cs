@@ -1,5 +1,6 @@
 using Autofac.Extensions.DependencyInjection;
 using ConductorSharp.ApiEnabled.Extensions;
+using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Util;
 using Serilog;
 
@@ -12,6 +13,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks().AddCheck<ConductorSharpHealthCheck>("running");
 
 //Autofac dependency injection
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureApiEnabled(configuration);
@@ -26,5 +28,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthorization();
+
 app.MapControllers();
+app.MapHealthChecks("/health");
 app.Run();

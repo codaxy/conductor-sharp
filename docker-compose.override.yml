@@ -1,7 +1,30 @@
 version: '3.4'
 
 services:
+
+  conductorsharp.noapi:
+    healthcheck:
+      test: bash -c "[ -f /app/CONDUCTORSHARP_HEALTH.json ]"
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+
+  conductorsharp.definitions:
+    healthcheck:
+      test: bash -c "[ -f /app/CONDUCTORSHARP_HEALTH.json ]"
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+
   conductorsharp.apienabled:
+    healthcheck:
+      test: bash -c "[ -f /app/CONDUCTORSHARP_HEALTH.json ]"
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:

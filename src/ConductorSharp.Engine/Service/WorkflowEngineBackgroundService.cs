@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Interface;
+﻿using ConductorSharp.Engine.Health;
+using ConductorSharp.Engine.Interface;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -7,17 +8,19 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Service
 {
-    public class WorkflowEngineBackgroundService : IHostedService, IDisposable
+    internal class WorkflowEngineBackgroundService : IHostedService, IDisposable
     {
         private readonly ILogger<WorkflowEngineBackgroundService> _logger;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IDeploymentService _deploymentService;
         private readonly ExecutionManager _executionManager;
         private readonly ModuleDeployment _deployment;
+        private readonly IConductorSharpHealthService _healthService;
         private Task _executingTask;
         private readonly CancellationTokenSource _stoppingCts = new();
 
         public WorkflowEngineBackgroundService(
+            IConductorSharpHealthService healthService,
             ILogger<WorkflowEngineBackgroundService> logger,
             IHostApplicationLifetime hostApplicationLifetime,
             IDeploymentService deploymentService,
@@ -30,6 +33,7 @@ namespace ConductorSharp.Engine.Service
             _deploymentService = deploymentService;
             _executionManager = executionManager;
             _deployment = deployment;
+            _healthService = healthService;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -48,11 +52,14 @@ namespace ConductorSharp.Engine.Service
         {
             try
             {
+                _healthService.RemoveHealthData();
                 await _deploymentService.Deploy(_deployment);
+                await _healthService.SetExecutionManagerRunning(cancellationToken);
                 await _executionManager.StartAsync(cancellationToken);
             }
             catch (Exception exception)
             {
+                await _healthService.UnsetExecutionManagerRunning();
                 _logger.LogCritical(exception, "Workflow Engine Background Service encountered an error");
                 throw;
             }
@@ -64,6 +71,7 @@ namespace ConductorSharp.Engine.Service
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
+            _healthService.RemoveHealthData();
             if (_executingTask == null)
             {
                 return;
