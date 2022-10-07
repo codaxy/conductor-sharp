@@ -115,6 +115,7 @@ namespace ConductorSharp.Engine.Builders
             AdditionalTaskParameters additionalParameters = null
         ) where F : IRequest<G> => AddAndReturnBuilder(new SimpleTaskBuilder<F, G>(refference.Body, input.Body, additionalParameters));
 
+        [Obsolete("Use DecisionCases<TWorkflow> overload")]
         public ITaskOptionsBuilder AddTask(
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
             Expression<Func<TWorkflow, DecisionTaskInput>> expression,
@@ -127,6 +128,30 @@ namespace ConductorSharp.Engine.Builders
             {
                 builder.AddCase(funcase.Item1);
                 funcase.Item2.Invoke(builder);
+            }
+
+            _taskBuilders.Add(builder);
+            return builder;
+        }
+
+        public ITaskOptionsBuilder AddTask(
+            Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
+            Expression<Func<TWorkflow, DecisionTaskInput>> expression,
+            DecisionCases<TWorkflow> decisionCases
+        )
+        {
+            var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
+
+            foreach (var @case in decisionCases.Cases)
+            {
+                builder.AddCase(@case.Key);
+                @case.Value(builder);
+            }
+
+            if (decisionCases.DefaultCase != null)
+            {
+                builder.AddDefaultCase();
+                decisionCases.DefaultCase(builder);
             }
 
             _taskBuilders.Add(builder);

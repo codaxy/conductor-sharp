@@ -13,20 +13,20 @@ namespace ConductorSharp.Engine.Builders
     public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput> where TWorkflow : ITypedWorkflow
     {
         private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
-
         private string _currentCaseName;
+        private List<ITaskBuilder> _defaultCaseBuilders = null;
 
         public DecisionTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }
 
-        public DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
+        internal DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
         {
+            // caseName == null => Specify default case
             _currentCaseName = caseName;
-
-            if (!_caseDictionary.ContainsKey(_currentCaseName))
-                _caseDictionary.Add(caseName, new List<ITaskBuilder>());
 
             return this;
         }
+
+        internal DecisionTaskBuilder<TWorkflow> AddDefaultCase() => AddCase(null);
 
         public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
             Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence,
@@ -34,7 +34,7 @@ namespace ConductorSharp.Engine.Builders
         ) where F : IRequest<G>
         {
             var builder = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body);
-            _caseDictionary[_currentCaseName].Add(builder);
+            GetBuilderListForCurrentCase().Add(builder);
 
             return this;
         }
@@ -46,7 +46,7 @@ namespace ConductorSharp.Engine.Builders
         ) where F : IRequest<G>
         {
             var builder = new LambdaTaskBuilder<F, G>(script, taskSelector.Body, expression.Body);
-            _caseDictionary[_currentCaseName].Add(builder);
+            GetBuilderListForCurrentCase().Add(builder);
 
             return this;
         }
@@ -57,7 +57,7 @@ namespace ConductorSharp.Engine.Builders
         )
         {
             var builder = new DynamicForkJoinTaskBuilder(taskSelector.Body, expression.Body);
-            _caseDictionary[_currentCaseName].Add(builder);
+            GetBuilderListForCurrentCase().Add(builder);
 
             return this;
         }
@@ -69,7 +69,7 @@ namespace ConductorSharp.Engine.Builders
         ) where F : IRequest<G>
         {
             var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body, additionalParameters);
-            _caseDictionary[_currentCaseName].Add(builder);
+            GetBuilderListForCurrentCase().Add(builder);
 
             return this;
         }
@@ -80,11 +80,12 @@ namespace ConductorSharp.Engine.Builders
         )
         {
             var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body);
-            _caseDictionary[_currentCaseName].Add(builder);
+            GetBuilderListForCurrentCase().Add(builder);
 
             return this;
         }
 
+        [Obsolete("Use DecisionCases<TWorkflow> overload")]
         public DecisionTaskBuilder<TWorkflow> WithTask(
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
             Expression<Func<TWorkflow, DecisionTaskInput>> expression,
@@ -99,7 +100,32 @@ namespace ConductorSharp.Engine.Builders
                 funcase.Item2.Invoke(builder);
             }
 
-            _caseDictionary[_currentCaseName].Add(builder);
+            GetBuilderListForCurrentCase().Add(builder);
+
+            return this;
+        }
+
+        public DecisionTaskBuilder<TWorkflow> WithTask(
+            Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
+            Expression<Func<TWorkflow, DecisionTaskInput>> expression,
+            DecisionCases<TWorkflow> decisionCases
+        )
+        {
+            var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
+
+            foreach (var @case in decisionCases.Cases)
+            {
+                builder.AddCase(@case.Key);
+                @case.Value(builder);
+            }
+
+            if (decisionCases.DefaultCase != null)
+            {
+                builder.AddDefaultCase();
+                decisionCases.DefaultCase(builder);
+            }
+
+            GetBuilderListForCurrentCase().Add(builder);
 
             return this;
         }
@@ -117,12 +143,29 @@ namespace ConductorSharp.Engine.Builders
                     InputParameters = _inputParameters,
                     Type = "DECISION",
                     CaseValueParam = "case_value_param",
-                    DecisionCases = new Newtonsoft.Json.Linq.JObject
+                    DecisionCases = new JObject
                     {
                         _caseDictionary.Select(a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(a => a.Build()))))
-                    }
+                    },
+                    DefaultCase = _defaultCaseBuilders?.SelectMany(taskBuilder => taskBuilder.Build()).Select(JObject.FromObject).ToList()
                 }
             };
+        }
+
+        private List<ITaskBuilder> GetBuilderListForCurrentCase()
+        {
+            if (_currentCaseName == null)
+            {
+                if (_defaultCaseBuilders == null)
+                    _defaultCaseBuilders = new();
+
+                return _defaultCaseBuilders;
+            }
+
+            if (!_caseDictionary.ContainsKey(_currentCaseName))
+                _caseDictionary.Add(_currentCaseName, new());
+
+            return _caseDictionary[_currentCaseName];
         }
     }
 }
