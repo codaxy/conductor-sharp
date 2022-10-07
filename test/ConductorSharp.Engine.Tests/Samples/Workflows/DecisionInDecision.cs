@@ -21,6 +21,10 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
         public DecisionTaskModel SecondSendNotificationDecision { get; set; }
         public SendCustomerNotification SendNotificationSubworkflow { get; set; }
 
+        public DecisionTaskModel SendNotificationDecisionNewMethod { get; set; }
+        public DecisionTaskModel SecondSendNotificationDecisionNewMethod { get; set; }
+        public SendCustomerNotification SendNotificationSubworkflowNewMethod { get; set; }
+
         public override WorkflowDefinition GetDefinition()
         {
             var builder = new WorkflowDefinitionBuilder<DecisionInDecision>();
@@ -41,6 +45,31 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                             )
                         )
                 )
+            );
+
+            builder.AddTask(
+                wf => wf.SendNotificationDecisionNewMethod,
+                wf => new() { CaseValueParam = wf.WorkflowInput.ShouldSendNotification },
+                new DecisionCases<DecisionInDecision>
+                {
+                    ["YES"] = builder =>
+                    {
+                        builder.WithTask(
+                            wf => wf.SecondSendNotificationDecisionNewMethod,
+                            wf => new() { CaseValueParam = wf.WorkflowInput.ShouldSendNotification },
+                            new DecisionCases<DecisionInDecision>
+                            {
+                                ["YES"] = builder =>
+                                {
+                                    builder.WithTask(
+                                        wf => wf.SendNotificationSubworkflowNewMethod,
+                                        wf => new() { CustomerId = wf.WorkflowInput.CustomerId }
+                                    );
+                                }
+                            }
+                        );
+                    }
+                }
             );
 
             return builder.Build(opts => opts.Version = 1);
