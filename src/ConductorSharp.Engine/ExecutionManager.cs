@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Autofac;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Health;
+using ConductorSharp.Engine.Polling;
 
 namespace ConductorSharp.Engine
 {
@@ -25,15 +26,8 @@ namespace ConductorSharp.Engine
         private readonly IEnumerable<TaskToWorker> _registeredWorkers;
         private readonly ILifetimeScope _lifetimeScope;
         private readonly IConductorSharpHealthUpdater _healthUpdater;
-
-        // TODO: Implement polling strategy so that if there
-        // are no requests incoming we poll less, and when queues are full
-        // we poll more often
-
-        // TODO: Implement load balancing strategy so we can avoid
-        // task starvation. One way is to create some sort of task priority
-        // which will dynamically change based on how many of those tasks we served
-        // When a task is polled we reduce its priorty and when increse the priorty of all others
+        private readonly IPollTimingStrategy _pollTimingStrategy;
+        private readonly IPollOrderStrategy _pollOrderStrategy;
 
         public ExecutionManager(
             WorkerSetConfig options,
@@ -42,6 +36,8 @@ namespace ConductorSharp.Engine
             IEnumerable<TaskToWorker> workerMappings,
             ILifetimeScope lifetimeScope,
             IConductorSharpHealthUpdater healthUpdater
+            IPollTimingStrategy pollTimingStrategy,
+            IPollOrderStrategy pollOrderStrategy
         )
         {
             _configuration = options;
@@ -51,15 +47,31 @@ namespace ConductorSharp.Engine
             _registeredWorkers = workerMappings;
             _lifetimeScope = lifetimeScope;
             _healthUpdater = healthUpdater;
+            _pollTimingStrategy = pollTimingStrategy;
+            _pollOrderStrategy = pollOrderStrategy;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await _healthUpdater.SetExecutionManagerStarted();
+            var currentSleepInterval = _configuration.SleepInterval;
+
             while (!cancellationToken.IsCancellationRequested)
             {
-                var scheduleQueue = await _taskManager.GetAllQueues();
-                var scheduledWorkers = _registeredWorkers.Where(a => scheduleQueue.ContainsKey(a.TaskName) && scheduleQueue[a.TaskName] > 0).ToList();
+                var queuedTasks = (await _taskManager.GetAllQueues())
+                    .Where(a => _registeredWorkers.Any(b => b.TaskName == a.Key) && a.Value > 0)
+                    .ToDictionary(a => a.Key, a => a.Value);
+
+                var scheduledWorkers = _registeredWorkers.Where(a => queuedTasks.ContainsKey(a.TaskName)).ToList();
+
+                currentSleepInterval = _pollTimingStrategy.CalculateDelay(
+                    queuedTasks,
+                    scheduledWorkers,
+                    _configuration.SleepInterval,
+                    currentSleepInterval
+                );
+
+                scheduledWorkers = _pollOrderStrategy.CalculateOrder(queuedTasks, scheduledWorkers, _semaphore.CurrentCount);
 
                 foreach (var scheduledWorker in scheduledWorkers)
                 {
@@ -67,7 +79,7 @@ namespace ConductorSharp.Engine
                     _ = PollAndHandle(scheduledWorker, cancellationToken).ContinueWith(_ => _semaphore.Release());
                 }
 
-                await Task.Delay(_configuration.SleepInterval, cancellationToken);
+                await Task.Delay(currentSleepInterval, cancellationToken);
             }
         }
 
