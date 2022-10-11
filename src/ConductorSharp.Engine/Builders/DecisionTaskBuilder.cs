@@ -12,9 +12,9 @@ namespace ConductorSharp.Engine.Builders
 {
     public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput> where TWorkflow : ITypedWorkflow
     {
-        private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
+        private readonly Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
         private string _currentCaseName;
-        private List<ITaskBuilder> _defaultCaseBuilders = null;
+        private List<ITaskBuilder> _defaultCaseBuilders;
 
         public DecisionTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }
 
