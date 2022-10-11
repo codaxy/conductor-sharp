@@ -65,7 +65,7 @@ namespace ConductorSharp.Engine.Service
             }
             finally
             {
-                _hostApplicationLifetime.StopApplication();
+                _healthService.RemoveHealthData();
             }
         }
 
