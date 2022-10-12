@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using ConductorSharp.Engine.Behaviors;
+using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Polling;
 using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
 using MediatR;
@@ -39,6 +41,12 @@ namespace ConductorSharp.Engine.Extensions
 
             _builder.RegisterType<ConductorSharpExecutionContext>().InstancePerLifetimeScope();
 
+            _builder.RegisterType<InMemoryHealthService>().As<IConductorSharpHealthService>().SingleInstance();
+
+            _builder.RegisterType<InverseExponentialBackoff>().As<IPollTimingStrategy>();
+
+            _builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
+
             return this;
         }
 
@@ -52,5 +60,13 @@ namespace ConductorSharp.Engine.Extensions
             _builder.RegisterGeneric(typeof(RequestResponseLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
         public void AddValidation() => _builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+
+        public void AddContextLogging() => _builder.RegisterGeneric(typeof(ContextLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+
+        public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
+        {
+            _builder.RegisterType<T>().As<IConductorSharpHealthService>().SingleInstance();
+            return this;
+        }
     }
 }

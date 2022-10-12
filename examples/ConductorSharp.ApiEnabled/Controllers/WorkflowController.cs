@@ -40,6 +40,6 @@ public class WorkflowController : ControllerBase
         await workflowService.QueueWorkflowStringResponse(
             NotificationWorfklowName,
             1,
-            new JObject { new JProperty("customer_id", request.CustomerId) }
+            new JObject { new JProperty("task_to_execute", "CUSTOMER_get"), new JProperty("customer_id", request.CustomerId) }
         );
 }

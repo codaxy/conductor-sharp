@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Engine.Util;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,32 +14,27 @@ namespace ConductorSharp.Engine.Behaviors
     public class RequestResponseLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> _logger;
-        private readonly ConductorSharpExecutionContext _executionContext;
 
-        public RequestResponseLoggingBehavior(
-            ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> logger,
-            ConductorSharpExecutionContext executionContext
-        )
+        public RequestResponseLoggingBehavior(ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> logger)
         {
             _logger = logger;
-            _executionContext = executionContext;
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             var stopwatch = new Stopwatch();
-            _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}} in {{@conductorSharpContext}}", request, _executionContext);
+            _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}}", request);
             stopwatch.Start();
 
             try
             {
                 var response = await next();
+
                 stopwatch.Stop();
 
                 _logger.LogInformation(
-                    $"Received response {{@{typeof(TResponse).Name}}} in {{@conductorSharpContext}} in {{ellapsedMilliseconds}}",
+                    $"Received response {{@{typeof(TResponse).Name}}} in {{ellapsedMilliseconds}}",
                     response,
-                    _executionContext,
                     stopwatch.ElapsedMilliseconds
                 );
 
@@ -47,12 +43,7 @@ namespace ConductorSharp.Engine.Behaviors
             catch (Exception exc)
             {
                 stopwatch.Stop();
-                _logger.LogInformation(
-                    $"Exception {{exceptionMessage}} in {{@conductorSharpContext}} in {{elapsedMilliseconds}}",
-                    exc.Message,
-                    _executionContext,
-                    stopwatch.ElapsedMilliseconds
-                );
+                _logger.LogInformation($"Exception {{exceptionMessage}} in {{elapsedMilliseconds}}", exc.Message, stopwatch.ElapsedMilliseconds);
                 throw;
             }
         }

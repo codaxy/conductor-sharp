@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Client.Service;
+using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using Microsoft.Extensions.Logging;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Service
 {
-    public class DeploymentService : IDeploymentService
+    internal class DeploymentService : IDeploymentService
     {
         private readonly IMetadataService _metadataService;
 

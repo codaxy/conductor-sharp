@@ -20,10 +20,12 @@ public class PrepareEmailResponse
 public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
 {
     private readonly ConductorSharpExecutionContext _context;
+    private readonly ILogger<PrepareEmailHandler> _logger;
 
-    public PrepareEmailHandler(ConductorSharpExecutionContext context)
+    public PrepareEmailHandler(ConductorSharpExecutionContext context, ILogger<PrepareEmailHandler> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
@@ -38,6 +40,8 @@ public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, Prep
         emailBodyBuilder.AppendLine("------------------");
         emailBodyBuilder.AppendLine($"WorkflowId : {_context.WorkflowId}");
         emailBodyBuilder.AppendLine($"WorkflowName: {_context.WorkflowName}");
+
+        _logger.LogInformation("Prepared email");
 
         return Task.FromResult(new PrepareEmailResponse { EmailBody = emailBodyBuilder.ToString() });
     }

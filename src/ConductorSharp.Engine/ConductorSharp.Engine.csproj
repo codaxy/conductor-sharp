@@ -6,7 +6,7 @@
     <Authors>Codaxy</Authors>
 	<Company>Codaxy</Company>
 	<PackageId>ConductorSharp.Engine</PackageId>
-	<Version>1.5.0-alpha2</Version>
+	<Version>1.5.0-alpha5</Version>
     <Description>Client library for Netflix Conductor, with some additional quality of life features.</Description>
 	<RepositoryUrl>https://github.com/codaxy/conductor-sharp</RepositoryUrl>
 	<PackageTags>netflix;conductor</PackageTags>
@@ -18,8 +18,10 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.9" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
 

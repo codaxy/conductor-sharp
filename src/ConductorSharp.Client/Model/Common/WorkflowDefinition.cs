@@ -14,8 +14,21 @@ namespace ConductorSharp.Client.Model.Common
             [JsonProperty("name")]
             public string Name { get; set; }
 
+            [JsonIgnore]
+            public int Version
+            {
+                get
+                {
+                    if (int.TryParse(VersionAsString, out int version))
+                        return version;
+
+                    return 0;
+                }
+                set { VersionAsString = value.ToString(); }
+            }
+
             [JsonProperty("version")]
-            public int Version { get; set; }
+            public string VersionAsString { get; set; }
 
             [JsonProperty("taskToDomain")]
             public JObject TaskToDomain { get; set; }

@@ -85,6 +85,17 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
+        public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
+            Expression<Func<TWorkflow, DynamicTaskModel<F, G>>> taskSelector,
+            Expression<Func<TWorkflow, DynamicTaskInput<F, G>>> expression
+        ) where F : IRequest<G>
+        {
+            var builder = new DynamicTaskBuilder<F, G>(taskSelector.Body, expression.Body);
+            GetBuilderListForCurrentCase().Add(builder);
+
+            return this;
+        }
+
         [Obsolete("Use DecisionCases<TWorkflow> overload")]
         public DecisionTaskBuilder<TWorkflow> WithTask(
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
