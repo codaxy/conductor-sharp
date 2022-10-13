@@ -8,5 +8,5 @@ using System.Text;
 namespace ConductorSharp.Engine.Model
 {
     [OriginalName(CSharpLambdaTaskHandler.TaskName)]
-    public sealed class CSharpLambdaTaskModel<TInput, TOutput> : SimpleTaskModel<TInput, TOutput> where TInput : IRequest<TOutput> { }
+    public sealed class CSharpLambdaTaskModel<TInput, TOutput> : TaskModel<TInput, TOutput> where TInput : IRequest<TOutput> { }
 }
