@@ -175,7 +175,7 @@ namespace ConductorSharp.Engine.Builders
             Func<TInput, TOutput> handler
         ) where TInput : IRequest<TOutput>
         {
-            var builder = new CSharpLambdaTaskBuilder<TInput, TOutput>(reference, input, _name);
+            var builder = new CSharpLambdaTaskBuilder<TInput, TOutput>(reference.Body, input.Body, _name);
             _lambdas.Add(new CSharpLambda(builder.LambdaIdentifier, handler, typeof(TInput)));
             return AddAndReturnBuilder(builder);
         }
