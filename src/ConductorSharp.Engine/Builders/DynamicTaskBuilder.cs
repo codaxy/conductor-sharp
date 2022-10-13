@@ -21,9 +21,6 @@ namespace ConductorSharp.Engine.Builders
             [JsonProperty("task_input")]
             public JObject TaskInput { get; set; }
 
-            [JsonProperty("workflow_version")]
-            public string WorkflowVersion { get; set; }
-
             [JsonProperty(DynamicTasknameParam)]
             public string TaskToExecute { get; set; }
         }
@@ -43,12 +40,7 @@ namespace ConductorSharp.Engine.Builders
                     Type = TaskType,
                     InputParameters = parameters.TaskInput,
                     DynamicTaskNameParam = DynamicTasknameParam,
-                    SubWorkflowParam = new WorkflowDefinition.SubWorkflowParam
-                    {
-                        Name = parameters.TaskToExecute,
-                        VersionAsString = parameters.WorkflowVersion
-                    },
-                    Description = new JObject { new JProperty("description", "A dynamic task") }.ToString(Newtonsoft.Json.Formatting.None)
+                    Description = new JObject { new JProperty("description", "A dynamic task") }.ToString(Formatting.None)
                 }
             };
         }

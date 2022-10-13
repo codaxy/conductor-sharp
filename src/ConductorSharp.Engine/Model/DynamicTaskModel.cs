@@ -9,7 +9,6 @@ namespace ConductorSharp.Engine.Model
     {
         public I TaskInput { get; set; }
         public string TaskToExecute { get; set; }
-        public int WorkflowVersion { get; set; }
     }
 
     public class DynamicTaskModel<I, O> : TaskModel<DynamicTaskInput<I, O>, O> { }
