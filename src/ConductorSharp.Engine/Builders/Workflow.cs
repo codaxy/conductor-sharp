@@ -21,7 +21,7 @@ namespace ConductorSharp.Engine.Builders
         public TInput WorkflowInput { get; set; }
         public TOutput WorkflowOutput { get; set; }
         public WorkflowId Id { get; set; }
-        public CSharpLambda[] Lambdas { get; private set; }
+        public CSharpLambda[] Lambdas { get; protected set; }
 
         public abstract WorkflowDefinition GetDefinition();
     }
