@@ -27,7 +27,7 @@ namespace ConductorSharp.Engine.Builders
                 new WorkflowDefinition.Task
                 {
                     Name = _taskName,
-                    TaskReferenceName = LambdaIdentifier,
+                    TaskReferenceName = _taskRefferenceName,
                     Type = "SIMPLE",
                     InputParameters = new JObject
                     {
