@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,16 +18,18 @@ namespace ConductorSharp.Engine.Handlers
         public const string TaskInputPropName = "task_input";
 
         [JsonProperty(LambdaIdenfitierPropName)]
+        [Required]
         public string LambdaIdentifier { get; set; }
 
         [JsonProperty(TaskInputPropName)]
+        [Required]
         public JObject TaskInput { get; set; }
     }
 
     [OriginalName(TaskName)]
     internal class CSharpLambdaTaskHandler : ITaskRequestHandler<CSharpLambdaTaskInput, object>
     {
-        public const string TaskName = "___CONDUCTOR_SHARP_INLINE_LAMBDA_TASK";
+        public const string TaskName = "_CONDUCTOR_SHARP_inline_lambda_task";
         private readonly Dictionary<string, CSharpLambda> _lambdas;
 
         public CSharpLambdaTaskHandler(IEnumerable<CSharpLambda> lambdas) => _lambdas = lambdas.ToDictionary(lambda => lambda.LambdaIdentifier);
