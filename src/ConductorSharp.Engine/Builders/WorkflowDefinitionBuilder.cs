@@ -22,6 +22,9 @@ namespace ConductorSharp.Engine.Builders
         private WorkflowOptions _workflowOptions;
 
         private List<ITaskBuilder> _taskBuilders = new();
+        private readonly List<CSharpLambda> _lambdas = new();
+
+        internal CSharpLambda[] Lambdas => _lambdas.ToArray();
 
         public WorkflowDefinitionBuilder()
         {
@@ -165,6 +168,17 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, TerminateTaskModel>> reference,
             Expression<Func<TWorkflow, TerminateTaskInput>> input
         ) => AddAndReturnBuilder(new TerminateTaskBuilder(reference.Body, input.Body));
+
+        public ITaskOptionsBuilder AddTask<TInput, TOutput>(
+            Expression<Func<TWorkflow, CSharpLambdaTaskModel<TInput, TOutput>>> reference,
+            Expression<Func<TWorkflow, TInput>> input,
+            Func<TInput, TOutput> handler
+        ) where TInput : IRequest<TOutput>
+        {
+            var builder = new CSharpLambdaTaskBuilder<TInput, TOutput>(reference, input, _name);
+            _lambdas.Add(new CSharpLambda(builder.LambdaIdentifier, handler, typeof(TInput)));
+            return AddAndReturnBuilder(builder);
+        }
 
         private ITaskOptionsBuilder AddAndReturnBuilder<T>(T builder) where T : ITaskOptionsBuilder, ITaskBuilder
         {
