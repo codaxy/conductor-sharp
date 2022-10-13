@@ -112,8 +112,16 @@ namespace ConductorSharp.Engine.Extensions
             builder.RegisterInstance(definition);
         }
 
-        public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder) where TWorkflow : ITypedWorkflow, new() =>
-            builder.RegisterInstance(new TWorkflow().GetDefinition());
+        public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder) where TWorkflow : ITypedWorkflow, new()
+        {
+            var workflow = new TWorkflow();
+            if (workflow.Lambdas != null)
+            {
+                foreach (var lambda in workflow.Lambdas)
+                    builder.RegisterInstance(lambda);
+            }
+            builder.RegisterInstance(workflow.GetDefinition());
+        }
 
         public static void RegisterTaskDefinition(this ContainerBuilder builder, TaskDefinition definition) => builder.RegisterInstance(definition);
         // TODO: add RegisterEventHandlerDefinition

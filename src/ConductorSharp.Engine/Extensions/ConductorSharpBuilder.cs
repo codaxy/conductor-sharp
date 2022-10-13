@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using ConductorSharp.Engine.Behaviors;
+using ConductorSharp.Engine.Handlers;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
@@ -66,6 +67,12 @@ namespace ConductorSharp.Engine.Extensions
         public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
         {
             _builder.RegisterType<T>().As<IConductorSharpHealthService>().SingleInstance();
+            return this;
+        }
+
+        public IExecutionManagerBuilder AddCSharpLambdaTasks()
+        {
+            _builder.RegisterWorkerTask<CSharpLambdaTaskHandler>();
             return this;
         }
     }
