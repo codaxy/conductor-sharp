@@ -24,7 +24,7 @@ namespace ConductorSharp.Engine.Builders
         private List<ITaskBuilder> _taskBuilders = new();
         private readonly List<CSharpLambda> _lambdas = new();
 
-        internal CSharpLambda[] Lambdas => _lambdas.ToArray();
+        public CSharpLambda[] Lambdas => _lambdas.ToArray();
 
         public WorkflowDefinitionBuilder()
         {
