@@ -114,5 +114,28 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             Assert.Equal(expectedDefinition, definition);
         }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionCSharpLambdaWorkflow()
+        {
+            var workflow = new CSharpLambdaWorkflow();
+            var definition = SerializationUtil.SerializeObject(workflow.GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/CSharpLambdaWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+            Assert.Collection(
+                workflow.Lambdas,
+                lambda =>
+                {
+                    Assert.Equal("c_sharp_lambda_workflow.first_task", lambda.LambdaIdentifier);
+                    Assert.Equal(typeof(CSharpLambdaWorkflow.TaskInput), lambda.InputType);
+                },
+                lambda =>
+                {
+                    Assert.Equal("c_sharp_lambda_workflow.second_task", lambda.LambdaIdentifier);
+                    Assert.Equal(typeof(CSharpLambdaWorkflow.TaskInput), lambda.InputType);
+                }
+            );
+        }
     }
 }

@@ -11,6 +11,7 @@
     <None Remove="Samples\Tasks\EmailPrepare.json" />
     <None Remove="Samples\Workflows\Arrays.json" />
     <None Remove="Samples\Workflows\ConditionallySendCustomerNotificationOutput.json" />
+    <None Remove="Samples\Workflows\CSharpLambdaWorkflow.json" />
     <None Remove="Samples\Workflows\DecisionInDecision.json" />
     <None Remove="Samples\Workflows\DynamicTask.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
@@ -23,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Samples\Workflows\CSharpLambdaWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\DecisionInDecision.json" />
   </ItemGroup>
 
