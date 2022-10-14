@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Interface;
+﻿using ConductorSharp.Client;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using MediatR;
 using Newtonsoft.Json;
@@ -40,7 +41,7 @@ namespace ConductorSharp.Engine.Handlers
             if (lambda == null)
                 throw new NotImplementedException($"No corresponding lambda for identifier: {request.LambdaIdentifier}");
 
-            return Task.FromResult(lambda.Handler.DynamicInvoke(request.TaskInput.ToObject(lambda.InputType)));
+            return Task.FromResult(lambda.Handler.DynamicInvoke(request.TaskInput.ToObject(lambda.InputType, ConductorConstants.IoJsonSerializer)));
         }
     }
 }
