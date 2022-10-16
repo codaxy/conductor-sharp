@@ -32,12 +32,7 @@
       "defaultCase": null,
       "forkTasks": null,
       "startDelay": 0,
-      "subWorkflowParam": {
-        "name": "${workflow.input.task_name}",
-        "version": "${workflow.input.workflow_version}",
-        "taskToDomain": null,
-        "workflowDefinition": null
-      },
+      "subWorkflowParam": null,
       "joinOn": null,
       "sink": null,
       "optional": false,
