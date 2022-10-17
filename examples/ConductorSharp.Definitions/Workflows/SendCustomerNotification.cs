@@ -40,7 +40,6 @@ namespace ConductorSharp.Definitions.Workflows
                     {
                         TaskInput = new() { CustomerId = b.WorkflowInput.CustomerId },
                         TaskToExecute = b.WorkflowInput.TaskToExecute,
-                        WorkflowVersion = 3
                     }
             );
 

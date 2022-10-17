@@ -32,7 +32,7 @@
       "startDelay": 0,
       "subWorkflowParam": {
         "name": "SCAFFOLDED_one",
-        "version": "1",
+        "version": 1,
         "taskToDomain": null,
         "workflowDefinition": null
       },
@@ -70,7 +70,7 @@
       "startDelay": 0,
       "subWorkflowParam": {
         "name": "SCAFFOLDED_two",
-        "version": "1",
+        "version": 1,
         "taskToDomain": null,
         "workflowDefinition": null
       },
