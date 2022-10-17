@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using Newtonsoft.Json.Linq;
 using System;
@@ -8,6 +9,20 @@ using System.Text;
 
 namespace ConductorSharp.Engine.Builders
 {
+    public static class TerminateTaskExtensions
+    {
+        public static ITaskOptionsBuilder AddTask<TWorkflow>(
+            this WorkflowDefinitionBuilder<TWorkflow> builder,
+            Expression<Func<TWorkflow, TerminateTaskModel>> reference,
+            Expression<Func<TWorkflow, TerminateTaskInput>> input
+        ) where TWorkflow : ITypedWorkflow
+        {
+            var taskBuilder = new TerminateTaskBuilder(reference.Body, input.Body);
+            builder.Context.TaskBuilders.Add(taskBuilder);
+            return taskBuilder;
+        }
+    }
+
     internal class TerminateTaskBuilder : BaseTaskBuilder<TerminateTaskInput, NoOutput>
     {
         public TerminateTaskBuilder(Expression taskExpression, Expression memberExpression) : base(taskExpression, memberExpression) { }

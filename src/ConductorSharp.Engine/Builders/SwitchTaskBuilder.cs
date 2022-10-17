@@ -10,6 +10,28 @@ using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
+    public static class SwitchTaskExtensions
+    {
+        public static ITaskOptionsBuilder AddTask<TWorkflow>(
+            this WorkflowDefinitionBuilder<TWorkflow> builder,
+            Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
+            Expression<Func<TWorkflow, SwitchTaskInput>> expression,
+            params (string, Action<SwitchTaskBuilder<TWorkflow>>)[] caseActions
+        ) where TWorkflow : ITypedWorkflow
+        {
+            var taskBuilder = new SwitchTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
+
+            foreach (var funcase in caseActions)
+            {
+                taskBuilder.AddCase(funcase.Item1);
+                funcase.Item2.Invoke(taskBuilder);
+            }
+
+            builder.Context.TaskBuilders.Add(taskBuilder);
+            return taskBuilder;
+        }
+    }
+
     public class SwitchTaskBuilder<TWorkflow> : BaseTaskBuilder<SwitchTaskInput, NoOutput> where TWorkflow : ITypedWorkflow
     {
         private Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = new();
