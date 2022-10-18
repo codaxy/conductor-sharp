@@ -17,8 +17,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class PatternTasks : Workflow<PatternTasksInput, PatternTasksOutput>
     {
-        public WaitSecondsHandler WaitSeconds { get; set; }
-        public ReadWorkflowTasksHandler ReadWorkflowTasks { get; set; }
+        public WaitSeconds WaitSeconds { get; set; }
+        public ReadWorkflowTasks ReadWorkflowTasks { get; set; }
 
         public override WorkflowDefinition GetDefinition()
         {

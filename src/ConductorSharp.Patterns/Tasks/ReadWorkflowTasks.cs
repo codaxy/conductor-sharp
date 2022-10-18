@@ -37,12 +37,12 @@ namespace ConductorSharp.Patterns.Tasks
     }
 
     [OriginalName(Constants.TaskNamePrefix + "_read_tasks")]
-    public class ReadWorkflowTasksHandler : TaskRequestHandler<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
+    public class ReadWorkflowTasks : TaskRequestHandler<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
     {
-        private readonly ILogger<ReadWorkflowTasksHandler> _logger;
+        private readonly ILogger<ReadWorkflowTasks> _logger;
         private readonly IWorkflowService _workflowService;
 
-        public ReadWorkflowTasksHandler(ILogger<ReadWorkflowTasksHandler> logger, IWorkflowService workflowService)
+        public ReadWorkflowTasks(ILogger<ReadWorkflowTasks> logger, IWorkflowService workflowService)
         {
             _logger = logger;
             _workflowService = workflowService;
