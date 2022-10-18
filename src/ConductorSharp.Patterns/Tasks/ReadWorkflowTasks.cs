@@ -16,9 +16,15 @@ namespace ConductorSharp.Patterns.Tasks
 {
     public class ReadWorkflowTasksRequest : IRequest<ReadWorkflowTasksResponse>
     {
+        /// <summary>
+        /// Comma separated list of task reference names to be read from specified workflow
+        /// </summary>
         [Required]
         public string TaskNames { get; set; }
 
+        /// <summary>
+        /// Id of the workflow to read tasks from
+        /// </summary>
         [Required]
         public string WorkflowId { get; set; }
     }
@@ -36,6 +42,9 @@ namespace ConductorSharp.Patterns.Tasks
         public string Status { get; set; }
     }
 
+    /// <summary>
+    /// Uses the Conductor API to read the input/output and status of the specified tasks for the specified workflow.
+    /// </summary>
     [OriginalName(Constants.TaskNamePrefix + "_read_tasks")]
     public class ReadWorkflowTasks : TaskRequestHandler<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
     {
