@@ -3,6 +3,7 @@ using ConductorSharp.Patterns.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using MediatR.Extensions.Autofac.DependencyInjection;
 
 namespace ConductorSharp.Patterns.Extensions
 {
@@ -12,6 +13,7 @@ namespace ConductorSharp.Patterns.Extensions
         {
             executionManagerBuilder.Builder.RegisterWorkerTask<ReadWorkflowTasks>();
             executionManagerBuilder.Builder.RegisterWorkerTask<WaitSeconds>();
+            executionManagerBuilder.Builder.RegisterMediatR(typeof(WaitSeconds).Assembly);
 
             return executionManagerBuilder;
         }
