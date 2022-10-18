@@ -21,11 +21,11 @@ namespace ConductorSharp.Patterns.Tasks
     public class WaitSecondsResponse { }
 
     [OriginalName(Constants.TaskNamePrefix + "_wait_seconds")]
-    public class WaitSecondsHandler : TaskRequestHandler<WaitSecondsRequest, WaitSecondsResponse>
+    public class WaitSeconds : TaskRequestHandler<WaitSecondsRequest, WaitSecondsResponse>
     {
-        private readonly ILogger<WaitSecondsHandler> _logger;
+        private readonly ILogger<WaitSeconds> _logger;
 
-        public WaitSecondsHandler(ILogger<WaitSecondsHandler> logger) => _logger = logger;
+        public WaitSeconds(ILogger<WaitSeconds> logger) => _logger = logger;
 
         public async override Task<WaitSecondsResponse> Handle(WaitSecondsRequest input, CancellationToken cancellationToken)
         {

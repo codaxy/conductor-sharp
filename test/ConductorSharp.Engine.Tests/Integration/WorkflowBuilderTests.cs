@@ -114,5 +114,14 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             Assert.Equal(expectedDefinition, definition);
         }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionPatternTasks()
+        {
+            var definition = SerializationUtil.SerializeObject(new PatternTasks().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/PatternTasks.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
     }
 }
