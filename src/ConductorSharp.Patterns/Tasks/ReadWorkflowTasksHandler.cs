@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Patterns.Tasks
 {
-    public class ReadWorkflowTasksInput : IRequest<ReadWorkflowTasksOutput>
+    public class ReadWorkflowTasksRequest : IRequest<ReadWorkflowTasksResponse>
     {
         [Required]
         public string TaskNames { get; set; }
@@ -23,7 +23,7 @@ namespace ConductorSharp.Patterns.Tasks
         public string WorkflowId { get; set; }
     }
 
-    public class ReadWorkflowTasksOutput
+    public class ReadWorkflowTasksResponse
     {
         public JObject Tasks { get; set; }
     }
@@ -36,26 +36,26 @@ namespace ConductorSharp.Patterns.Tasks
         public string Status { get; set; }
     }
 
-    [OriginalName("CSH_PATTERNS_read_tasks")]
-    public class ReadWorkflowTasks : TaskRequestHandler<ReadWorkflowTasksInput, ReadWorkflowTasksOutput>
+    [OriginalName(Constants.TaskNamePrefix + "_read_tasks")]
+    public class ReadWorkflowTasksHandler : TaskRequestHandler<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
     {
-        private readonly ILogger<ReadWorkflowTasks> _logger;
+        private readonly ILogger<ReadWorkflowTasksHandler> _logger;
         private readonly IWorkflowService _workflowService;
 
-        public ReadWorkflowTasks(ILogger<ReadWorkflowTasks> logger, IWorkflowService workflowService)
+        public ReadWorkflowTasksHandler(ILogger<ReadWorkflowTasksHandler> logger, IWorkflowService workflowService)
         {
             _logger = logger;
             _workflowService = workflowService;
         }
 
-        public async override Task<ReadWorkflowTasksOutput> Handle(ReadWorkflowTasksInput input, CancellationToken cancellationToken)
+        public async override Task<ReadWorkflowTasksResponse> Handle(ReadWorkflowTasksRequest input, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(input.TaskNames))
                 throw new Exception("No task names provided. Comma separated list of reference names expected");
 
             var tasknames = input.TaskNames.Split(",").Where(a => !string.IsNullOrEmpty(a)).ToList();
 
-            var output = new ReadWorkflowTasksOutput { Tasks = new JObject() };
+            var output = new ReadWorkflowTasksResponse { Tasks = new JObject() };
 
             var taskNotFoundPrototype = new TaskExecutionDetails
             {
