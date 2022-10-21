@@ -19,6 +19,7 @@ namespace ConductorSharp.Engine.Builders
         private readonly Type _workflowType;
         private string _name;
         private JObject _inputs = new();
+        private JObject _outputs = null;
         private WorkflowOptions _workflowOptions;
 
         private List<ITaskBuilder> _taskBuilders = new();
@@ -88,6 +89,7 @@ namespace ConductorSharp.Engine.Builders
                 InputParameters = _inputs,
                 OwnerApp = _workflowOptions.OwnerApp,
                 OwnerEmail = _workflowOptions.OwnerEmail,
+                OutputParameters = _outputs,
             };
         }
 
@@ -165,6 +167,13 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, TerminateTaskModel>> reference,
             Expression<Func<TWorkflow, TerminateTaskInput>> input
         ) => AddAndReturnBuilder(new TerminateTaskBuilder(reference.Body, input.Body));
+
+        public ITaskOptionsBuilder SetOutput<F>(Expression<Func<TWorkflow, F>> input) where F : WorkflowOutput
+        {
+            _outputs = ExpressionUtil.ParseToParameters(input.Body);
+
+            return null;
+        }
 
         private ITaskOptionsBuilder AddAndReturnBuilder<T>(T builder) where T : ITaskOptionsBuilder, ITaskBuilder
         {

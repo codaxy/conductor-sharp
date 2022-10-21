@@ -15,6 +15,7 @@ namespace ConductorSharp.Definitions.Workflows
 
     public class SendCustomerNotificationOutput : WorkflowOutput
     {
+        public dynamic? CustomerId { get; set; }
         public dynamic? EmailBody { get; set; }
     }
 
@@ -44,6 +45,10 @@ namespace ConductorSharp.Definitions.Workflows
             );
 
             builder.AddTask(a => a.PrepareEmail, b => new() { Address = b.DynamicHandler!.Output.Address, Name = b.DynamicHandler!.Output.Name });
+
+            builder.SetOutput(
+                a => new SendCustomerNotificationOutput { CustomerId = a.WorkflowInput.CustomerId, EmailBody = a.PrepareEmail.Output.EmailBody }
+            );
 
             return builder.Build(options =>
             {
