@@ -168,11 +168,9 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, TerminateTaskInput>> input
         ) => AddAndReturnBuilder(new TerminateTaskBuilder(reference.Body, input.Body));
 
-        public ITaskOptionsBuilder SetOutput<F>(Expression<Func<TWorkflow, F>> input) where F : WorkflowOutput
+        public void SetOutput<F>(Expression<Func<TWorkflow, F>> input) where F : WorkflowOutput
         {
             _outputs = ExpressionUtil.ParseToParameters(input.Body);
-
-            return null;
         }
 
         private ITaskOptionsBuilder AddAndReturnBuilder<T>(T builder) where T : ITaskOptionsBuilder, ITaskBuilder
