@@ -26,7 +26,7 @@ namespace ConductorSharp.Engine.Builders
         private readonly Type _workflowType;
         private string _name;
         private JObject _inputs = new();
-        public DefinitionContext Context { get; set; } = new();
+        public DefinitionContext Context { get; } = new();
 
         public WorkflowDefinitionBuilder()
         {
