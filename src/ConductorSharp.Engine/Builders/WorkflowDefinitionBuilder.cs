@@ -18,7 +18,7 @@ namespace ConductorSharp.Engine.Builders
     {
         public WorkflowOptions WorkflowOptions { get; set; }
 
-        public List<ITaskBuilder> TaskBuilders { get; set; } = new();
+        public List<ITaskBuilder> TaskBuilders { get; } = new();
     }
 
     public class WorkflowDefinitionBuilder<TWorkflow> where TWorkflow : ITypedWorkflow
