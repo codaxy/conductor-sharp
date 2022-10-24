@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Patterns.Tasks
 {
+    #region models
     public class ReadWorkflowTasksRequest : IRequest<ReadWorkflowTasksResponse>
     {
         /// <summary>
@@ -42,12 +43,12 @@ namespace ConductorSharp.Patterns.Tasks
 
     public class TaskExecutionDetails
     {
-        public JObject InputData { get; set; }
-        public JObject OutputData { get; set; }
+        public JObject InputData { get; set; } = new JObject();
+        public JObject OutputData { get; set; } = new JObject();
         public string ReferenceTaskName { get; set; }
-        public string Status { get; set; }
+        public string Status { get; set; } = "NOT_FOUND";
     }
-
+    #endregion
     /// <summary>
     /// Uses the Conductor API to read the input/output and status of the specified tasks for the specified workflow.
     /// </summary>
@@ -70,15 +71,6 @@ namespace ConductorSharp.Patterns.Tasks
 
             var tasknames = input.TaskNames.Split(",").Where(a => !string.IsNullOrEmpty(a)).ToList();
 
-            var output = new ReadWorkflowTasksResponse { Workflow = new WorkflowDetails(), Tasks = new Dictionary<string, TaskExecutionDetails>() };
-
-            var taskNotFoundPrototype = new TaskExecutionDetails
-            {
-                InputData = new JObject(),
-                OutputData = new JObject(),
-                Status = "NOT_FOUND"
-            };
-
             var starterWorkfow = await _workflowService.GetWorkflowStatus(input.WorkflowId);
 
             if (starterWorkfow == null)
@@ -86,14 +78,16 @@ namespace ConductorSharp.Patterns.Tasks
 
             var taskData = starterWorkfow.SelectToken("tasks").ToObject<List<TaskExecutionDetails>>();
 
+            var output = new ReadWorkflowTasksResponse
+            {
+                Workflow = new WorkflowDetails { InputData = starterWorkfow.SelectToken("input") as JObject },
+                Tasks = new Dictionary<string, TaskExecutionDetails>()
+            };
+
             foreach (var task in tasknames)
             {
-                var value = taskData.Where(a => a.ReferenceTaskName == task).FirstOrDefault() ?? taskNotFoundPrototype;
-                output.Tasks.Add(task, value);
+                output.Tasks.Add(task, taskData.FirstOrDefault(a => a.ReferenceTaskName == task) ?? new TaskExecutionDetails());
             }
-
-            // Add workflow input as it might also be useful
-            output.Workflow.InputData = starterWorkfow.SelectToken("input") as JObject;
 
             return output;
         }
