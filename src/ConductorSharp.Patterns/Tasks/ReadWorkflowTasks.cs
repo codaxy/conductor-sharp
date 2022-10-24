@@ -43,9 +43,16 @@ namespace ConductorSharp.Patterns.Tasks
 
     public class TaskExecutionDetails
     {
+        [JsonProperty("inputData")]
         public JObject InputData { get; set; } = new JObject();
+
+        [JsonProperty("outputData")]
         public JObject OutputData { get; set; } = new JObject();
+
+        [JsonProperty("referenceTaskName")]
         public string ReferenceTaskName { get; set; }
+
+        [JsonProperty("status")]
         public string Status { get; set; } = "NOT_FOUND";
     }
     #endregion
