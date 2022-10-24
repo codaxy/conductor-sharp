@@ -32,7 +32,12 @@ namespace ConductorSharp.Patterns.Tasks
     public class ReadWorkflowTasksResponse
     {
         public Dictionary<string, TaskExecutionDetails> Tasks { get; set; }
-        public JObject WorkflowInput { get; set; }
+        public WorkflowDetails Workflow { get; set; }
+    }
+
+    public class WorkflowDetails
+    {
+        public JObject InputData { get; set; }
     }
 
     public class TaskExecutionDetails
@@ -65,7 +70,7 @@ namespace ConductorSharp.Patterns.Tasks
 
             var tasknames = input.TaskNames.Split(",").Where(a => !string.IsNullOrEmpty(a)).ToList();
 
-            var output = new ReadWorkflowTasksResponse { Tasks = new Dictionary<string, TaskExecutionDetails>() };
+            var output = new ReadWorkflowTasksResponse { Workflow = new WorkflowDetails(), Tasks = new Dictionary<string, TaskExecutionDetails>() };
 
             var taskNotFoundPrototype = new TaskExecutionDetails
             {
@@ -88,7 +93,7 @@ namespace ConductorSharp.Patterns.Tasks
             }
 
             // Add workflow input as it might also be useful
-            output.WorkflowInput = starterWorkfow.SelectToken("input") as JObject;
+            output.Workflow.InputData = starterWorkfow.SelectToken("input") as JObject;
 
             return output;
         }
