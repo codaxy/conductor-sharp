@@ -16,7 +16,7 @@ namespace ConductorSharp.Engine.Builders
 {
     public class DefinitionContext
     {
-        public WorkflowOptions WorkflowOptions { get; set; }
+        public WorkflowOptions WorkflowOptions { get; } = new();
 
         public List<ITaskBuilder> TaskBuilders { get; } = new();
     }
@@ -31,7 +31,6 @@ namespace ConductorSharp.Engine.Builders
         public WorkflowDefinitionBuilder()
         {
             _workflowType = typeof(TWorkflow);
-            Context.WorkflowOptions = new WorkflowOptions();
 
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
             _name = NamingUtil.DetermineRegistrationName(_workflowType);
