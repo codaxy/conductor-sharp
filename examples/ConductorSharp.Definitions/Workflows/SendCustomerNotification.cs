@@ -51,6 +51,7 @@ namespace ConductorSharp.Definitions.Workflows
 
             return builder.Build(options =>
             {
+                options.FailureWorkflow = typeof(HandleNotificationFailure);
                 options.Version = 1;
                 options.OwnerEmail = "example@example.local";
             });

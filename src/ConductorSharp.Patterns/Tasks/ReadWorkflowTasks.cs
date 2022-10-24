@@ -31,7 +31,8 @@ namespace ConductorSharp.Patterns.Tasks
 
     public class ReadWorkflowTasksResponse
     {
-        public JObject Tasks { get; set; }
+        public Dictionary<string, TaskExecutionDetails> Tasks { get; set; }
+        public JObject WorkflowInput { get; set; }
     }
 
     public class TaskExecutionDetails
@@ -64,7 +65,7 @@ namespace ConductorSharp.Patterns.Tasks
 
             var tasknames = input.TaskNames.Split(",").Where(a => !string.IsNullOrEmpty(a)).ToList();
 
-            var output = new ReadWorkflowTasksResponse { Tasks = new JObject() };
+            var output = new ReadWorkflowTasksResponse { Tasks = new Dictionary<string, TaskExecutionDetails>() };
 
             var taskNotFoundPrototype = new TaskExecutionDetails
             {
@@ -82,14 +83,12 @@ namespace ConductorSharp.Patterns.Tasks
 
             foreach (var task in tasknames)
             {
-                var value =
-                    taskData.Where(a => a.ReferenceTaskName == task).Select(a => JObject.FromObject(a)).FirstOrDefault()
-                    ?? JObject.FromObject(taskNotFoundPrototype);
-                output.Tasks.Add(new JProperty(task, value));
+                var value = taskData.Where(a => a.ReferenceTaskName == task).FirstOrDefault() ?? taskNotFoundPrototype;
+                output.Tasks.Add(task, value);
             }
 
             // Add workflow input as it might also be useful
-            output.Tasks.Add(new JProperty("workflow", starterWorkfow.SelectToken("input") as JObject));
+            output.WorkflowInput = starterWorkfow.SelectToken("input") as JObject;
 
             return output;
         }
