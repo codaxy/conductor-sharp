@@ -6,6 +6,12 @@ using System.Text;
 
 namespace ConductorSharp.Engine.Builders
 {
+    public static class PassThroughTaskExtensions
+    {
+        public static void AddTasks<TWorkflow>(this WorkflowDefinitionBuilder<TWorkflow> builder, params WorkflowDefinition.Task[] taskDefinitions)
+            where TWorkflow : ITypedWorkflow => builder.Context.TaskBuilders.Add(new PassThroughTaskBuilder(taskDefinitions));
+    }
+
     public class PassThroughTaskBuilder : ITaskBuilder
     {
         private readonly WorkflowDefinition.Task[] _tasks;

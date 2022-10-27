@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConductorSharp.Engine.Util
+namespace ConductorSharp.Engine.Tests.Util
 {
     internal static class EmbeddedFileHelper
     {
