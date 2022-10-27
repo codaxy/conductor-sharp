@@ -78,16 +78,16 @@ namespace ConductorSharp.Patterns.Tasks
 
             var tasknames = input.TaskNames.Split(",").Where(a => !string.IsNullOrEmpty(a)).ToList();
 
-            var starterWorkfow = await _workflowService.GetWorkflowStatus(input.WorkflowId);
+            var starterWorkflow = await _workflowService.GetWorkflowStatus(input.WorkflowId);
 
-            if (starterWorkfow == null)
+            if (starterWorkflow == null)
                 throw new Exception($"Could not find starter workflow by id {input.WorkflowId}");
 
-            var taskData = starterWorkfow.SelectToken("tasks").ToObject<List<TaskExecutionDetails>>();
+            var taskData = starterWorkflow.SelectToken("tasks").ToObject<List<TaskExecutionDetails>>();
 
             var output = new ReadWorkflowTasksResponse
             {
-                Workflow = new WorkflowDetails { InputData = starterWorkfow.SelectToken("input") as JObject },
+                Workflow = new WorkflowDetails { InputData = starterWorkflow.SelectToken("input") as JObject },
                 Tasks = new Dictionary<string, TaskExecutionDetails>()
             };
 
