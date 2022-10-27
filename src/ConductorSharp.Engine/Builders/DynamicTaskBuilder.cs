@@ -1,5 +1,7 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,6 +11,20 @@ using System.Text;
 
 namespace ConductorSharp.Engine.Builders
 {
+    public static class DynamicTaskExtensions
+    {
+        public static ITaskOptionsBuilder AddTask<TWorkflow, F, G>(
+            this WorkflowDefinitionBuilder<TWorkflow> builder,
+            Expression<Func<TWorkflow, DynamicTaskModel<F, G>>> reference,
+            Expression<Func<TWorkflow, DynamicTaskInput<F, G>>> input
+        ) where TWorkflow : ITypedWorkflow
+        {
+            var taskBuilder = new DynamicTaskBuilder<F, G>(reference.Body, input.Body);
+            builder.Context.TaskBuilders.Add(taskBuilder);
+            return taskBuilder;
+        }
+    }
+
     public class DynamicTaskBuilder<I, O> : BaseTaskBuilder<DynamicTaskInput<I, O>, O>
     {
         private const string TaskType = "DYNAMIC";
