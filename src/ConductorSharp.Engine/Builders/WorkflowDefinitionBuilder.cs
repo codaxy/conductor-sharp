@@ -16,6 +16,8 @@ namespace ConductorSharp.Engine.Builders
 {
     public class DefinitionContext
     {
+        public JObject Inputs { get; set; }
+        public JObject Outputs { get; set; }
         public WorkflowOptions WorkflowOptions { get; } = new();
 
         public List<ITaskBuilder> TaskBuilders { get; } = new();
@@ -23,16 +25,13 @@ namespace ConductorSharp.Engine.Builders
 
     public class WorkflowDefinitionBuilder<TWorkflow> where TWorkflow : ITypedWorkflow
     {
-        private readonly Type _workflowType;
-        private string _name;
-        private JObject _inputs = new();
-        private JObject _outputs = null;
+        private readonly Type _workflowType = typeof(TWorkflow);
+        private readonly string _name;
+
         public DefinitionContext Context { get; } = new();
 
         public WorkflowDefinitionBuilder()
         {
-            _workflowType = typeof(TWorkflow);
-
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
             _name = NamingUtil.DetermineRegistrationName(_workflowType);
 
@@ -42,6 +41,7 @@ namespace ConductorSharp.Engine.Builders
             var labels = _workflowType.GetDocSection("labels");
 
             Context.WorkflowOptions.Version = 1;
+            Context.Inputs = new();
 
             if (!string.IsNullOrEmpty(summary))
                 Context.WorkflowOptions.Description = summary;
@@ -66,7 +66,7 @@ namespace ConductorSharp.Engine.Builders
                 var propertyName = prop.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(prop.Name);
 
                 var requiredString = isRequired != null ? "(required)" : "(optional)";
-                _inputs.Add(
+                Context.Inputs.Add(
                     new JProperty(
                         propertyName,
                         new JObject { new JProperty("value", ""), new JProperty("description", $"{description} {requiredString}"), }
@@ -92,16 +92,16 @@ namespace ConductorSharp.Engine.Builders
                     new JProperty("description", Context.WorkflowOptions.Description),
                     new JProperty("labels", Context.WorkflowOptions.Labels)
                 }.ToString(Formatting.None),
-                InputParameters = _inputs,
-                OutputParameters = _outputs,
+                InputParameters = Context.Inputs,
+                OutputParameters = Context.Outputs,
                 OwnerApp = Context.WorkflowOptions.OwnerApp,
                 OwnerEmail = Context.WorkflowOptions.OwnerEmail,
             };
         }
-    }
 
-    public void SetOutput<F>(Expression<Func<TWorkflow, F>> input) where F : WorkflowOutput
-    {
-        _outputs = ExpressionUtil.ParseToParameters(input.Body);
+        public void SetOutput<F>(Expression<Func<TWorkflow, F>> input) where F : WorkflowOutput
+        {
+            Context.Outputs = ExpressionUtil.ParseToParameters(input.Body);
+        }
     }
 }
