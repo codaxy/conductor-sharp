@@ -20,7 +20,6 @@ namespace ConductorSharp.Engine.Builders
         public TInput WorkflowInput { get; set; }
         public TOutput WorkflowOutput { get; set; }
         public WorkflowId Id { get; set; }
-
         public abstract WorkflowDefinition GetDefinition();
     }
 }

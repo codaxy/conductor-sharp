@@ -98,10 +98,21 @@ namespace ConductorSharp.Engine.Builders
                 OwnerEmail = Context.WorkflowOptions.OwnerEmail,
             };
         }
+    }
 
-        public void SetOutput<F>(Expression<Func<TWorkflow, F>> input) where F : WorkflowOutput
+    public class WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> : WorkflowDefinitionBuilder<TWorkflow>
+        where TWorkflow : ITypedWorkflow
+        where TInput : WorkflowInput<TOutput>
+        where TOutput : WorkflowOutput { }
+
+    public static class WorkflowOutputExtension
+    {
+        public static void SetOutput<FWorkflow, F, G>(this WorkflowDefinitionBuilder<FWorkflow, F, G> builder, Expression<Func<FWorkflow, G>> input)
+            where FWorkflow : Workflow<F, G>
+            where F : WorkflowInput<G>
+            where G : WorkflowOutput
         {
-            Context.Outputs = ExpressionUtil.ParseToParameters(input.Body);
+            builder.Context.Outputs = ExpressionUtil.ParseToParameters(input.Body);
         }
     }
 }
