@@ -5,6 +5,9 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
+
+ENV HUSKY 0
+
 COPY ["examples/ConductorSharp.Definitions/ConductorSharp.Definitions.csproj", "examples/ConductorSharp.Definitions/"]
 COPY ["src/ConductorSharp.Patterns/ConductorSharp.Patterns.csproj", "src/ConductorSharp.Patterns/"]
 COPY ["src/ConductorSharp.Engine/ConductorSharp.Engine.csproj", "src/ConductorSharp.Engine/"]
