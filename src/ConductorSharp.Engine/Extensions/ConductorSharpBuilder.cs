@@ -35,6 +35,8 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.RegisterType<DeploymentService>().As<IDeploymentService>();
 
+            Builder.RegisterType<TypedWorkflowService>().As<ITypedWorkflowService>();
+
             Builder.RegisterType<ModuleDeployment>();
 
             Builder.RegisterType<ExecutionManager>().SingleInstance();

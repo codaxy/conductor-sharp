@@ -1,0 +1,4 @@
+baseUrl: http://host.docker.internal:8080
+apiPath: api
+namespace: ConductorSharp.ScaffoldedDefinitions
+destination: ./ConductorSharp.ScaffoldedDefinitions/
