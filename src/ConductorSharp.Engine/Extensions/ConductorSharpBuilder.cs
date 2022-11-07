@@ -72,7 +72,7 @@ namespace ConductorSharp.Engine.Extensions
 
         public IExecutionManagerBuilder AddCSharpLambdaTasks()
         {
-            _builder.RegisterWorkerTask<CSharpLambdaTaskHandler>();
+            Builder.RegisterWorkerTask<CSharpLambdaTaskHandler>();
             return this;
         }
     }
