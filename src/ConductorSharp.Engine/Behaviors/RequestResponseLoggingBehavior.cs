@@ -33,7 +33,7 @@ namespace ConductorSharp.Engine.Behaviors
                 stopwatch.Stop();
 
                 _logger.LogInformation(
-                    $"Received response {{@{typeof(TResponse).Name}}} in {{ellapsedMilliseconds}}",
+                    $"Received response {{@{typeof(TResponse).Name}}} for request {typeof(TRequest).Name} (exec time = {{@EllapsedMilliseconds}})",
                     response,
                     stopwatch.ElapsedMilliseconds
                 );
@@ -43,7 +43,11 @@ namespace ConductorSharp.Engine.Behaviors
             catch (Exception exc)
             {
                 stopwatch.Stop();
-                _logger.LogInformation($"Exception {{exceptionMessage}} in {{elapsedMilliseconds}}", exc.Message, stopwatch.ElapsedMilliseconds);
+                _logger.LogError(
+                    $"Exception occured {{@Exception}} for request {typeof(TRequest).Name} (exec time = {{@ElapsedMilliseconds}})",
+                    exc,
+                    stopwatch.ElapsedMilliseconds
+                );
                 throw;
             }
         }

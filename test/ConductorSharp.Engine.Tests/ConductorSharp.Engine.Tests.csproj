@@ -16,6 +16,7 @@
     <None Remove="Samples\Workflows\DynamicTask.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\OptionalTaskWorkflow.json" />
+    <None Remove="Samples\Workflows\PatternTasks.json" />
     <None Remove="Samples\Workflows\ScaffoldedWorkflows.json" />
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
     <None Remove="Samples\Workflows\StringInterpolation.json" />
@@ -33,6 +34,7 @@
     <EmbeddedResource Include="Samples\Tasks\EmailPrepare.json" />
     <EmbeddedResource Include="Samples\Workflows\Arrays.json" />
     <EmbeddedResource Include="Samples\Workflows\DynamicTask.json" />
+    <EmbeddedResource Include="Samples\Workflows\PatternTasks.json" />
     <EmbeddedResource Include="Samples\Workflows\ScaffoldedWorkflows.json" />
     <EmbeddedResource Include="Samples\Workflows\OptionalTaskWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\NestedObjects.json" />
@@ -57,6 +59,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ConductorSharp.Engine\ConductorSharp.Engine.csproj" />
+    <ProjectReference Include="..\..\src\ConductorSharp.Patterns\ConductorSharp.Patterns.csproj" />
   </ItemGroup>
 
   <ItemGroup>

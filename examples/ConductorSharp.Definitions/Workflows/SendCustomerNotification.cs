@@ -3,6 +3,7 @@ using ConductorSharp.Definitions.Generated;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Patterns.Tasks;
 using MediatR;
 
 namespace ConductorSharp.Definitions.Workflows
@@ -28,6 +29,7 @@ namespace ConductorSharp.Definitions.Workflows
         public EmailPrepareV1? PrepareEmail { get; set; }
         public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput>? DynamicHandler { get; set; }
         public SendCustomerNotification? SendNotif { get; set; }
+        public WaitSeconds? WaitSeconds { get; set; }
 
         public override WorkflowDefinition GetDefinition()
         {
@@ -40,14 +42,16 @@ namespace ConductorSharp.Definitions.Workflows
                     {
                         TaskInput = new() { CustomerId = b.WorkflowInput.CustomerId },
                         TaskToExecute = b.WorkflowInput.TaskToExecute,
-                        WorkflowVersion = 3
                     }
             );
+
+            builder.AddTask(a => a.WaitSeconds, b => new() { Seconds = 10 });
 
             builder.AddTask(a => a.PrepareEmail, b => new() { Address = b.DynamicHandler!.Output.Address, Name = b.DynamicHandler!.Output.Name });
 
             return builder.Build(options =>
             {
+                options.FailureWorkflow = typeof(HandleNotificationFailure);
                 options.Version = 1;
                 options.OwnerEmail = "example@example.local";
             });

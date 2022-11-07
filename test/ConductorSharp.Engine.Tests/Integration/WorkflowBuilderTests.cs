@@ -116,6 +116,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
+        public void BuilderReturnsCorrectDefinitionPatternTasks()
+        {
+            var definition = SerializationUtil.SerializeObject(new PatternTasks().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/PatternTasks.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
         public void BuilderReturnsCorrectDefinitionCSharpLambdaWorkflow()
         {
             var workflow = new CSharpLambdaWorkflow();

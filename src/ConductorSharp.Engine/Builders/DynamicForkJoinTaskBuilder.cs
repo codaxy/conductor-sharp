@@ -1,10 +1,26 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
+    public static class DynamicForkJoinTaskExtensions
+    {
+        public static ITaskOptionsBuilder AddTask<TWorkflow>(
+            this WorkflowDefinitionBuilder<TWorkflow> builder,
+            Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> refference,
+            Expression<Func<TWorkflow, DynamicForkJoinInput>> input
+        ) where TWorkflow : ITypedWorkflow
+        {
+            var taskBuilder = new DynamicForkJoinTaskBuilder(refference.Body, input.Body);
+            builder.Context.TaskBuilders.Add(taskBuilder);
+            return taskBuilder;
+        }
+    }
+
     public class DynamicForkJoinTaskBuilder : BaseTaskBuilder<DynamicForkJoinInput, NoOutput>
     {
         public DynamicForkJoinTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }

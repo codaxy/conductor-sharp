@@ -16,9 +16,9 @@ namespace ConductorSharp.Engine.Extensions
 {
     public class ConductorSharpBuilder : IConductorSharpBuilder, IExecutionManagerBuilder, IPipelineBuilder
     {
-        private readonly ContainerBuilder _builder;
+        public ContainerBuilder Builder { get; set; }
 
-        public ConductorSharpBuilder(ContainerBuilder builder) => _builder = builder;
+        public ConductorSharpBuilder(ContainerBuilder builder) => Builder = builder;
 
         public IExecutionManagerBuilder AddExecutionManager(int maxConcurrentWorkers, int sleepInterval, int longPollInterval, string domain = null)
         {
@@ -30,23 +30,23 @@ namespace ConductorSharp.Engine.Extensions
                 SleepInterval = sleepInterval
             };
 
-            _builder.RegisterInstance(workerConfig).SingleInstance();
+            Builder.RegisterInstance(workerConfig).SingleInstance();
 
-            _builder.RegisterType<WorkflowEngineBackgroundService>().As<IHostedService>();
+            Builder.RegisterType<WorkflowEngineBackgroundService>().As<IHostedService>();
 
-            _builder.RegisterType<DeploymentService>().As<IDeploymentService>();
+            Builder.RegisterType<DeploymentService>().As<IDeploymentService>();
 
-            _builder.RegisterType<ModuleDeployment>();
+            Builder.RegisterType<ModuleDeployment>();
 
-            _builder.RegisterType<ExecutionManager>().SingleInstance();
+            Builder.RegisterType<ExecutionManager>().SingleInstance();
 
-            _builder.RegisterType<ConductorSharpExecutionContext>().InstancePerLifetimeScope();
+            Builder.RegisterType<ConductorSharpExecutionContext>().InstancePerLifetimeScope();
 
-            _builder.RegisterType<InMemoryHealthService>().As<IConductorSharpHealthService>().SingleInstance();
+            Builder.RegisterType<InMemoryHealthService>().As<IConductorSharpHealthService>().SingleInstance();
 
-            _builder.RegisterType<InverseExponentialBackoff>().As<IPollTimingStrategy>();
+            Builder.RegisterType<InverseExponentialBackoff>().As<IPollTimingStrategy>();
 
-            _builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
+            Builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
 
             return this;
         }
@@ -58,15 +58,15 @@ namespace ConductorSharp.Engine.Extensions
         }
 
         public void AddRequestResponseLogging() =>
-            _builder.RegisterGeneric(typeof(RequestResponseLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+            Builder.RegisterGeneric(typeof(RequestResponseLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
-        public void AddValidation() => _builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+        public void AddValidation() => Builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
-        public void AddContextLogging() => _builder.RegisterGeneric(typeof(ContextLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+        public void AddContextLogging() => Builder.RegisterGeneric(typeof(ContextLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
         public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
         {
-            _builder.RegisterType<T>().As<IConductorSharpHealthService>().SingleInstance();
+            Builder.RegisterType<T>().As<IConductorSharpHealthService>().SingleInstance();
             return this;
         }
 

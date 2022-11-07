@@ -42,7 +42,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     new()
                     {
                         TaskToExecute = b.WorkflowInput.TaskName,
-                        WorkflowVersion = b.WorkflowInput.WorkflowVersion,
                         TaskInput = new() { Count = b.WorkflowInput.Count, ShouldUseNext = b.WorkflowInput.ShouldUseNext }
                     }
             );

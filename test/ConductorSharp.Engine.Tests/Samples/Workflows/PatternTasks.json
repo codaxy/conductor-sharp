@@ -4,19 +4,20 @@
   "updateTime": 0,
   "createdBy": null,
   "updatedBy": null,
-  "name": "SCAFFOLDED_workflows",
+  "name": "pattern_tasks",
   "description": "{\"description\":null,\"labels\":null}",
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
-      "name": "SCAFFOLDED_one",
-      "taskReferenceName": "scaff_one",
+      "name": "CSH_PATTERNS_read_tasks",
+      "taskReferenceName": "read_workflow_tasks",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "input_one": "${workflow.input.customer_id}"
+        "task_names": "task1,task2",
+        "workflow_id": "${workflow.input.workflow_id}"
       },
-      "type": "SUB_WORKFLOW",
+      "type": "SIMPLE",
       "dynamicTaskNameParam": null,
       "caseValueParam": null,
       "caseExpression": null,
@@ -30,12 +31,7 @@
       "defaultCase": null,
       "forkTasks": null,
       "startDelay": 0,
-      "subWorkflowParam": {
-        "name": "SCAFFOLDED_one",
-        "version": 1,
-        "taskToDomain": null,
-        "workflowDefinition": null
-      },
+      "subWorkflowParam": null,
       "joinOn": null,
       "sink": null,
       "optional": false,
@@ -48,13 +44,13 @@
     },
     {
       "queryExpression": null,
-      "name": "SCAFFOLDED_two",
-      "taskReferenceName": "scaff_two",
+      "name": "CSH_PATTERNS_wait_seconds",
+      "taskReferenceName": "wait_seconds",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "name": "${scaff_one.output.output_one}"
+        "seconds": "${workflow.input.seconds}"
       },
-      "type": "SUB_WORKFLOW",
+      "type": "SIMPLE",
       "dynamicTaskNameParam": null,
       "caseValueParam": null,
       "caseExpression": null,
@@ -68,12 +64,7 @@
       "defaultCase": null,
       "forkTasks": null,
       "startDelay": 0,
-      "subWorkflowParam": {
-        "name": "SCAFFOLDED_two",
-        "version": 1,
-        "taskToDomain": null,
-        "workflowDefinition": null
-      },
+      "subWorkflowParam": null,
       "joinOn": null,
       "sink": null,
       "optional": false,
@@ -86,7 +77,7 @@
     }
   ],
   "inputParameters": [
-    "{\"customer_id\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "{\"seconds\":{\"value\":\"\",\"description\":\" (optional)\"},\"workflow_id\":{\"value\":\"\",\"description\":\" (optional)\"}}"
   ],
   "outputParameters": null,
   "failureWorkflow": null,
