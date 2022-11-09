@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client;
+using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using MediatR;
@@ -152,7 +153,9 @@ namespace ConductorSharp.Engine.Builders
                     CaseValueParam = "case_value_param",
                     DecisionCases = new Newtonsoft.Json.Linq.JObject
                     {
-                        _caseDictionary.Select(a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(a => a.Build()))))
+                        _caseDictionary.Select(
+                            a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(a => a.Build()), ConductorConstants.DefinitionsSerializer))
+                        )
                     }
                 }
             };

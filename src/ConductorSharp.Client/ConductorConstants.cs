@@ -15,5 +15,6 @@ namespace ConductorSharp.Client
                 MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
                 TypeNameHandling = TypeNameHandling.Auto
             };
+        public static JsonSerializer DefinitionsSerializer { get; } = new() { NullValueHandling = NullValueHandling.Ignore };
     }
 }
