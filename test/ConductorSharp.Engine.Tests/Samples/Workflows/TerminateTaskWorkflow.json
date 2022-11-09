@@ -26,7 +26,6 @@
       "decisionCases": {
         "value": [
           {
-            "queryExpression": null,
             "name": "TERMINATE_decision_terminate",
             "taskReferenceName": "decision_terminate",
             "description": "{\"description\":null}",
@@ -37,29 +36,10 @@
               "terminationStatus": "COMPLETED"
             },
             "type": "TERMINATE",
-            "dynamicTaskNameParam": null,
-            "caseValueParam": null,
-            "caseExpression": null,
-            "expression": null,
-            "evaluatorType": null,
-            "scriptExpression": null,
-            "decisionCases": null,
-            "dynamicForkJoinTasksParam": null,
-            "dynamicForkTasksParam": null,
-            "dynamicForkTasksInputParamName": null,
-            "defaultCase": null,
-            "forkTasks": null,
             "startDelay": 0,
-            "subWorkflowParam": null,
-            "joinOn": null,
-            "sink": null,
             "optional": false,
-            "taskDefinition": null,
             "rateLimited": false,
-            "defaultExclusiveJoinTask": null,
-            "asyncComplete": false,
-            "loopCondition": null,
-            "loopOver": null
+            "asyncComplete": false
           }
         ]
       },
@@ -98,7 +78,6 @@
       "decisionCases": {
         "value": [
           {
-            "queryExpression": null,
             "name": "TERMINATE_switch_terminate",
             "taskReferenceName": "switch_terminate",
             "description": "{\"description\":null}",
@@ -109,29 +88,10 @@
               "terminationStatus": "FAILED"
             },
             "type": "TERMINATE",
-            "dynamicTaskNameParam": null,
-            "caseValueParam": null,
-            "caseExpression": null,
-            "expression": null,
-            "evaluatorType": null,
-            "scriptExpression": null,
-            "decisionCases": null,
-            "dynamicForkJoinTasksParam": null,
-            "dynamicForkTasksParam": null,
-            "dynamicForkTasksInputParamName": null,
-            "defaultCase": null,
-            "forkTasks": null,
             "startDelay": 0,
-            "subWorkflowParam": null,
-            "joinOn": null,
-            "sink": null,
             "optional": false,
-            "taskDefinition": null,
             "rateLimited": false,
-            "defaultExclusiveJoinTask": null,
-            "asyncComplete": false,
-            "loopCondition": null,
-            "loopOver": null
+            "asyncComplete": false
           }
         ]
       },

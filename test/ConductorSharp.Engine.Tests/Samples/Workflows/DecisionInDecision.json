@@ -26,24 +26,16 @@
       "decisionCases": {
         "YES": [
           {
-            "queryExpression": null,
             "name": "DECISION_second_send_notification_decision",
             "taskReferenceName": "second_send_notification_decision",
-            "description": null,
             "inputParameters": {
               "case_value_param": "${workflow.input.should_send_notification}"
             },
             "type": "DECISION",
-            "dynamicTaskNameParam": null,
             "caseValueParam": "case_value_param",
-            "caseExpression": null,
-            "expression": null,
-            "evaluatorType": null,
-            "scriptExpression": null,
             "decisionCases": {
               "YES": [
                 {
-                  "queryExpression": null,
                   "name": "NOTIFICATION_send_to_customer",
                   "taskReferenceName": "send_notification_subworkflow",
                   "description": "{\"description\":null}",
@@ -51,53 +43,21 @@
                     "customer_id": "${workflow.input.customer_id}"
                   },
                   "type": "SUB_WORKFLOW",
-                  "dynamicTaskNameParam": null,
-                  "caseValueParam": null,
-                  "caseExpression": null,
-                  "expression": null,
-                  "evaluatorType": null,
-                  "scriptExpression": null,
-                  "decisionCases": null,
-                  "dynamicForkJoinTasksParam": null,
-                  "dynamicForkTasksParam": null,
-                  "dynamicForkTasksInputParamName": null,
-                  "defaultCase": null,
-                  "forkTasks": null,
                   "startDelay": 0,
                   "subWorkflowParam": {
                     "name": "NOTIFICATION_send_to_customer",
-                    "version": 1,
-                    "taskToDomain": null,
-                    "workflowDefinition": null
+                    "version": 1
                   },
-                  "joinOn": null,
-                  "sink": null,
                   "optional": false,
-                  "taskDefinition": null,
                   "rateLimited": false,
-                  "defaultExclusiveJoinTask": null,
-                  "asyncComplete": false,
-                  "loopCondition": null,
-                  "loopOver": null
+                  "asyncComplete": false
                 }
               ]
             },
-            "dynamicForkJoinTasksParam": null,
-            "dynamicForkTasksParam": null,
-            "dynamicForkTasksInputParamName": null,
-            "defaultCase": null,
-            "forkTasks": null,
             "startDelay": 0,
-            "subWorkflowParam": null,
-            "joinOn": null,
-            "sink": null,
             "optional": false,
-            "taskDefinition": null,
             "rateLimited": false,
-            "defaultExclusiveJoinTask": null,
-            "asyncComplete": false,
-            "loopCondition": null,
-            "loopOver": null
+            "asyncComplete": false
           }
         ]
       },
