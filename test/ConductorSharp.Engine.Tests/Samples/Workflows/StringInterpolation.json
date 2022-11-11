@@ -46,7 +46,9 @@
   "inputParameters": [
     "{\"first_input\":{\"value\":\"\",\"description\":\" (optional)\"},\"second_input\":{\"value\":\"\",\"description\":\" (optional)\"}}"
   ],
-  "outputParameters": null,
+  "outputParameters": {
+    "email_body": "${email_prepare.output.email_body}"
+  },
   "failureWorkflow": null,
   "schemaVersion": 2,
   "restartable": true,

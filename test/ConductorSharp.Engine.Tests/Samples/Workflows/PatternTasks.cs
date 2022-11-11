@@ -13,7 +13,10 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
         public string WorkflowId { get; set; }
     }
 
-    public class PatternTasksOutput : WorkflowOutput { }
+    public class PatternTasksOutput : WorkflowOutput
+    {
+        public int WaitTime { get; set; }
+    }
 
     public class PatternTasks : Workflow<PatternTasksInput, PatternTasksOutput>
     {
@@ -22,7 +25,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public override WorkflowDefinition GetDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<PatternTasks>();
+            var builder = new WorkflowDefinitionBuilder<PatternTasks, PatternTasksInput, PatternTasksOutput>();
 
             builder.AddTask(wf => wf.ReadWorkflowTasks, wf => new() { TaskNames = "task1,task2", WorkflowId = wf.WorkflowInput.WorkflowId });
 

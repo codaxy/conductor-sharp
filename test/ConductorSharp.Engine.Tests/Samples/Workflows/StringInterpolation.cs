@@ -12,7 +12,10 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
         public string SecondInput { get; set; }
     }
 
-    public class StringInterpolationOutput : WorkflowOutput { }
+    public class StringInterpolationOutput : WorkflowOutput
+    {
+        public dynamic EmailBody { get; set; }
+    }
 
     [OriginalName("TEST_StringInterpolation")]
     public class StringInterpolation : Workflow<StringInterpolationInput, StringInterpolationOutput>
@@ -21,7 +24,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public override WorkflowDefinition GetDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<StringInterpolation>();
+            var builder = new WorkflowDefinitionBuilder<StringInterpolation, StringInterpolationInput, StringInterpolationOutput>();
 
             builder.AddTask(
                 wf => wf.EmailPrepare,
@@ -32,6 +35,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                         Name = $"Workflow name: {NamingUtil.NameOf<StringInterpolation>()}"
                     }
             );
+
+            builder.SetOutput(a => new() { EmailBody = a.EmailPrepare.Output.EmailBody });
 
             return builder.Build(opts => opts.Version = 1);
         }
