@@ -62,16 +62,21 @@ namespace ConductorSharp.Engine.Builders
             {
                 var isRequired = prop.GetCustomAttribute<RequiredAttribute>();
                 var description = prop.GetDocSection("summary");
+                var value = prop.GetDocSection("value") ?? "";
+                var type = prop.GetDocSection("type");
+                var options = prop.GetDocSection("options");
 
                 var propertyName = prop.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(prop.Name);
 
                 var requiredString = isRequired != null ? "(required)" : "(optional)";
-                Context.Inputs.Add(
-                    new JProperty(
-                        propertyName,
-                        new JObject { new JProperty("value", ""), new JProperty("description", $"{description} {requiredString}"), }
-                    )
-                );
+
+                var propertyObject = new JObject { new JProperty("value", value), new JProperty("description", $"{description} {requiredString}") };
+                if (type == "toggle")
+                {
+                    propertyObject.Add(new JProperty("options", $"[{options}]"));
+                    propertyObject.Add(new JProperty("type", "toggle"));
+                }
+                Context.Inputs.Add(new JProperty(propertyName, propertyObject));
             }
         }
 

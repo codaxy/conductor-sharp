@@ -5,6 +5,7 @@ using ConductorSharp.Patterns.Tasks;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,11 @@ namespace ConductorSharp.Definitions.Workflows
     public class HandleNotificationFailureInput : WorkflowInput<HandleNotificationFailureOutput>
     {
         [JsonProperty("workflowId")]
+        [StringInputDescriptor("eed4edd1-ebc5-418f-86c0-27f2e8d8089c", "Identifier of the executed workflow")]
         public string? WorkflowId { get; set; }
+
+        [OptionsInputDescriptor("Location to deliver notification to", new string[] { "location one", "location two" })]
+        public dynamic? Location { get; set; }
     }
 
     public class HandleNotificationFailureOutput : WorkflowOutput { }
