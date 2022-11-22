@@ -117,21 +117,14 @@ namespace ConductorSharp.Engine.Extensions
         public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder) where TWorkflow : ITypedWorkflow, new() =>
             builder.RegisterInstance(new TWorkflow().GetDefinition());
 
-        public static void RegisterWorkflow<TWorkflow>(
-            this ContainerBuilder builder,
-            BuildConfiguration buildConfiguration,
-            BuildContext buildContext
-        ) where TWorkflow : ITypedWorkflow
+        public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder, BuildConfiguration buildConfiguration)
+            where TWorkflow : ITypedWorkflow
         {
             var type = typeof(TWorkflow);
-            var parentType = type.BaseType;
 
-            var configurableType = typeof(Workflow<,,>);
-            var nonconfigurableType = typeof(Workflow<,>);
-
-            if (IsSubclassOfRawGeneric(configurableType, type))
+            if (IsSubclassOfRawGeneric(typeof(Workflow<,,>), type))
             {
-                var workflow = Activator.CreateInstance(type, buildConfiguration, buildContext) as ITypedWorkflow;
+                var workflow = Activator.CreateInstance(type, buildConfiguration, new BuildContext()) as ITypedWorkflow;
                 workflow.OnRegistration(builder);
 
                 builder
@@ -144,7 +137,7 @@ namespace ConductorSharp.Engine.Extensions
                     })
                     .SingleInstance();
             }
-            else if (IsSubclassOfRawGeneric(nonconfigurableType, type))
+            else if (IsSubclassOfRawGeneric(typeof(Workflow<,>), type))
             {
                 var workflow = Activator.CreateInstance(type) as ITypedWorkflow;
                 workflow.OnRegistration(builder);

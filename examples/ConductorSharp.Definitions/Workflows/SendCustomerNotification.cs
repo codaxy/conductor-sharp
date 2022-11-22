@@ -34,7 +34,6 @@ namespace ConductorSharp.Definitions.Workflows
 
         public EmailPrepareV1? PrepareEmail { get; set; }
         public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput>? DynamicHandler { get; set; }
-        public SendCustomerNotification? SendNotif { get; set; }
         public WaitSeconds? WaitSeconds { get; set; }
 
         public override void AddTasks(
