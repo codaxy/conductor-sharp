@@ -14,14 +14,14 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal(expectedDefinition, definition);
         }
 
-        [Fact]
-        public void BuilderReturnsCorrectDefinitionStringInterpolation()
-        {
-            var definition = SerializationUtil.SerializeObject(new StringInterpolation().GetDefinition());
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/StringInterpolation.json");
+        //[Fact]
+        //public void BuilderReturnsCorrectDefinitionStringInterpolation()
+        //{
+        //    var definition = SerializationUtil.SerializeObject(new StringInterpolation().GetDefinition());
+        //    var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/StringInterpolation.json");
 
-            Assert.Equal(expectedDefinition, definition);
-        }
+        //    Assert.Equal(expectedDefinition, definition);
+        //}
 
         [Fact]
         public void BuilderReturnsCorrectDefinitionNestedObjects()

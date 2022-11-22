@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using Autofac;
+using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using MediatR;
@@ -21,5 +22,11 @@ namespace ConductorSharp.Engine.Builders
         public TOutput WorkflowOutput { get; set; }
         public WorkflowId Id { get; set; }
         public abstract WorkflowDefinition GetDefinition();
+
+        public void OnGetDefinition(WorkflowDefinition workflowDefinition) { }
+
+        public void OnRegistration(ContainerBuilder containerBuilder) { }
+
+        public void OnResolve(IComponentContext componentContext) { }
     }
 }

@@ -3,8 +3,10 @@ using ConductorSharp.Client;
 using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Builders.Configurable;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -91,7 +93,7 @@ namespace ConductorSharp.Engine.Extensions
         public static void RegisterWorkerTask<TWorkerTask>(this ContainerBuilder builder, Action<TaskDefinitionOptions> updateOptions = null)
             where TWorkerTask : IWorker
         {
-            var taskDefinition = TaskDefinitionBuilder.Build<TWorkerTask>(updateOptions);
+            var taskDefinition = Builders.TaskDefinitionBuilder.Build<TWorkerTask>(updateOptions);
 
             builder.RegisterType<TWorkerTask>().Keyed<IWorker>(taskDefinition.Name);
             builder.RegisterInstance(taskDefinition);
@@ -114,6 +116,71 @@ namespace ConductorSharp.Engine.Extensions
 
         public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder) where TWorkflow : ITypedWorkflow, new() =>
             builder.RegisterInstance(new TWorkflow().GetDefinition());
+
+        public static void RegisterWorkflow<TWorkflow>(
+            this ContainerBuilder builder,
+            BuildConfiguration buildConfiguration,
+            BuildContext buildContext
+        ) where TWorkflow : ITypedWorkflow
+        {
+            var type = typeof(TWorkflow);
+            var parentType = type.BaseType;
+
+            var configurableType = typeof(Workflow<,,>);
+            var nonconfigurableType = typeof(Workflow<,>);
+
+            if (IsSubclassOfRawGeneric(configurableType, type))
+            {
+                var workflow = Activator.CreateInstance(type, buildConfiguration, buildContext) as ITypedWorkflow;
+                workflow.OnRegistration(builder);
+
+                builder
+                    .Register(ctx =>
+                    {
+                        workflow.OnResolve(ctx);
+                        var definition = workflow.GetDefinition();
+                        workflow.OnGetDefinition(definition);
+                        return definition;
+                    })
+                    .SingleInstance();
+            }
+            else if (IsSubclassOfRawGeneric(nonconfigurableType, type))
+            {
+                var workflow = Activator.CreateInstance(type) as ITypedWorkflow;
+                workflow.OnRegistration(builder);
+
+                builder
+                    .Register(ctx =>
+                    {
+                        workflow.OnResolve(ctx);
+                        var definition = workflow.GetDefinition();
+                        workflow.OnGetDefinition(definition);
+                        return definition;
+                    })
+                    .SingleInstance();
+            }
+            else
+            {
+                throw new Exception("Registering unsupported workflow definition");
+            }
+
+            //Activator.CreateInstance(typeof(TWorkflow));
+            //builder.RegisterInstance(new TWorkflow().GetDefinition());
+        }
+
+        static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
+        {
+            while (toCheck != null && toCheck != typeof(object))
+            {
+                var cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+                if (generic == cur)
+                {
+                    return true;
+                }
+                toCheck = toCheck.BaseType;
+            }
+            return false;
+        }
 
         public static void RegisterTaskDefinition(this ContainerBuilder builder, TaskDefinition definition) => builder.RegisterInstance(definition);
         // TODO: add RegisterEventHandlerDefinition

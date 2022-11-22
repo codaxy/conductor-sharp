@@ -25,7 +25,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public override WorkflowDefinition GetDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<PatternTasks, PatternTasksInput, PatternTasksOutput>();
+            var builder = new WorkflowDefinitionBuilder<PatternTasks>();
 
             builder.AddTask(wf => wf.ReadWorkflowTasks, wf => new() { TaskNames = "task1,task2", WorkflowId = wf.WorkflowInput.WorkflowId });
 

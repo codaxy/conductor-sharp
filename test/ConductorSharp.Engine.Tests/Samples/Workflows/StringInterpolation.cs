@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ConductorSharp.Engine.Builders.Configurable;
+using ConductorSharp.Engine.Util.Builders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,27 +20,25 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     }
 
     [OriginalName("TEST_StringInterpolation")]
-    public class StringInterpolation : Workflow<StringInterpolationInput, StringInterpolationOutput>
+    public class StringInterpolation : Workflow<StringInterpolation, StringInterpolationInput, StringInterpolationOutput>
     {
+        public StringInterpolation(BuildConfiguration buildConfiguration, BuildContext buildContext) : base(buildConfiguration, buildContext) { }
+
         public EmailPrepareV1 EmailPrepare { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void AddTasks(WorkflowDefinitionBuilder<StringInterpolation, StringInterpolationInput, StringInterpolationOutput> builder)
         {
-            var builder = new WorkflowDefinitionBuilder<StringInterpolation, StringInterpolationInput, StringInterpolationOutput>();
-
-            builder.AddTask(
-                wf => wf.EmailPrepare,
-                wf =>
-                    new()
-                    {
-                        Address = $"{wf.WorkflowInput.FirstInput},{wf.WorkflowInput.SecondInput}",
-                        Name = $"Workflow name: {NamingUtil.NameOf<StringInterpolation>()}"
-                    }
-            );
+            //_builder.AddTask(
+            //    wf => wf.EmailPrepare,
+            //    wf =>
+            //        new()
+            //        {
+            //            Address = $"{wf.WorkflowInput.FirstInput},{wf.WorkflowInput.SecondInput}",
+            //            Name = $"Workflow name: {NamingUtil.NameOf<StringInterpolation>()}"
+            //        }
+            //);
 
             builder.SetOutput(a => new() { EmailBody = a.EmailPrepare.Output.EmailBody });
-
-            return builder.Build(opts => opts.Version = 1);
         }
     }
 }

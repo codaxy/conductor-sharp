@@ -1,8 +1,10 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Definitions.Generated;
 using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Builders.Configurable;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Tasks;
 using MediatR;
 
@@ -26,17 +28,19 @@ namespace ConductorSharp.Definitions.Workflows
     public class ExpectedDynamicOutput : CustomerGetV1Output { }
 
     [OriginalName("NOTIFICATION_send_to_customer")]
-    public class SendCustomerNotification : Workflow<SendCustomerNotificationInput, SendCustomerNotificationOutput>
+    public class SendCustomerNotification : Workflow<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>
     {
+        public SendCustomerNotification(BuildConfiguration buildConfiguration, BuildContext buildContext) : base(buildConfiguration, buildContext) { }
+
         public EmailPrepareV1? PrepareEmail { get; set; }
         public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput>? DynamicHandler { get; set; }
         public SendCustomerNotification? SendNotif { get; set; }
         public WaitSeconds? WaitSeconds { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void AddTasks(
+            WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
+        )
         {
-            var builder = new WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>();
-
             builder.AddTask(
                 a => a.DynamicHandler,
                 b =>
@@ -61,12 +65,12 @@ namespace ConductorSharp.Definitions.Workflows
                     }
             );
 
-            return builder.Build(options =>
-            {
-                options.FailureWorkflow = typeof(HandleNotificationFailure);
-                options.Version = 1;
-                options.OwnerEmail = "example@example.local";
-            });
+            //return _builder.Build(options =>
+            //{
+            //    options.FailureWorkflow = typeof(HandleNotificationFailure);
+            //    options.Version = 1;
+            //    options.OwnerEmail = "example@example.local";
+            //});
         }
     }
 }
