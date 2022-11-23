@@ -24,7 +24,12 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
             builder.AddTask(
                 wf => wf.PrepareEmail,
-                wf => new PrepareEmailRequest() { CustomerName = wf.GetCustomer.Output.NameString, Address = wf.GetCustomer.Output.AddressString }
+                wf =>
+                    new PrepareEmailRequest()
+                    {
+                        CustomerName = wf.GetCustomer.Output.FullName.FirstName,
+                        Address = wf.GetCustomer.Output.AddressString
+                    }
             );
 
             return builder.Build(opts =>
