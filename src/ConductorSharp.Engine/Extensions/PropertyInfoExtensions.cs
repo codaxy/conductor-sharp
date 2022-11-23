@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ConductorSharp.Engine.Extensions
 {
-    internal static class MemberInfoExtensions
+    internal static class PropertyInfoExtensions
     {
         public static bool IsTypedProperty(this PropertyInfo propertyInfo) => propertyInfo.GetCustomAttribute<TypedPropertyAttribute>() != null;
 
