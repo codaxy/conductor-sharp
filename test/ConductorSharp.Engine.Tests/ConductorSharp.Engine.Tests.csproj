@@ -20,6 +20,7 @@
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
     <None Remove="Samples\Workflows\StringInterpolation.json" />
     <None Remove="Samples\Workflows\TerminateTaskWorkflow.json" />
+    <None Remove="Samples\Workflows\UntypedProperty.json" />
     <None Remove="Samples\Workflows\VersionAttributeWorkflow.json" />
   </ItemGroup>
 
@@ -39,6 +40,7 @@
 	<EmbeddedResource Include="Samples\Workflows\SendCustomerNotification.json" />
 	<EmbeddedResource Include="Samples\Workflows\StringInterpolation.json" />
 	<EmbeddedResource Include="Samples\Workflows\TerminateTaskWorkflow.json" />
+	<EmbeddedResource Include="Samples\Workflows\UntypedProperty.json" />
 	<EmbeddedResource Include="Samples\Workflows\VersionAttributeWorkflow.json" />
   </ItemGroup>
 
