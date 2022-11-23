@@ -12,7 +12,8 @@ public class PrepareEmailResponse
 }
 
 [OriginalName("EMAIL_prepare")]
-public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
+public class PrepareEmailHandler : TaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
 {
-    public Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken) => throw new NotImplementedException();
+    public override Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken) =>
+        throw new NotImplementedException();
 }
