@@ -210,7 +210,7 @@ namespace ConductorSharp.Engine.Util
                 memberName = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>(true)?.PropertyName;
 
             if (memberName == null)
-                memberName = SnakeCaseUtil.ToLowercasedPrefixSnakeCase(propertyInfo.Name);
+                memberName = SnakeCaseUtil.ToSnakeCase(propertyInfo.Name);
 
             return memberName;
         }

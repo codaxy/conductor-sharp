@@ -31,30 +31,6 @@ namespace ConductorSharp.Engine.Util
             return string.Join("_", chunks);
         }
 
-        public static string ToLowercasedPrefixSnakeCase(string str)
-        {
-            str = str.Replace("-", "");
-            var pattern = new Regex(@"[A-Z0-9_]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z][0-9]+|[A-Z]");
-            var prefixPattern = new Regex(@"[A-Z0-9]{2,}");
-
-            var matches = pattern.Matches(str);
-
-            var chunks = new List<string>();
-
-            for (var i = 0; i < matches.Count; i++)
-            {
-                if (i == 0 && prefixPattern.Match(matches[i].Value).Success)
-                {
-                    chunks.Add(matches[i].Value.Replace("_", "").ToLower());
-                    continue;
-                }
-                else
-                    chunks.Add(matches[i].Value.ToLower());
-            }
-
-            return string.Join("_", chunks);
-        }
-
         public static string ToSnakeCase(string str) =>
             string.Concat(str.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
 
