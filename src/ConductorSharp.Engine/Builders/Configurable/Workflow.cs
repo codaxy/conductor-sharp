@@ -12,7 +12,8 @@ namespace ConductorSharp.Engine.Builders.Configurable
         where TInput : WorkflowInput<TOutput>
         where TOutput : WorkflowOutput
     {
-        private readonly WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> _builder;
+        protected readonly WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> _builder;
+        private WorkflowDefinition _workflowDefinition;
         public event LoadWorflow OnRegisterEvent;
         public event GetWorkflowDefinition OnGetDefinitionEvent;
         public event ResolveWorkflow OnResolveEvent;
@@ -32,14 +33,17 @@ namespace ConductorSharp.Engine.Builders.Configurable
             OnGetDefinitionEvent += _builder.OnGetDefinition;
         }
 
-        public abstract void SetTasks(WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder);
-        public abstract void SetOptions(WorkflowOptions options);
+        public abstract void UpdateWorkflowDefinition();
 
         public WorkflowDefinition GetDefinition()
         {
-            SetTasks(_builder);
-            SetOptions(_builder.BuildContext.WorkflowOptions);
-            return _builder.Build();
+            if (_workflowDefinition == null)
+            {
+                UpdateWorkflowDefinition();
+                _workflowDefinition = _builder.Build();
+            }
+
+            return _workflowDefinition;
         }
 
         public void OnRegistration(ContainerBuilder containerBuilder)

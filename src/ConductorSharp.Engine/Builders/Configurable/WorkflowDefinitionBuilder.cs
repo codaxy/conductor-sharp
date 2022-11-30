@@ -24,6 +24,14 @@ namespace ConductorSharp.Engine.Builders.Configurable
             builder.BuildContext.Outputs = ExpressionUtil.ParseToParameters(input.Body);
             builder.OnLoad += (context) => { };
         }
+
+        public static void SetOptions<FWorkflow, F, G>(this WorkflowDefinitionBuilder<FWorkflow, F, G> builder, Action<WorkflowOptions> adjustOptions)
+            where FWorkflow : Workflow<FWorkflow, F, G>
+            where F : WorkflowInput<G>
+            where G : WorkflowOutput
+        {
+            adjustOptions?.Invoke(builder.BuildContext.WorkflowOptions);
+        }
     }
 
     public class WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput>

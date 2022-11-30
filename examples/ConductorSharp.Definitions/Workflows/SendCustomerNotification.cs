@@ -30,24 +30,15 @@ namespace ConductorSharp.Definitions.Workflows
     [OriginalName("NOTIFICATION_send_to_customer")]
     public class SendCustomerNotification : Workflow<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>
     {
-        //public SendCustomerNotification(BuildConfiguration buildConfiguration, BuildContext buildContext) : base(buildConfiguration, buildContext) { }
+        public SendCustomerNotification(BuildConfiguration buildConfiguration) : base(buildConfiguration) { }
 
         public EmailPrepareV1? PrepareEmail { get; set; }
         public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput>? DynamicHandler { get; set; }
         public WaitSeconds? WaitSeconds { get; set; }
 
-        public override void SetOptions(WorkflowOptions options)
+        public override void UpdateWorkflowDefinition()
         {
-            options.Version = 1;
-            options.FailureWorkflow = typeof(HandleNotificationFailure);
-            options.OwnerEmail = "example@example.local";
-        }
-
-        public override void SetTasks(
-            WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
-        )
-        {
-            builder.AddTask(
+            _builder.AddTask(
                 a => a.DynamicHandler,
                 b =>
                     new()
@@ -57,11 +48,11 @@ namespace ConductorSharp.Definitions.Workflows
                     }
             );
 
-            builder.AddTask(a => a.WaitSeconds, b => new() { Seconds = 10 });
+            _builder.AddTask(a => a.WaitSeconds, b => new() { Seconds = 10 });
 
-            builder.AddTask(a => a.PrepareEmail, b => new() { Address = b.DynamicHandler!.Output.Address, Name = b.DynamicHandler!.Output.Name });
+            _builder.AddTask(a => a.PrepareEmail, b => new() { Address = b.DynamicHandler!.Output.Address, Name = b.DynamicHandler!.Output.Name });
 
-            builder.SetOutput(
+            _builder.SetOutput(
                 a =>
                     new()
                     {
@@ -70,6 +61,13 @@ namespace ConductorSharp.Definitions.Workflows
                         Constant = 500
                     }
             );
+
+            _builder.SetOptions(options =>
+            {
+                options.Version = 1;
+                options.FailureWorkflow = typeof(HandleNotificationFailure);
+                options.OwnerEmail = "example@example.local";
+            });
         }
     }
 }
