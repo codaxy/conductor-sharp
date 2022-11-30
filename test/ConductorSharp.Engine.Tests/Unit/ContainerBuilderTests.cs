@@ -14,7 +14,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             var builder = new ContainerBuilder();
 
             builder.RegisterWorkflow<StringInterpolation>(new BuildConfiguration());
-            builder.RegisterWorkflow<PatternTasks>();
+
             var container = builder.Build();
 
             var definitions = container.Resolve<IEnumerable<WorkflowDefinition>>().ToList();

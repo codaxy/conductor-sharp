@@ -52,12 +52,18 @@ namespace ConductorSharp.Engine.Builders.Configurable
         public WorkflowDefinitionBuilder(BuildConfiguration buildConfiguration)
         {
             BuildConfiguration = buildConfiguration;
-
-            BuildContext.WorkflowOptions.OwnerApp = buildConfiguration?.DefaultOwnerApp;
-            BuildContext.WorkflowOptions.OwnerEmail = buildConfiguration?.DefaultOwnerEmail;
-
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
             _name = NamingUtil.DetermineRegistrationName(_workflowType);
+
+            if (!string.IsNullOrEmpty(buildConfiguration?.DefaultOwnerApp))
+            {
+                BuildContext.WorkflowOptions.OwnerApp = buildConfiguration?.DefaultOwnerApp;
+            }
+
+            if (!string.IsNullOrEmpty(buildConfiguration?.DefaultOwnerEmail))
+            {
+                BuildContext.WorkflowOptions.OwnerEmail = buildConfiguration?.DefaultOwnerEmail;
+            }
 
             if (!string.IsNullOrEmpty(buildConfiguration.WorkflowPrefix))
             {
