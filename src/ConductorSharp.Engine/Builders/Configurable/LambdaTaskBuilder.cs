@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using Autofac;
+using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
@@ -23,6 +24,7 @@ namespace ConductorSharp.Engine.Builders.Configurable
             where F : IRequest<G>
         {
             var taskBuilder = new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body, builder.BuildConfiguration);
+
             builder.BuildContext.TaskBuilders.Add(taskBuilder);
             return taskBuilder;
         }

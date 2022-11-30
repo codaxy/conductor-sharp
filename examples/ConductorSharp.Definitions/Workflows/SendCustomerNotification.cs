@@ -30,13 +30,20 @@ namespace ConductorSharp.Definitions.Workflows
     [OriginalName("NOTIFICATION_send_to_customer")]
     public class SendCustomerNotification : Workflow<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>
     {
-        public SendCustomerNotification(BuildConfiguration buildConfiguration, BuildContext buildContext) : base(buildConfiguration, buildContext) { }
+        //public SendCustomerNotification(BuildConfiguration buildConfiguration, BuildContext buildContext) : base(buildConfiguration, buildContext) { }
 
         public EmailPrepareV1? PrepareEmail { get; set; }
         public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput>? DynamicHandler { get; set; }
         public WaitSeconds? WaitSeconds { get; set; }
 
-        public override void AddTasks(
+        public override void SetOptions(WorkflowOptions options)
+        {
+            options.Version = 1;
+            options.FailureWorkflow = typeof(HandleNotificationFailure);
+            options.OwnerEmail = "example@example.local";
+        }
+
+        public override void SetTasks(
             WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
         )
         {
@@ -63,13 +70,6 @@ namespace ConductorSharp.Definitions.Workflows
                         Constant = 500
                     }
             );
-
-            //return _builder.Build(options =>
-            //{
-            //    options.FailureWorkflow = typeof(HandleNotificationFailure);
-            //    options.Version = 1;
-            //    options.OwnerEmail = "example@example.local";
-            //});
         }
     }
 }

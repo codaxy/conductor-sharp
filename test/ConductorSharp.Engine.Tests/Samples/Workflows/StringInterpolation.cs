@@ -26,7 +26,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public EmailPrepareV1 EmailPrepare { get; set; }
 
-        public override void AddTasks(WorkflowDefinitionBuilder<StringInterpolation, StringInterpolationInput, StringInterpolationOutput> builder)
+        public override void SetTasks(WorkflowDefinitionBuilder<StringInterpolation, StringInterpolationInput, StringInterpolationOutput> builder)
         {
             //_builder.AddTask(
             //    wf => wf.EmailPrepare,

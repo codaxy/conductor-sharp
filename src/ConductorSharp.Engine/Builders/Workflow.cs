@@ -22,11 +22,5 @@ namespace ConductorSharp.Engine.Builders
         public TOutput WorkflowOutput { get; set; }
         public WorkflowId Id { get; set; }
         public abstract WorkflowDefinition GetDefinition();
-
-        public void OnGetDefinition(WorkflowDefinition workflowDefinition) { }
-
-        public void OnRegistration(ContainerBuilder containerBuilder) { }
-
-        public void OnResolve(IComponentContext componentContext) { }
     }
 }

@@ -10,6 +10,7 @@ using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace ConductorSharp.Engine.Extensions
@@ -117,62 +118,33 @@ namespace ConductorSharp.Engine.Extensions
         public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder) where TWorkflow : ITypedWorkflow, new() =>
             builder.RegisterInstance(new TWorkflow().GetDefinition());
 
-        public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder, BuildConfiguration buildConfiguration)
-            where TWorkflow : ITypedWorkflow
+        public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder, BuildConfiguration buildConfiguration = null)
+            where TWorkflow : IConfigurableWorkflow
         {
             var type = typeof(TWorkflow);
 
-            if (IsSubclassOfRawGeneric(typeof(Workflow<,,>), type))
-            {
-                var workflow = Activator.CreateInstance(type, buildConfiguration, new BuildContext()) as ITypedWorkflow;
-                workflow.OnRegistration(builder);
+            var ctors = type.GetMatchingConstructor(new Type[] { typeof(BuildConfiguration) });
 
-                builder
-                    .Register(ctx =>
-                    {
-                        workflow.OnResolve(ctx);
-                        var definition = workflow.GetDefinition();
-                        workflow.OnGetDefinition(definition);
-                        return definition;
-                    })
-                    .SingleInstance();
-            }
-            else if (IsSubclassOfRawGeneric(typeof(Workflow<,>), type))
-            {
-                var workflow = Activator.CreateInstance(type) as ITypedWorkflow;
-                workflow.OnRegistration(builder);
+            var parameters = new List<object>();
 
-                builder
-                    .Register(ctx =>
-                    {
-                        workflow.OnResolve(ctx);
-                        var definition = workflow.GetDefinition();
-                        workflow.OnGetDefinition(definition);
-                        return definition;
-                    })
-                    .SingleInstance();
-            }
-            else
+            if (ctors != null)
             {
-                throw new Exception("Registering unsupported workflow definition");
+                parameters.Add(buildConfiguration);
             }
 
-            //Activator.CreateInstance(typeof(TWorkflow));
-            //builder.RegisterInstance(new TWorkflow().GetDefinition());
-        }
+            var workflow = Activator.CreateInstance(type, parameters.ToArray()) as IConfigurableWorkflow;
 
-        static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
-        {
-            while (toCheck != null && toCheck != typeof(object))
-            {
-                var cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
-                if (generic == cur)
+            workflow.OnRegistration(builder);
+
+            builder
+                .Register(ctx =>
                 {
-                    return true;
-                }
-                toCheck = toCheck.BaseType;
-            }
-            return false;
+                    workflow.OnResolve(ctx);
+                    var definition = workflow.GetDefinition();
+                    workflow.OnGetDefinition(definition);
+                    return definition;
+                })
+                .SingleInstance();
         }
 
         public static void RegisterTaskDefinition(this ContainerBuilder builder, TaskDefinition definition) => builder.RegisterInstance(definition);

@@ -19,7 +19,7 @@ namespace ConductorSharp.Engine.Tests.Unit
 
             var definitions = container.Resolve<IEnumerable<WorkflowDefinition>>().ToList();
 
-            Assert.Single(definitions);
+            Assert.True(definitions.Any());
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using ConductorSharp.Definitions.Workflows;
 using ConductorSharp.Engine.Extensions;
+using ConductorSharp.Engine.Util.Builders;
 
 namespace ConductorSharp.Definitions
 {
@@ -10,7 +11,7 @@ namespace ConductorSharp.Definitions
         {
             base.Load(builder);
 
-            builder.RegisterWorkflow<SendCustomerNotification>();
+            builder.RegisterWorkflow<SendCustomerNotification>(new BuildConfiguration { });
             builder.RegisterWorkflow<HandleNotificationFailure>();
         }
     }

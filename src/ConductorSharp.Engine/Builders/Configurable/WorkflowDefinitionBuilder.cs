@@ -22,7 +22,7 @@ namespace ConductorSharp.Engine.Builders.Configurable
             where G : WorkflowOutput
         {
             builder.BuildContext.Outputs = ExpressionUtil.ParseToParameters(input.Body);
-            builder.HandlerRegistrations += (context) => { };
+            builder.OnLoad += (context) => { };
         }
     }
 
@@ -32,20 +32,19 @@ namespace ConductorSharp.Engine.Builders.Configurable
         where TOutput : WorkflowOutput
     {
         public delegate void OnRegistration(ContainerBuilder containerBuilder);
-        public event HandleRegistration HandlerRegistrations;
-        public event HandleResolve HandlerResolve;
-        public event HandleBuild HandlerBuild;
+        public event LoadWorflow OnLoad;
+        public event ResolveWorkflow OnWorkflowResolve;
+        public event GetWorkflowDefinition OnWorkflowGetDefinition;
 
         private readonly Type _workflowType = typeof(TWorkflow);
         private readonly string _name;
 
-        public BuildContext BuildContext { get; }
-        public BuildConfiguration BuildConfiguration { get; }
+        public BuildContext BuildContext { get; } = new();
 
-        public WorkflowDefinitionBuilder(BuildConfiguration buildConfiguration, BuildContext buildContext)
+        public BuildConfiguration BuildConfiguration { get; set; }
+
+        public WorkflowDefinitionBuilder()
         {
-            BuildConfiguration = buildConfiguration;
-            BuildContext = buildContext;
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
             _name = NamingUtil.DetermineRegistrationName(_workflowType);
 
@@ -89,11 +88,8 @@ namespace ConductorSharp.Engine.Builders.Configurable
             }
         }
 
-        public WorkflowDefinition Build(Action<WorkflowOptions> adjustOptions)
+        public WorkflowDefinition Build()
         {
-            if (adjustOptions != null)
-                adjustOptions.Invoke(BuildContext.WorkflowOptions);
-
             return new WorkflowDefinition
             {
                 Name = _name,
@@ -114,14 +110,19 @@ namespace ConductorSharp.Engine.Builders.Configurable
             };
         }
 
-        public void HandleRegistration(ContainerBuilder containerBuilder)
+        public void OnRegister(ContainerBuilder containerBuilder)
         {
-            HandlerRegistrations?.Invoke(containerBuilder);
+            OnLoad?.Invoke(containerBuilder);
         }
 
-        public void HandleResolve(IComponentContext componentContext)
+        public void OnResolve(IComponentContext componentContext)
         {
-            HandlerResolve?.Invoke(componentContext);
+            OnWorkflowResolve?.Invoke(componentContext);
+        }
+
+        public void OnGetDefinition(WorkflowDefinition workflowDefinition)
+        {
+            OnWorkflowGetDefinition?.Invoke(workflowDefinition);
         }
     }
 }
