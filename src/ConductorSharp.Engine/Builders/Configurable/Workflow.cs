@@ -33,13 +33,13 @@ namespace ConductorSharp.Engine.Builders.Configurable
             OnGetDefinitionEvent += _builder.OnGetDefinition;
         }
 
-        public abstract void UpdateWorkflowDefinition();
+        public abstract void BuildDefinition();
 
         public WorkflowDefinition GetDefinition()
         {
             if (_workflowDefinition == null)
             {
-                UpdateWorkflowDefinition();
+                BuildDefinition();
                 _workflowDefinition = _builder.Build();
             }
 

@@ -36,7 +36,7 @@ namespace ConductorSharp.Definitions.Workflows
         public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput>? DynamicHandler { get; set; }
         public WaitSeconds? WaitSeconds { get; set; }
 
-        public override void UpdateWorkflowDefinition()
+        public override void BuildDefinition()
         {
             _builder.AddTask(
                 a => a.DynamicHandler,
