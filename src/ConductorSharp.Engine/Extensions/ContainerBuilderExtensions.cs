@@ -119,26 +119,12 @@ namespace ConductorSharp.Engine.Extensions
             builder.RegisterInstance(new TWorkflow().GetDefinition());
 
         public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder, BuildConfiguration buildConfiguration = null)
-            where TWorkflow : IConfigurableWorkflow
+            where TWorkflow : IConfigurableWorkflow, new()
         {
-            var type = typeof(TWorkflow);
-
-            var ctors = type.GetMatchingConstructor(new Type[] { typeof(BuildConfiguration) });
-
-            var parameters = new List<object>();
-
-            if (ctors != null)
-            {
-                parameters.Add(buildConfiguration);
-            }
-
-            var workflow = Activator.CreateInstance(type, parameters.ToArray()) as IConfigurableWorkflow;
-
-            workflow.OnRegistration(builder);
-
             builder
                 .Register(ctx =>
                 {
+                    var workflow = new TWorkflow();
                     workflow.OnResolve(ctx);
                     var definition = workflow.GetDefinition();
                     workflow.OnGetDefinition(definition);

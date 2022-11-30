@@ -3,6 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using ConductorSharp.Definitions;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
+using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Extensions;
 using MediatR.Extensions.Autofac.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -47,7 +48,15 @@ var builder = Host.CreateDefaultBuilder()
                 {
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
-                });
+                })
+                .AddConfigurableBuilder(
+                    new BuildConfiguration
+                    {
+                        DefaultOwnerApp = "testApp",
+                        DefaultOwnerEmail = "owner@test.app",
+                        WorkflowPrefix = "TEST_APP_"
+                    }
+                );
 
             builder.RegisterMediatR(typeof(Program).Assembly);
             builder.RegisterModule<ConductorModule>();

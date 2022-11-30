@@ -1,10 +1,12 @@
 ﻿using Autofac;
 using ConductorSharp.Engine.Behaviors;
+using ConductorSharp.Engine.Builders.Configurable;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
 using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -66,6 +68,13 @@ namespace ConductorSharp.Engine.Extensions
         public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
         {
             Builder.RegisterType<T>().As<IConductorSharpHealthService>().SingleInstance();
+            return this;
+        }
+
+        public IExecutionManagerBuilder AddConfigurableBuilder(BuildConfiguration buildConfiguration)
+        {
+            Builder.RegisterInstance(buildConfiguration);
+            Builder.RegisterGeneric(typeof(WorkflowDefinitionBuilder<,,>));
             return this;
         }
     }

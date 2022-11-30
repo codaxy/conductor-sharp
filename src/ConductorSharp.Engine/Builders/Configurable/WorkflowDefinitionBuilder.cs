@@ -22,7 +22,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
             where G : WorkflowOutput
         {
             builder.BuildContext.Outputs = ExpressionUtil.ParseToParameters(input.Body);
-            builder.OnLoad += (context) => { };
         }
 
         public static void SetOptions<FWorkflow, F, G>(this WorkflowDefinitionBuilder<FWorkflow, F, G> builder, Action<WorkflowOptions> adjustOptions)
@@ -40,7 +39,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
         where TOutput : WorkflowOutput
     {
         public delegate void OnRegistration(ContainerBuilder containerBuilder);
-        public event LoadWorflow OnLoad;
         public event ResolveWorkflow OnWorkflowResolve;
         public event GetWorkflowDefinition OnWorkflowGetDefinition;
 
@@ -49,12 +47,22 @@ namespace ConductorSharp.Engine.Builders.Configurable
 
         public BuildContext BuildContext { get; } = new();
 
-        public BuildConfiguration BuildConfiguration { get; set; }
+        public BuildConfiguration BuildConfiguration { get; }
 
-        public WorkflowDefinitionBuilder()
+        public WorkflowDefinitionBuilder(BuildConfiguration buildConfiguration)
         {
+            BuildConfiguration = buildConfiguration;
+
+            BuildContext.WorkflowOptions.OwnerApp = buildConfiguration?.DefaultOwnerApp;
+            BuildContext.WorkflowOptions.OwnerEmail = buildConfiguration?.DefaultOwnerEmail;
+
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
             _name = NamingUtil.DetermineRegistrationName(_workflowType);
+
+            if (!string.IsNullOrEmpty(buildConfiguration.WorkflowPrefix))
+            {
+                _name = $"{buildConfiguration.WorkflowPrefix}{_name}";
+            }
 
             var summary = _workflowType.GetDocSection("summary");
             var ownerApp = _workflowType.GetDocSection("ownerApp");
@@ -116,11 +124,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
                 OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
             };
-        }
-
-        public void OnRegister(ContainerBuilder containerBuilder)
-        {
-            OnLoad?.Invoke(containerBuilder);
         }
 
         public void OnResolve(IComponentContext componentContext)

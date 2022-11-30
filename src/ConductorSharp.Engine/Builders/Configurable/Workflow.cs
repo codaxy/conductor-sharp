@@ -12,26 +12,14 @@ namespace ConductorSharp.Engine.Builders.Configurable
         where TInput : WorkflowInput<TOutput>
         where TOutput : WorkflowOutput
     {
-        protected readonly WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> _builder;
+        protected WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> _builder;
         private WorkflowDefinition _workflowDefinition;
-        public event LoadWorflow OnRegisterEvent;
         public event GetWorkflowDefinition OnGetDefinitionEvent;
         public event ResolveWorkflow OnResolveEvent;
 
         public TInput WorkflowInput { get; set; }
         public TOutput WorkflowOutput { get; set; }
         public WorkflowId Id { get; set; }
-
-        public Workflow() : this(null) { }
-
-        public Workflow(BuildConfiguration buildConfiguration)
-        {
-            _builder = new WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> { BuildConfiguration = buildConfiguration };
-
-            OnRegisterEvent += _builder.OnRegister;
-            OnResolveEvent += _builder.OnResolve;
-            OnGetDefinitionEvent += _builder.OnGetDefinition;
-        }
 
         public abstract void BuildDefinition();
 
@@ -46,13 +34,22 @@ namespace ConductorSharp.Engine.Builders.Configurable
             return _workflowDefinition;
         }
 
-        public void OnRegistration(ContainerBuilder containerBuilder)
-        {
-            OnRegisterEvent?.Invoke(containerBuilder);
-        }
-
         public void OnResolve(IComponentContext componentContext)
         {
+            var resolved = componentContext.TryResolve(out WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> instance);
+
+            if (!resolved)
+            {
+                _builder = new WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput>(null);
+            }
+            else
+            {
+                _builder = instance;
+            }
+
+            OnResolveEvent += _builder.OnResolve;
+            OnGetDefinitionEvent += _builder.OnGetDefinition;
+
             OnResolveEvent?.Invoke(componentContext);
         }
 

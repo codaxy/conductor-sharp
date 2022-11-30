@@ -8,7 +8,6 @@ namespace ConductorSharp.Engine.Interface
 {
     public interface IConfigurableWorkflow : ITypedWorkflow
     {
-        void OnRegistration(ContainerBuilder containerBuilder);
         void OnGetDefinition(WorkflowDefinition workflowDefinition);
         void OnResolve(IComponentContext componentContext);
     }
