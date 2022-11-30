@@ -3,7 +3,6 @@ using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using static ConductorSharp.Engine.Util.Builders.Events;
 
 namespace ConductorSharp.Engine.Builders.Configurable
 {

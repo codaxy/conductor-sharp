@@ -10,7 +10,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using static ConductorSharp.Engine.Util.Builders.Events;
 
 namespace ConductorSharp.Engine.Builders.Configurable
 {
