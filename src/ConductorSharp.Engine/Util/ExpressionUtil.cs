@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Interface;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -202,11 +203,14 @@ namespace ConductorSharp.Engine.Util
                 if (memberName == null)
                     memberName = propertyInfo.GetDocSection("originalName");
 
+            if (propertyInfo.IsTypedProperty())
+                return GetMemberName(propertyInfo.GetUntypedProperty());
+
             if (memberName == null)
                 memberName = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>(true)?.PropertyName;
 
             if (memberName == null)
-                memberName = SnakeCaseUtil.ToLowercasedPrefixSnakeCase(propertyInfo.Name);
+                memberName = SnakeCaseUtil.ToSnakeCase(propertyInfo.Name);
 
             return memberName;
         }

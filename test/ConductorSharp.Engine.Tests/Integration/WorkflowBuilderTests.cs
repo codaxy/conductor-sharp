@@ -123,5 +123,14 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             Assert.Equal(expectedDefinition, definition);
         }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionUntypedProperty()
+        {
+            var definition = SerializationUtil.SerializeObject(new UntypedProperty().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/UntypedProperty.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
     }
 }
