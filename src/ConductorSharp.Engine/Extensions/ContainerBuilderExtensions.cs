@@ -115,17 +115,14 @@ namespace ConductorSharp.Engine.Extensions
             builder.RegisterInstance(definition);
         }
 
-        public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder) where TWorkflow : ITypedWorkflow, new() =>
-            builder.RegisterInstance(new TWorkflow().GetDefinition());
-
         public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder, BuildConfiguration buildConfiguration = null)
-            where TWorkflow : IConfigurableWorkflow, new()
+            where TWorkflow : ITypedWorkflow, new()
         {
             builder
                 .Register(ctx =>
                 {
                     var workflow = new TWorkflow();
-                    workflow.OnResolve(ctx);
+                    workflow.BeforeGetDefinition(ctx, buildConfiguration);
                     var definition = workflow.GetDefinition();
                     workflow.OnGetDefinition(definition);
                     return definition;

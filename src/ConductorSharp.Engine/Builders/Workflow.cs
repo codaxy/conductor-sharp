@@ -2,6 +2,7 @@
 using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 
 namespace ConductorSharp.Engine.Builders
@@ -21,6 +22,11 @@ namespace ConductorSharp.Engine.Builders
         public TInput WorkflowInput { get; set; }
         public TOutput WorkflowOutput { get; set; }
         public WorkflowId Id { get; set; }
+
+        public void BeforeGetDefinition(IComponentContext componentContext, BuildConfiguration buildConfiguration) { }
+
+        public void OnGetDefinition(WorkflowDefinition workflowDefinition) { }
+
         public abstract WorkflowDefinition GetDefinition();
     }
 }

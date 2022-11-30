@@ -34,17 +34,22 @@ namespace ConductorSharp.Engine.Builders.Configurable
             return _workflowDefinition;
         }
 
-        public void OnResolve(IComponentContext componentContext)
+        public void BeforeGetDefinition(IComponentContext componentContext, BuildConfiguration buildConfiguration)
         {
             var resolved = componentContext.TryResolve(out WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> instance);
 
             if (!resolved)
             {
-                _builder = new WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput>(null);
+                _builder = new WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput>(buildConfiguration);
             }
             else
             {
                 _builder = instance;
+
+                if (buildConfiguration != null)
+                {
+                    _builder.BuildConfiguration = buildConfiguration;
+                }
             }
 
             OnResolveEvent += _builder.OnResolve;

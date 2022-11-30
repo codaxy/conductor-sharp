@@ -6,9 +6,5 @@ using System.Text;
 
 namespace ConductorSharp.Engine.Interface
 {
-    public interface IConfigurableWorkflow : ITypedWorkflow
-    {
-        void OnGetDefinition(WorkflowDefinition workflowDefinition);
-        void OnResolve(IComponentContext componentContext);
-    }
+    public interface IConfigurableWorkflow : ITypedWorkflow { }
 }

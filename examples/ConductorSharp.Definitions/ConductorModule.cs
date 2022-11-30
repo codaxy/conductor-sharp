@@ -11,7 +11,7 @@ namespace ConductorSharp.Definitions
         {
             base.Load(builder);
 
-            builder.RegisterWorkflow<SendCustomerNotification>(new BuildConfiguration { });
+            builder.RegisterWorkflow<SendCustomerNotification>();
             builder.RegisterWorkflow<HandleNotificationFailure>();
         }
     }

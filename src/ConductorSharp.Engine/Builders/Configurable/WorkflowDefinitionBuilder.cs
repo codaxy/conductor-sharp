@@ -47,7 +47,7 @@ namespace ConductorSharp.Engine.Builders.Configurable
 
         public BuildContext BuildContext { get; } = new();
 
-        public BuildConfiguration BuildConfiguration { get; }
+        public BuildConfiguration BuildConfiguration { get; set; }
 
         public WorkflowDefinitionBuilder(BuildConfiguration buildConfiguration)
         {
