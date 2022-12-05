@@ -22,7 +22,15 @@ namespace ConductorSharp.Engine.Builders.Configurable
 
         public abstract void BuildDefinition();
 
-        public WorkflowDefinition GetDefinition()
+        public Workflow(WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder)
+        {
+            _builder = builder;
+
+            OnResolveEvent += _builder.OnResolve;
+            OnGetDefinitionEvent += _builder.OnGetDefinition;
+        }
+
+        public virtual WorkflowDefinition GetDefinition()
         {
             if (_workflowDefinition == null)
             {
@@ -35,25 +43,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
 
         public void BeforeGetDefinition(IComponentContext componentContext, BuildConfiguration buildConfiguration)
         {
-            var resolved = componentContext.TryResolve(out WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> instance);
-
-            if (!resolved)
-            {
-                _builder = new WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput>(buildConfiguration);
-            }
-            else
-            {
-                _builder = instance;
-
-                if (buildConfiguration != null)
-                {
-                    _builder.BuildConfiguration = buildConfiguration;
-                }
-            }
-
-            OnResolveEvent += _builder.OnResolve;
-            OnGetDefinitionEvent += _builder.OnGetDefinition;
-
             OnResolveEvent?.Invoke(componentContext);
         }
 

@@ -30,6 +30,10 @@ namespace ConductorSharp.Definitions.Workflows
     [OriginalName("NOTIFICATION_send_to_customer")]
     public class SendCustomerNotification : Workflow<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>
     {
+        public SendCustomerNotification(
+            WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
+        ) : base(builder) { }
+
         public EmailPrepareV1? PrepareEmail { get; set; }
         public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput>? DynamicHandler { get; set; }
         public WaitSeconds? WaitSeconds { get; set; }

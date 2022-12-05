@@ -22,6 +22,9 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     [OriginalName("TEST_StringInterpolation")]
     public class StringInterpolation : Workflow<StringInterpolation, StringInterpolationInput, StringInterpolationOutput>
     {
+        public StringInterpolation(WorkflowDefinitionBuilder<StringInterpolation, StringInterpolationInput, StringInterpolationOutput> builder)
+            : base(builder) { }
+
         public EmailPrepareV1 EmailPrepare { get; set; }
 
         public override void BuildDefinition()

@@ -73,6 +73,11 @@ namespace ConductorSharp.Engine.Extensions
 
         public IExecutionManagerBuilder AddConfigurableBuilder(BuildConfiguration buildConfiguration)
         {
+            if (buildConfiguration == null)
+            {
+                throw new ArgumentException($"{nameof(BuildConfiguration)} must not be null");
+            }
+
             Builder.RegisterInstance(buildConfiguration);
             Builder.RegisterGeneric(typeof(WorkflowDefinitionBuilder<,,>));
             return this;

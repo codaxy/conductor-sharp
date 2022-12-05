@@ -42,7 +42,7 @@ namespace ConductorSharp.Engine.Builders.Configurable
         public event GetWorkflowDefinition OnWorkflowGetDefinition;
 
         private readonly Type _workflowType = typeof(TWorkflow);
-        private readonly string _name;
+        private string _name;
 
         public BuildContext BuildContext { get; } = new();
 
@@ -51,22 +51,26 @@ namespace ConductorSharp.Engine.Builders.Configurable
         public WorkflowDefinitionBuilder(BuildConfiguration buildConfiguration)
         {
             BuildConfiguration = buildConfiguration;
+        }
+
+        public WorkflowDefinition Build()
+        {
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
             _name = NamingUtil.DetermineRegistrationName(_workflowType);
 
-            if (!string.IsNullOrEmpty(buildConfiguration?.DefaultOwnerApp))
+            if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
-                BuildContext.WorkflowOptions.OwnerApp = buildConfiguration?.DefaultOwnerApp;
+                BuildContext.WorkflowOptions.OwnerApp = BuildConfiguration?.DefaultOwnerApp;
             }
 
-            if (!string.IsNullOrEmpty(buildConfiguration?.DefaultOwnerEmail))
+            if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerEmail))
             {
-                BuildContext.WorkflowOptions.OwnerEmail = buildConfiguration?.DefaultOwnerEmail;
+                BuildContext.WorkflowOptions.OwnerEmail = BuildConfiguration?.DefaultOwnerEmail;
             }
 
-            if (!string.IsNullOrEmpty(buildConfiguration.WorkflowPrefix))
+            if (!string.IsNullOrEmpty(BuildConfiguration.WorkflowPrefix))
             {
-                _name = $"{buildConfiguration.WorkflowPrefix}{_name}";
+                _name = $"{BuildConfiguration.WorkflowPrefix}{_name}";
             }
 
             var summary = _workflowType.GetDocSection("summary");
@@ -107,10 +111,7 @@ namespace ConductorSharp.Engine.Builders.Configurable
                     )
                 );
             }
-        }
 
-        public WorkflowDefinition Build()
-        {
             return new WorkflowDefinition
             {
                 Name = _name,

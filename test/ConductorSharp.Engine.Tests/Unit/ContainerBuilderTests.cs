@@ -13,13 +13,24 @@ namespace ConductorSharp.Engine.Tests.Unit
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterWorkflow<StringInterpolation>(new BuildConfiguration());
+            builder
+                .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
+                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1)
+                .AddConfigurableBuilder(
+                    new BuildConfiguration
+                    {
+                        DefaultOwnerApp = "testApp",
+                        DefaultOwnerEmail = "owner@test.app",
+                        WorkflowPrefix = "TEST_APP_"
+                    }
+                );
 
+            builder.RegisterWorkflow<StringInterpolation>(new BuildConfiguration { DefaultOwnerApp = "override" });
             var container = builder.Build();
 
             var definitions = container.Resolve<IEnumerable<WorkflowDefinition>>().ToList();
 
-            Assert.True(definitions.Any());
+            Assert.True(definitions.All(a => a.OwnerApp == "override"));
         }
     }
 }
