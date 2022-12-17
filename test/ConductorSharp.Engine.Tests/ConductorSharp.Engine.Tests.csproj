@@ -18,6 +18,7 @@
     <None Remove="Samples\Workflows\PatternTasks.json" />
     <None Remove="Samples\Workflows\ScaffoldedWorkflows.json" />
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
+    <None Remove="Samples\Workflows\StringAddition.json" />
     <None Remove="Samples\Workflows\StringInterpolation.json" />
     <None Remove="Samples\Workflows\TerminateTaskWorkflow.json" />
     <None Remove="Samples\Workflows\UntypedProperty.json" />
@@ -38,6 +39,7 @@
     <EmbeddedResource Include="Samples\Workflows\OptionalTaskWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\NestedObjects.json" />
 	<EmbeddedResource Include="Samples\Workflows\SendCustomerNotification.json" />
+	<EmbeddedResource Include="Samples\Workflows\StringAddition.json" />
 	<EmbeddedResource Include="Samples\Workflows\StringInterpolation.json" />
 	<EmbeddedResource Include="Samples\Workflows\TerminateTaskWorkflow.json" />
 	<EmbeddedResource Include="Samples\Workflows\UntypedProperty.json" />
