@@ -49,14 +49,7 @@ var builder = Host.CreateDefaultBuilder()
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
                 })
-                .AddConfigurableBuilder(
-                    new BuildConfiguration
-                    {
-                        DefaultOwnerApp = "testApp",
-                        DefaultOwnerEmail = "owner@test.app",
-                        WorkflowPrefix = "TEST_APP_"
-                    }
-                );
+                .AddConfigurableBuilder();
 
             builder.RegisterMediatR(typeof(Program).Assembly);
             builder.RegisterModule<ConductorModule>();
