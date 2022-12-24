@@ -101,6 +101,38 @@ namespace ConductorSharp.Engine.Extensions
             builder.RegisterInstance(new TaskToWorker { TaskName = taskDefinition.Name, TaskType = typeof(TWorkerTask), });
         }
 
+        public static void RegisterWorkerTaskV2<TWorkerTask>(
+            this ContainerBuilder builder,
+            Action<TaskDefinitionOptions> updateOptions = null,
+            BuildConfiguration buildConfiguration = null
+        ) where TWorkerTask : IWorker
+        {
+            try
+            {
+                builder
+                    .Register(ctx =>
+                    {
+                        return ctx.Resolve<Builders.Configurable.TaskDefinitionBuilder>().Build<TWorkerTask>();
+                    })
+                    .SingleInstance();
+
+                //builder
+                //    .Register(ctx =>
+                //    {
+                //        var definition = ctx.Resolve<Builders.Configurable.TaskDefinitionBuilder>().Build<TWorkerTask>();
+                //        return definition.Name;
+                //    })
+                //    .As<TWorkerTask>();
+
+                builder.Register(ctx =>
+                {
+                    var definition = ctx.Resolve<Builders.Configurable.TaskDefinitionBuilder>().Build<TWorkerTask>();
+                    return new TaskToWorker { TaskName = definition.Name, TaskType = typeof(TWorkerTask) };
+                });
+            }
+            catch (Exception exc) { }
+        }
+
         public static void RegisterWorkflowDefinition(this ContainerBuilder builder, WorkflowDefinition definition) =>
             builder.RegisterInstance(definition);
 
@@ -121,29 +153,27 @@ namespace ConductorSharp.Engine.Extensions
         public static void RegisterWorkflow<TWorkflow>(this ContainerBuilder builder, BuildConfiguration buildConfiguration = null)
             where TWorkflow : IConfigurableWorkflow
         {
-            builder
-                .Register(ctx =>
+            builder.Register(ctx =>
+            {
+                var builder = ctx.Resolve(typeof(WorkflowDefinitionBuilder<,,>).MakeGenericType(typeof(TWorkflow).BaseType.GenericTypeArguments));
+
+                if (buildConfiguration != null)
                 {
-                    var builder = ctx.Resolve(typeof(WorkflowDefinitionBuilder<,,>).MakeGenericType(typeof(TWorkflow).BaseType.GenericTypeArguments));
+                    builder.GetType().GetProperty("BuildConfiguration").SetValue(builder, buildConfiguration);
+                }
 
-                    if (buildConfiguration != null)
-                    {
-                        builder.GetType().GetProperty("BuildConfiguration").SetValue(builder, buildConfiguration);
-                    }
+                if (typeof(TWorkflow).GetMatchingConstructor(new Type[] { builder.GetType() }) == null)
+                {
+                    throw new ArgumentException($"Configurable workflow constructor must have a {builder.GetType().Name} parameter");
+                }
 
-                    if (typeof(TWorkflow).GetMatchingConstructor(new Type[] { builder.GetType() }) == null)
-                    {
-                        throw new ArgumentException($"Configurable workflow constructor must have a {builder.GetType().Name} parameter");
-                    }
+                var workflow = Activator.CreateInstance(typeof(TWorkflow), builder) as ITypedWorkflow;
 
-                    var workflow = Activator.CreateInstance(typeof(TWorkflow), builder) as ITypedWorkflow;
-
-                    workflow.BeforeGetDefinition(ctx, buildConfiguration);
-                    var definition = workflow.GetDefinition();
-                    workflow.OnGetDefinition(definition);
-                    return definition;
-                })
-                .SingleInstance();
+                workflow.BeforeGetDefinition(ctx, buildConfiguration);
+                var definition = workflow.GetDefinition();
+                workflow.OnGetDefinition(definition);
+                return definition;
+            });
         }
 
         public static void RegisterTaskDefinition(this ContainerBuilder builder, TaskDefinition definition) => builder.RegisterInstance(definition);

@@ -16,7 +16,7 @@ namespace ConductorSharp.NoApi
 
         private static void RegisterTasks(ContainerBuilder builder)
         {
-            builder.RegisterWorkerTask<GetCustomerHandler>();
+            builder.RegisterWorkerTaskV2<GetCustomerHandler>();
         }
 
         private static void RegisterWorkflows(ContainerBuilder builder) { }

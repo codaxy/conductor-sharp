@@ -2,6 +2,7 @@
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
@@ -10,9 +11,16 @@ namespace ConductorSharp.Engine.Builders.Configurable
 {
     public class TaskDefinitionBuilder
     {
-        public static TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
+        private readonly BuildConfiguration _buildConfiguration;
 
-        public static TaskDefinition Build(Type taskType, Action<TaskDefinitionOptions> updateOptions = null)
+        public TaskDefinitionBuilder(BuildConfiguration buildConfiguration)
+        {
+            _buildConfiguration = buildConfiguration;
+        }
+
+        public TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
+
+        public TaskDefinition Build(Type taskType, Action<TaskDefinitionOptions> updateOptions = null)
         {
             var options = new TaskDefinitionOptions();
 
@@ -62,7 +70,7 @@ namespace ConductorSharp.Engine.Builders.Configurable
             };
         }
 
-        private static string DetermineDescription(string description, params string[] labels)
+        private string DetermineDescription(string description, params string[] labels)
         {
             var descriptionProperty = string.IsNullOrEmpty(description)
                 ? new JProperty("description", "Missing description")

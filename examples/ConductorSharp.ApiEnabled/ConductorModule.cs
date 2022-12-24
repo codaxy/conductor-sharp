@@ -16,7 +16,7 @@ public class ConductorModule : Module
 
     private static void RegisterTasks(ContainerBuilder builder)
     {
-        builder.RegisterWorkerTask<PrepareEmailHandler>();
+        builder.RegisterWorkerTaskV2<PrepareEmailHandler>();
     }
 
     private static void RegisterWorkflows(ContainerBuilder builder) { }
