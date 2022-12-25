@@ -74,6 +74,7 @@ namespace ConductorSharp.Engine.Extensions
         public IExecutionManagerBuilder AddConfigurableBuilder(BuildConfiguration buildConfiguration = null)
         {
             Builder.RegisterInstance(buildConfiguration ?? new BuildConfiguration());
+            Builder.RegisterType<WorkflowBuildItemRegistry>().SingleInstance();
             Builder.RegisterType<TaskDefinitionBuilder>();
             Builder.RegisterGeneric(typeof(WorkflowDefinitionBuilder<,,>));
             return this;

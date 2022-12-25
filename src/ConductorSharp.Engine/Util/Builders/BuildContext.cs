@@ -13,6 +13,5 @@ namespace ConductorSharp.Engine.Util.Builders
         public JObject Outputs { get; set; }
         public WorkflowOptions WorkflowOptions { get; } = new();
         public List<ITaskBuilder> TaskBuilders { get; } = new();
-        public Dictionary<string, object> Items { get; set; } = new();
     }
 }
