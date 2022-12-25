@@ -11,8 +11,6 @@ namespace ConductorSharp.Engine.Service
         public string TaskId { get; set; }
         public string TaskName { get; set; }
         public DateTimeOffset StartedAt { get; set; }
-        public DateTimeOffset CompletedAt { get; set; }
-        public DateTimeOffset FailedAt { get; set; }
     }
 
     public class TaskExecutionCounterService

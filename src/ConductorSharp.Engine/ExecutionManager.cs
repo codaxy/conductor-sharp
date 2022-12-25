@@ -14,6 +14,7 @@ using Autofac;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Polling;
+using ConductorSharp.Engine.Service;
 
 namespace ConductorSharp.Engine
 {
@@ -27,6 +28,7 @@ namespace ConductorSharp.Engine
         private readonly ILifetimeScope _lifetimeScope;
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
+        private readonly TaskExecutionCounterService _taskExecutionCounterService;
 
         public ExecutionManager(
             WorkerSetConfig options,
@@ -35,7 +37,8 @@ namespace ConductorSharp.Engine
             IEnumerable<TaskToWorker> workerMappings,
             ILifetimeScope lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
-            IPollOrderStrategy pollOrderStrategy
+            IPollOrderStrategy pollOrderStrategy,
+            TaskExecutionCounterService taskExecutionCounterService
         )
         {
             _configuration = options;
@@ -46,6 +49,7 @@ namespace ConductorSharp.Engine
             _lifetimeScope = lifetimeScope;
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
+            _taskExecutionCounterService = taskExecutionCounterService;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -134,7 +138,19 @@ namespace ConductorSharp.Engine
                     context.WorkerId = workerId;
                 }
 
+                _taskExecutionCounterService.Track(
+                    new TrackedTask
+                    {
+                        TaskId = pollResponse.TaskId,
+                        TaskName = pollResponse.TaskDefName,
+                        StartedAt = DateTimeOffset.UtcNow
+                    }
+                );
+
                 var response = await mediator.Send(inputData, cancellationToken);
+
+                _taskExecutionCounterService.MoveToCompleted(pollResponse.TaskId);
+
                 await _taskManager.UpdateTaskCompleted(response, pollResponse.TaskId, pollResponse.WorkflowInstanceId);
             }
             catch (Exception exception)
@@ -148,6 +164,8 @@ namespace ConductorSharp.Engine
                 );
 
                 var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
+
+                _taskExecutionCounterService.MoveToFailed(pollResponse.TaskId);
 
                 await _taskManager.UpdateTaskFailed(
                     errorMessage,
