@@ -47,6 +47,8 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
 
+            Builder.RegisterType<TaskExecutionCounterService>().SingleInstance();
+
             return this;
         }
 
