@@ -37,8 +37,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
         where TInput : WorkflowInput<TOutput>
         where TOutput : WorkflowOutput
     {
-        public delegate void OnRegistration(ContainerBuilder containerBuilder);
-
         private readonly Type _workflowType = typeof(TWorkflow);
         private string _name;
 
