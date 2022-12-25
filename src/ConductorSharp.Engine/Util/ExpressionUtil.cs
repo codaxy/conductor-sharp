@@ -41,6 +41,9 @@ namespace ConductorSharp.Engine.Util
             if (expression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
                 return ParseExpression(unaryEx.Operand);
 
+            if (expression is BinaryExpression binaryEx)
+                return ParseBinaryExpression(binaryEx);
+
             if (
                 expression is MethodCallExpression methodExpression
                 && methodExpression.Method.Name == nameof(string.Format)
@@ -62,6 +65,26 @@ namespace ConductorSharp.Engine.Util
                 return ParseArrayInitalization(newArrayExpression);
 
             return CompileMemberOrNameExpressions(expression);
+        }
+
+        private static object ParseBinaryExpression(BinaryExpression binaryEx)
+        {
+            var left = ParseExpression(binaryEx.Left);
+            var right = ParseExpression(binaryEx.Right);
+
+            switch (binaryEx.NodeType)
+            {
+                case ExpressionType.Add:
+
+                    if (left is string leftStr)
+                        return leftStr + right;
+                    if (right is string rightStr)
+                        return left + rightStr;
+
+                    throw new NotSupportedException($"Expression {left} + {right} not supported");
+                default:
+                    throw new NotSupportedException($"Binary expression with node type {binaryEx.NodeType} not supported");
+            }
         }
 
         private static object ParseConstantExpression(ConstantExpression cex)
