@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConductorSharp.Engine.Interface;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,51 +7,61 @@ using System.Text;
 
 namespace ConductorSharp.Engine.Service
 {
-    public class TrackedTask
-    {
-        public string TaskId { get; set; }
-        public string TaskName { get; set; }
-        public DateTimeOffset StartedAt { get; set; }
-    }
-
-    public class TaskExecutionCounterService
+    public class TaskExecutionCounterService : ITaskExecutionCounterService
     {
         private const int _maxTrackedCount = 10000;
 
-        public ConcurrentDictionary<string, TrackedTask> InProgress { get; } = new();
-        public ConcurrentDictionary<string, int> Failed { get; } = new();
-        public ConcurrentDictionary<string, int> Completed { get; } = new();
+        private readonly ConcurrentDictionary<string, RunningTask> _inProgress = new();
+        private readonly ConcurrentDictionary<string, int> _failed = new();
+        private readonly ConcurrentDictionary<string, int> _completed = new();
 
-        public void Track(TrackedTask trackedTask)
+        public void Track(RunningTask trackedTask)
         {
-            if (InProgress.Keys.Count >= _maxTrackedCount)
+            if (_inProgress.Keys.Count >= _maxTrackedCount)
             {
                 return;
             }
 
-            InProgress.TryAdd(trackedTask.TaskId, trackedTask);
+            _inProgress.TryAdd(trackedTask.TaskId, trackedTask);
         }
 
         public void MoveToFailed(string taskId)
         {
-            if (!InProgress.TryGetValue(taskId, out var task))
+            if (!_inProgress.TryGetValue(taskId, out var task))
             {
                 return;
             }
 
-            InProgress.Remove(task.TaskId, out var removedTask);
-            Failed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
+            _inProgress.Remove(task.TaskId, out var removedTask);
+            _failed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
         }
 
         public void MoveToCompleted(string taskId)
         {
-            if (!InProgress.TryGetValue(taskId, out var task))
+            if (!_inProgress.TryGetValue(taskId, out var task))
             {
                 return;
             }
 
-            InProgress.Remove(task.TaskId, out var removedTask);
-            Completed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
+            _inProgress.Remove(task.TaskId, out var removedTask);
+            _completed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
         }
+
+        public List<RunningTask> GetRunning() =>
+            _inProgress
+                .Select(
+                    a =>
+                        new RunningTask
+                        {
+                            StartedAt = a.Value.StartedAt,
+                            TaskId = a.Value.TaskId,
+                            TaskName = a.Value.TaskName
+                        }
+                )
+                .ToList();
+
+        public List<TaskRunCount> GetCompletedCount() => _completed.Select(a => new TaskRunCount { TaskName = a.Key, Count = a.Value }).ToList();
+
+        public List<TaskRunCount> GetFailedCount() => _failed.Select(a => new TaskRunCount { TaskName = a.Key, Count = a.Value }).ToList();
     }
 }

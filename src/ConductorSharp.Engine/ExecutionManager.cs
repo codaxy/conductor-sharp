@@ -28,7 +28,7 @@ namespace ConductorSharp.Engine
         private readonly ILifetimeScope _lifetimeScope;
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
-        private readonly TaskExecutionCounterService _taskExecutionCounterService;
+        private readonly ITaskExecutionCounterService _taskExecutionCounterService;
 
         public ExecutionManager(
             WorkerSetConfig options,
@@ -38,7 +38,7 @@ namespace ConductorSharp.Engine
             ILifetimeScope lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy,
-            TaskExecutionCounterService taskExecutionCounterService
+            ITaskExecutionCounterService taskExecutionCounterService
         )
         {
             _configuration = options;
@@ -139,7 +139,7 @@ namespace ConductorSharp.Engine
                 }
 
                 _taskExecutionCounterService.Track(
-                    new TrackedTask
+                    new RunningTask
                     {
                         TaskId = pollResponse.TaskId,
                         TaskName = pollResponse.TaskDefName,

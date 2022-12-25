@@ -28,7 +28,7 @@ public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, Prep
         _logger = logger;
     }
 
-    public Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
+    public async Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
     {
         var emailBodyBuilder = new StringBuilder();
 
@@ -43,6 +43,7 @@ public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, Prep
 
         _logger.LogInformation("Prepared email");
 
-        return Task.FromResult(new PrepareEmailResponse { EmailBody = emailBodyBuilder.ToString() });
+        await Task.Delay(10000, cancellationToken);
+        return new PrepareEmailResponse { EmailBody = emailBodyBuilder.ToString() };
     }
 }
