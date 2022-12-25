@@ -45,7 +45,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
         private string _name;
 
         public BuildContext BuildContext { get; } = new();
-
         public BuildConfiguration BuildConfiguration { get; set; }
         public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
 
