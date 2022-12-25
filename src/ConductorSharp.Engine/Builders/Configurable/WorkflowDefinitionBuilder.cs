@@ -38,8 +38,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
         where TOutput : WorkflowOutput
     {
         public delegate void OnRegistration(ContainerBuilder containerBuilder);
-        public event ResolveWorkflow OnWorkflowResolve;
-        public event GetWorkflowDefinition OnWorkflowGetDefinition;
 
         private readonly Type _workflowType = typeof(TWorkflow);
         private string _name;
@@ -131,16 +129,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
                 OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
             };
-        }
-
-        public void OnResolve(IComponentContext componentContext)
-        {
-            OnWorkflowResolve?.Invoke(componentContext);
-        }
-
-        public void OnGetDefinition(WorkflowDefinition workflowDefinition)
-        {
-            OnWorkflowGetDefinition?.Invoke(workflowDefinition);
         }
     }
 }

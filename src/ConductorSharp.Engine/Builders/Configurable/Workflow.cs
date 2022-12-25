@@ -13,8 +13,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
     {
         protected WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> _builder;
         private WorkflowDefinition _workflowDefinition;
-        public event GetWorkflowDefinition OnGetDefinitionEvent;
-        public event ResolveWorkflow OnResolveEvent;
 
         public TInput WorkflowInput { get; set; }
         public TOutput WorkflowOutput { get; set; }
@@ -25,9 +23,6 @@ namespace ConductorSharp.Engine.Builders.Configurable
         public Workflow(WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder)
         {
             _builder = builder;
-
-            OnResolveEvent += _builder.OnResolve;
-            OnGetDefinitionEvent += _builder.OnGetDefinition;
         }
 
         public virtual WorkflowDefinition GetDefinition()
