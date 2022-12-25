@@ -61,12 +61,12 @@ namespace ConductorSharp.Engine.Builders.Configurable
 
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
-                BuildContext.WorkflowOptions.OwnerApp = BuildConfiguration?.DefaultOwnerApp;
+                BuildContext.WorkflowOptions.OwnerApp = BuildConfiguration.DefaultOwnerApp;
             }
 
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerEmail))
             {
-                BuildContext.WorkflowOptions.OwnerEmail = BuildConfiguration?.DefaultOwnerEmail;
+                BuildContext.WorkflowOptions.OwnerEmail = BuildConfiguration.DefaultOwnerEmail;
             }
 
             if (!string.IsNullOrEmpty(BuildConfiguration.WorkflowPrefix))
