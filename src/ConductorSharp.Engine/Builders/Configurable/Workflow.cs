@@ -40,15 +40,5 @@ namespace ConductorSharp.Engine.Builders.Configurable
 
             return _workflowDefinition;
         }
-
-        public void BeforeGetDefinition(IComponentContext componentContext, BuildConfiguration buildConfiguration)
-        {
-            OnResolveEvent?.Invoke(componentContext);
-        }
-
-        public void OnGetDefinition(WorkflowDefinition workflowDefinition)
-        {
-            OnGetDefinitionEvent?.Invoke(workflowDefinition);
-        }
     }
 }

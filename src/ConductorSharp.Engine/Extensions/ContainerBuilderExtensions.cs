@@ -169,9 +169,7 @@ namespace ConductorSharp.Engine.Extensions
 
                 var workflow = Activator.CreateInstance(typeof(TWorkflow), builder) as ITypedWorkflow;
 
-                workflow.BeforeGetDefinition(ctx, buildConfiguration);
                 var definition = workflow.GetDefinition();
-                workflow.OnGetDefinition(definition);
                 return definition;
             });
         }

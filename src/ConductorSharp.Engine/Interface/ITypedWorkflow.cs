@@ -11,7 +11,5 @@ namespace ConductorSharp.Engine.Interface
     public interface ITypedWorkflow : INameable
     {
         WorkflowDefinition GetDefinition();
-        void OnGetDefinition(WorkflowDefinition workflowDefinition);
-        void BeforeGetDefinition(IComponentContext componentContext, BuildConfiguration buildConfiguration);
     }
 }
