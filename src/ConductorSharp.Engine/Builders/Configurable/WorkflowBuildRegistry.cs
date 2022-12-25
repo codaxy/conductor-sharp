@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Engine.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ConductorSharp.Engine.Builders.Configurable
@@ -23,5 +24,10 @@ namespace ConductorSharp.Engine.Builders.Configurable
 
         public bool TryGet<TWorkflow>(out Dictionary<string, object> items) where TWorkflow : IConfigurableWorkflow =>
             _items.TryGetValue(typeof(TWorkflow), out items);
+
+        public List<T> GetAll<T>()
+        {
+            return _items.Values.SelectMany(a => a.Values).Where(a => a is T).Select(b => (T)b).ToList();
+        }
     }
 }
