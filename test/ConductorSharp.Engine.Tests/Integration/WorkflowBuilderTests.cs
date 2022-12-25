@@ -164,5 +164,14 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             Assert.Equal(expectedDefinition, definition);
         }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionStringAddition()
+        {
+            var definition = SerializationUtil.SerializeObject(new StringAddition().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/StringAddition.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
     }
 }
