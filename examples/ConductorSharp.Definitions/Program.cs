@@ -48,8 +48,7 @@ var builder = Host.CreateDefaultBuilder()
                 {
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
-                })
-                .AddConfigurableBuilder();
+                });
 
             builder.RegisterMediatR(typeof(Program).Assembly);
             builder.RegisterModule<ConductorModule>();

@@ -94,7 +94,7 @@ namespace ConductorSharp.Engine.Builders.Configurable
             if (!string.IsNullOrEmpty(labels))
                 BuildContext.WorkflowOptions.Labels = labels.Split(",").Select(a => a.Trim()).ToArray();
 
-            var input = _workflowType.BaseType.GenericTypeArguments[0];
+            var input = _workflowType.BaseType.GenericTypeArguments[1];
             var props = input.GetProperties();
 
             foreach (var prop in props)

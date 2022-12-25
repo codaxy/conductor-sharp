@@ -5,6 +5,7 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
 using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -50,6 +51,17 @@ namespace ConductorSharp.Engine.Extensions
 
             _builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
 
+            return this;
+        }
+
+        public IWorkflowEngineBuilder SetBuildConfiguration(BuildConfiguration buildConfiguration)
+        {
+            if (buildConfiguration is null)
+            {
+                throw new ArgumentException("Build configuration cannot be null");
+            }
+
+            _builder.RegisterInstance(buildConfiguration);
             return this;
         }
     }

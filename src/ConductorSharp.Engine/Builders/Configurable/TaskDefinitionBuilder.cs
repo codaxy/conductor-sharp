@@ -11,11 +11,11 @@ namespace ConductorSharp.Engine.Builders.Configurable
 {
     public class TaskDefinitionBuilder
     {
-        private readonly BuildConfiguration _buildConfiguration;
+        public BuildConfiguration BuildConfiguration { get; set; }
 
         public TaskDefinitionBuilder(BuildConfiguration buildConfiguration)
         {
-            _buildConfiguration = buildConfiguration;
+            BuildConfiguration = buildConfiguration;
         }
 
         public TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
@@ -32,6 +32,7 @@ namespace ConductorSharp.Engine.Builders.Configurable
                 .GetInterfaces()
                 .Where(a => a.IsGenericType && a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
                 .First();
+
             var genericArguments = interfaces.GetGenericArguments();
 
             var inputType = genericArguments[0];
@@ -41,7 +42,7 @@ namespace ConductorSharp.Engine.Builders.Configurable
 
             return new TaskDefinition
             {
-                OwnerApp = options.OwnerApp,
+                OwnerApp = BuildConfiguration.DefaultOwnerApp ?? options.OwnerApp,
                 Name = originalName,
                 Description = options.Description ?? DetermineDescription(taskType.GetDocSection("summary")),
                 RetryCount = options.RetryCount,

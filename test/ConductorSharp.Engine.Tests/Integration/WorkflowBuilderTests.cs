@@ -1,5 +1,7 @@
-﻿using ConductorSharp.Engine.Tests.Samples.Workflows;
+﻿using Autofac;
+using ConductorSharp.Engine.Tests.Samples.Workflows;
 using ConductorSharp.Engine.Tests.Util;
+using ConductorSharp.Engine.Extensions;
 
 namespace ConductorSharp.Engine.Tests.Integration
 {
@@ -14,14 +16,24 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal(expectedDefinition, definition);
         }
 
-        //[Fact]
-        //public void BuilderReturnsCorrectDefinitionStringInterpolation()
-        //{
-        //    var definition = SerializationUtil.SerializeObject(new StringInterpolation().GetDefinition());
-        //    var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/StringInterpolation.json");
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionStringInterpolation()
+        {
+            var builder = new ContainerBuilder();
 
-        //    Assert.Equal(expectedDefinition, definition);
-        //}
+            builder
+                .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
+                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1);
+
+            builder.RegisterWorkflow<StringInterpolation>();
+
+            var container = builder.Build();
+
+            var definition = SerializationUtil.SerializeObject(container.Resolve<WorkflowDefinition>());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/StringInterpolation.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
 
         [Fact]
         public void BuilderReturnsCorrectDefinitionNestedObjects()
@@ -128,6 +140,26 @@ namespace ConductorSharp.Engine.Tests.Integration
         public void BuilderReturnsCorrectDefinitionUntypedProperty()
         {
             var definition = SerializationUtil.SerializeObject(new UntypedProperty().GetDefinition());
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/UntypedProperty.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void RegisteredWorkflowResolves()
+        {
+            var builder = new ContainerBuilder();
+
+            builder
+                .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
+                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1);
+
+            builder.RegisterWorkflow<UntypedProperty>();
+
+            var container = builder.Build();
+
+            var definition = SerializationUtil.SerializeObject(container.Resolve<WorkflowDefinition>());
+
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/UntypedProperty.json");
 
             Assert.Equal(expectedDefinition, definition);

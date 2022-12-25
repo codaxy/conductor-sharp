@@ -15,15 +15,15 @@ namespace ConductorSharp.Engine.Tests.Unit
 
             builder
                 .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
-                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1)
-                .AddConfigurableBuilder(
+                .SetBuildConfiguration(
                     new BuildConfiguration
                     {
                         DefaultOwnerApp = "testApp",
                         DefaultOwnerEmail = "owner@test.app",
                         WorkflowPrefix = "TEST_APP_"
                     }
-                );
+                )
+                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1);
 
             builder.RegisterWorkflow<StringInterpolation>();
             var container = builder.Build();
@@ -40,15 +40,15 @@ namespace ConductorSharp.Engine.Tests.Unit
             var overrideValue = "override";
             builder
                 .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
-                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1)
-                .AddConfigurableBuilder(
+                .SetBuildConfiguration(
                     new BuildConfiguration
                     {
                         DefaultOwnerApp = "testApp",
                         DefaultOwnerEmail = "owner@test.app",
                         WorkflowPrefix = "TEST_APP_"
                     }
-                );
+                )
+                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1);
 
             builder.RegisterWorkflow<StringInterpolation>(new BuildConfiguration { DefaultOwnerApp = overrideValue });
             var container = builder.Build();

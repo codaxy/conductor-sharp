@@ -22,17 +22,17 @@ namespace ConductorSharp.Engine.Tests.Unit
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterType<ConductorSharp.Engine.Builders.Configurable.TaskDefinitionBuilder>();
+            builder.AddConductorSharp(baseUrl: "empty", apiPath: "empty");
+
             builder.RegisterInstance(new BuildConfiguration { DefaultOwnerApp = "owner" });
 
-            builder.RegisterWorkerTaskV2<GetCustomerHandler>();
+            builder.RegisterWorkerTask<GetCustomerHandler>();
 
             var container = builder.Build();
 
-            var definitions = container.Resolve<TaskDefinition>();
+            var definition = container.Resolve<TaskDefinition>();
 
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Tasks/CustomerGet.json");
-            Assert.True(true);
+            Assert.Equal("owner", definition.OwnerApp);
         }
     }
 }
