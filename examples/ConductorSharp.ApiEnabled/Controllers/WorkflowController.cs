@@ -3,6 +3,7 @@ using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Client.Model.Request;
 using ConductorSharp.Client.Model.Response;
 using ConductorSharp.Client.Service;
+using ConductorSharp.Engine.Service;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -15,14 +16,20 @@ public class WorkflowController : ControllerBase
     private readonly IMetadataService metadataService;
     private readonly IWorkflowService workflowService;
     private readonly ITaskService taskService;
-
+    private readonly TaskExecutionCounterService _taskExecutionCounterService;
     private const string NotificationWorfklowName = "NOTIFICATION_send_to_customer";
 
-    public WorkflowController(IMetadataService metadataService, IWorkflowService workflowService, ITaskService taskService)
+    public WorkflowController(
+        IMetadataService metadataService,
+        IWorkflowService workflowService,
+        ITaskService taskService,
+        TaskExecutionCounterService taskExecutionCounterService
+    )
     {
         this.metadataService = metadataService;
         this.workflowService = workflowService;
         this.taskService = taskService;
+        _taskExecutionCounterService = taskExecutionCounterService;
     }
 
     [HttpGet("get-workflows")]
@@ -42,4 +49,10 @@ public class WorkflowController : ControllerBase
             1,
             new JObject { new JProperty("task_to_execute", "CUSTOMER_get"), new JProperty("customer_id", request.CustomerId) }
         );
+
+    [HttpGet("counters")]
+    public ActionResult<Dictionary<string, int>> GetCounters()
+    {
+        return Ok(_taskExecutionCounterService.Completed);
+    }
 }

@@ -15,12 +15,19 @@ namespace ConductorSharp.Engine.Service
 
     public class TaskExecutionCounterService
     {
-        private ConcurrentDictionary<string, TrackedTask> InProgress { get; set; } = new();
-        private ConcurrentDictionary<string, int> Failed { get; set; } = new();
-        private ConcurrentDictionary<string, int> Completed { get; set; } = new();
+        private const int _maxTrackedCount = 10000;
+
+        public ConcurrentDictionary<string, TrackedTask> InProgress { get; } = new();
+        public ConcurrentDictionary<string, int> Failed { get; } = new();
+        public ConcurrentDictionary<string, int> Completed { get; } = new();
 
         public void Track(TrackedTask trackedTask)
         {
+            if (InProgress.Keys.Count >= _maxTrackedCount)
+            {
+                return;
+            }
+
             InProgress.TryAdd(trackedTask.TaskId, trackedTask);
         }
 
@@ -32,7 +39,7 @@ namespace ConductorSharp.Engine.Service
             }
 
             InProgress.Remove(task.TaskId, out var removedTask);
-            Failed.AddOrUpdate(task.TaskName, 0, (id, count) => count++);
+            Failed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
         }
 
         public void MoveToCompleted(string taskId)
@@ -43,7 +50,7 @@ namespace ConductorSharp.Engine.Service
             }
 
             InProgress.Remove(task.TaskId, out var removedTask);
-            Completed.AddOrUpdate(task.TaskName, 0, (id, count) => count++);
+            Completed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
         }
     }
 }
