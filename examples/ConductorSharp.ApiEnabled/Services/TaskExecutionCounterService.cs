@@ -1,11 +1,7 @@
 ﻿using ConductorSharp.Engine.Interface;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace ConductorSharp.Engine.Service
+namespace ConductorSharp.ApiEnabled.Services
 {
     public class TaskExecutionCounterService : ITaskExecutionCounterService
     {
@@ -15,36 +11,36 @@ namespace ConductorSharp.Engine.Service
         private readonly ConcurrentDictionary<string, int> _failed = new();
         private readonly ConcurrentDictionary<string, int> _completed = new();
 
-        public void Track(RunningTask trackedTask)
+        public Task OnPolled(RunningTask trackedTask)
         {
-            if (_inProgress.Keys.Count >= _maxTrackedCount)
+            if (_inProgress.Keys.Count < _maxTrackedCount)
             {
-                return;
+                _inProgress.TryAdd(trackedTask.TaskId, trackedTask);
             }
 
-            _inProgress.TryAdd(trackedTask.TaskId, trackedTask);
+            return Task.CompletedTask;
         }
 
-        public void MoveToFailed(string taskId)
+        public Task OnFailed(RunningTask trackedTask)
         {
-            if (!_inProgress.TryGetValue(taskId, out var task))
+            if (_inProgress.TryGetValue(trackedTask.TaskId, out var task))
             {
-                return;
+                _inProgress.Remove(task.TaskId, out var removedTask);
+                _failed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
             }
 
-            _inProgress.Remove(task.TaskId, out var removedTask);
-            _failed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
+            return Task.CompletedTask;
         }
 
-        public void MoveToCompleted(string taskId)
+        public Task OnCompleted(RunningTask trackedTask)
         {
-            if (!_inProgress.TryGetValue(taskId, out var task))
+            if (_inProgress.TryGetValue(trackedTask.TaskId, out var task))
             {
-                return;
+                _inProgress.Remove(task.TaskId, out var removedTask);
+                _completed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
             }
 
-            _inProgress.Remove(task.TaskId, out var removedTask);
-            _completed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
+            return Task.CompletedTask;
         }
 
         public List<RunningTask> GetRunning() =>

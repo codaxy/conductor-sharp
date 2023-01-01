@@ -28,7 +28,7 @@ namespace ConductorSharp.Engine
         private readonly ILifetimeScope _lifetimeScope;
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
-        private readonly ITaskExecutionCounterService _taskExecutionCounterService;
+        private readonly IEnumerable<ITaskExecutionService> _taskExecutionServices;
 
         public ExecutionManager(
             WorkerSetConfig options,
@@ -38,7 +38,7 @@ namespace ConductorSharp.Engine
             ILifetimeScope lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy,
-            ITaskExecutionCounterService taskExecutionCounterService
+            IEnumerable<ITaskExecutionService> taskExecutionServices
         )
         {
             _configuration = options;
@@ -49,7 +49,7 @@ namespace ConductorSharp.Engine
             _lifetimeScope = lifetimeScope;
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
-            _taskExecutionCounterService = taskExecutionCounterService;
+            _taskExecutionServices = taskExecutionServices;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -117,6 +117,13 @@ namespace ConductorSharp.Engine
                 pollResponse.InputData = await _taskManager.FetchExternalStorage(externalStorageLocation.Path);
             }
 
+            var trackedTask = new RunningTask
+            {
+                TaskId = pollResponse.TaskId,
+                TaskName = pollResponse.TaskDefName,
+                StartedAt = DateTimeOffset.UtcNow
+            };
+
             try
             {
                 var inputType = GetInputType(scheduledWorker.TaskType);
@@ -138,18 +145,17 @@ namespace ConductorSharp.Engine
                     context.WorkerId = workerId;
                 }
 
-                _taskExecutionCounterService.Track(
-                    new RunningTask
-                    {
-                        TaskId = pollResponse.TaskId,
-                        TaskName = pollResponse.TaskDefName,
-                        StartedAt = DateTimeOffset.UtcNow
-                    }
-                );
+                foreach (var taskExecutionService in _taskExecutionServices)
+                {
+                    await taskExecutionService.OnPolled(trackedTask);
+                }
 
                 var response = await mediator.Send(inputData, cancellationToken);
 
-                _taskExecutionCounterService.MoveToCompleted(pollResponse.TaskId);
+                foreach (var taskExecutionService in _taskExecutionServices)
+                {
+                    await taskExecutionService.OnCompleted(trackedTask);
+                }
 
                 await _taskManager.UpdateTaskCompleted(response, pollResponse.TaskId, pollResponse.WorkflowInstanceId);
             }
@@ -165,7 +171,10 @@ namespace ConductorSharp.Engine
 
                 var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
 
-                _taskExecutionCounterService.MoveToFailed(pollResponse.TaskId);
+                foreach (var taskExecutionService in _taskExecutionServices)
+                {
+                    await taskExecutionService.OnFailed(trackedTask);
+                }
 
                 await _taskManager.UpdateTaskFailed(
                     errorMessage,
