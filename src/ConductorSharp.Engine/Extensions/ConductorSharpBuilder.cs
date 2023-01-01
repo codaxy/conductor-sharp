@@ -63,7 +63,7 @@ namespace ConductorSharp.Engine.Extensions
 
         public void AddContextLogging() => Builder.RegisterGeneric(typeof(ContextLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
-        public void AddTaskTracking() => Builder.RegisterGeneric(typeof(TaskExecutionTrackingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+        public void AddExecutionTaskTracking() => Builder.RegisterGeneric(typeof(TaskExecutionTrackingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
         public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
         {
