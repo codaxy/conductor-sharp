@@ -32,13 +32,13 @@ namespace ConductorSharp.Engine.Behaviors
                 StartedAt = DateTimeOffset.UtcNow
             };
 
+            foreach (var taskExecutionService in _taskExecutionServices)
+            {
+                await taskExecutionService.OnPolled(trackedTask);
+            }
+
             try
             {
-                foreach (var taskExecutionService in _taskExecutionServices)
-                {
-                    await taskExecutionService.OnPolled(trackedTask);
-                }
-
                 var response = await next();
 
                 foreach (var taskExecutionService in _taskExecutionServices)
@@ -54,6 +54,7 @@ namespace ConductorSharp.Engine.Behaviors
                 {
                     await taskExecutionService.OnFailed(trackedTask);
                 }
+
                 throw;
             }
         }
