@@ -19,3 +19,10 @@ services:
       context: .
       dockerfile: examples/ConductorSharp.Definitions/Dockerfile
 
+
+  conductorsharp.proxy:
+    image: ${DOCKER_REGISTRY-}conductorsharpproxy
+    build:
+      context: .
+      dockerfile: src/ConductorSharp.Proxy/Dockerfile
+

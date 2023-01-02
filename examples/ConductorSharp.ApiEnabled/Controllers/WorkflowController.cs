@@ -25,6 +25,13 @@ public class WorkflowController : ControllerBase
         this.taskService = taskService;
     }
 
+    [HttpGet("status")]
+    public async Task<string> GetStatus(string workflowId)
+    {
+        var response = await workflowService.GetWorkflowStatus(workflowId, false);
+        return response.ToString();
+    }
+
     [HttpGet("get-workflows")]
     public async Task<ActionResult<WorkflowDefinition[]>> GetRegisteredWorkflows() => await metadataService.GetAllWorkflowDefinitions();
 
