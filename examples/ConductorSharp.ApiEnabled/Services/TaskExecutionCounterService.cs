@@ -13,20 +13,16 @@ namespace ConductorSharp.ApiEnabled.Services
 
         public Task OnPolled(RunningTask trackedTask)
         {
-            if (_inProgress.Keys.Count < _maxTrackedCount)
-            {
-                _inProgress.TryAdd(trackedTask.TaskId, trackedTask);
-            }
+            _inProgress.TryAdd(trackedTask.TaskId, trackedTask);
 
             return Task.CompletedTask;
         }
 
         public Task OnFailed(RunningTask trackedTask)
         {
-            if (_inProgress.TryGetValue(trackedTask.TaskId, out var task))
+            if (_inProgress.TryRemove(trackedTask.TaskId, out var removedTask))
             {
-                _inProgress.Remove(task.TaskId, out var removedTask);
-                _failed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
+                _failed[removedTask.TaskName]++;
             }
 
             return Task.CompletedTask;
@@ -34,10 +30,9 @@ namespace ConductorSharp.ApiEnabled.Services
 
         public Task OnCompleted(RunningTask trackedTask)
         {
-            if (_inProgress.TryGetValue(trackedTask.TaskId, out var task))
+            if (_inProgress.TryRemove(trackedTask.TaskId, out var removedTask))
             {
-                _inProgress.Remove(task.TaskId, out var removedTask);
-                _completed.AddOrUpdate(task.TaskName, 1, (id, count) => count + 1);
+                _completed[removedTask.TaskName]++;
             }
 
             return Task.CompletedTask;
