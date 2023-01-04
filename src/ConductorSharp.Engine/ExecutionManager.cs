@@ -14,7 +14,6 @@ using Autofac;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Polling;
-using ConductorSharp.Engine.Service;
 
 namespace ConductorSharp.Engine
 {
