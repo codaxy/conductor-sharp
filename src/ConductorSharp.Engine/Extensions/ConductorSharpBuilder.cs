@@ -75,7 +75,7 @@ namespace ConductorSharp.Engine.Extensions
         {
             if (buildConfiguration is null)
             {
-                throw new ArgumentException("Build configuration cannot be null");
+                throw new ArgumentNullException("Build configuration cannot be null");
             }
 
             Builder.RegisterInstance(buildConfiguration);
