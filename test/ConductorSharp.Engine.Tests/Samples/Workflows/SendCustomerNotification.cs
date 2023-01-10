@@ -29,7 +29,7 @@ public class SendCustomerNotification : Workflow<SendCustomerNotificationInput, 
 
         return builder.Build(options =>
         {
-            options.Version = 1;
+            options.Version = 3;
             options.OwnerEmail = "example@example.local";
         });
     }
