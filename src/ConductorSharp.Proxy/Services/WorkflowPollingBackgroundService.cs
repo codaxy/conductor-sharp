@@ -17,10 +17,7 @@ namespace ConductorSharp.Proxy.Services
             _workflowService = workflowService;
         }
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        public void Dispose() { }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -40,38 +37,46 @@ namespace ConductorSharp.Proxy.Services
         {
             while (!_cancellationTokenSource.IsCancellationRequested)
             {
-                var ids = _polledWokflowRegistry.GetPolledWorkflows();
-
-                if (ids.Count == 0)
+                try
                 {
-                    continue;
-                }
+                    var ids = _polledWokflowRegistry.GetPolledWorkflows();
 
-                var tasks = new List<Task<JObject>>();
-
-                //var batchSize = 100;
-
-                //int numberOfBatches = (int)Math.Ceiling((double)ids.Count() / batchSize);
-
-                //for (int i = 0; i < numberOfBatches; i++)
-                //{
-                //    var currentIds = ids.Skip(i * batchSize).Take(batchSize).ToList();
-                //    tasks.Add(_workflowService.GetWorkflowStatus(currentIds.First()));
-                //}
-
-                tasks.Add(_workflowService.GetWorkflowStatus(ids.First()));
-
-                var objs = await Task.WhenAll(tasks);
-
-                var results = objs.Select(a => a.ToObject<TaskPollResult>());
-
-                foreach (var result in results)
-                {
-                    if (result.Status == "RUNNING")
+                    if (ids.Count == 0)
                     {
-                        _polledWokflowRegistry.StopPolling(result.WorkflowId);
-                        await _polledWokflowRegistry.PublishUpdate();
+                        continue;
                     }
+
+                    var tasks = new List<Task<JObject>>();
+
+                    //var batchSize = 100;
+
+                    //int numberOfBatches = (int)Math.Ceiling((double)ids.Count() / batchSize);
+
+                    //for (int i = 0; i < numberOfBatches; i++)
+                    //{
+                    //    var currentIds = ids.Skip(i * batchSize).Take(batchSize).ToList();
+                    //    tasks.Add(_workflowService.GetWorkflowStatus(currentIds.First()));
+                    //}
+
+                    foreach (var wf in ids)
+                    {
+                        tasks.Add(_workflowService.GetWorkflowStatus(wf));
+                    }
+
+                    var objs = await Task.WhenAll(tasks);
+
+                    var results = objs.Select(a => a.ToObject<TaskPollResult>());
+
+                    foreach (var result in results)
+                    {
+                        await _polledWokflowRegistry.PublishUpdate(result);
+                    }
+
+                    await Task.Delay(1000);
+                }
+                catch (Exception exc)
+                {
+                    Console.WriteLine(exc);
                 }
             }
         }

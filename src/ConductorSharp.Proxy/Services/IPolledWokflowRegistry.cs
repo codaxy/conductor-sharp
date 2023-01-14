@@ -1,10 +1,12 @@
-﻿namespace ConductorSharp.Proxy.Services
+﻿using ConductorSharp.Proxy.Models;
+
+namespace ConductorSharp.Proxy.Services
 {
     public interface IPolledWokflowRegistry
     {
         void Poll(string workflowId);
         void StopPolling(string workflowId);
         ICollection<string> GetPolledWorkflows();
-        Task PublishUpdate();
+        Task PublishUpdate(TaskPollResult pollResult);
     }
 }

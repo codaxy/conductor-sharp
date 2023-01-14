@@ -18,7 +18,7 @@ namespace ConductorSharp.Proxy.Models
         public string Status { get; set; }
 
         [JsonProperty("endTime", NullValueHandling = NullValueHandling.Ignore)]
-        public int EndTime { get; set; }
+        public long EndTime { get; set; }
 
         [JsonProperty("workflowId", NullValueHandling = NullValueHandling.Ignore)]
         public string WorkflowId { get; set; }

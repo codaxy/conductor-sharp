@@ -3,6 +3,8 @@ version: '3.4'
 services:
 
   conductorsharp.noapi:
+    depends_on: 
+      - conductorsharp.proxy
     healthcheck:
       test: bash -c "[ -f /app/CONDUCTORSHARP_HEALTH.json ]"
       interval: 60s
@@ -11,6 +13,8 @@ services:
       timeout: 10s
 
   conductorsharp.definitions:
+    depends_on: 
+      - conductorsharp.proxy
     healthcheck:
       test: bash -c "[ -f /app/CONDUCTORSHARP_HEALTH.json ]"
       interval: 60s
@@ -19,6 +23,8 @@ services:
       timeout: 10s
 
   conductorsharp.apienabled:
+    depends_on: 
+      - conductorsharp.proxy
     healthcheck:
       test: bash -c "[ -f /app/CONDUCTORSHARP_HEALTH.json ]"
       interval: 60s
@@ -34,5 +40,5 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
-      - "80"
+      - "5029:80"
 
