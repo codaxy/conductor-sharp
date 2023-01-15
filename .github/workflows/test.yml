@@ -3,7 +3,6 @@ name: Action test
 on:
   push:
     tags: ["v1.*"]
-    branches: [action_test]
 
 jobs:
   deploy-packages:
