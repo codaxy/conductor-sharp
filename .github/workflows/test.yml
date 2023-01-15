@@ -12,10 +12,11 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
     - name: Install .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-    - name: Test
-      run: dotnet test ConductorSharp.sln
+    - name: Create package
+      run: dotnet pack ./src/ConductorSharp.Engine -c Release
+    - name: Publish package
+      run: dotnet nuget push ./src/ConductorSharp.Engine/bin/Release/ConductorSharp.Engine*.nupkg --api-key {{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
