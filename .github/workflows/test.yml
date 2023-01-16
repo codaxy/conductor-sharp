@@ -1,4 +1,4 @@
-name: Action test
+name: Deploy packages
 
 on:
   push:
@@ -16,7 +16,13 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-    - name: Create package
-      run: dotnet pack ./src/ConductorSharp.Engine -c Release
-    - name: Publish package
+    - name: Restore dependencies
+      run: dotnet restore ConductorSharp.sln
+    - name: Create ConductorSharp.Client package
+      run: dotnet pack --no-restore ./src/ConductorSharp.Client -c Release
+    - name: Create ConductorSharp.Engine package
+      run: dotnet pack --no-restore ./src/ConductorSharp.Engine -c Release
+    - name: Publish ConductorSharp.Client package
+      run: dotnet nuget push ./src/ConductorSharp.Client/bin/Release/ConductorSharp.Client*.nupkg --api-key {{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+    - name: Publish ConductorSharp.Engine package
       run: dotnet nuget push ./src/ConductorSharp.Engine/bin/Release/ConductorSharp.Engine*.nupkg --api-key {{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
