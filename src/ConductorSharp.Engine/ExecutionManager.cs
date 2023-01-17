@@ -135,6 +135,7 @@ namespace ConductorSharp.Engine
                 }
 
                 var response = await mediator.Send(inputData, cancellationToken);
+
                 await _taskManager.UpdateTaskCompleted(response, pollResponse.TaskId, pollResponse.WorkflowInstanceId);
             }
             catch (Exception exception)
