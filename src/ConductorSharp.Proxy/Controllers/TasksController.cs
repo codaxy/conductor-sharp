@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Client.Model.Request;
 using ConductorSharp.Client.Model.Response;
 using ConductorSharp.Client.Service;
+using ConductorSharp.Proxy.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -11,10 +12,13 @@ namespace ConductorSharp.Proxy.Controllers
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
+        private readonly ISingleFetchService _lockAndPoller;
+        private static bool shouldCache = false;
 
-        public TasksController(ITaskService taskService)
+        public TasksController(ITaskService taskService, ISingleFetchService lockAndPoller)
         {
             _taskService = taskService;
+            _lockAndPoller = lockAndPoller;
         }
 
         //tasks/externalstoragelocation?path={0}&operation=READ&payloadType=TASK_INPUT
@@ -35,7 +39,30 @@ namespace ConductorSharp.Proxy.Controllers
         [HttpGet("queue/all")]
         public async Task<IDictionary<string, int>> GetAllQueues()
         {
-            return await _taskService.GetAllQueues();
+            if (shouldCache)
+            {
+                return await _lockAndPoller.Fetch(async () => await _taskService.GetAllQueues());
+            }
+            else
+            {
+                return await _taskService.GetAllQueues();
+            }
+        }
+
+        //used
+        [HttpGet("queue/caching")]
+        public async Task<object> GetAllQueuesCaching()
+        {
+            return Task.FromResult(
+                new { Ratio = _lockAndPoller.GetCacheRatio(), Cached = _lockAndPoller.GetCachedCount(), Polled = _lockAndPoller.GetPolledCount() }
+            );
+        }
+
+        [HttpGet("queue/toggle")]
+        public async Task<object> ToggleCache()
+        {
+            shouldCache = !shouldCache;
+            return Task.FromResult(new { ShouldCache = shouldCache });
         }
 
         //used

@@ -4,6 +4,7 @@ using ConductorSharp.Engine.Util;
 using ConductorSharp.Proxy.Extensions;
 using Serilog;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+using ConductorSharp.Proxy.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -15,6 +16,8 @@ builder.Services
     {
         config.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     });
+
+builder.Services.AddSingleton<ISingleFetchService, SingleFetchService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

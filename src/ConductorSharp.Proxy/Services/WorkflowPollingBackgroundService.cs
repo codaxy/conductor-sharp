@@ -9,7 +9,7 @@ namespace ConductorSharp.Proxy.Services
         private readonly IPolledWokflowRegistry _polledWokflowRegistry;
         private readonly IWorkflowService _workflowService;
         private readonly CancellationTokenSource _cancellationTokenSource = new();
-        private Task _runningTask;
+        private Task? _runningTask;
 
         public WorkflowPollingBackgroundService(IPolledWokflowRegistry polledWokflowRegistry, IWorkflowService workflowService)
         {
@@ -21,7 +21,7 @@ namespace ConductorSharp.Proxy.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _runningTask = Run();
+            _runningTask = Run(_cancellationTokenSource.Token);
 
             return Task.CompletedTask;
         }
@@ -30,49 +30,38 @@ namespace ConductorSharp.Proxy.Services
         {
             _cancellationTokenSource.Cancel();
 
-            await Task.WhenAny(_runningTask, Task.Delay(Timeout.Infinite, cancellationToken));
+            if (_runningTask != null)
+                await Task.WhenAny(_runningTask, Task.Delay(Timeout.Infinite, cancellationToken));
         }
 
-        private async Task Run()
+        private async Task Run(CancellationToken cancellationToken)
         {
-            while (!_cancellationTokenSource.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
                     var ids = _polledWokflowRegistry.GetPolledWorkflows();
 
-                    if (ids.Count == 0)
+                    if (ids.Count != 0)
                     {
-                        continue;
+                        var tasks = new List<Task<JObject>>();
+
+                        foreach (var wf in ids)
+                        {
+                            tasks.Add(_workflowService.GetWorkflowStatus(wf));
+                        }
+
+                        var objs = await Task.WhenAll(tasks);
+
+                        var results = objs.Where(a => a != null).Select(a => a.ToObject<TaskPollResult>());
+
+                        foreach (var result in results)
+                        {
+                            await _polledWokflowRegistry.PublishUpdate(result!);
+                        }
                     }
 
-                    var tasks = new List<Task<JObject>>();
-
-                    //var batchSize = 100;
-
-                    //int numberOfBatches = (int)Math.Ceiling((double)ids.Count() / batchSize);
-
-                    //for (int i = 0; i < numberOfBatches; i++)
-                    //{
-                    //    var currentIds = ids.Skip(i * batchSize).Take(batchSize).ToList();
-                    //    tasks.Add(_workflowService.GetWorkflowStatus(currentIds.First()));
-                    //}
-
-                    foreach (var wf in ids)
-                    {
-                        tasks.Add(_workflowService.GetWorkflowStatus(wf));
-                    }
-
-                    var objs = await Task.WhenAll(tasks);
-
-                    var results = objs.Select(a => a.ToObject<TaskPollResult>());
-
-                    foreach (var result in results)
-                    {
-                        await _polledWokflowRegistry.PublishUpdate(result);
-                    }
-
-                    await Task.Delay(1000);
+                    await Task.Delay(1000, cancellationToken);
                 }
                 catch (Exception exc)
                 {
