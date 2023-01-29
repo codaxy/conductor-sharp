@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using ConductorSharp.Engine.Behaviors;
-using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
 using ConductorSharp.Engine.Service;
