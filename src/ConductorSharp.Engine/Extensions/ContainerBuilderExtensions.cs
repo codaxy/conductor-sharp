@@ -2,7 +2,7 @@
 using ConductorSharp.Client;
 using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Client.Service;
-using ConductorSharp.Engine.Builders.Configurable;
+using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Util.Builders;
 using RestSharp;
 using System;

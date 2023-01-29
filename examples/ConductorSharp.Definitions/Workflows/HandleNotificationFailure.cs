@@ -20,21 +20,17 @@ namespace ConductorSharp.Definitions.Workflows
     public class HandleNotificationFailureOutput : WorkflowOutput { }
 
     [OriginalName("NOTIFICATION_handle_failure")]
-    public class HandleNotificationFailure : Workflow<HandleNotificationFailureInput, HandleNotificationFailureOutput>
+    public class HandleNotificationFailure : Workflow<HandleNotificationFailure, HandleNotificationFailureInput, HandleNotificationFailureOutput>
     {
+        public HandleNotificationFailure(
+            WorkflowDefinitionBuilder<HandleNotificationFailure, HandleNotificationFailureInput, HandleNotificationFailureOutput> builder
+        ) : base(builder) { }
+
         public ReadWorkflowTasks? ReadExecutedTasks { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<HandleNotificationFailure>();
-
-            builder.AddTask(a => a.ReadExecutedTasks, b => new() { TaskNames = "dynamic_handler", WorkflowId = b.WorkflowInput.WorkflowId });
-
-            return builder.Build(options =>
-            {
-                options.Version = 1;
-                options.OwnerEmail = "example@example.local";
-            });
+            _builder.AddTask(a => a.ReadExecutedTasks, b => new() { TaskNames = "dynamic_handler", WorkflowId = b.WorkflowInput.WorkflowId });
         }
     }
 }

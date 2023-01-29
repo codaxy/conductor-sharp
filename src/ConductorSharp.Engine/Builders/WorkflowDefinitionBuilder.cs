@@ -1,12 +1,11 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using Autofac;
+using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
-using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
-using MediatR;
+using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
@@ -14,48 +13,84 @@ using System.Reflection;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public class DefinitionContext
+    public static class WorkflowOutputExtension
     {
-        public JObject Inputs { get; set; }
-        public JObject Outputs { get; set; }
-        public WorkflowOptions WorkflowOptions { get; } = new();
+        public static void SetOutput<FWorkflow, F, G>(this WorkflowDefinitionBuilder<FWorkflow, F, G> builder, Expression<Func<FWorkflow, G>> input)
+            where FWorkflow : Workflow<FWorkflow, F, G>
+            where F : WorkflowInput<G>
+            where G : WorkflowOutput
+        {
+            builder.BuildContext.Outputs = ExpressionUtil.ParseToParameters(input.Body);
+        }
 
-        public List<ITaskBuilder> TaskBuilders { get; } = new();
+        public static void SetOptions<FWorkflow, F, G>(this WorkflowDefinitionBuilder<FWorkflow, F, G> builder, Action<WorkflowOptions> adjustOptions)
+            where FWorkflow : Workflow<FWorkflow, F, G>
+            where F : WorkflowInput<G>
+            where G : WorkflowOutput
+        {
+            adjustOptions?.Invoke(builder.BuildContext.WorkflowOptions);
+        }
     }
 
-    public class WorkflowDefinitionBuilder<TWorkflow> where TWorkflow : ITypedWorkflow
+    public class WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput>
+        where TWorkflow : ITypedWorkflow
+        where TInput : WorkflowInput<TOutput>
+        where TOutput : WorkflowOutput
     {
         private readonly Type _workflowType = typeof(TWorkflow);
-        private readonly string _name;
+        private string _name;
 
-        public DefinitionContext Context { get; } = new();
+        public BuildContext BuildContext { get; } = new();
+        public BuildConfiguration BuildConfiguration { get; set; }
+        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
 
-        public WorkflowDefinitionBuilder()
+        public WorkflowDefinitionBuilder(BuildConfiguration buildConfiguration, WorkflowBuildItemRegistry workflowBuildRegistry)
+        {
+            BuildConfiguration = buildConfiguration;
+            WorkflowBuildRegistry = workflowBuildRegistry;
+        }
+
+        public WorkflowDefinition Build()
         {
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
             _name = NamingUtil.DetermineRegistrationName(_workflowType);
+
+            if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
+            {
+                BuildContext.WorkflowOptions.OwnerApp = BuildConfiguration.DefaultOwnerApp;
+            }
+
+            if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerEmail))
+            {
+                BuildContext.WorkflowOptions.OwnerEmail = BuildConfiguration.DefaultOwnerEmail;
+            }
+
+            if (!string.IsNullOrEmpty(BuildConfiguration.WorkflowPrefix))
+            {
+                _name = $"{BuildConfiguration.WorkflowPrefix}{_name}";
+            }
 
             var summary = _workflowType.GetDocSection("summary");
             var ownerApp = _workflowType.GetDocSection("ownerApp");
             var ownerEmail = _workflowType.GetDocSection("ownerEmail");
             var labels = _workflowType.GetDocSection("labels");
 
-            Context.WorkflowOptions.Version = 1;
-            Context.Inputs = new();
+            BuildContext.WorkflowOptions.Version = 1;
+            BuildContext.Inputs = new();
 
             if (!string.IsNullOrEmpty(summary))
-                Context.WorkflowOptions.Description = summary;
+                BuildContext.WorkflowOptions.Description = summary;
 
             if (!string.IsNullOrEmpty(ownerApp))
-                Context.WorkflowOptions.OwnerApp = ownerApp;
+                BuildContext.WorkflowOptions.OwnerApp = ownerApp;
 
             if (!string.IsNullOrEmpty(ownerEmail))
-                Context.WorkflowOptions.OwnerEmail = ownerEmail;
+                BuildContext.WorkflowOptions.OwnerEmail = ownerEmail;
 
             if (!string.IsNullOrEmpty(labels))
-                Context.WorkflowOptions.Labels = labels.Split(",").Select(a => a.Trim()).ToArray();
+                BuildContext.WorkflowOptions.Labels = labels.Split(",").Select(a => a.Trim()).ToArray();
 
-            var input = _workflowType.BaseType.GenericTypeArguments[0];
+            var input = _workflowType.BaseType.GenericTypeArguments[1];
             var props = input.GetProperties();
 
             foreach (var prop in props)
@@ -66,36 +101,31 @@ namespace ConductorSharp.Engine.Builders
                 var propertyName = prop.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(prop.Name);
 
                 var requiredString = isRequired != null ? "(required)" : "(optional)";
-                Context.Inputs.Add(
+                BuildContext.Inputs.Add(
                     new JProperty(
                         propertyName,
                         new JObject { new JProperty("value", ""), new JProperty("description", $"{description} {requiredString}"), }
                     )
                 );
             }
-        }
-
-        public WorkflowDefinition Build(Action<WorkflowOptions> adjustOptions)
-        {
-            adjustOptions.Invoke(Context.WorkflowOptions);
 
             return new WorkflowDefinition
             {
                 Name = _name,
-                Tasks = Context.TaskBuilders.SelectMany(a => a.Build()).ToList(),
+                Tasks = BuildContext.TaskBuilders.SelectMany(a => a.Build()).ToList(),
                 FailureWorkflow =
-                    Context.WorkflowOptions.FailureWorkflow != null
-                        ? NamingUtil.DetermineRegistrationName(Context.WorkflowOptions.FailureWorkflow)
+                    BuildContext.WorkflowOptions.FailureWorkflow != null
+                        ? NamingUtil.DetermineRegistrationName(BuildContext.WorkflowOptions.FailureWorkflow)
                         : null,
                 Description = new JObject()
                 {
-                    new JProperty("description", Context.WorkflowOptions.Description),
-                    new JProperty("labels", Context.WorkflowOptions.Labels)
+                    new JProperty("description", BuildContext.WorkflowOptions.Description),
+                    new JProperty("labels", BuildContext.WorkflowOptions.Labels)
                 }.ToString(Formatting.None),
-                InputParameters = Context.Inputs,
-                OutputParameters = Context.Outputs,
-                OwnerApp = Context.WorkflowOptions.OwnerApp,
-                OwnerEmail = Context.WorkflowOptions.OwnerEmail,
+                InputParameters = BuildContext.Inputs,
+                OutputParameters = BuildContext.Outputs,
+                OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
+                OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
             };
         }
     }

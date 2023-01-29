@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using ConductorSharp.Engine.Builders.Configurable;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
 using ConductorSharp.Engine.Util.Builders;

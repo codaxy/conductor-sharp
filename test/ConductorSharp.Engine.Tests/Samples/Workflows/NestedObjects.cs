@@ -10,8 +10,10 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class NestedObjectsOutput : WorkflowOutput { }
 
-    public class NestedObjects : Workflow<NestedObjectsInput, NestedObjectsOutput>
+    public class NestedObjects : Workflow<NestedObjects, NestedObjectsInput, NestedObjectsOutput>
     {
+        public NestedObjects(WorkflowDefinitionBuilder<NestedObjects, NestedObjectsInput, NestedObjectsOutput> builder) : base(builder) { }
+
         public class TestModel
         {
             public int Integer { get; set; }
@@ -21,11 +23,9 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public Tasks.NestedObjects TaskNestedObjects { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<NestedObjects>();
-
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.TaskNestedObjects,
                 wf =>
                     new()
@@ -43,8 +43,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                         },
                     }
             );
-
-            return builder.Build(opts => opts.Version = 1);
         }
     }
 }

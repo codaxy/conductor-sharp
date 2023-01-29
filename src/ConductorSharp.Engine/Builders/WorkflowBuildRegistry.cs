@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ConductorSharp.Engine.Builders.Configurable
+namespace ConductorSharp.Engine.Builders
 {
     public class WorkflowBuildItemRegistry
     {

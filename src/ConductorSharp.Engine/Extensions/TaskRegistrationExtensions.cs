@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
@@ -29,12 +30,12 @@ namespace ConductorSharp.Engine.Extensions
             );
         }
 
-        private static Builders.Configurable.TaskDefinitionBuilder ResolveTaskDefinitionBuilder(
+        private static TaskDefinitionBuilder ResolveTaskDefinitionBuilder(
             this IComponentContext componentContext,
             BuildConfiguration buildConfiguration
         )
         {
-            var builder = componentContext.Resolve<Builders.Configurable.TaskDefinitionBuilder>();
+            var builder = componentContext.Resolve<TaskDefinitionBuilder>();
 
             builder.BuildConfiguration = buildConfiguration ?? builder.BuildConfiguration;
 

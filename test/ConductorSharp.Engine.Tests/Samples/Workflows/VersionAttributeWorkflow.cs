@@ -4,17 +4,17 @@
 
     public class VersionAttributeWorkflowOutput : WorkflowOutput { }
 
-    public class VersionAttributeWorkflow : Workflow<VersionAttributeWorkflowInput, VersionAttributeWorkflowOutput>
+    public class VersionAttributeWorkflow : Workflow<VersionAttributeWorkflow, VersionAttributeWorkflowInput, VersionAttributeWorkflowOutput>
     {
+        public VersionAttributeWorkflow(
+            WorkflowDefinitionBuilder<VersionAttributeWorkflow, VersionAttributeWorkflowInput, VersionAttributeWorkflowOutput> builder
+        ) : base(builder) { }
+
         public VersionSubworkflow TestSubworkflow { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<VersionAttributeWorkflow>();
-
-            builder.AddTask(wf => wf.TestSubworkflow, wf => new());
-
-            return builder.Build(opts => opts.Version = 1);
+            _builder.AddTask(wf => wf.TestSubworkflow, wf => new());
         }
     }
 }

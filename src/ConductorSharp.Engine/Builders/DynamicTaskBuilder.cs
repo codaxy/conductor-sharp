@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,14 +14,18 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class DynamicTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, F, G>(
-            this WorkflowDefinitionBuilder<TWorkflow> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput, F, G>(
+            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
             Expression<Func<TWorkflow, DynamicTaskModel<F, G>>> reference,
             Expression<Func<TWorkflow, DynamicTaskInput<F, G>>> input
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
+            where TInput : WorkflowInput<TOutput>
+            where TOutput : WorkflowOutput
+            where F : IRequest<G>
         {
-            var taskBuilder = new DynamicTaskBuilder<F, G>(reference.Body, input.Body);
-            builder.Context.TaskBuilders.Add(taskBuilder);
+            var taskBuilder = new DynamicTaskBuilder<F, G>(reference.Body, input.Body, builder.BuildConfiguration);
+            builder.BuildContext.TaskBuilders.Add(taskBuilder);
             return taskBuilder;
         }
     }
@@ -30,7 +35,8 @@ namespace ConductorSharp.Engine.Builders
         private const string TaskType = "DYNAMIC";
         private const string DynamicTasknameParam = "task_to_execute";
 
-        public DynamicTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }
+        public DynamicTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+            : base(taskExpression, inputExpression, buildConfiguration) { }
 
         private class DynamicTaskParameters
         {

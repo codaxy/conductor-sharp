@@ -1,7 +1,6 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Definitions.Generated;
 using ConductorSharp.Engine.Builders;
-using ConductorSharp.Engine.Builders.Configurable;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;

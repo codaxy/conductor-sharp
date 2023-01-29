@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Engine.Builders.Configurable;
+using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json;

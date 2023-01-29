@@ -3,6 +3,7 @@ using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
@@ -15,10 +16,11 @@ namespace ConductorSharp.Engine.Builders
         protected readonly JObject _inputParameters;
         protected readonly string _taskRefferenceName;
         protected readonly string _taskName;
+        private readonly BuildConfiguration _buildConfiguration;
         protected string _description;
         protected AdditionalTaskParameters _additionalParameters = new();
 
-        public BaseTaskBuilder(Expression taskExpression, Expression memberExpression)
+        public BaseTaskBuilder(Expression taskExpression, Expression memberExpression, BuildConfiguration buildConfiguration)
         {
             var taskType = ExpressionUtil.ParseToType(taskExpression);
 
@@ -26,6 +28,7 @@ namespace ConductorSharp.Engine.Builders
             _taskRefferenceName = ExpressionUtil.ParseToReferenceName(taskExpression);
             _inputParameters = ExpressionUtil.ParseToParameters(memberExpression);
             _taskName = NamingUtil.DetermineRegistrationName(taskType);
+            _buildConfiguration = buildConfiguration;
         }
 
         public ITaskOptionsBuilder AsOptional()

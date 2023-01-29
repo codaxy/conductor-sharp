@@ -14,17 +14,22 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     public class TaskInputInitializationMemberInitOutput : WorkflowOutput { }
 
     [OriginalName("TEST_TaskInputInialization")]
-    public class TaskInputInitializationMemberInit : Workflow<TaskInputInitializationMemberInitInput, TaskInputInitializationMemberInitOutput>
+    public class TaskInputInitializationMemberInit
+        : Workflow<TaskInputInitializationMemberInit, TaskInputInitializationMemberInitInput, TaskInputInitializationMemberInitOutput>
     {
+        public TaskInputInitializationMemberInit(
+            WorkflowDefinitionBuilder<
+                TaskInputInitializationMemberInit,
+                TaskInputInitializationMemberInitInput,
+                TaskInputInitializationMemberInitOutput
+            > builder
+        ) : base(builder) { }
+
         public CustomerGetV1 GetCustomer { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<TaskInputInitializationNew>();
-
-            builder.AddTask(wf => wf.GetCustomer, wf => new() { });
-
-            return builder.Build(opts => opts.Version = 1);
+            _builder.AddTask(wf => wf.GetCustomer, wf => new() { });
         }
     }
 }

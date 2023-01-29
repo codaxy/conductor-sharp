@@ -10,21 +10,26 @@ public class ConditionallySendCustomerNotificationInput : WorkflowInput<Conditio
 public class ConditionallySendCustomerNotificationOutput : WorkflowOutput { }
 #endregion
 [OriginalName("NOTIFICATION_conditionally_send_to_customer")]
-public class ConditionallySendCustomerNotification : Workflow<ConditionallySendCustomerNotificationInput, ConditionallySendCustomerNotificationOutput>
+public class ConditionallySendCustomerNotification
+    : Workflow<ConditionallySendCustomerNotification, ConditionallySendCustomerNotificationInput, ConditionallySendCustomerNotificationOutput>
 {
+    public ConditionallySendCustomerNotification(
+        WorkflowDefinitionBuilder<
+            ConditionallySendCustomerNotification,
+            ConditionallySendCustomerNotificationInput,
+            ConditionallySendCustomerNotificationOutput
+        > builder
+    ) : base(builder) { }
+
     public DecisionTaskModel SendNotificationDecision { get; set; }
     public SendCustomerNotification SendNotificationSubworkflow { get; set; }
 
-    public override WorkflowDefinition GetDefinition()
+    public override void BuildDefinition()
     {
-        var builder = new WorkflowDefinitionBuilder<ConditionallySendCustomerNotification>();
-
-        builder.AddTask(
+        _builder.AddTask(
             wf => wf.SendNotificationDecision,
             wf => new() { CaseValueParam = wf.WorkflowInput.ShouldSendNotification },
             ("YES", builder => builder.WithTask(c => c.SendNotificationSubworkflow, wf => new() { CustomerId = wf.WorkflowInput.CustomerId }))
         );
-
-        return builder.Build(opts => opts.Version = 1);
     }
 }

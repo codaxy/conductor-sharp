@@ -8,10 +8,30 @@ namespace ConductorSharp.Engine.Tests.Unit
 {
     public class TaskDefinitionBuilderTests
     {
+        private readonly IContainer _container;
+
+        public TaskDefinitionBuilderTests()
+        {
+            var _containerBuilder = new ContainerBuilder();
+
+            _containerBuilder
+                .AddConductorSharp("example.com", "api", false)
+                .AddExecutionManager(10, 100, 100)
+                .AddPipelines(pipelines =>
+                {
+                    pipelines.AddContextLogging();
+                    pipelines.AddRequestResponseLogging();
+                    pipelines.AddValidation();
+                });
+
+            _container = _containerBuilder.Build();
+        }
+
         [Fact]
         public void ReturnsCorrectDefinition()
         {
-            var definition = SerializationUtil.SerializeObject(TaskDefinitionBuilder.Build<GetCustomerHandler>(null));
+            var taskDefinitionBuilder = _container.Resolve<TaskDefinitionBuilder>();
+            var definition = SerializationUtil.SerializeObject(taskDefinitionBuilder.Build<GetCustomerHandler>(null));
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Tasks/CustomerGet.json");
 
             Assert.Equal(expectedDefinition, definition);

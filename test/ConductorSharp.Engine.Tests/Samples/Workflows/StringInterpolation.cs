@@ -1,5 +1,4 @@
-﻿using ConductorSharp.Engine.Builders.Configurable;
-using ConductorSharp.Engine.Util.Builders;
+﻿using ConductorSharp.Engine.Util.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;

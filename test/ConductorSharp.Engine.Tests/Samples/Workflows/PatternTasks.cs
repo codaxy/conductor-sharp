@@ -18,20 +18,18 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
         public int WaitTime { get; set; }
     }
 
-    public class PatternTasks : Workflow<PatternTasksInput, PatternTasksOutput>
+    public class PatternTasks : Workflow<PatternTasks, PatternTasksInput, PatternTasksOutput>
     {
+        public PatternTasks(WorkflowDefinitionBuilder<PatternTasks, PatternTasksInput, PatternTasksOutput> builder) : base(builder) { }
+
         public WaitSeconds WaitSeconds { get; set; }
         public ReadWorkflowTasks ReadWorkflowTasks { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<PatternTasks>();
+            _builder.AddTask(wf => wf.ReadWorkflowTasks, wf => new() { TaskNames = "task1,task2", WorkflowId = wf.WorkflowInput.WorkflowId });
 
-            builder.AddTask(wf => wf.ReadWorkflowTasks, wf => new() { TaskNames = "task1,task2", WorkflowId = wf.WorkflowInput.WorkflowId });
-
-            builder.AddTask(wf => wf.WaitSeconds, wf => new() { Seconds = wf.WorkflowInput.Seconds });
-
-            return builder.Build(opts => opts.Version = 1);
+            _builder.AddTask(wf => wf.WaitSeconds, wf => new() { Seconds = wf.WorkflowInput.Seconds });
         }
     }
 }
