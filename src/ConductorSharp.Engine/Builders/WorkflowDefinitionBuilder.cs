@@ -75,7 +75,7 @@ namespace ConductorSharp.Engine.Builders
             var ownerEmail = _workflowType.GetDocSection("ownerEmail");
             var labels = _workflowType.GetDocSection("labels");
 
-            BuildContext.WorkflowOptions.Version = 1;
+            BuildContext.WorkflowOptions.Version = _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? 1;
             BuildContext.Inputs = new();
 
             if (!string.IsNullOrEmpty(summary))

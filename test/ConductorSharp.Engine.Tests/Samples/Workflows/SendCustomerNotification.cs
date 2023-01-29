@@ -13,6 +13,7 @@ public class SendCustomerNotificationOutput : WorkflowOutput
     public dynamic EmailBody { get; set; }
 }
 #endregion
+[Version(3)]
 [OriginalName("NOTIFICATION_send_to_customer")]
 public class SendCustomerNotification : Workflow<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>
 {
