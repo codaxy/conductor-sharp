@@ -6,7 +6,7 @@
   "updatedBy": null,
   "name": "NOTIFICATION_send_to_customer",
   "description": "{\"description\":null,\"labels\":null}",
-  "version": 1,
+  "version": 3,
   "tasks": [
     {
       "queryExpression": null,

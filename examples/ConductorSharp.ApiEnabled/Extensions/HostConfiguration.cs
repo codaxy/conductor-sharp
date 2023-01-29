@@ -26,6 +26,7 @@ public static class HostConfiguration
                 .SetHealthCheckService<FileHealthService>()
                 .AddPipelines(pipelines =>
                 {
+                    pipelines.AddExecutionTaskTracking();
                     pipelines.AddContextLogging();
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();

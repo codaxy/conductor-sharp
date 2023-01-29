@@ -47,14 +47,8 @@ namespace ConductorSharp.Engine.Builders
                 Description = options.Description ?? DetermineDescription(taskType.GetDocSection("summary")),
                 RetryCount = options.RetryCount,
                 TimeoutSeconds = options.TimeoutSeconds,
-                InputKeys = inputType
-                    .GetProperties()
-                    .Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name))
-                    .ToList(),
-                OutputKeys = outputType
-                    .GetProperties()
-                    .Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name))
-                    .ToList(),
+                InputKeys = inputType.GetProperties().Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(a.Name)).ToList(),
+                OutputKeys = outputType.GetProperties().Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(a.Name)).ToList(),
                 TimeoutPolicy = options.TimeoutPolicy,
                 RetryLogic = options.RetryLogic,
                 RetryDelaySeconds = options.RetryDelaySeconds,
