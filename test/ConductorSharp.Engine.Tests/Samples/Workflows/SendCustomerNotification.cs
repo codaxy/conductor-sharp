@@ -13,24 +13,21 @@ public class SendCustomerNotificationOutput : WorkflowOutput
     public dynamic EmailBody { get; set; }
 }
 #endregion
+[Version(3)]
 [OriginalName("NOTIFICATION_send_to_customer")]
-public class SendCustomerNotification : Workflow<SendCustomerNotificationInput, SendCustomerNotificationOutput>
+public class SendCustomerNotification : Workflow<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>
 {
+    public SendCustomerNotification(
+        WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
+    ) : base(builder) { }
+
     public GetCustomerHandler GetCustomer { get; set; }
     public EmailPrepareV1 PrepareEmail { get; set; }
 
-    public override WorkflowDefinition GetDefinition()
+    public override void BuildDefinition()
     {
-        var builder = new WorkflowDefinitionBuilder<SendCustomerNotification>();
+        _builder.AddTask(a => a.GetCustomer, b => new() { CustomerId = b.WorkflowInput.CustomerId });
 
-        builder.AddTask(a => a.GetCustomer, b => new() { CustomerId = b.WorkflowInput.CustomerId });
-
-        builder.AddTask(a => a.PrepareEmail, b => new() { Address = b.GetCustomer.Output.Address, Name = b.GetCustomer.Output.Name });
-
-        return builder.Build(options =>
-        {
-            options.Version = 1;
-            options.OwnerEmail = "example@example.local";
-        });
+        _builder.AddTask(a => a.PrepareEmail, b => new() { Address = b.GetCustomer.Output.Address, Name = b.GetCustomer.Output.Name });
     }
 }

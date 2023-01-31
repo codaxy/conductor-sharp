@@ -5,11 +5,10 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
 using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -63,9 +62,22 @@ namespace ConductorSharp.Engine.Extensions
 
         public void AddContextLogging() => Builder.RegisterGeneric(typeof(ContextLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
+        public void AddExecutionTaskTracking() => Builder.RegisterGeneric(typeof(TaskExecutionTrackingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+
         public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
         {
             Builder.RegisterType<T>().As<IConductorSharpHealthService>().SingleInstance();
+            return this;
+        }
+
+        public IConductorSharpBuilder SetBuildConfiguration(BuildConfiguration buildConfiguration)
+        {
+            if (buildConfiguration is null)
+            {
+                throw new ArgumentNullException("Build configuration cannot be null");
+            }
+
+            Builder.RegisterInstance(buildConfiguration);
             return this;
         }
     }

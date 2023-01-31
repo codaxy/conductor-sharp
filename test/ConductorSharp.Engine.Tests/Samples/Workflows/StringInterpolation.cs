@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConductorSharp.Engine.Util.Builders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,15 +19,16 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     }
 
     [OriginalName("TEST_StringInterpolation")]
-    public class StringInterpolation : Workflow<StringInterpolationInput, StringInterpolationOutput>
+    public class StringInterpolation : Workflow<StringInterpolation, StringInterpolationInput, StringInterpolationOutput>
     {
+        public StringInterpolation(WorkflowDefinitionBuilder<StringInterpolation, StringInterpolationInput, StringInterpolationOutput> builder)
+            : base(builder) { }
+
         public EmailPrepareV1 EmailPrepare { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<StringInterpolation, StringInterpolationInput, StringInterpolationOutput>();
-
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.EmailPrepare,
                 wf =>
                     new()
@@ -36,9 +38,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     }
             );
 
-            builder.SetOutput(a => new() { EmailBody = a.EmailPrepare.Output.EmailBody });
-
-            return builder.Build(opts => opts.Version = 1);
+            _builder.SetOutput(a => new() { EmailBody = a.EmailPrepare.Output.EmailBody });
         }
     }
 }

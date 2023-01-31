@@ -15,17 +15,18 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     public class DecisionInDecisionOutput : WorkflowOutput { }
 
     [OriginalName("TEST_decision_in_decision")]
-    public class DecisionInDecision : Workflow<DecisionInDecisionInput, DecisionInDecisionOutput>
+    public class DecisionInDecision : Workflow<DecisionInDecision, DecisionInDecisionInput, DecisionInDecisionOutput>
     {
+        public DecisionInDecision(WorkflowDefinitionBuilder<DecisionInDecision, DecisionInDecisionInput, DecisionInDecisionOutput> builder)
+            : base(builder) { }
+
         public DecisionTaskModel SendNotificationDecision { get; set; }
         public DecisionTaskModel SecondSendNotificationDecision { get; set; }
         public SendCustomerNotification SendNotificationSubworkflow { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<DecisionInDecision>();
-
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.SendNotificationDecision,
                 wf => new() { CaseValueParam = wf.WorkflowInput.ShouldSendNotification },
                 (
@@ -42,8 +43,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                         )
                 )
             );
-
-            return builder.Build(opts => opts.Version = 1);
         }
     }
 }

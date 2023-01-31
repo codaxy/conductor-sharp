@@ -46,7 +46,7 @@
                   "startDelay": 0,
                   "subWorkflowParam": {
                     "name": "NOTIFICATION_send_to_customer",
-                    "version": 1
+                    "version": 3
                   },
                   "optional": false,
                   "rateLimited": false,

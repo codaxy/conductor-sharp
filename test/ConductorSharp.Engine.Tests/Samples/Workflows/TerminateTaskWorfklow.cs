@@ -10,19 +10,21 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class TerminateTaskWorfklowOutput : WorkflowOutput { }
 
-    public class TerminateTaskWorfklow : Workflow<TerminateTaskWorfklowInput, TerminateTaskWorfklowOutput>
+    public class TerminateTaskWorfklow : Workflow<TerminateTaskWorfklow, TerminateTaskWorfklowInput, TerminateTaskWorfklowOutput>
     {
+        public TerminateTaskWorfklow(
+            WorkflowDefinitionBuilder<TerminateTaskWorfklow, TerminateTaskWorfklowInput, TerminateTaskWorfklowOutput> builder
+        ) : base(builder) { }
+
         public DecisionTaskModel DecisionTask { get; set; }
         public SwitchTaskModel SwitchTask { get; set; }
         public TerminateTaskModel DecisionTerminate { get; set; }
         public TerminateTaskModel SwitchTerminate { get; set; }
         public TerminateTaskModel Terminate { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<TerminateTaskWorfklow>();
-
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.DecisionTask,
                 wf => new() { CaseValueParam = "value" },
                 (
@@ -35,7 +37,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 )
             );
 
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.SwitchTask,
                 wf => new() { SwitchCaseValue = "value" },
                 (
@@ -48,12 +50,10 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 )
             );
 
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.Terminate,
                 wf => new() { TerminationStatus = TerminationStatus.Failed, WorkflowOutput = new { Property = "Test" } }
             );
-
-            return builder.Build(options => options.Version = 1);
         }
     }
 }

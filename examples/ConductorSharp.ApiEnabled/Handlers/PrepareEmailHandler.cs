@@ -7,13 +7,13 @@ namespace ConductorSharp.ApiEnabled.Handlers;
 
 public class PrepareEmailRequest : IRequest<PrepareEmailResponse>
 {
-    public string? CustomerName { get; set; }
-    public string? Address { get; set; }
+    public string CustomerName { get; set; }
+    public string Address { get; set; }
 }
 
 public class PrepareEmailResponse
 {
-    public string? EmailBody { get; set; }
+    public string EmailBody { get; set; }
 }
 
 [OriginalName("EMAIL_prepare")]
@@ -28,7 +28,7 @@ public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, Prep
         _logger = logger;
     }
 
-    public Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
+    public async Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
     {
         var emailBodyBuilder = new StringBuilder();
 
@@ -43,6 +43,7 @@ public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, Prep
 
         _logger.LogInformation("Prepared email");
 
-        return Task.FromResult(new PrepareEmailResponse { EmailBody = emailBodyBuilder.ToString() });
+        await Task.Delay(10000, cancellationToken);
+        return new PrepareEmailResponse { EmailBody = emailBodyBuilder.ToString() };
     }
 }

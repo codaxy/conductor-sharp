@@ -3,13 +3,14 @@ using Autofac.Extensions.DependencyInjection;
 using ConductorSharp.Definitions;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
+using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Extensions;
 using MediatR.Extensions.Autofac.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-IConfiguration? configuration = null;
+IConfiguration configuration = null;
 
 var builder = Host.CreateDefaultBuilder()
     .ConfigureAppConfiguration(

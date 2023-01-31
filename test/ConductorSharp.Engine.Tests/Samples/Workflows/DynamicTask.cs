@@ -21,22 +21,22 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
         public string Name { get; set; }
     }
 
-    public class MandatoryDynamicInput
+    public class MandatoryDynamicInput : IRequest<ExpectedDynamicOutput>
     {
         public int Count { get; set; }
         public bool ShouldUseNext { get; set; }
     }
 
     [OriginalName("TEST_dynamic_task")]
-    public class DynamicTask : Workflow<DynamicTaskInput, DynamicTaskOutput>
+    public class DynamicTask : Workflow<DynamicTask, DynamicTaskInput, DynamicTaskOutput>
     {
+        public DynamicTask(WorkflowDefinitionBuilder<DynamicTask, DynamicTaskInput, DynamicTaskOutput> builder) : base(builder) { }
+
         public DynamicTaskModel<MandatoryDynamicInput, ExpectedDynamicOutput> DynamicHandler { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<DynamicTask>();
-
-            builder.AddTask(
+            _builder.AddTask(
                 a => a.DynamicHandler,
                 b =>
                     new()
@@ -45,8 +45,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                         TaskInput = new() { Count = b.WorkflowInput.Count, ShouldUseNext = b.WorkflowInput.ShouldUseNext }
                     }
             );
-
-            return builder.Build(opts => opts.Version = 1);
         }
     }
 }

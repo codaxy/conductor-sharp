@@ -3,6 +3,7 @@ using ConductorSharp.Definitions.Generated;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Tasks;
 using MediatR;
 
@@ -10,14 +11,14 @@ namespace ConductorSharp.Definitions.Workflows
 {
     public class SendCustomerNotificationInput : WorkflowInput<SendCustomerNotificationOutput>
     {
-        public int? CustomerId { get; set; }
-        public string? TaskToExecute { get; set; }
+        public int CustomerId { get; set; }
+        public string TaskToExecute { get; set; }
     }
 
     public class SendCustomerNotificationOutput : WorkflowOutput
     {
-        public dynamic? CustomerId { get; set; }
-        public dynamic? EmailBody { get; set; }
+        public dynamic CustomerId { get; set; }
+        public dynamic EmailBody { get; set; }
         public dynamic Constant { get; set; }
     }
 
@@ -26,18 +27,19 @@ namespace ConductorSharp.Definitions.Workflows
     public class ExpectedDynamicOutput : CustomerGetV1Output { }
 
     [OriginalName("NOTIFICATION_send_to_customer")]
-    public class SendCustomerNotification : Workflow<SendCustomerNotificationInput, SendCustomerNotificationOutput>
+    public class SendCustomerNotification : Workflow<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>
     {
-        public EmailPrepareV1? PrepareEmail { get; set; }
-        public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput>? DynamicHandler { get; set; }
-        public SendCustomerNotification? SendNotif { get; set; }
-        public WaitSeconds? WaitSeconds { get; set; }
+        public SendCustomerNotification(
+            WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
+        ) : base(builder) { }
 
-        public override WorkflowDefinition GetDefinition()
+        public EmailPrepareV1 PrepareEmail { get; set; }
+        public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput> DynamicHandler { get; set; }
+        public WaitSeconds WaitSeconds { get; set; }
+
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>();
-
-            builder.AddTask(
+            _builder.AddTask(
                 a => a.DynamicHandler,
                 b =>
                     new()
@@ -47,11 +49,11 @@ namespace ConductorSharp.Definitions.Workflows
                     }
             );
 
-            builder.AddTask(a => a.WaitSeconds, b => new() { Seconds = 10 });
+            _builder.AddTask(a => a.WaitSeconds, b => new() { Seconds = 10 });
 
-            builder.AddTask(a => a.PrepareEmail, b => new() { Address = b.DynamicHandler!.Output.Address, Name = b.DynamicHandler!.Output.Name });
+            _builder.AddTask(a => a.PrepareEmail, b => new() { Address = b.DynamicHandler!.Output.Address, Name = b.DynamicHandler!.Output.Name });
 
-            builder.SetOutput(
+            _builder.SetOutput(
                 a =>
                     new()
                     {
@@ -61,10 +63,10 @@ namespace ConductorSharp.Definitions.Workflows
                     }
             );
 
-            return builder.Build(options =>
+            _builder.SetOptions(options =>
             {
-                options.FailureWorkflow = typeof(HandleNotificationFailure);
                 options.Version = 1;
+                options.FailureWorkflow = typeof(HandleNotificationFailure);
                 options.OwnerEmail = "example@example.local";
             });
         }

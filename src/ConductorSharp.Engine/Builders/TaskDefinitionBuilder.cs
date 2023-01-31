@@ -2,6 +2,7 @@
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
@@ -10,9 +11,16 @@ namespace ConductorSharp.Engine.Builders
 {
     public class TaskDefinitionBuilder
     {
-        public static TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
+        public BuildConfiguration BuildConfiguration { get; set; }
 
-        public static TaskDefinition Build(Type taskType, Action<TaskDefinitionOptions> updateOptions = null)
+        public TaskDefinitionBuilder(BuildConfiguration buildConfiguration)
+        {
+            BuildConfiguration = buildConfiguration;
+        }
+
+        public TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
+
+        public TaskDefinition Build(Type taskType, Action<TaskDefinitionOptions> updateOptions = null)
         {
             var options = new TaskDefinitionOptions();
 
@@ -24,6 +32,7 @@ namespace ConductorSharp.Engine.Builders
                 .GetInterfaces()
                 .Where(a => a.IsGenericType && a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
                 .First();
+
             var genericArguments = interfaces.GetGenericArguments();
 
             var inputType = genericArguments[0];
@@ -33,19 +42,13 @@ namespace ConductorSharp.Engine.Builders
 
             return new TaskDefinition
             {
-                OwnerApp = options.OwnerApp,
+                OwnerApp = BuildConfiguration.DefaultOwnerApp ?? options.OwnerApp,
                 Name = originalName,
                 Description = options.Description ?? DetermineDescription(taskType.GetDocSection("summary")),
                 RetryCount = options.RetryCount,
                 TimeoutSeconds = options.TimeoutSeconds,
-                InputKeys = inputType
-                    .GetProperties()
-                    .Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name))
-                    .ToList(),
-                OutputKeys = outputType
-                    .GetProperties()
-                    .Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(a.Name))
-                    .ToList(),
+                InputKeys = inputType.GetProperties().Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(a.Name)).ToList(),
+                OutputKeys = outputType.GetProperties().Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(a.Name)).ToList(),
                 TimeoutPolicy = options.TimeoutPolicy,
                 RetryLogic = options.RetryLogic,
                 RetryDelaySeconds = options.RetryDelaySeconds,
@@ -62,7 +65,7 @@ namespace ConductorSharp.Engine.Builders
             };
         }
 
-        private static string DetermineDescription(string description, params string[] labels)
+        private string DetermineDescription(string description, params string[] labels)
         {
             var descriptionProperty = string.IsNullOrEmpty(description)
                 ? new JProperty("description", "Missing description")
