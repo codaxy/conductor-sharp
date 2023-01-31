@@ -1,6 +1,8 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using Autofac;
+using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,17 +12,20 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class LambdaTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, F, G>(
-            this WorkflowDefinitionBuilder<TWorkflow> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput, F, G>(
+            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
             Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence,
             Expression<Func<TWorkflow, F>> input,
             string script
         )
-            where TWorkflow : ITypedWorkflow
+            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
+            where TInput : WorkflowInput<TOutput>
+            where TOutput : WorkflowOutput
             where F : IRequest<G>
         {
-            var taskBuilder = new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body);
-            builder.Context.TaskBuilders.Add(taskBuilder);
+            var taskBuilder = new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body, builder.BuildConfiguration);
+
+            builder.BuildContext.TaskBuilders.Add(taskBuilder);
             return taskBuilder;
         }
     }
@@ -29,8 +34,8 @@ namespace ConductorSharp.Engine.Builders
     {
         private readonly string _script;
 
-        public LambdaTaskBuilder(string script, Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) =>
-            _script = script;
+        public LambdaTaskBuilder(string script, Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+            : base(taskExpression, inputExpression, buildConfiguration) => _script = script;
 
         public override WorkflowDefinition.Task[] Build()
         {

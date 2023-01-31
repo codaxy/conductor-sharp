@@ -10,16 +10,16 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class ArrayOutput : WorkflowOutput { }
 
-    public class Arrays : Workflow<ArrayInput, ArrayOutput>
+    public class Arrays : Workflow<Arrays, ArrayInput, ArrayOutput>
     {
+        public Arrays(WorkflowDefinitionBuilder<Arrays, ArrayInput, ArrayOutput> builder) : base(builder) { }
+
         public ArrayTask ArrayTask1 { get; set; }
         public ArrayTask ArrayTask2 { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<Arrays>();
-
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.ArrayTask1,
                 wf =>
                     new()
@@ -34,7 +34,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     }
             );
 
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.ArrayTask2,
                 wf =>
                     new()
@@ -44,8 +44,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                         Objects = new dynamic[] { }
                     }
             );
-
-            return builder.Build(opts => opts.Version = 1);
         }
     }
 }

@@ -2,6 +2,7 @@
 using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,14 +14,17 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class DecisionTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow>(
-            this WorkflowDefinitionBuilder<TWorkflow> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
+            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
             Expression<Func<TWorkflow, DecisionTaskInput>> expression,
             params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
+            where TInput : WorkflowInput<TOutput>
+            where TOutput : WorkflowOutput
         {
-            var taskBbuilder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
+            var taskBbuilder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body, builder.BuildConfiguration);
 
             foreach (var funcase in caseActions)
             {
@@ -28,7 +32,7 @@ namespace ConductorSharp.Engine.Builders
                 funcase.Item2.Invoke(taskBbuilder);
             }
 
-            builder.Context.TaskBuilders.Add(taskBbuilder);
+            builder.BuildContext.TaskBuilders.Add(taskBbuilder);
             return taskBbuilder;
         }
     }
@@ -38,8 +42,13 @@ namespace ConductorSharp.Engine.Builders
         private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
 
         private string _currentCaseName;
+        private readonly BuildConfiguration _buildConfiguration;
 
-        public DecisionTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }
+        public DecisionTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+            : base(taskExpression, inputExpression, buildConfiguration)
+        {
+            _buildConfiguration = buildConfiguration;
+        }
 
         public DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
         {
@@ -56,7 +65,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, F>> input
         ) where F : IRequest<G>
         {
-            var builder = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body);
+            var builder = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body, _buildConfiguration);
             _caseDictionary[_currentCaseName].Add(builder);
 
             return this;
@@ -68,7 +77,7 @@ namespace ConductorSharp.Engine.Builders
             string script
         ) where F : IRequest<G>
         {
-            var builder = new LambdaTaskBuilder<F, G>(script, taskSelector.Body, expression.Body);
+            var builder = new LambdaTaskBuilder<F, G>(script, taskSelector.Body, expression.Body, _buildConfiguration);
             _caseDictionary[_currentCaseName].Add(builder);
 
             return this;
@@ -79,7 +88,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, DynamicForkJoinInput>> expression
         )
         {
-            var builder = new DynamicForkJoinTaskBuilder(taskSelector.Body, expression.Body);
+            var builder = new DynamicForkJoinTaskBuilder(taskSelector.Body, expression.Body, _buildConfiguration);
             _caseDictionary[_currentCaseName].Add(builder);
 
             return this;
@@ -91,7 +100,7 @@ namespace ConductorSharp.Engine.Builders
             AdditionalTaskParameters additionalParameters = null
         ) where F : IRequest<G>
         {
-            var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body, additionalParameters);
+            var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body, additionalParameters, _buildConfiguration);
             _caseDictionary[_currentCaseName].Add(builder);
 
             return this;
@@ -102,7 +111,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, TerminateTaskInput>> expression
         )
         {
-            var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body);
+            var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body, _buildConfiguration);
             _caseDictionary[_currentCaseName].Add(builder);
 
             return this;
@@ -113,7 +122,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, DynamicTaskInput<F, G>>> expression
         ) where F : IRequest<G>
         {
-            var builder = new DynamicTaskBuilder<F, G>(taskSelector.Body, expression.Body);
+            var builder = new DynamicTaskBuilder<F, G>(taskSelector.Body, expression.Body, _buildConfiguration);
             _caseDictionary[_currentCaseName].Add(builder);
 
             return this;
@@ -125,7 +134,7 @@ namespace ConductorSharp.Engine.Builders
             params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
         )
         {
-            var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
+            var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body, _buildConfiguration);
 
             foreach (var funcase in caseActions)
             {
@@ -151,7 +160,7 @@ namespace ConductorSharp.Engine.Builders
                     InputParameters = _inputParameters,
                     Type = "DECISION",
                     CaseValueParam = "case_value_param",
-                    DecisionCases = new Newtonsoft.Json.Linq.JObject
+                    DecisionCases = new JObject
                     {
                         _caseDictionary.Select(
                             a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(a => a.Build()), ConductorConstants.DefinitionsSerializer))

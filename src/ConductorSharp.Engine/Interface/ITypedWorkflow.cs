@@ -1,4 +1,6 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using Autofac;
+using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Util.Builders;
 
 namespace ConductorSharp.Engine.Interface
 {

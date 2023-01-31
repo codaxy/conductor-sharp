@@ -11,18 +11,18 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class UntypedPropertyOutput : WorkflowOutput { }
 
-    public class UntypedProperty : Workflow<UntypedPropertyInput, UntypedPropertyOutput>
+    public class UntypedProperty : Workflow<UntypedProperty, UntypedPropertyInput, UntypedPropertyOutput>
     {
+        public UntypedProperty(WorkflowDefinitionBuilder<UntypedProperty, UntypedPropertyInput, UntypedPropertyOutput> builder) : base(builder) { }
+
         public CustomerGetV1 GetCustomer { get; set; }
         public PrepareEmailHandler PrepareEmail { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<UntypedProperty>();
+            _builder.AddTask(wf => wf.GetCustomer, wf => new() { CustomerId = 1 });
 
-            builder.AddTask(wf => wf.GetCustomer, wf => new() { CustomerId = 1 });
-
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.PrepareEmail,
                 wf =>
                     new PrepareEmailRequest()
@@ -31,12 +31,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                         Address = wf.GetCustomer.Output.AddressString
                     }
             );
-
-            return builder.Build(opts =>
-            {
-                opts.Version = 1;
-                opts.OwnerEmail = "test@test.com";
-            });
         }
     }
 }

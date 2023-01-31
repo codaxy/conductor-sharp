@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using System;
 using System.Linq.Expressions;
@@ -9,23 +10,26 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class JsonJqTransformTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, F, G>(
-            this WorkflowDefinitionBuilder<TWorkflow> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput, F, G>(
+            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
             Expression<Func<TWorkflow, JsonJqTransformTaskModel<F, G>>> refference,
             Expression<Func<TWorkflow, F>> input
         )
-            where TWorkflow : ITypedWorkflow
+            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
+            where TInput : WorkflowInput<TOutput>
+            where TOutput : WorkflowOutput
             where F : IRequest<G>
         {
-            var taskBuilder = new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body);
-            builder.Context.TaskBuilders.Add(taskBuilder);
+            var taskBuilder = new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body, builder.BuildConfiguration);
+            builder.BuildContext.TaskBuilders.Add(taskBuilder);
             return taskBuilder;
         }
     }
 
     public class JsonJqTransformTaskBuilder<A, B> : BaseTaskBuilder<A, B> where A : IRequest<B>
     {
-        public JsonJqTransformTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression)
+        public JsonJqTransformTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+            : base(taskExpression, inputExpression, buildConfiguration)
         {
             var queryExpressionValue = _inputParameters.GetValue("query_expression");
 

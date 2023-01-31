@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using ConductorSharp.Definitions.Workflows;
 using ConductorSharp.Engine.Extensions;
+using ConductorSharp.Engine.Util.Builders;
 
 namespace ConductorSharp.Definitions
 {

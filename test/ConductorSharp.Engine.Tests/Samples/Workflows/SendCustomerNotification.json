@@ -84,7 +84,7 @@
   "schemaVersion": 2,
   "restartable": true,
   "workflowStatusListenerEnabled": true,
-  "ownerEmail": "example@example.local",
+  "ownerEmail": null,
   "timeoutPolicy": null,
   "timeoutSeconds": 0,
   "variables": null

@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -11,21 +12,25 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class TerminateTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow>(
-            this WorkflowDefinitionBuilder<TWorkflow> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
+            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
             Expression<Func<TWorkflow, TerminateTaskModel>> reference,
             Expression<Func<TWorkflow, TerminateTaskInput>> input
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
+            where TInput : WorkflowInput<TOutput>
+            where TOutput : WorkflowOutput
         {
-            var taskBuilder = new TerminateTaskBuilder(reference.Body, input.Body);
-            builder.Context.TaskBuilders.Add(taskBuilder);
+            var taskBuilder = new TerminateTaskBuilder(reference.Body, input.Body, builder.BuildConfiguration);
+            builder.BuildContext.TaskBuilders.Add(taskBuilder);
             return taskBuilder;
         }
     }
 
     internal class TerminateTaskBuilder : BaseTaskBuilder<TerminateTaskInput, NoOutput>
     {
-        public TerminateTaskBuilder(Expression taskExpression, Expression memberExpression) : base(taskExpression, memberExpression) { }
+        public TerminateTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+            : base(taskExpression, inputExpression, buildConfiguration) { }
 
         public override WorkflowDefinition.Task[] Build() =>
             new[]

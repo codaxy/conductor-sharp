@@ -2,6 +2,7 @@
 using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,14 +14,17 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class SwitchTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow>(
-            this WorkflowDefinitionBuilder<TWorkflow> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
+            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
             Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
             Expression<Func<TWorkflow, SwitchTaskInput>> expression,
             params (string, Action<SwitchTaskBuilder<TWorkflow>>)[] caseActions
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
+            where TInput : WorkflowInput<TOutput>
+            where TOutput : WorkflowOutput
         {
-            var taskBuilder = new SwitchTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body);
+            var taskBuilder = new SwitchTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body, builder.BuildConfiguration);
 
             foreach (var funcase in caseActions)
             {
@@ -28,7 +32,7 @@ namespace ConductorSharp.Engine.Builders
                 funcase.Item2.Invoke(taskBuilder);
             }
 
-            builder.Context.TaskBuilders.Add(taskBuilder);
+            builder.BuildContext.TaskBuilders.Add(taskBuilder);
             return taskBuilder;
         }
     }
@@ -38,8 +42,13 @@ namespace ConductorSharp.Engine.Builders
         private Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = new();
 
         private string _currentCaseName;
+        private readonly BuildConfiguration _buildConfiguration;
 
-        public SwitchTaskBuilder(Expression taskExpression, Expression inputExpression) : base(taskExpression, inputExpression) { }
+        public SwitchTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+            : base(taskExpression, inputExpression, buildConfiguration)
+        {
+            _buildConfiguration = buildConfiguration;
+        }
 
         public SwitchTaskBuilder<TWorkflow> AddCase(string caseName)
         {
@@ -54,7 +63,7 @@ namespace ConductorSharp.Engine.Builders
             string script
         ) where F : IRequest<G>
         {
-            var builder = new LambdaTaskBuilder<F, G>(script, taskSelector.Body, expression.Body);
+            var builder = new LambdaTaskBuilder<F, G>(script, taskSelector.Body, expression.Body, _buildConfiguration);
 
             AddBuilder(builder);
 
@@ -66,7 +75,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, DynamicForkJoinInput>> expression
         )
         {
-            var builder = new DynamicForkJoinTaskBuilder(taskSelector.Body, expression.Body);
+            var builder = new DynamicForkJoinTaskBuilder(taskSelector.Body, expression.Body, _buildConfiguration);
 
             AddBuilder(builder);
 
@@ -79,7 +88,7 @@ namespace ConductorSharp.Engine.Builders
             AdditionalTaskParameters additionalParameters = null
         ) where F : IRequest<G>
         {
-            var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body, additionalParameters);
+            var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body, additionalParameters, _buildConfiguration);
 
             AddBuilder(builder);
 
@@ -91,7 +100,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, F>> expression
         ) where F : IRequest<G>
         {
-            var builder = new SubWorkflowTaskBuilder<F, G>(taskSelector.Body, expression.Body);
+            var builder = new SubWorkflowTaskBuilder<F, G>(taskSelector.Body, expression.Body, _buildConfiguration);
 
             AddBuilder(builder);
 
@@ -103,7 +112,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, TerminateTaskInput>> expression
         )
         {
-            var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body);
+            var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body, _buildConfiguration);
             AddBuilder(builder);
             return this;
         }
@@ -113,7 +122,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, DynamicTaskInput<F, G>>> expression
         ) where F : IRequest<G>
         {
-            var builder = new DynamicTaskBuilder<F, G>(taskSelector.Body, expression.Body);
+            var builder = new DynamicTaskBuilder<F, G>(taskSelector.Body, expression.Body, _buildConfiguration);
             AddBuilder(builder);
             return this;
         }
@@ -151,7 +160,7 @@ namespace ConductorSharp.Engine.Builders
                     Type = "SWITCH",
                     Expression = "switch_case_value",
                     EvaluatorType = "value-param",
-                    DecisionCases = new Newtonsoft.Json.Linq.JObject
+                    DecisionCases = new JObject
                     {
                         _caseDictionary.Select(
                             a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(b => b.Build()), ConductorConstants.DefinitionsSerializer))

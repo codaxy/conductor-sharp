@@ -42,20 +42,19 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     public class ScaffoldedWorkflowsOutput : WorkflowOutput { }
 
     [OriginalName("SCAFFOLDED_workflows")]
-    public class ScaffoldedWorkflows : Workflow<ScaffoldedWorkflowsInput, ScaffoldedWorkflowsOutput>
+    public class ScaffoldedWorkflows : Workflow<ScaffoldedWorkflows, ScaffoldedWorkflowsInput, ScaffoldedWorkflowsOutput>
     {
+        public ScaffoldedWorkflows(WorkflowDefinitionBuilder<ScaffoldedWorkflows, ScaffoldedWorkflowsInput, ScaffoldedWorkflowsOutput> builder)
+            : base(builder) { }
+
         public ScaffoldedOne ScaffOne { get; set; }
         public ScaffoldedTwo ScaffTwo { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<ScaffoldedWorkflows>();
+            _builder.AddTask(wf => wf.ScaffOne, wf => new() { InputOne = wf.WorkflowInput.CustomerId });
 
-            builder.AddTask(wf => wf.ScaffOne, wf => new() { InputOne = wf.WorkflowInput.CustomerId });
-
-            builder.AddTask(wf => wf.ScaffTwo, wf => new() { Name = wf.ScaffOne.Output.OutputOne });
-
-            return builder.Build(opts => opts.Version = 1);
+            _builder.AddTask(wf => wf.ScaffTwo, wf => new() { Name = wf.ScaffOne.Output.OutputOne });
         }
     }
 }

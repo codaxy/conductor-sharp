@@ -14,8 +14,10 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     public class StringAdditionOutput : WorkflowOutput { }
 
     [OriginalName("string_addition")]
-    public class StringAddition : Workflow<StringAdditionInput, StringAdditionOutput>
+    public class StringAddition : Workflow<StringAddition, StringAdditionInput, StringAdditionOutput>
     {
+        public StringAddition(WorkflowDefinitionBuilder<StringAddition, StringAdditionInput, StringAdditionOutput> builder) : base(builder) { }
+
         public class StringTaskOutput { }
 
         public class StringTaskInput : IRequest<StringTaskOutput>
@@ -25,11 +27,9 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public LambdaTaskModel<StringTaskInput, StringTaskOutput> StringTask { get; set; }
 
-        public override WorkflowDefinition GetDefinition()
+        public override void BuildDefinition()
         {
-            var builder = new WorkflowDefinitionBuilder<StringAddition>();
-
-            builder.AddTask(
+            _builder.AddTask(
                 wf => wf.StringTask,
                 wf =>
                     new()
@@ -45,11 +45,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     },
                 ""
             );
-
-            return builder.Build(opts =>
-            {
-                opts.Version = 1;
-            });
         }
     }
 }

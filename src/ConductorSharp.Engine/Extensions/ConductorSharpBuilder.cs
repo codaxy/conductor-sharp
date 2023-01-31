@@ -5,6 +5,7 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
 using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -68,6 +69,17 @@ namespace ConductorSharp.Engine.Extensions
         public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
         {
             Builder.RegisterType<T>().As<IConductorSharpHealthService>().SingleInstance();
+            return this;
+        }
+
+        public IConductorSharpBuilder SetBuildConfiguration(BuildConfiguration buildConfiguration)
+        {
+            if (buildConfiguration is null)
+            {
+                throw new ArgumentNullException("Build configuration cannot be null");
+            }
+
+            Builder.RegisterInstance(buildConfiguration);
             return this;
         }
     }
