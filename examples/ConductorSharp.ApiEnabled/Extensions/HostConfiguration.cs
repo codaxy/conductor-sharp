@@ -7,7 +7,7 @@ namespace ConductorSharp.ApiEnabled.Extensions;
 
 public static class HostConfiguration
 {
-    public static IHostBuilder ConfigureApiEnabled(this IHostBuilder hostBuilder, ConfigurationManager? configuration)
+    public static IHostBuilder ConfigureApiEnabled(this IHostBuilder hostBuilder, ConfigurationManager configuration)
     {
         return hostBuilder.ConfigureContainer<ContainerBuilder>(builder =>
         {
