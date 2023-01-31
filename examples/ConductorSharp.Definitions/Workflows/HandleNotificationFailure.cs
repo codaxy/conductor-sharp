@@ -14,7 +14,7 @@ namespace ConductorSharp.Definitions.Workflows
     public class HandleNotificationFailureInput : WorkflowInput<HandleNotificationFailureOutput>
     {
         [JsonProperty("workflowId")]
-        public string? WorkflowId { get; set; }
+        public string WorkflowId { get; set; }
     }
 
     public class HandleNotificationFailureOutput : WorkflowOutput { }
@@ -26,7 +26,7 @@ namespace ConductorSharp.Definitions.Workflows
             WorkflowDefinitionBuilder<HandleNotificationFailure, HandleNotificationFailureInput, HandleNotificationFailureOutput> builder
         ) : base(builder) { }
 
-        public ReadWorkflowTasks? ReadExecutedTasks { get; set; }
+        public ReadWorkflowTasks ReadExecutedTasks { get; set; }
 
         public override void BuildDefinition()
         {

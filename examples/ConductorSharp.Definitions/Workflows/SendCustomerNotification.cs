@@ -11,14 +11,14 @@ namespace ConductorSharp.Definitions.Workflows
 {
     public class SendCustomerNotificationInput : WorkflowInput<SendCustomerNotificationOutput>
     {
-        public int? CustomerId { get; set; }
-        public string? TaskToExecute { get; set; }
+        public int CustomerId { get; set; }
+        public string TaskToExecute { get; set; }
     }
 
     public class SendCustomerNotificationOutput : WorkflowOutput
     {
-        public dynamic? CustomerId { get; set; }
-        public dynamic? EmailBody { get; set; }
+        public dynamic CustomerId { get; set; }
+        public dynamic EmailBody { get; set; }
         public dynamic Constant { get; set; }
     }
 
@@ -33,9 +33,9 @@ namespace ConductorSharp.Definitions.Workflows
             WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
         ) : base(builder) { }
 
-        public EmailPrepareV1? PrepareEmail { get; set; }
-        public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput>? DynamicHandler { get; set; }
-        public WaitSeconds? WaitSeconds { get; set; }
+        public EmailPrepareV1 PrepareEmail { get; set; }
+        public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput> DynamicHandler { get; set; }
+        public WaitSeconds WaitSeconds { get; set; }
 
         public override void BuildDefinition()
         {
