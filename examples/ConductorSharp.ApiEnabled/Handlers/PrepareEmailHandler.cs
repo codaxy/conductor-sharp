@@ -7,13 +7,13 @@ namespace ConductorSharp.ApiEnabled.Handlers;
 
 public class PrepareEmailRequest : IRequest<PrepareEmailResponse>
 {
-    public string? CustomerName { get; set; }
-    public string? Address { get; set; }
+    public string CustomerName { get; set; }
+    public string Address { get; set; }
 }
 
 public class PrepareEmailResponse
 {
-    public string? EmailBody { get; set; }
+    public string EmailBody { get; set; }
 }
 
 [OriginalName("EMAIL_prepare")]

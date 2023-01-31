@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-IConfiguration? configuration = null;
+IConfiguration configuration = null;
 
 var builder = Host.CreateDefaultBuilder()
     .ConfigureAppConfiguration(
