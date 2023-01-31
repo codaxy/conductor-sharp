@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
