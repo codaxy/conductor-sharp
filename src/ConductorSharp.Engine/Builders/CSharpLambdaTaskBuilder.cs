@@ -32,7 +32,6 @@ namespace ConductorSharp.Engine.Builders
     {
         private readonly string _lambdaIdentifier;
         private readonly string _lambdaTaskPrefix;
-        private readonly string _workflowName;
 
         public CSharpLambdaTaskBuilder(
             Expression taskExpression,
@@ -43,7 +42,6 @@ namespace ConductorSharp.Engine.Builders
         {
             _lambdaIdentifier = $"{workflowName}.{_taskRefferenceName}";
             _lambdaTaskPrefix = buildConfiguration.LambdaTaskPrefix;
-            _workflowName = workflowName;
             if (_lambdaTaskPrefix == null)
                 throw new NotSupportedException("Can't use lambda tasks without LambdaTaskPrefix set");
         }
