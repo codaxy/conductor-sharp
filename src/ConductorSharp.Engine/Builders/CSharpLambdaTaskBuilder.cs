@@ -61,7 +61,8 @@ namespace ConductorSharp.Engine.Builders
                         new JProperty(CSharpLambdaTaskInput.LambdaIdenfitierParamName, _lambdaIdentifier),
                         new JProperty(CSharpLambdaTaskInput.TaskInputParamName, _inputParameters)
                     },
-                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None)
+                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
+                    Optional = _additionalParameters.Optional
                 }
             };
         }
