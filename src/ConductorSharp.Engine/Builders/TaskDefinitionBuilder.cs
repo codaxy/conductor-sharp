@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Handlers;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
@@ -38,7 +39,7 @@ namespace ConductorSharp.Engine.Builders
             var inputType = genericArguments[0];
             var outputType = genericArguments[1];
 
-            var originalName = NamingUtil.DetermineRegistrationName(taskType);
+            var originalName = DetermineRegistrationName(taskType);
 
             return new TaskDefinition
             {
@@ -64,6 +65,11 @@ namespace ConductorSharp.Engine.Builders
                 ExecutionNameSpace = options.ExecutionNameSpace,
             };
         }
+
+        private string DetermineRegistrationName(Type taskType) =>
+            taskType == typeof(CSharpLambdaTaskHandler)
+                ? $"{BuildConfiguration.LambdaTaskPrefix}.{NamingUtil.DetermineRegistrationName(taskType)}"
+                : NamingUtil.DetermineRegistrationName(taskType);
 
         private string DetermineDescription(string description, params string[] labels)
         {
