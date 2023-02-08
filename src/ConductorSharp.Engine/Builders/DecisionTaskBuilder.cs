@@ -1,7 +1,9 @@
 ﻿using ConductorSharp.Client;
 using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Handlers;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
@@ -24,7 +26,14 @@ namespace ConductorSharp.Engine.Builders
             where TInput : WorkflowInput<TOutput>
             where TOutput : WorkflowOutput
         {
-            var taskBbuilder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body, builder.BuildConfiguration);
+            var taskBbuilder = new DecisionTaskBuilder<TWorkflow>(
+                taskSelector.Body,
+                expression.Body,
+                builder.BuildConfiguration,
+                builder.BuildContext,
+                builder.WorkflowBuildRegistry,
+                builder.ConfigurationProperties
+            );
 
             foreach (var funcase in caseActions)
             {
@@ -37,17 +46,29 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput> where TWorkflow : ITypedWorkflow
+    public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput> where TWorkflow : IConfigurableWorkflow
     {
         private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
 
         private string _currentCaseName;
         private readonly BuildConfiguration _buildConfiguration;
+        private readonly BuildContext _buildContext;
+        private readonly WorkflowBuildItemRegistry _workflowBuildItemRegistry;
+        private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
 
-        public DecisionTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration)
+        public DecisionTaskBuilder(
+            Expression taskExpression,
+            Expression inputExpression,
+            BuildConfiguration buildConfiguration,
+            BuildContext buildContext,
+            WorkflowBuildItemRegistry buildItemRegistry,
+            IEnumerable<ConfigurationProperty> configurationProperties
+        ) : base(taskExpression, inputExpression, buildConfiguration)
         {
             _buildConfiguration = buildConfiguration;
+            _buildContext = buildContext;
+            _workflowBuildItemRegistry = buildItemRegistry;
+            _configurationProperties = configurationProperties;
         }
 
         public DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
@@ -134,7 +155,14 @@ namespace ConductorSharp.Engine.Builders
             params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
         )
         {
-            var builder = new DecisionTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body, _buildConfiguration);
+            var builder = new DecisionTaskBuilder<TWorkflow>(
+                taskSelector.Body,
+                expression.Body,
+                _buildConfiguration,
+                _buildContext,
+                _workflowBuildItemRegistry,
+                _configurationProperties
+            );
 
             foreach (var funcase in caseActions)
             {
@@ -144,6 +172,29 @@ namespace ConductorSharp.Engine.Builders
 
             _caseDictionary[_currentCaseName].Add(builder);
 
+            return this;
+        }
+
+        public DecisionTaskBuilder<TWorkflow> WithTask<TInput, TOutput>(
+            Expression<Func<TWorkflow, CSharpLambdaTaskModel<TInput, TOutput>>> task,
+            Expression<Func<TWorkflow, TInput>> input,
+            Func<TInput, TOutput> lambda
+        ) where TInput : IRequest<TOutput>
+        {
+            // TODO: Same logic already contained in corresponding AddTask, find solution to avoid duplication
+            var lambdaTaskNamePrefix = (string)
+                _configurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
+            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
+                task,
+                input,
+                _buildConfiguration,
+                _buildContext.WorkflowName,
+                lambdaTaskNamePrefix
+            );
+            _workflowBuildItemRegistry.Register<TWorkflow>(
+                taskBuilder.LambdaIdentifer,
+                new CSharpLambdaHandler(taskBuilder.LambdaIdentifer, typeof(TInput), lambda)
+            );
             return this;
         }
 
