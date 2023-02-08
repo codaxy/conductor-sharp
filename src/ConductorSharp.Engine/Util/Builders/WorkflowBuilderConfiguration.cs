@@ -6,7 +6,7 @@ namespace ConductorSharp.Engine.Util.Builders
 {
     public class WorkflowBuilderConfiguration
     {
-        internal WorkflowBuilderConfiguration(BuildConfiguration buildConfiguration, IEnumerable<ConfigurationProperty> configurationProperties)
+        public WorkflowBuilderConfiguration(BuildConfiguration buildConfiguration, IEnumerable<ConfigurationProperty> configurationProperties)
         {
             BuildConfiguration = buildConfiguration;
             ConfigurationProperties = configurationProperties;
