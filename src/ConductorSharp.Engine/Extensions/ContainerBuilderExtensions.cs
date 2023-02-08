@@ -39,6 +39,7 @@ namespace ConductorSharp.Engine.Extensions
             builder.RegisterType<WorkflowService>().As<IWorkflowService>();
 
             builder.RegisterInstance(new BuildConfiguration());
+            builder.RegisterType<WorkflowBuilderConfiguration>();
 
             builder.RegisterType<WorkflowBuildItemRegistry>().SingleInstance();
 
