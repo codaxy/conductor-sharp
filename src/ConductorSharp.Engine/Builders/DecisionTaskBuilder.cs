@@ -30,7 +30,6 @@ namespace ConductorSharp.Engine.Builders
                 taskSelector.Body,
                 expression.Body,
                 builder.BuildConfiguration,
-                builder.BuildContext,
                 builder.WorkflowBuildRegistry,
                 builder.ConfigurationProperties
             );
@@ -52,7 +51,6 @@ namespace ConductorSharp.Engine.Builders
 
         private string _currentCaseName;
         private readonly BuildConfiguration _buildConfiguration;
-        private readonly BuildContext _buildContext;
         private readonly WorkflowBuildItemRegistry _workflowBuildItemRegistry;
         private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
 
@@ -60,13 +58,11 @@ namespace ConductorSharp.Engine.Builders
             Expression taskExpression,
             Expression inputExpression,
             BuildConfiguration buildConfiguration,
-            BuildContext buildContext,
             WorkflowBuildItemRegistry buildItemRegistry,
             IEnumerable<ConfigurationProperty> configurationProperties
         ) : base(taskExpression, inputExpression, buildConfiguration)
         {
             _buildConfiguration = buildConfiguration;
-            _buildContext = buildContext;
             _workflowBuildItemRegistry = buildItemRegistry;
             _configurationProperties = configurationProperties;
         }
@@ -159,7 +155,6 @@ namespace ConductorSharp.Engine.Builders
                 taskSelector.Body,
                 expression.Body,
                 _buildConfiguration,
-                _buildContext,
                 _workflowBuildItemRegistry,
                 _configurationProperties
             );
@@ -184,13 +179,7 @@ namespace ConductorSharp.Engine.Builders
             // TODO: Same logic already contained in corresponding AddTask, find solution to avoid duplication
             var lambdaTaskNamePrefix = (string)
                 _configurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
-            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
-                task,
-                input,
-                _buildConfiguration,
-                _buildContext.WorkflowName,
-                lambdaTaskNamePrefix
-            );
+            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(task, input, _buildConfiguration, lambdaTaskNamePrefix);
             _workflowBuildItemRegistry.Register<TWorkflow>(
                 taskBuilder.LambdaIdentifer,
                 new CSharpLambdaHandler(taskBuilder.LambdaIdentifer, typeof(TInput), lambda)
