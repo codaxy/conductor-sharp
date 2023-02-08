@@ -88,7 +88,9 @@ namespace ConductorSharp.Engine.Extensions
         public IExecutionManagerBuilder AddCSharpLambdaTasks(string csharpLambdaTaskNamePrefix = "")
         {
             Builder.RegisterWorkerTask<CSharpLambdaTaskHandler>();
-            Builder.RegisterInstance(new ConfigurationProperty(CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty, csharpLambdaTaskNamePrefix))
+            Builder.RegisterInstance(
+                new ConfigurationProperty(CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty, csharpLambdaTaskNamePrefix)
+            );
             return this;
         }
     }
