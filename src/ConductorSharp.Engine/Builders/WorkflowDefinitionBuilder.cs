@@ -6,6 +6,7 @@ using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
@@ -38,22 +39,23 @@ namespace ConductorSharp.Engine.Builders
         where TOutput : WorkflowOutput
     {
         private readonly Type _workflowType = typeof(TWorkflow);
-        private string _name;
 
         public BuildContext BuildContext { get; } = new();
         public BuildConfiguration BuildConfiguration { get; set; }
         public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
+        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; }
 
-        public WorkflowDefinitionBuilder(BuildConfiguration buildConfiguration, WorkflowBuildItemRegistry workflowBuildRegistry)
+        public WorkflowDefinitionBuilder(WorkflowBuilderConfiguration configuration, WorkflowBuildItemRegistry workflowBuildRegistry)
         {
-            BuildConfiguration = buildConfiguration;
+            BuildConfiguration = configuration.BuildConfiguration;
             WorkflowBuildRegistry = workflowBuildRegistry;
+            ConfigurationProperties = configuration.ConfigurationProperties;
         }
 
         public WorkflowDefinition Build()
         {
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
-            _name = NamingUtil.DetermineRegistrationName(_workflowType);
+            BuildContext.WorkflowName = NamingUtil.DetermineRegistrationName(_workflowType);
 
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
@@ -67,7 +69,7 @@ namespace ConductorSharp.Engine.Builders
 
             if (!string.IsNullOrEmpty(BuildConfiguration.WorkflowPrefix))
             {
-                _name = $"{BuildConfiguration.WorkflowPrefix}{_name}";
+                BuildContext.WorkflowName = $"{BuildConfiguration.WorkflowPrefix}{BuildContext.WorkflowName}";
             }
 
             var summary = _workflowType.GetDocSection("summary");
@@ -111,7 +113,7 @@ namespace ConductorSharp.Engine.Builders
 
             return new WorkflowDefinition
             {
-                Name = _name,
+                Name = BuildContext.WorkflowName,
                 Tasks = BuildContext.TaskBuilders.SelectMany(a => a.Build()).ToList(),
                 FailureWorkflow =
                     BuildContext.WorkflowOptions.FailureWorkflow != null
