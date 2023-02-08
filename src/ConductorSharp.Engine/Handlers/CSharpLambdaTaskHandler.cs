@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Exceptions;
+﻿using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using MediatR;
@@ -34,13 +35,13 @@ namespace ConductorSharp.Engine.Handlers
         public const string TaskName = "CONDUCTOR_SHARP_inline_lambda_task";
         public const string LambdaTaskNameConfigurationProperty = nameof(LambdaTaskNameConfigurationProperty);
 
-        private readonly IEnumerable<CSharpLambdaHandler> _handlers;
+        private readonly WorkflowBuildItemRegistry _itemRegistry;
 
-        public CSharpLambdaTaskHandler(IEnumerable<CSharpLambdaHandler> handlers) => _handlers = handlers;
+        public CSharpLambdaTaskHandler(WorkflowBuildItemRegistry itemRegistry) => _itemRegistry = itemRegistry;
 
         public Task<object> Handle(CSharpLambdaTaskInput request, CancellationToken cancellationToken)
         {
-            var lambda = _handlers.FirstOrDefault(lambda => lambda.LambdaIdentifier == request.LambdaIdentifier);
+            var lambda = _itemRegistry.GetAll<CSharpLambdaHandler>().FirstOrDefault(lambda => lambda.LambdaIdentifier == request.LambdaIdentifier);
             if (lambda == null)
                 throw new NoLambdaException(request.LambdaIdentifier);
 
