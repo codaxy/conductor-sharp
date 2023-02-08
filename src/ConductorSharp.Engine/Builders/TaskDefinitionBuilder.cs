@@ -6,6 +6,7 @@ using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ConductorSharp.Engine.Builders
@@ -13,10 +14,12 @@ namespace ConductorSharp.Engine.Builders
     public class TaskDefinitionBuilder
     {
         public BuildConfiguration BuildConfiguration { get; set; }
+        private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
 
-        public TaskDefinitionBuilder(BuildConfiguration buildConfiguration)
+        public TaskDefinitionBuilder(BuildConfiguration buildConfiguration, IEnumerable<ConfigurationProperty> configurationProperties)
         {
             BuildConfiguration = buildConfiguration;
+            _configurationProperties = configurationProperties;
         }
 
         public TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
@@ -69,7 +72,7 @@ namespace ConductorSharp.Engine.Builders
         private string DetermineRegistrationName(Type taskType) =>
             // TODO: Implement some kind of naming provider for this once we move it to the Patterns project
             taskType == typeof(CSharpLambdaTaskHandler)
-                ? $"{BuildConfiguration.LambdaTaskPrefix}.{NamingUtil.DetermineRegistrationName(taskType)}"
+                ? $"{GetLambdaTaskPrefix()}.{NamingUtil.DetermineRegistrationName(taskType)}"
                 : NamingUtil.DetermineRegistrationName(taskType);
 
         private string DetermineDescription(string description, params string[] labels)
@@ -81,5 +84,8 @@ namespace ConductorSharp.Engine.Builders
             var descriptionObject = new JObject(descriptionProperty);
             return descriptionObject.ToString(Newtonsoft.Json.Formatting.None);
         }
+
+        private string GetLambdaTaskPrefix() =>
+            (string)_configurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
     }
 }
