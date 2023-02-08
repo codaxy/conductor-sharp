@@ -32,6 +32,7 @@ namespace ConductorSharp.Engine.Handlers
     internal class CSharpLambdaTaskHandler : ITaskRequestHandler<CSharpLambdaTaskInput, object>
     {
         public const string TaskName = "CONDUCTOR_SHARP_inline_lambda_task";
+        public const string LambdaTaskNameConfigurationProperty = nameof(LambdaTaskNameConfigurationProperty);
 
         private readonly IEnumerable<CSharpLambdaHandler> _handlers;
 
