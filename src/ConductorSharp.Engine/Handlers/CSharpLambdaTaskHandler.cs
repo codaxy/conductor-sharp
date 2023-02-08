@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Builders;
+﻿using ConductorSharp.Client;
+using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
@@ -45,7 +46,9 @@ namespace ConductorSharp.Engine.Handlers
             if (lambda == null)
                 throw new NoLambdaException(request.LambdaIdentifier);
 
-            return Task.FromResult(lambda.Handler.DynamicInvoke(request.TaskInput.ToObject(lambda.TaskInputType)));
+            return Task.FromResult(
+                lambda.Handler.DynamicInvoke(request.TaskInput.ToObject(lambda.TaskInputType, ConductorConstants.IoJsonSerializer))
+            );
         }
     }
 }
