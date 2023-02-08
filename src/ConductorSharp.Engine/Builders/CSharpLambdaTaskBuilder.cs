@@ -1,12 +1,15 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Handlers;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -16,34 +19,43 @@ namespace ConductorSharp.Engine.Builders
     {
         public static ITaskOptionsBuilder AddTask<TWorkflow, TWorkflowInput, TWorkflowOutput, TInput, TOutput>(
             this WorkflowDefinitionBuilder<TWorkflow, TWorkflowInput, TWorkflowOutput> builder,
-            CSharpLambdaTaskModel<TInput, TOutput> reference
+            Expression<Func<TWorkflow, CSharpLambdaTaskModel<TInput, TOutput>>> task,
+            Expression<Func<TWorkflow, TInput>> input
         )
             where TWorkflow : Workflow<TWorkflow, TWorkflowInput, TWorkflowOutput>
             where TWorkflowInput : WorkflowInput<TWorkflowOutput>
             where TWorkflowOutput : WorkflowOutput
             where TInput : IRequest<TOutput>
         {
-            //builder.BuildContext.TaskBuilders.Add(new CSharpLambdaTaskBuilder());
-            return null;
+            var lambdaTaskNamePrefix = (string)
+                builder.ConfigurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
+            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
+                task.Body,
+                input.Body,
+                builder.BuildConfiguration,
+                builder.BuildContext.WorkflowName,
+                lambdaTaskNamePrefix
+            );
+            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            return taskBuilder;
         }
     }
 
     internal class CSharpLambdaTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput> where TInput : IRequest<TOutput>
     {
         private readonly string _lambdaIdentifier;
-        private readonly string _lambdaTaskPrefix;
+        private readonly string _lambdaTaskNamePrefix;
 
         public CSharpLambdaTaskBuilder(
             Expression taskExpression,
             Expression memberExpression,
             BuildConfiguration buildConfiguration,
-            string workflowName
+            string workflowName,
+            string lambdaTaskNamePrefix
         ) : base(taskExpression, memberExpression, buildConfiguration)
         {
             _lambdaIdentifier = $"{workflowName}.{_taskRefferenceName}";
-            _lambdaTaskPrefix = buildConfiguration.LambdaTaskPrefix;
-            if (_lambdaTaskPrefix == null)
-                throw new NotSupportedException("Can't use lambda tasks without LambdaTaskPrefix set");
+            _lambdaTaskNamePrefix = lambdaTaskNamePrefix;
         }
 
         public override WorkflowDefinition.Task[] Build()
@@ -52,7 +64,7 @@ namespace ConductorSharp.Engine.Builders
             {
                 new WorkflowDefinition.Task
                 {
-                    Name = $"{_lambdaTaskPrefix}.{_taskName}",
+                    Name = $"{_lambdaTaskNamePrefix}.{CSharpLambdaTaskHandler.TaskName}",
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = new JObject
                     {
