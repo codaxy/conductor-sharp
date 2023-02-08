@@ -46,11 +46,15 @@ namespace ConductorSharp.Engine.Builders
         public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
         public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; }
 
-        public WorkflowDefinitionBuilder(WorkflowBuilderConfiguration configuration, WorkflowBuildItemRegistry workflowBuildRegistry)
+        public WorkflowDefinitionBuilder(
+            BuildConfiguration buildConfiguration,
+            IEnumerable<ConfigurationProperty> configurationProperties,
+            WorkflowBuildItemRegistry workflowBuildRegistry
+        )
         {
-            BuildConfiguration = configuration.BuildConfiguration;
+            BuildConfiguration = buildConfiguration;
             WorkflowBuildRegistry = workflowBuildRegistry;
-            ConfigurationProperties = configuration.ConfigurationProperties;
+            ConfigurationProperties = configurationProperties;
         }
 
         public WorkflowDefinition Build()
