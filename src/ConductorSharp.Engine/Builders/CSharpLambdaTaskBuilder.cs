@@ -20,7 +20,8 @@ namespace ConductorSharp.Engine.Builders
         public static ITaskOptionsBuilder AddTask<TWorkflow, TWorkflowInput, TWorkflowOutput, TInput, TOutput>(
             this WorkflowDefinitionBuilder<TWorkflow, TWorkflowInput, TWorkflowOutput> builder,
             Expression<Func<TWorkflow, CSharpLambdaTaskModel<TInput, TOutput>>> task,
-            Expression<Func<TWorkflow, TInput>> input
+            Expression<Func<TWorkflow, TInput>> input,
+            Func<TInput, TOutput> lambda
         )
             where TWorkflow : Workflow<TWorkflow, TWorkflowInput, TWorkflowOutput>
             where TWorkflowInput : WorkflowInput<TWorkflowOutput>
@@ -36,6 +37,10 @@ namespace ConductorSharp.Engine.Builders
                 builder.BuildContext.WorkflowName,
                 lambdaTaskNamePrefix
             );
+            builder.WorkflowBuildRegistry.Register<TWorkflow>(
+                taskBuilder.LambdaIdentifer,
+                new CSharpLambdaHandler(taskBuilder.LambdaIdentifer, typeof(TInput), lambda)
+            );
             builder.BuildContext.TaskBuilders.Add(taskBuilder);
             return taskBuilder;
         }
@@ -43,7 +48,8 @@ namespace ConductorSharp.Engine.Builders
 
     internal class CSharpLambdaTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput> where TInput : IRequest<TOutput>
     {
-        private readonly string _lambdaIdentifier;
+        public string LambdaIdentifer { get; }
+
         private readonly string _lambdaTaskNamePrefix;
 
         public CSharpLambdaTaskBuilder(
@@ -54,7 +60,7 @@ namespace ConductorSharp.Engine.Builders
             string lambdaTaskNamePrefix
         ) : base(taskExpression, memberExpression, buildConfiguration)
         {
-            _lambdaIdentifier = $"{workflowName}.{_taskRefferenceName}";
+            LambdaIdentifer = $"{workflowName}.{_taskRefferenceName}";
             _lambdaTaskNamePrefix = lambdaTaskNamePrefix;
         }
 
@@ -68,7 +74,7 @@ namespace ConductorSharp.Engine.Builders
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = new JObject
                     {
-                        new JProperty(CSharpLambdaTaskInput.LambdaIdenfitierParamName, _lambdaIdentifier),
+                        new JProperty(CSharpLambdaTaskInput.LambdaIdenfitierParamName, LambdaIdentifer),
                         new JProperty(CSharpLambdaTaskInput.TaskInputParamName, _inputParameters)
                     },
                     Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
