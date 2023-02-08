@@ -179,11 +179,13 @@ namespace ConductorSharp.Engine.Builders
             // TODO: Same logic already contained in corresponding AddTask, find solution to avoid duplication
             var lambdaTaskNamePrefix = (string)
                 _configurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
-            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(task, input, _buildConfiguration, lambdaTaskNamePrefix);
+            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(task.Body, input.Body, _buildConfiguration, lambdaTaskNamePrefix);
             _workflowBuildItemRegistry.Register<TWorkflow>(
                 taskBuilder.LambdaIdentifer,
                 new CSharpLambdaHandler(taskBuilder.LambdaIdentifer, typeof(TInput), lambda)
             );
+
+            _caseDictionary[_currentCaseName].Add(taskBuilder);
             return this;
         }
 
