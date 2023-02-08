@@ -67,6 +67,7 @@ namespace ConductorSharp.Engine.Builders
         }
 
         private string DetermineRegistrationName(Type taskType) =>
+            // TODO: Implement some kind of naming provider for this once we move it to the Patterns project
             taskType == typeof(CSharpLambdaTaskHandler)
                 ? $"{BuildConfiguration.LambdaTaskPrefix}.{NamingUtil.DetermineRegistrationName(taskType)}"
                 : NamingUtil.DetermineRegistrationName(taskType);
