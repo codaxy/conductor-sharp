@@ -14,7 +14,7 @@
       "taskReferenceName": "first_lambda_task",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "lambda_identifier": "0.first_lambda_task",
+        "lambda_identifier": "c_sharp_lambda_workflow.first_lambda_task",
         "task_input": {
           "lambda_input": "${workflow.input.input}"
         }
@@ -66,7 +66,7 @@
             "taskReferenceName": "second_lambda_task",
             "description": "{\"description\":null}",
             "inputParameters": {
-              "lambda_identifier": "1.second_lambda_task",
+              "lambda_identifier": "c_sharp_lambda_workflow.second_lambda_task",
               "task_input": {
                 "lambda_input": "${workflow.input.input}"
               }
@@ -84,7 +84,7 @@
             "taskReferenceName": "third_lambda_task",
             "description": "{\"description\":null}",
             "inputParameters": {
-              "lambda_identifier": "2.third_lambda_task",
+              "lambda_identifier": "c_sharp_lambda_workflow.third_lambda_task",
               "task_input": {
                 "lambda_input": "${workflow.input.input}"
               }
