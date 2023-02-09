@@ -14,7 +14,7 @@
       "taskReferenceName": "first_lambda_task",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "lambda_identifier": "de74b877-ce11-471b-8bc5-17c0a4a8d1f9.first_lambda_task",
+        "lambda_identifier": "0.first_lambda_task",
         "task_input": {
           "lambda_input": "${workflow.input.input}"
         }
@@ -66,7 +66,7 @@
             "taskReferenceName": "second_lambda_task",
             "description": "{\"description\":null}",
             "inputParameters": {
-              "lambda_identifier": "9d7fd648-cb57-4f88-a633-d3a9f26e1b4e.second_lambda_task",
+              "lambda_identifier": "1.second_lambda_task",
               "task_input": {
                 "lambda_input": "${workflow.input.input}"
               }
@@ -84,7 +84,7 @@
             "taskReferenceName": "third_lambda_task",
             "description": "{\"description\":null}",
             "inputParameters": {
-              "lambda_identifier": "07805788-fd4e-4c2d-89e8-24c0363492ec.third_lambda_task",
+              "lambda_identifier": "2.third_lambda_task",
               "task_input": {
                 "lambda_input": "${workflow.input.input}"
               }
