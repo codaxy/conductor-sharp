@@ -30,13 +30,7 @@ namespace ConductorSharp.Engine.Builders
         {
             var lambdaTaskNamePrefix = (string)
                 builder.ConfigurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
-            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
-                task.Body,
-                input.Body,
-                builder.BuildConfiguration,
-                lambdaTaskNamePrefix,
-                builder.BuildContext
-            );
+            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(task.Body, input.Body, builder.BuildConfiguration, lambdaTaskNamePrefix);
             builder.WorkflowBuildRegistry.Register<TWorkflow>(
                 taskBuilder.LambdaIdentifer,
                 new CSharpLambdaHandler(taskBuilder.LambdaIdentifer, typeof(TInput), lambda)
@@ -58,13 +52,10 @@ namespace ConductorSharp.Engine.Builders
             Expression taskExpression,
             Expression memberExpression,
             BuildConfiguration buildConfiguration,
-            string lambdaTaskNamePrefix,
-            BuildContext buildContext
+            string lambdaTaskNamePrefix
         ) : base(taskExpression, memberExpression, buildConfiguration)
         {
-            var id = buildContext.Storage.GetOrDefault(LambdaIdStorageKey, 0);
-            LambdaIdentifer = $"{id}.{_taskRefferenceName}";
-            buildContext.Storage.Set(LambdaIdStorageKey, id + 1);
+            LambdaIdentifer = $"{0}.{_taskRefferenceName}";
             _lambdaTaskNamePrefix = lambdaTaskNamePrefix;
         }
 
