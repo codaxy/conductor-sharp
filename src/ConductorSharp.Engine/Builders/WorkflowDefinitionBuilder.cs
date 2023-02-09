@@ -55,12 +55,21 @@ namespace ConductorSharp.Engine.Builders
             BuildConfiguration = buildConfiguration;
             WorkflowBuildRegistry = workflowBuildRegistry;
             ConfigurationProperties = configurationProperties;
+            GenerateWorkflowName();
+        }
+
+        private void GenerateWorkflowName()
+        {
+            BuildContext.WorkflowName = NamingUtil.DetermineRegistrationName(_workflowType);
+            if (!string.IsNullOrEmpty(BuildConfiguration.WorkflowPrefix))
+            {
+                BuildContext.WorkflowName = $"{BuildConfiguration.WorkflowPrefix}{BuildContext.WorkflowName}";
+            }
         }
 
         public WorkflowDefinition Build()
         {
             XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
-            _name = NamingUtil.DetermineRegistrationName(_workflowType);
 
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
@@ -70,11 +79,6 @@ namespace ConductorSharp.Engine.Builders
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerEmail))
             {
                 BuildContext.WorkflowOptions.OwnerEmail = BuildConfiguration.DefaultOwnerEmail;
-            }
-
-            if (!string.IsNullOrEmpty(BuildConfiguration.WorkflowPrefix))
-            {
-                _name = $"{BuildConfiguration.WorkflowPrefix}{_name}";
             }
 
             var summary = _workflowType.GetDocSection("summary");
@@ -118,7 +122,7 @@ namespace ConductorSharp.Engine.Builders
 
             return new WorkflowDefinition
             {
-                Name = _name,
+                Name = BuildContext.WorkflowName,
                 Tasks = BuildContext.TaskBuilders.SelectMany(a => a.Build()).ToList(),
                 FailureWorkflow =
                     BuildContext.WorkflowOptions.FailureWorkflow != null
