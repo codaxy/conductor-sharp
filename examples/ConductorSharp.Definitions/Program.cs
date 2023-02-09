@@ -3,6 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using ConductorSharp.Definitions;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Extensions;
 using MediatR.Extensions.Autofac.DependencyInjection;
@@ -48,9 +49,10 @@ var builder = Host.CreateDefaultBuilder()
                 {
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
-                });
+                })
+                .AddCSharpLambdaTasks(typeof(ITaskRequestHandler<,>).Assembly.GetName().Name);
 
-            builder.RegisterMediatR(typeof(Program).Assembly);
+            builder.RegisterMediatR(typeof(Program).Assembly, typeof(ITaskRequestHandler<,>).Assembly);
             builder.RegisterModule<ConductorModule>();
         }
     );
