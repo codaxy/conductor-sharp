@@ -1,0 +1,130 @@
+{
+  "ownerApp": null,
+  "createTime": 0,
+  "updateTime": 0,
+  "createdBy": null,
+  "updatedBy": null,
+  "name": "c_sharp_lambda_workflow",
+  "description": "{\"description\":null,\"labels\":null}",
+  "version": 1,
+  "tasks": [
+    {
+      "queryExpression": null,
+      "name": "TEST.CONDUCTOR_SHARP_inline_lambda_task",
+      "taskReferenceName": "first_lambda_task",
+      "description": "{\"description\":null}",
+      "inputParameters": {
+        "lambda_identifier": "de74b877-ce11-471b-8bc5-17c0a4a8d1f9.first_lambda_task",
+        "task_input": {
+          "lambda_input": "${workflow.input.input}"
+        }
+      },
+      "type": "SIMPLE",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": null,
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": null,
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    },
+    {
+      "queryExpression": null,
+      "name": "DECISION_decision_task",
+      "taskReferenceName": "decision_task",
+      "description": null,
+      "inputParameters": {
+        "case_value_param": "${workflow.input.operation}"
+      },
+      "type": "DECISION",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": "case_value_param",
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": {
+        "upper": [
+          {
+            "name": "TEST.CONDUCTOR_SHARP_inline_lambda_task",
+            "taskReferenceName": "second_lambda_task",
+            "description": "{\"description\":null}",
+            "inputParameters": {
+              "lambda_identifier": "9d7fd648-cb57-4f88-a633-d3a9f26e1b4e.second_lambda_task",
+              "task_input": {
+                "lambda_input": "${workflow.input.input}"
+              }
+            },
+            "type": "SIMPLE",
+            "startDelay": 0,
+            "optional": false,
+            "rateLimited": false,
+            "asyncComplete": false
+          }
+        ],
+        "lower": [
+          {
+            "name": "TEST.CONDUCTOR_SHARP_inline_lambda_task",
+            "taskReferenceName": "third_lambda_task",
+            "description": "{\"description\":null}",
+            "inputParameters": {
+              "lambda_identifier": "07805788-fd4e-4c2d-89e8-24c0363492ec.third_lambda_task",
+              "task_input": {
+                "lambda_input": "${workflow.input.input}"
+              }
+            },
+            "type": "SIMPLE",
+            "startDelay": 0,
+            "optional": false,
+            "rateLimited": false,
+            "asyncComplete": false
+          }
+        ]
+      },
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    }
+  ],
+  "inputParameters": [
+    "{\"operation\":{\"value\":\"\",\"description\":\" (optional)\"},\"input\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+  ],
+  "outputParameters": null,
+  "failureWorkflow": null,
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": true,
+  "ownerEmail": "test@test.com",
+  "timeoutPolicy": null,
+  "timeoutSeconds": 0,
+  "variables": null
+}
