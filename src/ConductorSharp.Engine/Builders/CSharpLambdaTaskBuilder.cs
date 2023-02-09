@@ -30,7 +30,13 @@ namespace ConductorSharp.Engine.Builders
         {
             var lambdaTaskNamePrefix = (string)
                 builder.ConfigurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
-            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(task.Body, input.Body, builder.BuildConfiguration, lambdaTaskNamePrefix);
+            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
+                task.Body,
+                input.Body,
+                builder.BuildConfiguration,
+                lambdaTaskNamePrefix,
+                builder.BuildContext
+            );
             builder.WorkflowBuildRegistry.Register<TWorkflow>(
                 taskBuilder.LambdaIdentifer,
                 new CSharpLambdaHandler(taskBuilder.LambdaIdentifer, typeof(TInput), lambda)
@@ -42,6 +48,8 @@ namespace ConductorSharp.Engine.Builders
 
     internal class CSharpLambdaTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput> where TInput : IRequest<TOutput>
     {
+        public const string LambdaIdStorageKey = "ConductorSharp.Engine.CSharpLambdaTaskBuilder.LambdaId";
+
         public string LambdaIdentifer { get; }
 
         private readonly string _lambdaTaskNamePrefix;
@@ -50,10 +58,13 @@ namespace ConductorSharp.Engine.Builders
             Expression taskExpression,
             Expression memberExpression,
             BuildConfiguration buildConfiguration,
-            string lambdaTaskNamePrefix
+            string lambdaTaskNamePrefix,
+            BuildContext buildContext
         ) : base(taskExpression, memberExpression, buildConfiguration)
         {
-            LambdaIdentifer = $"{Guid.NewGuid()}.{_taskRefferenceName}";
+            var id = buildContext.Storage.GetOrDefault(LambdaIdStorageKey, 0);
+            LambdaIdentifer = $"{id}.{_taskRefferenceName}";
+            buildContext.Storage.Set(LambdaIdStorageKey, id + 1);
             _lambdaTaskNamePrefix = lambdaTaskNamePrefix;
         }
 
