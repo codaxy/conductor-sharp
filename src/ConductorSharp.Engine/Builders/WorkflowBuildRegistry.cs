@@ -14,7 +14,7 @@ namespace ConductorSharp.Engine.Builders
         {
             if (_items.TryGetValue(typeof(TWorkflow), out var item))
             {
-                item.Add(key, value);
+                item[key] = value;
             }
             else
             {
