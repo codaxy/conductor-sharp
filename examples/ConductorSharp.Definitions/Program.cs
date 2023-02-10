@@ -41,6 +41,7 @@ var builder = Host.CreateDefaultBuilder()
                     maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
+                    typeof(Program).Assembly,
                     domain: configuration.GetValue<string>("Conductor:WorkerDomain")
                 )
                 .AddConductorSharpPatterns()
@@ -52,7 +53,6 @@ var builder = Host.CreateDefaultBuilder()
                 })
                 .AddCSharpLambdaTasks(typeof(ITaskRequestHandler<,>).Assembly.GetName().Name);
 
-            builder.RegisterMediatR(typeof(Program).Assembly, typeof(ITaskRequestHandler<,>).Assembly);
             builder.RegisterModule<ConductorModule>();
         }
     );

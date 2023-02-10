@@ -22,7 +22,13 @@ namespace ConductorSharp.Engine.Extensions
 
         public ConductorSharpBuilder(ContainerBuilder builder) => Builder = builder;
 
-        public IExecutionManagerBuilder AddExecutionManager(int maxConcurrentWorkers, int sleepInterval, int longPollInterval, string domain = null)
+        public IExecutionManagerBuilder AddExecutionManager(
+            int maxConcurrentWorkers,
+            int sleepInterval,
+            int longPollInterval,
+            Assembly handlersAssembly,
+            string domain = null
+        )
         {
             var workerConfig = new WorkerSetConfig
             {
@@ -49,6 +55,8 @@ namespace ConductorSharp.Engine.Extensions
             Builder.RegisterType<InverseExponentialBackoff>().As<IPollTimingStrategy>();
 
             Builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
+
+            Builder.RegisterMediatR(handlersAssembly);
 
             return this;
         }
@@ -88,6 +96,7 @@ namespace ConductorSharp.Engine.Extensions
         public IExecutionManagerBuilder AddCSharpLambdaTasks(string csharpLambdaTaskNamePrefix = "")
         {
             Builder.RegisterWorkerTask<CSharpLambdaTaskHandler>();
+            Builder.RegisterMediatR(typeof(CSharpLambdaTaskHandler).Assembly);
             Builder.RegisterInstance(
                 new ConfigurationProperty(CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty, csharpLambdaTaskNamePrefix)
             );

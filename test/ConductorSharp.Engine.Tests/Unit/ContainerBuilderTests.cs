@@ -22,7 +22,12 @@ namespace ConductorSharp.Engine.Tests.Unit
                         WorkflowPrefix = "TEST_APP_"
                     }
                 )
-                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1);
+                .AddExecutionManager(
+                    maxConcurrentWorkers: 1,
+                    sleepInterval: 1,
+                    longPollInterval: 1,
+                    handlersAssembly: typeof(ContainerBuilderTests).Assembly
+                );
 
             builder.RegisterWorkflow<StringInterpolation>();
             var container = builder.Build();
@@ -47,7 +52,12 @@ namespace ConductorSharp.Engine.Tests.Unit
                         WorkflowPrefix = "TEST_APP_"
                     }
                 )
-                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1);
+                .AddExecutionManager(
+                    maxConcurrentWorkers: 1,
+                    sleepInterval: 1,
+                    longPollInterval: 1,
+                    handlersAssembly: typeof(ContainerBuilderTests).Assembly
+                );
 
             builder.RegisterWorkflow<StringInterpolation>(new BuildConfiguration { DefaultOwnerApp = overrideValue });
             var container = builder.Build();
