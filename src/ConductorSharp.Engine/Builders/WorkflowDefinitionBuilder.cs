@@ -39,7 +39,6 @@ namespace ConductorSharp.Engine.Builders
         where TOutput : WorkflowOutput
     {
         private readonly Type _workflowType = typeof(TWorkflow);
-        private string _name;
 
         public BuildContext BuildContext { get; } = new();
         public BuildConfiguration BuildConfiguration { get; set; }
