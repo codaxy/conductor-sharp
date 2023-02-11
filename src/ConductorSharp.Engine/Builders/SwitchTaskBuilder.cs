@@ -1,7 +1,9 @@
 ﻿using ConductorSharp.Client;
 using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Handlers;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
@@ -24,7 +26,14 @@ namespace ConductorSharp.Engine.Builders
             where TInput : WorkflowInput<TOutput>
             where TOutput : WorkflowOutput
         {
-            var taskBuilder = new SwitchTaskBuilder<TWorkflow>(taskSelector.Body, expression.Body, builder.BuildConfiguration);
+            var taskBuilder = new SwitchTaskBuilder<TWorkflow>(
+                taskSelector.Body,
+                expression.Body,
+                builder.BuildConfiguration,
+                builder.WorkflowBuildRegistry,
+                builder.ConfigurationProperties,
+                builder.BuildContext
+            );
 
             foreach (var funcase in caseActions)
             {
@@ -37,17 +46,29 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class SwitchTaskBuilder<TWorkflow> : BaseTaskBuilder<SwitchTaskInput, NoOutput> where TWorkflow : ITypedWorkflow
+    public class SwitchTaskBuilder<TWorkflow> : BaseTaskBuilder<SwitchTaskInput, NoOutput> where TWorkflow : IConfigurableWorkflow
     {
         private Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = new();
 
         private string _currentCaseName;
         private readonly BuildConfiguration _buildConfiguration;
+        private readonly WorkflowBuildItemRegistry _workflowBuildItemRegistry;
+        private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
+        private readonly BuildContext _buildContext;
 
-        public SwitchTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration)
+        public SwitchTaskBuilder(
+            Expression taskExpression,
+            Expression inputExpression,
+            BuildConfiguration buildConfiguration,
+            WorkflowBuildItemRegistry workflowBuildItemRegistry,
+            IEnumerable<ConfigurationProperty> configurationProperties,
+            BuildContext buildContext
+        ) : base(taskExpression, inputExpression, buildConfiguration)
         {
             _buildConfiguration = buildConfiguration;
+            _workflowBuildItemRegistry = workflowBuildItemRegistry;
+            _configurationProperties = configurationProperties;
+            _buildContext = buildContext;
         }
 
         public SwitchTaskBuilder<TWorkflow> AddCase(string caseName)
@@ -124,6 +145,31 @@ namespace ConductorSharp.Engine.Builders
         {
             var builder = new DynamicTaskBuilder<F, G>(taskSelector.Body, expression.Body, _buildConfiguration);
             AddBuilder(builder);
+            return this;
+        }
+
+        public SwitchTaskBuilder<TWorkflow> WithTask<TInput, TOutput>(
+            Expression<Func<TWorkflow, CSharpLambdaTaskModel<TInput, TOutput>>> task,
+            Expression<Func<TWorkflow, TInput>> input,
+            Func<TInput, TOutput> lambda
+        ) where TInput : IRequest<TOutput>
+        {
+            // TODO: Same logic already contained in corresponding AddTask, find solution to avoid duplication
+            var lambdaTaskNamePrefix = (string)
+                _configurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
+            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
+                task.Body,
+                input.Body,
+                _buildConfiguration,
+                lambdaTaskNamePrefix,
+                _buildContext.WorkflowName
+            );
+            _workflowBuildItemRegistry.Register<TWorkflow>(
+                taskBuilder.LambdaIdentifer,
+                new CSharpLambdaHandler(taskBuilder.LambdaIdentifer, typeof(TInput), lambda)
+            );
+
+            AddBuilder(taskBuilder);
             return this;
         }
 

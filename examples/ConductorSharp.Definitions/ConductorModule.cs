@@ -13,6 +13,7 @@ namespace ConductorSharp.Definitions
 
             builder.RegisterWorkflow<SendCustomerNotification>();
             builder.RegisterWorkflow<HandleNotificationFailure>();
+            builder.RegisterWorkflow<CSharpLambdaWorkflow>();
         }
     }
 }

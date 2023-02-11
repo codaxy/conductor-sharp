@@ -15,13 +15,14 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             _containerBuilder
                 .AddConductorSharp("example.com", "api", false)
-                .AddExecutionManager(10, 100, 100)
+                .AddExecutionManager(10, 100, 100, null, typeof(WorkflowBuilderTests).Assembly)
                 .AddPipelines(pipelines =>
                 {
                     pipelines.AddContextLogging();
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
-                });
+                })
+                .AddCSharpLambdaTasks("TEST");
 
             _containerBuilder.RegisterWorkflow<SendCustomerNotification>();
             _containerBuilder.RegisterWorkflow<StringInterpolation>();
@@ -40,6 +41,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             _containerBuilder.RegisterWorkflow<PatternTasks>();
             _containerBuilder.RegisterWorkflow<UntypedProperty>();
             _containerBuilder.RegisterWorkflow<StringAddition>();
+            _containerBuilder.RegisterWorkflow<CSharpLambdaWorkflow>();
 
             _container = _containerBuilder.Build();
         }
@@ -178,6 +180,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         {
             var definition = GetDefinitionFromWorkflow<StringAddition>();
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/StringAddition.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionCSharpLambdaWorfklow()
+        {
+            var definition = GetDefinitionFromWorkflow<CSharpLambdaWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/CSharpLambdaWorkflow.json");
 
             Assert.Equal(expectedDefinition, definition);
         }

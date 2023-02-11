@@ -31,6 +31,7 @@ namespace ConductorSharp.Definitions.Workflows
         public override void BuildDefinition()
         {
             _builder.AddTask(a => a.ReadExecutedTasks, b => new() { TaskNames = "dynamic_handler", WorkflowId = b.WorkflowInput.WorkflowId });
+            _builder.SetOptions(options => options.OwnerEmail = "test@test.com");
         }
     }
 }

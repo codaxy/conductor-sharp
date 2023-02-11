@@ -3,6 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using ConductorSharp.Definitions;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Extensions;
 using MediatR.Extensions.Autofac.DependencyInjection;
@@ -40,7 +41,8 @@ var builder = Host.CreateDefaultBuilder()
                     maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
-                    domain: configuration.GetValue<string>("Conductor:WorkerDomain")
+                    domain: configuration.GetValue<string>("Conductor:WorkerDomain"),
+                    typeof(Program).Assembly
                 )
                 .AddConductorSharpPatterns()
                 .SetHealthCheckService<FileHealthService>()
@@ -48,9 +50,9 @@ var builder = Host.CreateDefaultBuilder()
                 {
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
-                });
+                })
+                .AddCSharpLambdaTasks(typeof(ITaskRequestHandler<,>).Assembly.GetName().Name);
 
-            builder.RegisterMediatR(typeof(Program).Assembly);
             builder.RegisterModule<ConductorModule>();
         }
     );

@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using ConductorSharp.Engine.Behaviors;
+using ConductorSharp.Engine.Handlers;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
@@ -7,8 +8,11 @@ using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
+using MediatR.Extensions.Autofac.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -18,7 +22,13 @@ namespace ConductorSharp.Engine.Extensions
 
         public ConductorSharpBuilder(ContainerBuilder builder) => Builder = builder;
 
-        public IExecutionManagerBuilder AddExecutionManager(int maxConcurrentWorkers, int sleepInterval, int longPollInterval, string domain = null)
+        public IExecutionManagerBuilder AddExecutionManager(
+            int maxConcurrentWorkers,
+            int sleepInterval,
+            int longPollInterval,
+            string domain = null,
+            params Assembly[] handlerAssemblies
+        )
         {
             var workerConfig = new WorkerSetConfig
             {
@@ -45,6 +55,8 @@ namespace ConductorSharp.Engine.Extensions
             Builder.RegisterType<InverseExponentialBackoff>().As<IPollTimingStrategy>();
 
             Builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
+
+            Builder.RegisterMediatR(handlerAssemblies);
 
             return this;
         }
@@ -78,6 +90,16 @@ namespace ConductorSharp.Engine.Extensions
             }
 
             Builder.RegisterInstance(buildConfiguration);
+            return this;
+        }
+
+        public IExecutionManagerBuilder AddCSharpLambdaTasks(string csharpLambdaTaskNamePrefix = "")
+        {
+            Builder.RegisterWorkerTask<CSharpLambdaTaskHandler>();
+            Builder.RegisterMediatR(typeof(CSharpLambdaTaskHandler).Assembly);
+            Builder.RegisterInstance(
+                new ConfigurationProperty(CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty, csharpLambdaTaskNamePrefix)
+            );
             return this;
         }
     }
