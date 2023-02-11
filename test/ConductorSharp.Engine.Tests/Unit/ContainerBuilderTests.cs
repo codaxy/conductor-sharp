@@ -26,7 +26,8 @@ namespace ConductorSharp.Engine.Tests.Unit
                     maxConcurrentWorkers: 1,
                     sleepInterval: 1,
                     longPollInterval: 1,
-                    handlersAssembly: typeof(ContainerBuilderTests).Assembly
+                    domain: null,
+                    handlerAssemblies: typeof(ContainerBuilderTests).Assembly
                 );
 
             builder.RegisterWorkflow<StringInterpolation>();
@@ -56,7 +57,8 @@ namespace ConductorSharp.Engine.Tests.Unit
                     maxConcurrentWorkers: 1,
                     sleepInterval: 1,
                     longPollInterval: 1,
-                    handlersAssembly: typeof(ContainerBuilderTests).Assembly
+                    null,
+                    handlerAssemblies: typeof(ContainerBuilderTests).Assembly
                 );
 
             builder.RegisterWorkflow<StringInterpolation>(new BuildConfiguration { DefaultOwnerApp = overrideValue });

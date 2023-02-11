@@ -12,8 +12,8 @@ namespace ConductorSharp.Engine.Extensions
             int maxConcurrentWorkers,
             int sleepInterval,
             int longPollInterval,
-            Assembly handlersAssembly,
-            string domain = null
+            string domain = null,
+            params Assembly[] handlerAssemblies
         );
         IConductorSharpBuilder SetBuildConfiguration(BuildConfiguration buildConfiguration);
     }

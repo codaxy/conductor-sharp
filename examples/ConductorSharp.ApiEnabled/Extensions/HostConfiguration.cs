@@ -21,8 +21,8 @@ public static class HostConfiguration
                     maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
-                    typeof(HostConfiguration).Assembly,
-                    domain: configuration.GetValue<string>("Conductor:WorkerDomain")
+                    domain: configuration.GetValue<string>("Conductor:WorkerDomain"),
+                    typeof(HostConfiguration).Assembly
                 )
                 .SetHealthCheckService<FileHealthService>()
                 .AddPipelines(pipelines =>

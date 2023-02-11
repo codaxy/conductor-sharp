@@ -26,8 +26,8 @@ namespace ConductorSharp.Engine.Extensions
             int maxConcurrentWorkers,
             int sleepInterval,
             int longPollInterval,
-            Assembly handlersAssembly,
-            string domain = null
+            string domain = null,
+            params Assembly[] handlerAssemblies
         )
         {
             var workerConfig = new WorkerSetConfig
@@ -56,7 +56,7 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
 
-            Builder.RegisterMediatR(handlersAssembly);
+            Builder.RegisterMediatR(handlerAssemblies);
 
             return this;
         }

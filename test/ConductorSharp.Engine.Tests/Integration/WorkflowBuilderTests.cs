@@ -15,7 +15,7 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             _containerBuilder
                 .AddConductorSharp("example.com", "api", false)
-                .AddExecutionManager(10, 100, 100, typeof(WorkflowBuilderTests).Assembly)
+                .AddExecutionManager(10, 100, 100, null, typeof(WorkflowBuilderTests).Assembly)
                 .AddPipelines(pipelines =>
                 {
                     pipelines.AddContextLogging();

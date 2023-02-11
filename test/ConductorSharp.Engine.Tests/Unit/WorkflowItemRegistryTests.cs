@@ -18,7 +18,8 @@ namespace ConductorSharp.Engine.Tests.Unit
                     maxConcurrentWorkers: 1,
                     sleepInterval: 1,
                     longPollInterval: 1,
-                    handlersAssembly: typeof(WorkflowItemRegistryTests).Assembly
+                    null,
+                    handlerAssemblies: typeof(WorkflowItemRegistryTests).Assembly
                 );
 
             builder.RegisterWorkflow<WorkflowItemTestWorkflow>();
@@ -45,7 +46,8 @@ namespace ConductorSharp.Engine.Tests.Unit
                     maxConcurrentWorkers: 1,
                     sleepInterval: 1,
                     longPollInterval: 1,
-                    handlersAssembly: typeof(WorkflowItemRegistryTests).Assembly
+                    null,
+                    handlerAssemblies: typeof(WorkflowItemRegistryTests).Assembly
                 );
 
             builder.RegisterWorkflow<WorkflowItemTestWorkflow>();
