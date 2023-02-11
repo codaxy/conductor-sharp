@@ -15,11 +15,17 @@ namespace ConductorSharp.Engine.Builders
     {
         public BuildConfiguration BuildConfiguration { get; set; }
         private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
+        private readonly ITaskNameBuilder _taskNameBuilder;
 
-        public TaskDefinitionBuilder(BuildConfiguration buildConfiguration, IEnumerable<ConfigurationProperty> configurationProperties)
+        public TaskDefinitionBuilder(
+            BuildConfiguration buildConfiguration,
+            IEnumerable<ConfigurationProperty> configurationProperties,
+            ITaskNameBuilder taskNameBuilder
+        )
         {
             BuildConfiguration = buildConfiguration;
             _configurationProperties = configurationProperties;
+            _taskNameBuilder = taskNameBuilder;
         }
 
         public TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
@@ -69,11 +75,12 @@ namespace ConductorSharp.Engine.Builders
             };
         }
 
-        private string DetermineRegistrationName(Type taskType) =>
-            // TODO: Implement some kind of naming provider for this once we move it to the Patterns project
-            taskType == typeof(CSharpLambdaTaskHandler)
-                ? $"{GetLambdaTaskPrefix()}.{NamingUtil.DetermineRegistrationName(taskType)}"
-                : NamingUtil.DetermineRegistrationName(taskType);
+        private string DetermineRegistrationName(Type taskType) => _taskNameBuilder.Build(taskType);
+
+        // TODO: Implement some kind of naming provider for this once we move it to the Patterns project
+        //taskType == typeof(CSharpLambdaTaskHandler)
+        //    ? $"{GetLambdaTaskPrefix()}.{NamingUtil.DetermineRegistrationName(taskType)}"
+        //    : NamingUtil.DetermineRegistrationName(taskType);
 
         private string DetermineDescription(string description, params string[] labels)
         {
