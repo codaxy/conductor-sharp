@@ -1,11 +1,8 @@
 ﻿using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Patterns.Extensions;
+using ConductorSharp.Patterns.Model;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConductorSharp.Definitions.Workflows
 {

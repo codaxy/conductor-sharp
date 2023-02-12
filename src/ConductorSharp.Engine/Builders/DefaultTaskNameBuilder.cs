@@ -6,6 +6,6 @@ namespace ConductorSharp.Engine.Builders
 {
     public class DefaultTaskNameBuilder : ITaskNameBuilder
     {
-        public string Build(Type taskType) => NamingUtil.DetermineRegistrationName(taskType);
+        public virtual string Build(Type taskType) => NamingUtil.DetermineRegistrationName(taskType);
     }
 }

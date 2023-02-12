@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using ConductorSharp.Engine.Behaviors;
-using ConductorSharp.Engine.Handlers;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
@@ -90,16 +89,6 @@ namespace ConductorSharp.Engine.Extensions
             }
 
             Builder.RegisterInstance(buildConfiguration);
-            return this;
-        }
-
-        public IExecutionManagerBuilder AddCSharpLambdaTasks(string csharpLambdaTaskNamePrefix = "")
-        {
-            Builder.RegisterWorkerTask<CSharpLambdaTaskHandler>();
-            Builder.RegisterMediatR(typeof(CSharpLambdaTaskHandler).Assembly);
-            Builder.RegisterInstance(
-                new ConfigurationProperty(CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty, csharpLambdaTaskNamePrefix)
-            );
             return this;
         }
     }

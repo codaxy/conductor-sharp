@@ -1,4 +1,7 @@
-﻿namespace ConductorSharp.Engine.Tests.Samples.Workflows
+﻿using ConductorSharp.Patterns.Extensions;
+using ConductorSharp.Patterns.Model;
+
+namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
     public class CSharpLambdaWorkflowInput : WorkflowInput<CSharpLambdaWorkflowOutput>
     {

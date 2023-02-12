@@ -1,19 +1,17 @@
 ﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Engine.Exceptions;
-using ConductorSharp.Engine.Handlers;
+using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
-using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
+using ConductorSharp.Patterns.Model;
+using ConductorSharp.Patterns.Tasks;
 using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
-namespace ConductorSharp.Engine.Builders
+namespace ConductorSharp.Patterns.Extensions
 {
     public static class CSharpLambdaTaskExtensions
     {
@@ -27,7 +25,7 @@ namespace ConductorSharp.Engine.Builders
             where TInput : IRequest<TOutput>
         {
             var lambdaTaskNamePrefix = (string)
-                builder.ConfigurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
+                builder.ConfigurationProperties.First(prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty).Value;
             var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
                 task.Body,
                 input.Body,
@@ -70,7 +68,7 @@ namespace ConductorSharp.Engine.Builders
             {
                 new WorkflowDefinition.Task
                 {
-                    Name = $"{_lambdaTaskNamePrefix}.{CSharpLambdaTaskHandler.TaskName}",
+                    Name = $"{_lambdaTaskNamePrefix}.{CSharpLambdaTask.TaskName}",
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = new JObject
                     {
