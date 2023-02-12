@@ -47,19 +47,11 @@ namespace ConductorSharp.Engine.Builders
         where TWorkflow : ITypedWorkflow
     {
         private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
-
         private string _currentCaseName;
-        private readonly BuildConfiguration _buildConfiguration;
-        private readonly WorkflowBuildItemRegistry _workflowBuildItemRegistry;
-        private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
-        private readonly BuildContext _buildContext;
 
         public BuildContext BuildContext { get; }
-
         public BuildConfiguration BuildConfiguration { get; }
-
         public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
-
         public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; }
 
         public DecisionTaskBuilder(
@@ -75,11 +67,6 @@ namespace ConductorSharp.Engine.Builders
             BuildContext = buildContext;
             WorkflowBuildRegistry = buildItemRegistry;
             ConfigurationProperties = configurationProperties;
-
-            _buildConfiguration = buildConfiguration;
-            _workflowBuildItemRegistry = buildItemRegistry;
-            _configurationProperties = configurationProperties;
-            _buildContext = buildContext;
         }
 
         public DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
@@ -89,125 +76,6 @@ namespace ConductorSharp.Engine.Builders
             if (!_caseDictionary.ContainsKey(_currentCaseName))
                 _caseDictionary.Add(caseName, new List<ITaskBuilder>());
 
-            return this;
-        }
-
-        public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
-            Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence,
-            Expression<Func<TWorkflow, F>> input
-        ) where F : IRequest<G>
-        {
-            var builder = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body, _buildConfiguration);
-            _caseDictionary[_currentCaseName].Add(builder);
-
-            return this;
-        }
-
-        public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
-            Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> taskSelector,
-            Expression<Func<TWorkflow, F>> expression,
-            string script
-        ) where F : IRequest<G>
-        {
-            var builder = new LambdaTaskBuilder<F, G>(script, taskSelector.Body, expression.Body, _buildConfiguration);
-            _caseDictionary[_currentCaseName].Add(builder);
-
-            return this;
-        }
-
-        public DecisionTaskBuilder<TWorkflow> WithTask(
-            Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> taskSelector,
-            Expression<Func<TWorkflow, DynamicForkJoinInput>> expression
-        )
-        {
-            var builder = new DynamicForkJoinTaskBuilder(taskSelector.Body, expression.Body, _buildConfiguration);
-            _caseDictionary[_currentCaseName].Add(builder);
-
-            return this;
-        }
-
-        public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
-            Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> taskSelector,
-            Expression<Func<TWorkflow, F>> expression,
-            AdditionalTaskParameters additionalParameters = null
-        ) where F : IRequest<G>
-        {
-            var builder = new SimpleTaskBuilder<F, G>(taskSelector.Body, expression.Body, additionalParameters, _buildConfiguration);
-            _caseDictionary[_currentCaseName].Add(builder);
-
-            return this;
-        }
-
-        //public DecisionTaskBuilder<TWorkflow> WithTask(
-        //    Expression<Func<TWorkflow, TerminateTaskModel>> taskSelector,
-        //    Expression<Func<TWorkflow, TerminateTaskInput>> expression
-        //)
-        //{
-        //    var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body, _buildConfiguration);
-        //    _caseDictionary[_currentCaseName].Add(builder);
-
-        //    return this;
-        //}
-
-        public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
-            Expression<Func<TWorkflow, DynamicTaskModel<F, G>>> taskSelector,
-            Expression<Func<TWorkflow, DynamicTaskInput<F, G>>> expression
-        ) where F : IRequest<G>
-        {
-            var builder = new DynamicTaskBuilder<F, G>(taskSelector.Body, expression.Body, _buildConfiguration);
-            _caseDictionary[_currentCaseName].Add(builder);
-
-            return this;
-        }
-
-        public DecisionTaskBuilder<TWorkflow> WithTask(
-            Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
-            Expression<Func<TWorkflow, DecisionTaskInput>> expression,
-            params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
-        )
-        {
-            var builder = new DecisionTaskBuilder<TWorkflow>(
-                taskSelector.Body,
-                expression.Body,
-                _buildConfiguration,
-                _workflowBuildItemRegistry,
-                _configurationProperties,
-                _buildContext
-            );
-
-            foreach (var funcase in caseActions)
-            {
-                builder.AddCase(funcase.Item1);
-                funcase.Item2.Invoke(builder);
-            }
-
-            _caseDictionary[_currentCaseName].Add(builder);
-
-            return this;
-        }
-
-        public DecisionTaskBuilder<TWorkflow> WithTask<TInput, TOutput>(
-            Expression<Func<TWorkflow, CSharpLambdaTaskModel<TInput, TOutput>>> task,
-            Expression<Func<TWorkflow, TInput>> input,
-            Func<TInput, TOutput> lambda
-        ) where TInput : IRequest<TOutput>
-        {
-            // TODO: Same logic already contained in corresponding AddTask, find solution to avoid duplication
-            var lambdaTaskNamePrefix = (string)
-                _configurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
-            var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
-                task.Body,
-                input.Body,
-                _buildConfiguration,
-                lambdaTaskNamePrefix,
-                _buildContext.WorkflowName
-            );
-            _workflowBuildItemRegistry.Register<TWorkflow>(
-                taskBuilder.LambdaIdentifer,
-                new CSharpLambdaHandler(taskBuilder.LambdaIdentifer, typeof(TInput), lambda)
-            );
-
-            _caseDictionary[_currentCaseName].Add(taskBuilder);
             return this;
         }
 
