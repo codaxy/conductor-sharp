@@ -2,6 +2,7 @@
 using ConductorSharp.Client;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
 using RestSharp;
 using System;
@@ -41,6 +42,8 @@ namespace ConductorSharp.Engine.Extensions
             builder.RegisterInstance(new BuildConfiguration());
 
             builder.RegisterType<WorkflowBuildItemRegistry>().SingleInstance();
+
+            builder.RegisterType<DefaultTaskNameBuilder>().As<ITaskNameBuilder>();
 
             builder.RegisterType<TaskDefinitionBuilder>();
 

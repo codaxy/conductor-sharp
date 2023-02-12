@@ -11,19 +11,17 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class SimpleTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput, F, G>(
-            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
-            Expression<Func<TWorkflow, SimpleTaskModel<F, G>>> refference,
-            Expression<Func<TWorkflow, F>> input,
+        public static ITaskOptionsBuilder AddTask<TWorkflow, Tinput, TOutput>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
+            Expression<Func<TWorkflow, SimpleTaskModel<Tinput, TOutput>>> refference,
+            Expression<Func<TWorkflow, Tinput>> input,
             AdditionalTaskParameters additionalParameters = null
         )
-            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput
-            where F : IRequest<G>
+            where TWorkflow : ITypedWorkflow
+            where Tinput : IRequest<TOutput>
         {
-            var taskBuilder = new SimpleTaskBuilder<F, G>(refference.Body, input.Body, additionalParameters, builder.BuildConfiguration);
-            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            var taskBuilder = new SimpleTaskBuilder<Tinput, TOutput>(refference.Body, input.Body, additionalParameters, builder.BuildConfiguration);
+            builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }

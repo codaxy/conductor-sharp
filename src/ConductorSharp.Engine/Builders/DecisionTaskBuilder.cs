@@ -16,17 +16,14 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class DecisionTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
-            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
             Expression<Func<TWorkflow, DecisionTaskInput>> expression,
             params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
-        )
-            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput
+        ) where TWorkflow : ITypedWorkflow
         {
-            var taskBbuilder = new DecisionTaskBuilder<TWorkflow>(
+            var taskBuilder = new DecisionTaskBuilder<TWorkflow>(
                 taskSelector.Body,
                 expression.Body,
                 builder.BuildConfiguration,
@@ -37,16 +34,17 @@ namespace ConductorSharp.Engine.Builders
 
             foreach (var funcase in caseActions)
             {
-                taskBbuilder.AddCase(funcase.Item1);
-                funcase.Item2.Invoke(taskBbuilder);
+                taskBuilder.AddCase(funcase.Item1);
+                funcase.Item2.Invoke(taskBuilder);
             }
 
-            builder.BuildContext.TaskBuilders.Add(taskBbuilder);
-            return taskBbuilder;
+            builder.AddTaskBuilderToSequence(taskBuilder);
+            return taskBuilder;
         }
     }
 
-    public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput> where TWorkflow : IConfigurableWorkflow
+    public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput>, ITaskSequenceBuilder<TWorkflow>
+        where TWorkflow : ITypedWorkflow
     {
         private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
 
@@ -55,6 +53,14 @@ namespace ConductorSharp.Engine.Builders
         private readonly WorkflowBuildItemRegistry _workflowBuildItemRegistry;
         private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
         private readonly BuildContext _buildContext;
+
+        public BuildContext BuildContext { get; }
+
+        public BuildConfiguration BuildConfiguration { get; }
+
+        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
+
+        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; }
 
         public DecisionTaskBuilder(
             Expression taskExpression,
@@ -65,6 +71,11 @@ namespace ConductorSharp.Engine.Builders
             BuildContext buildContext
         ) : base(taskExpression, inputExpression, buildConfiguration)
         {
+            BuildConfiguration = buildConfiguration;
+            BuildContext = buildContext;
+            WorkflowBuildRegistry = buildItemRegistry;
+            ConfigurationProperties = configurationProperties;
+
             _buildConfiguration = buildConfiguration;
             _workflowBuildItemRegistry = buildItemRegistry;
             _configurationProperties = configurationProperties;
@@ -127,16 +138,16 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
-        public DecisionTaskBuilder<TWorkflow> WithTask(
-            Expression<Func<TWorkflow, TerminateTaskModel>> taskSelector,
-            Expression<Func<TWorkflow, TerminateTaskInput>> expression
-        )
-        {
-            var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body, _buildConfiguration);
-            _caseDictionary[_currentCaseName].Add(builder);
+        //public DecisionTaskBuilder<TWorkflow> WithTask(
+        //    Expression<Func<TWorkflow, TerminateTaskModel>> taskSelector,
+        //    Expression<Func<TWorkflow, TerminateTaskInput>> expression
+        //)
+        //{
+        //    var builder = new TerminateTaskBuilder(taskSelector.Body, expression.Body, _buildConfiguration);
+        //    _caseDictionary[_currentCaseName].Add(builder);
 
-            return this;
-        }
+        //    return this;
+        //}
 
         public DecisionTaskBuilder<TWorkflow> WithTask<F, G>(
             Expression<Func<TWorkflow, DynamicTaskModel<F, G>>> taskSelector,
@@ -222,5 +233,7 @@ namespace ConductorSharp.Engine.Builders
                 }
             };
         }
+
+        public void AddTaskBuilderToSequence(ITaskBuilder builder) => _caseDictionary[_currentCaseName].Add(builder);
     }
 }

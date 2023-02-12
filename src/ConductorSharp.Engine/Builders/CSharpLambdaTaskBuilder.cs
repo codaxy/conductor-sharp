@@ -17,15 +17,13 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class CSharpLambdaTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TWorkflowInput, TWorkflowOutput, TInput, TOutput>(
-            this WorkflowDefinitionBuilder<TWorkflow, TWorkflowInput, TWorkflowOutput> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, CSharpLambdaTaskModel<TInput, TOutput>>> task,
             Expression<Func<TWorkflow, TInput>> input,
             Func<TInput, TOutput> lambda
         )
-            where TWorkflow : Workflow<TWorkflow, TWorkflowInput, TWorkflowOutput>
-            where TWorkflowInput : WorkflowInput<TWorkflowOutput>
-            where TWorkflowOutput : WorkflowOutput
+            where TWorkflow : ITypedWorkflow
             where TInput : IRequest<TOutput>
         {
             var lambdaTaskNamePrefix = (string)
@@ -41,7 +39,7 @@ namespace ConductorSharp.Engine.Builders
                 taskBuilder.LambdaIdentifer,
                 new CSharpLambdaHandler(taskBuilder.LambdaIdentifer, typeof(TInput), lambda)
             );
-            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }

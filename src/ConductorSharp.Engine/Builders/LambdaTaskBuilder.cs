@@ -12,20 +12,18 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class LambdaTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput, F, G>(
-            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
-            Expression<Func<TWorkflow, LambdaTaskModel<F, G>>> referrence,
-            Expression<Func<TWorkflow, F>> input,
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
+            Expression<Func<TWorkflow, LambdaTaskModel<TInput, TOutput>>> referrence,
+            Expression<Func<TWorkflow, TInput>> input,
             string script
         )
-            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput
-            where F : IRequest<G>
+            where TWorkflow : ITypedWorkflow
+            where TInput : IRequest<TOutput>
         {
-            var taskBuilder = new LambdaTaskBuilder<F, G>(script, referrence.Body, input.Body, builder.BuildConfiguration);
+            var taskBuilder = new LambdaTaskBuilder<TInput, TOutput>(script, referrence.Body, input.Body, builder.BuildConfiguration);
 
-            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }

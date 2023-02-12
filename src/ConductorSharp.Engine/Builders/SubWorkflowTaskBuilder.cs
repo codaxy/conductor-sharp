@@ -13,18 +13,16 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class SubWorkflowTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput, F, G>(
-            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
-            Expression<Func<TWorkflow, SubWorkflowTaskModel<F, G>>> referrence,
-            Expression<Func<TWorkflow, F>> input
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
+            Expression<Func<TWorkflow, SubWorkflowTaskModel<TInput, TOutput>>> referrence,
+            Expression<Func<TWorkflow, TInput>> input
         )
-            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput
-            where F : IRequest<G>
+            where TWorkflow : ITypedWorkflow
+            where TInput : IRequest<TOutput>
         {
-            var taskBuilder = new SubWorkflowTaskBuilder<F, G>(referrence.Body, input.Body, builder.BuildConfiguration);
-            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            var taskBuilder = new SubWorkflowTaskBuilder<TInput, TOutput>(referrence.Body, input.Body, builder.BuildConfiguration);
+            builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }

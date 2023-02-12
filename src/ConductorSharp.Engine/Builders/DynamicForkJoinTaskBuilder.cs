@@ -10,17 +10,14 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class DynamicForkJoinTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
-            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> refference,
             Expression<Func<TWorkflow, DynamicForkJoinInput>> input
-        )
-            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput
+        ) where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new DynamicForkJoinTaskBuilder(refference.Body, input.Body, builder.BuildConfiguration);
-            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }

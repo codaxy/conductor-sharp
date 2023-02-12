@@ -30,7 +30,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 (
                     "value",
                     builder =>
-                        builder.WithTask(
+                        builder.AddTask(
                             wf => wf.DecisionTerminate,
                             wf => new() { WorkflowOutput = new { Property = "Test" }, TerminationStatus = TerminationStatus.Completed }
                         )
@@ -43,7 +43,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 (
                     "value",
                     builder =>
-                        builder.WithTask(
+                        builder.AddTask(
                             wf => wf.SwitchTerminate,
                             wf => new() { WorkflowOutput = new { Property = "Test" }, TerminationStatus = TerminationStatus.Failed }
                         )

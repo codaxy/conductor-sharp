@@ -51,7 +51,7 @@
                     "upper",
                     builder =>
                     {
-                        builder.WithTask(
+                        builder.AddTask(
                             wf => wf.SecondLambdaTask,
                             wf => new() { LambdaInput = wf.WorkflowInput.Input },
                             input =>
@@ -65,7 +65,7 @@
                     "lower",
                     builder =>
                     {
-                        builder.WithTask(
+                        builder.AddTask(
                             wf => wf.ThirdLambdaTask,
                             wf => new() { LambdaInput = wf.WorkflowInput.Input },
                             input =>

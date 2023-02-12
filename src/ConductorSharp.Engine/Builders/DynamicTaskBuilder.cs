@@ -14,18 +14,16 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class DynamicTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput, F, G>(
-            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
-            Expression<Func<TWorkflow, DynamicTaskModel<F, G>>> reference,
-            Expression<Func<TWorkflow, DynamicTaskInput<F, G>>> input
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
+            Expression<Func<TWorkflow, DynamicTaskModel<TInput, TOutput>>> reference,
+            Expression<Func<TWorkflow, DynamicTaskInput<TInput, TOutput>>> input
         )
-            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput
-            where F : IRequest<G>
+            where TWorkflow : ITypedWorkflow
+            where TInput : IRequest<TOutput>
         {
-            var taskBuilder = new DynamicTaskBuilder<F, G>(reference.Body, input.Body, builder.BuildConfiguration);
-            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            var taskBuilder = new DynamicTaskBuilder<TInput, TOutput>(reference.Body, input.Body, builder.BuildConfiguration);
+            builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }

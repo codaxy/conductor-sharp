@@ -10,7 +10,7 @@ namespace ConductorSharp.Engine.Builders
     {
         private readonly Dictionary<Type, Dictionary<string, object>> _items = new();
 
-        public void Register<TWorkflow>(string key, object value) where TWorkflow : IConfigurableWorkflow
+        public void Register<TWorkflow>(string key, object value) where TWorkflow : ITypedWorkflow
         {
             if (_items.TryGetValue(typeof(TWorkflow), out var item))
             {

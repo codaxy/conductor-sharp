@@ -16,15 +16,12 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class SwitchTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
-            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
             Expression<Func<TWorkflow, SwitchTaskInput>> expression,
             params (string, Action<SwitchTaskBuilder<TWorkflow>>)[] caseActions
-        )
-            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput
+        ) where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new SwitchTaskBuilder<TWorkflow>(
                 taskSelector.Body,
@@ -41,12 +38,13 @@ namespace ConductorSharp.Engine.Builders
                 funcase.Item2.Invoke(taskBuilder);
             }
 
-            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }
 
-    public class SwitchTaskBuilder<TWorkflow> : BaseTaskBuilder<SwitchTaskInput, NoOutput> where TWorkflow : IConfigurableWorkflow
+    public class SwitchTaskBuilder<TWorkflow> : BaseTaskBuilder<SwitchTaskInput, NoOutput>, ITaskSequenceBuilder<TWorkflow>
+        where TWorkflow : ITypedWorkflow
     {
         private Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = new();
 
@@ -55,6 +53,14 @@ namespace ConductorSharp.Engine.Builders
         private readonly WorkflowBuildItemRegistry _workflowBuildItemRegistry;
         private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
         private readonly BuildContext _buildContext;
+
+        public BuildContext BuildContext { get; }
+
+        public BuildConfiguration BuildConfiguration { get; }
+
+        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
+
+        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; }
 
         public SwitchTaskBuilder(
             Expression taskExpression,
@@ -65,6 +71,11 @@ namespace ConductorSharp.Engine.Builders
             BuildContext buildContext
         ) : base(taskExpression, inputExpression, buildConfiguration)
         {
+            BuildConfiguration = buildConfiguration;
+            WorkflowBuildRegistry = workflowBuildItemRegistry;
+            ConfigurationProperties = configurationProperties;
+            BuildContext = buildContext;
+
             _buildConfiguration = buildConfiguration;
             _workflowBuildItemRegistry = workflowBuildItemRegistry;
             _configurationProperties = configurationProperties;
@@ -227,5 +238,7 @@ namespace ConductorSharp.Engine.Builders
                 _caseDictionary.Add(_currentCaseName, new List<ITaskBuilder>() { builder });
             }
         }
+
+        public void AddTaskBuilderToSequence(ITaskBuilder builder) => AddBuilder(builder);
     }
 }
