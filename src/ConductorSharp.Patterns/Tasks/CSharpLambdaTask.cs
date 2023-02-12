@@ -3,6 +3,7 @@ using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Patterns.Exceptions;
 using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
