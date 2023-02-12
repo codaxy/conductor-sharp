@@ -33,7 +33,7 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput>
+    public class WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> : ITaskSequenceBuilder<TWorkflow>
         where TWorkflow : ITypedWorkflow
         where TInput : WorkflowInput<TOutput>
         where TOutput : WorkflowOutput
