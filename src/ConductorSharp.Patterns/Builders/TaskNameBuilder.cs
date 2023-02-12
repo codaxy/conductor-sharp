@@ -17,9 +17,12 @@ namespace ConductorSharp.Patterns.Builders
         public TaskNameBuilder(IEnumerable<ConfigurationProperty> configurationProperties) => _configurationProperties = configurationProperties;
 
         public override string Build(Type taskType) =>
-            taskType == typeof(CSharpLambdaTask) ? $"{GetLambdaTaskPrefix()}.{base.Build(taskType)}" : base.Build(taskType);
+            taskType == typeof(CSharpLambdaTask) ? $"{GetLambdaTaskPrefix()}{base.Build(taskType)}" : base.Build(taskType);
 
-        private string GetLambdaTaskPrefix() =>
-            (string)_configurationProperties.First(prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty).Value;
+        private string GetLambdaTaskPrefix()
+        {
+            var prefix = (string)_configurationProperties.First(prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty).Value;
+            return prefix == null ? string.Empty : $"{prefix}.";
+        }
     }
 }

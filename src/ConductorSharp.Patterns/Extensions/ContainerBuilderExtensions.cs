@@ -24,7 +24,7 @@ namespace ConductorSharp.Patterns.Extensions
 
         public static IExecutionManagerBuilder AddCSharpLambdaTasks(
             this IExecutionManagerBuilder executionManagerBuilder,
-            string csharpLambdaTaskNamePrefix = ""
+            string csharpLambdaTaskNamePrefix = null
         )
         {
             executionManagerBuilder.Builder.RegisterWorkerTask<CSharpLambdaTask>();
