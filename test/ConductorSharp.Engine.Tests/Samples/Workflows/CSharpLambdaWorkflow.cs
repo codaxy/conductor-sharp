@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Patterns.Extensions;
+﻿using ConductorSharp.Patterns.Builders;
 using ConductorSharp.Patterns.Model;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows

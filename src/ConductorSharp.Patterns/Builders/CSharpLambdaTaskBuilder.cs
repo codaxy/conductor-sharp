@@ -11,7 +11,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace ConductorSharp.Patterns.Extensions
+namespace ConductorSharp.Patterns.Builders
 {
     public static class CSharpLambdaTaskExtensions
     {

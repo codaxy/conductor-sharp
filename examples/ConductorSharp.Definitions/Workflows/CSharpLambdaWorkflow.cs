@@ -1,6 +1,6 @@
 ﻿using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Model;
-using ConductorSharp.Patterns.Extensions;
+using ConductorSharp.Patterns.Builders;
 using ConductorSharp.Patterns.Model;
 using MediatR;
 
