@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConductorSharp.Engine.Exceptions
+namespace ConductorSharp.Patterns.Exceptions
 {
     public class NoLambdaException : Exception
     {

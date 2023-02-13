@@ -10,18 +10,16 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class JsonJqTransformTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput, F, G>(
-            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
-            Expression<Func<TWorkflow, JsonJqTransformTaskModel<F, G>>> refference,
-            Expression<Func<TWorkflow, F>> input
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
+            Expression<Func<TWorkflow, JsonJqTransformTaskModel<TInput, TOutput>>> refference,
+            Expression<Func<TWorkflow, TInput>> input
         )
-            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput
-            where F : IRequest<G>
+            where TWorkflow : ITypedWorkflow
+            where TInput : IRequest<TOutput>
         {
-            var taskBuilder = new JsonJqTransformTaskBuilder<F, G>(refference.Body, input.Body, builder.BuildConfiguration);
-            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            var taskBuilder = new JsonJqTransformTaskBuilder<TInput, TOutput>(refference.Body, input.Body, builder.BuildConfiguration);
+            builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }

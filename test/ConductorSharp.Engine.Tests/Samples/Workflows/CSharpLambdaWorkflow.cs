@@ -1,4 +1,7 @@
-﻿namespace ConductorSharp.Engine.Tests.Samples.Workflows
+﻿using ConductorSharp.Patterns.Builders;
+using ConductorSharp.Patterns.Model;
+
+namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
     public class CSharpLambdaWorkflowInput : WorkflowInput<CSharpLambdaWorkflowOutput>
     {
@@ -51,7 +54,7 @@
                     "upper",
                     builder =>
                     {
-                        builder.WithTask(
+                        builder.AddTask(
                             wf => wf.SecondLambdaTask,
                             wf => new() { LambdaInput = wf.WorkflowInput.Input },
                             input =>
@@ -65,7 +68,7 @@
                     "lower",
                     builder =>
                     {
-                        builder.WithTask(
+                        builder.AddTask(
                             wf => wf.ThirdLambdaTask,
                             wf => new() { LambdaInput = wf.WorkflowInput.Input },
                             input =>

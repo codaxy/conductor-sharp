@@ -2,6 +2,7 @@
 using ConductorSharp.Engine.Tests.Samples.Workflows;
 using ConductorSharp.Engine.Tests.Util;
 using ConductorSharp.Engine.Extensions;
+using ConductorSharp.Patterns.Extensions;
 
 namespace ConductorSharp.Engine.Tests.Integration
 {

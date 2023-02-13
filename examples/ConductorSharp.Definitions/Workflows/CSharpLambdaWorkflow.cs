@@ -1,11 +1,8 @@
 ﻿using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Patterns.Builders;
+using ConductorSharp.Patterns.Model;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConductorSharp.Definitions.Workflows
 {
@@ -60,7 +57,7 @@ namespace ConductorSharp.Definitions.Workflows
                     "upper",
                     builder =>
                     {
-                        builder.WithTask(
+                        builder.AddTask(
                             wf => wf.SecondLambdaTask,
                             wf => new() { LambdaInput = wf.WorkflowInput.Input },
                             input =>
@@ -74,7 +71,7 @@ namespace ConductorSharp.Definitions.Workflows
                     "lower",
                     builder =>
                     {
-                        builder.WithTask(
+                        builder.AddTask(
                             wf => wf.ThirdLambdaTask,
                             wf => new() { LambdaInput = wf.WorkflowInput.Input },
                             input =>

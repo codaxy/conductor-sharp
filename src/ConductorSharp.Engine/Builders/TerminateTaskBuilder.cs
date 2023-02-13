@@ -12,17 +12,14 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class TerminateTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow, TInput, TOutput>(
-            this WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder,
+        public static ITaskOptionsBuilder AddTask<TWorkflow>(
+            this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, TerminateTaskModel>> reference,
             Expression<Func<TWorkflow, TerminateTaskInput>> input
-        )
-            where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput
+        ) where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new TerminateTaskBuilder(reference.Body, input.Body, builder.BuildConfiguration);
-            builder.BuildContext.TaskBuilders.Add(taskBuilder);
+            builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }

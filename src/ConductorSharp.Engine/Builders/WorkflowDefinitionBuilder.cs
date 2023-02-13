@@ -33,12 +33,13 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput>
+    public class WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> : ITaskSequenceBuilder<TWorkflow>
         where TWorkflow : ITypedWorkflow
         where TInput : WorkflowInput<TOutput>
         where TOutput : WorkflowOutput
     {
         private readonly Type _workflowType = typeof(TWorkflow);
+        private readonly List<ITaskBuilder> _taskBuilders = new();
 
         public BuildContext BuildContext { get; } = new();
         public BuildConfiguration BuildConfiguration { get; set; }
@@ -122,7 +123,7 @@ namespace ConductorSharp.Engine.Builders
             return new WorkflowDefinition
             {
                 Name = BuildContext.WorkflowName,
-                Tasks = BuildContext.TaskBuilders.SelectMany(a => a.Build()).ToList(),
+                Tasks = _taskBuilders.SelectMany(a => a.Build()).ToList(),
                 FailureWorkflow =
                     BuildContext.WorkflowOptions.FailureWorkflow != null
                         ? NamingUtil.DetermineRegistrationName(BuildContext.WorkflowOptions.FailureWorkflow)
@@ -139,5 +140,7 @@ namespace ConductorSharp.Engine.Builders
                 Version = BuildContext.WorkflowOptions.Version
             };
         }
+
+        public void AddTaskBuilderToSequence(ITaskBuilder builder) => _taskBuilders.Add(builder);
     }
 }

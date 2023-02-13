@@ -1,5 +1,4 @@
 ﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Engine.Handlers;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
@@ -14,12 +13,12 @@ namespace ConductorSharp.Engine.Builders
     public class TaskDefinitionBuilder
     {
         public BuildConfiguration BuildConfiguration { get; set; }
-        private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
+        private readonly ITaskNameBuilder _taskNameBuilder;
 
-        public TaskDefinitionBuilder(BuildConfiguration buildConfiguration, IEnumerable<ConfigurationProperty> configurationProperties)
+        public TaskDefinitionBuilder(BuildConfiguration buildConfiguration, ITaskNameBuilder taskNameBuilder)
         {
             BuildConfiguration = buildConfiguration;
-            _configurationProperties = configurationProperties;
+            _taskNameBuilder = taskNameBuilder;
         }
 
         public TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
@@ -42,7 +41,7 @@ namespace ConductorSharp.Engine.Builders
             var inputType = genericArguments[0];
             var outputType = genericArguments[1];
 
-            var originalName = DetermineRegistrationName(taskType);
+            var originalName = _taskNameBuilder.Build(taskType);
 
             return new TaskDefinition
             {
@@ -69,11 +68,7 @@ namespace ConductorSharp.Engine.Builders
             };
         }
 
-        private string DetermineRegistrationName(Type taskType) =>
-            // TODO: Implement some kind of naming provider for this once we move it to the Patterns project
-            taskType == typeof(CSharpLambdaTaskHandler)
-                ? $"{GetLambdaTaskPrefix()}.{NamingUtil.DetermineRegistrationName(taskType)}"
-                : NamingUtil.DetermineRegistrationName(taskType);
+        private string DetermineRegistrationName(Type taskType) => _taskNameBuilder.Build(taskType);
 
         private string DetermineDescription(string description, params string[] labels)
         {
@@ -84,8 +79,5 @@ namespace ConductorSharp.Engine.Builders
             var descriptionObject = new JObject(descriptionProperty);
             return descriptionObject.ToString(Newtonsoft.Json.Formatting.None);
         }
-
-        private string GetLambdaTaskPrefix() =>
-            (string)_configurationProperties.First(prop => prop.Key == CSharpLambdaTaskHandler.LambdaTaskNameConfigurationProperty).Value;
     }
 }

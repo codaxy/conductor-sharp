@@ -3,6 +3,7 @@ using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
+using ConductorSharp.Patterns.Exceptions;
 using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,7 +16,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConductorSharp.Engine.Handlers
+namespace ConductorSharp.Patterns.Tasks
 {
     internal class CSharpLambdaTaskInput : IRequest<object>
     {
@@ -32,14 +33,14 @@ namespace ConductorSharp.Engine.Handlers
     }
 
     [OriginalName(TaskName)]
-    internal class CSharpLambdaTaskHandler : ITaskRequestHandler<CSharpLambdaTaskInput, object>
+    internal class CSharpLambdaTask : ITaskRequestHandler<CSharpLambdaTaskInput, object>
     {
         public const string TaskName = "CONDUCTOR_SHARP_inline_lambda_task";
         public const string LambdaTaskNameConfigurationProperty = nameof(LambdaTaskNameConfigurationProperty);
 
         private readonly WorkflowBuildItemRegistry _itemRegistry;
 
-        public CSharpLambdaTaskHandler(WorkflowBuildItemRegistry itemRegistry) => _itemRegistry = itemRegistry;
+        public CSharpLambdaTask(WorkflowBuildItemRegistry itemRegistry) => _itemRegistry = itemRegistry;
 
         public Task<object> Handle(CSharpLambdaTaskInput request, CancellationToken cancellationToken)
         {

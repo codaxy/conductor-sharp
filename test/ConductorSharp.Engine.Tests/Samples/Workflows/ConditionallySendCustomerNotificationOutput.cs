@@ -29,7 +29,7 @@ public class ConditionallySendCustomerNotification
         _builder.AddTask(
             wf => wf.SendNotificationDecision,
             wf => new() { CaseValueParam = wf.WorkflowInput.ShouldSendNotification },
-            ("YES", builder => builder.WithTask(c => c.SendNotificationSubworkflow, wf => new() { CustomerId = wf.WorkflowInput.CustomerId }))
+            ("YES", builder => builder.AddTask(c => c.SendNotificationSubworkflow, wf => new() { CustomerId = wf.WorkflowInput.CustomerId }))
         );
     }
 }

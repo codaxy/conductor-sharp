@@ -12,6 +12,5 @@ namespace ConductorSharp.Engine.Extensions
         ContainerBuilder Builder { get; set; }
         IExecutionManagerBuilder AddPipelines(Action<IPipelineBuilder> pipelines);
         IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService;
-        IExecutionManagerBuilder AddCSharpLambdaTasks(string csharpLambdaTaskNamePrefix = "");
     }
 }
