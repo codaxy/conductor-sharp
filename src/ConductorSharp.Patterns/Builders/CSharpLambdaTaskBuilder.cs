@@ -3,6 +3,7 @@ using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
+using ConductorSharp.Patterns.Exceptions;
 using ConductorSharp.Patterns.Model;
 using ConductorSharp.Patterns.Tasks;
 using MediatR;
@@ -25,7 +26,11 @@ namespace ConductorSharp.Patterns.Builders
             where TInput : IRequest<TOutput>
         {
             var lambdaTaskNamePrefix = (string)
-                builder.ConfigurationProperties.First(prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty).Value;
+                builder.ConfigurationProperties.FirstOrDefault(prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty).Value;
+
+            if (lambdaTaskNamePrefix == null)
+                throw new LambdaTasksNotEnabledException();
+
             var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
                 task.Body,
                 input.Body,
