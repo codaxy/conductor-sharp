@@ -30,7 +30,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     {
                         builder.AddTask(wf => wf.GetCustomer, wf => new() { CustomerId = 1 });
                     },
-                    DefaultCase = builder => builder.AddTask(wf => wf.GetCustomer, wf => new() { CustomerId = 0 }).AsOptional()
+                    DefaultCase = builder => builder.AddTask(wf => wf.Terminate, wf => new() { TerminationStatus = TerminationStatus.Failed })
                 }
             );
         }
