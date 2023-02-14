@@ -13,13 +13,30 @@ using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
+    public class DecisionCases<TWorkflow> where TWorkflow : ITypedWorkflow
+    {
+        internal Dictionary<string, Action<DecisionTaskBuilder<TWorkflow>>> Cases { get; } = new();
+
+        public Action<DecisionTaskBuilder<TWorkflow>> DefaultCase { get; set; }
+        public Action<DecisionTaskBuilder<TWorkflow>> this[string @case]
+        {
+            get => Cases[@case];
+            set
+            {
+                if (Cases.ContainsKey(@case))
+                    throw new InvalidOperationException($"Case \"{@case}\" already defined");
+                Cases[@case] = value;
+            }
+        }
+    }
+
     public static class DecisionTaskExtensions
     {
         public static ITaskOptionsBuilder AddTask<TWorkflow>(
             this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
             Expression<Func<TWorkflow, DecisionTaskInput>> expression,
-            params (string, Action<DecisionTaskBuilder<TWorkflow>>)[] caseActions
+            DecisionCases<TWorkflow> decisionCases
         ) where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new DecisionTaskBuilder<TWorkflow>(
@@ -31,10 +48,17 @@ namespace ConductorSharp.Engine.Builders
                 builder.BuildContext
             );
 
-            foreach (var funcase in caseActions)
+            foreach (var @case in decisionCases.Cases)
             {
-                taskBuilder.AddCase(funcase.Item1);
-                funcase.Item2.Invoke(taskBuilder);
+                taskBuilder.AddCase(@case.Key);
+                @case.Value(taskBuilder);
+            }
+
+            // Default case
+            if (decisionCases.DefaultCase != null)
+            {
+                taskBuilder.AddCase(null);
+                decisionCases.DefaultCase(taskBuilder);
             }
 
             builder.AddTaskBuilderToSequence(taskBuilder);
@@ -46,6 +70,7 @@ namespace ConductorSharp.Engine.Builders
         where TWorkflow : ITypedWorkflow
     {
         private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
+        private List<ITaskBuilder> _defaultCase;
         private string _currentCaseName;
 
         public BuildContext BuildContext { get; }
@@ -68,13 +93,10 @@ namespace ConductorSharp.Engine.Builders
             ConfigurationProperties = configurationProperties;
         }
 
-        public DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
+        internal DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
         {
+            // null specifies default case
             _currentCaseName = caseName;
-
-            if (!_caseDictionary.ContainsKey(_currentCaseName))
-                _caseDictionary.Add(caseName, new List<ITaskBuilder>());
-
             return this;
         }
 
@@ -96,11 +118,30 @@ namespace ConductorSharp.Engine.Builders
                         _caseDictionary.Select(
                             a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(a => a.Build()), ConductorConstants.DefinitionsSerializer))
                         )
-                    }
+                    },
+                    DefaultCase = _defaultCase
+                        ?.SelectMany(builder => builder.Build())
+                        .Select(task => JObject.FromObject(task, ConductorConstants.DefinitionsSerializer))
+                        .ToList()
                 }
             };
         }
 
-        public void AddTaskBuilderToSequence(ITaskBuilder builder) => _caseDictionary[_currentCaseName].Add(builder);
+        public void AddTaskBuilderToSequence(ITaskBuilder builder)
+        {
+            // Handle default case
+            if (_currentCaseName == null)
+            {
+                if (_defaultCase == null)
+                    _defaultCase = new();
+
+                _defaultCase.Add(builder);
+                return;
+            }
+
+            if (!_caseDictionary.ContainsKey(_currentCaseName))
+                _caseDictionary.Add(_currentCaseName, new List<ITaskBuilder>());
+            _caseDictionary[_currentCaseName].Add(builder);
+        }
     }
 }

@@ -13,6 +13,7 @@
     <None Remove="Samples\Workflows\ConditionallySendCustomerNotificationOutput.json" />
     <None Remove="Samples\Workflows\CSharpLambdaWorkflow.json" />
     <None Remove="Samples\Workflows\DecisionInDecision.json" />
+    <None Remove="Samples\Workflows\DecisionTask.json" />
     <None Remove="Samples\Workflows\DynamicTask.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\OptionalTaskWorkflow.json" />
@@ -37,6 +38,7 @@
     <EmbeddedResource Include="Samples\Tasks\CustomerGet.json" />
     <EmbeddedResource Include="Samples\Tasks\EmailPrepare.json" />
     <EmbeddedResource Include="Samples\Workflows\Arrays.json" />
+    <EmbeddedResource Include="Samples\Workflows\DecisionTask.json" />
     <EmbeddedResource Include="Samples\Workflows\DynamicTask.json" />
     <EmbeddedResource Include="Samples\Workflows\PatternTasks.json" />
     <EmbeddedResource Include="Samples\Workflows\ScaffoldedWorkflows.json" />

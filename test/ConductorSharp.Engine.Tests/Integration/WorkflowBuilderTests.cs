@@ -43,6 +43,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             _containerBuilder.RegisterWorkflow<UntypedProperty>();
             _containerBuilder.RegisterWorkflow<StringAddition>();
             _containerBuilder.RegisterWorkflow<CSharpLambdaWorkflow>();
+            _containerBuilder.RegisterWorkflow<DecisionTask>();
 
             _container = _containerBuilder.Build();
         }
@@ -190,6 +191,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         {
             var definition = GetDefinitionFromWorkflow<CSharpLambdaWorkflow>();
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/CSharpLambdaWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionDecisionTask()
+        {
+            var definition = GetDefinitionFromWorkflow<DecisionTask>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/DecisionTask.json");
 
             Assert.Equal(expectedDefinition, definition);
         }
