@@ -13,23 +13,6 @@ using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public class DecisionCases<TWorkflow> where TWorkflow : ITypedWorkflow
-    {
-        internal Dictionary<string, Action<DecisionTaskBuilder<TWorkflow>>> Cases { get; } = new();
-
-        public Action<DecisionTaskBuilder<TWorkflow>> DefaultCase { get; set; }
-        public Action<DecisionTaskBuilder<TWorkflow>> this[string @case]
-        {
-            get => Cases[@case];
-            set
-            {
-                if (Cases.ContainsKey(@case))
-                    throw new InvalidOperationException($"Case \"{@case}\" already defined");
-                Cases[@case] = value;
-            }
-        }
-    }
-
     public static class DecisionTaskExtensions
     {
         public static ITaskOptionsBuilder AddTask<TWorkflow>(
