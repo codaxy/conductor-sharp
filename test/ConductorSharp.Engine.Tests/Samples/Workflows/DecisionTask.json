@@ -45,15 +45,15 @@
       "dynamicForkTasksInputParamName": null,
       "defaultCase": [
         {
-          "name": "CUSTOMER_get",
-          "taskReferenceName": "get_customer",
+          "name": "TERMINATE_terminate",
+          "taskReferenceName": "terminate",
           "description": "{\"description\":null}",
           "inputParameters": {
-            "customer_id": 0
+            "terminationStatus": "FAILED"
           },
-          "type": "SIMPLE",
+          "type": "TERMINATE",
           "startDelay": 0,
-          "optional": true,
+          "optional": false,
           "rateLimited": false,
           "asyncComplete": false
         }
