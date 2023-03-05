@@ -49,10 +49,10 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
             _builder.AddTask(
                 wf => wf.DecisionTask,
-                wf => new DecisionTaskInput() { CaseValueParam = wf.WorkflowInput.Operation },
-                (
-                    "upper",
-                    builder =>
+                wf => new() { CaseValueParam = wf.WorkflowInput.Operation },
+                new()
+                {
+                    ["upper"] = builder =>
                     {
                         builder.AddTask(
                             wf => wf.SecondLambdaTask,
@@ -62,11 +62,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                                 return new() { LambdaOutput = new string(input.LambdaInput.ToUpperInvariant()) };
                             }
                         );
-                    }
-                ),
-                (
-                    "lower",
-                    builder =>
+                    },
+                    ["lower"] = builder =>
                     {
                         builder.AddTask(
                             wf => wf.ThirdLambdaTask,
@@ -77,7 +74,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                             }
                         );
                     }
-                )
+                }
             );
 
             _builder.SetOptions(options => options.OwnerEmail = "test@test.com");

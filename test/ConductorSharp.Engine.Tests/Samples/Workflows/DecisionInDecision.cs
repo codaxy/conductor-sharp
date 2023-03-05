@@ -29,19 +29,19 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
             _builder.AddTask(
                 wf => wf.SendNotificationDecision,
                 wf => new() { CaseValueParam = wf.WorkflowInput.ShouldSendNotification },
-                (
-                    "YES",
-                    builder =>
+                new()
+                {
+                    ["YES"] = builder =>
                         builder.AddTask(
                             wf => wf.SecondSendNotificationDecision,
                             wf => new() { CaseValueParam = wf.WorkflowInput.ShouldSendNotification },
-                            (
-                                "YES",
-                                builder =>
+                            new()
+                            {
+                                ["YES"] = builder =>
                                     builder.AddTask(c => c.SendNotificationSubworkflow, wf => new() { CustomerId = wf.WorkflowInput.CustomerId })
-                            )
+                            }
                         )
-                )
+                }
             );
         }
     }

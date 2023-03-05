@@ -27,27 +27,27 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
             _builder.AddTask(
                 wf => wf.DecisionTask,
                 wf => new() { CaseValueParam = "value" },
-                (
-                    "value",
-                    builder =>
+                new()
+                {
+                    ["value"] = builder =>
                         builder.AddTask(
                             wf => wf.DecisionTerminate,
                             wf => new() { WorkflowOutput = new { Property = "Test" }, TerminationStatus = TerminationStatus.Completed }
                         )
-                )
+                }
             );
 
             _builder.AddTask(
                 wf => wf.SwitchTask,
                 wf => new() { SwitchCaseValue = "value" },
-                (
-                    "value",
-                    builder =>
+                new()
+                {
+                    ["value"] = builder =>
                         builder.AddTask(
                             wf => wf.SwitchTerminate,
                             wf => new() { WorkflowOutput = new { Property = "Test" }, TerminationStatus = TerminationStatus.Failed }
                         )
-                )
+                }
             );
 
             _builder.AddTask(

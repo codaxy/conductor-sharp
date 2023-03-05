@@ -19,7 +19,7 @@ namespace ConductorSharp.Engine.Builders
             this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
             Expression<Func<TWorkflow, SwitchTaskInput>> expression,
-            params (string, Action<SwitchTaskBuilder<TWorkflow>>)[] caseActions
+            DecisionCases<TWorkflow> decisionCases
         ) where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new SwitchTaskBuilder<TWorkflow>(
@@ -31,10 +31,17 @@ namespace ConductorSharp.Engine.Builders
                 builder.BuildContext
             );
 
-            foreach (var funcase in caseActions)
+            foreach (var @case in decisionCases.Cases)
             {
-                taskBuilder.AddCase(funcase.Item1);
-                funcase.Item2.Invoke(taskBuilder);
+                taskBuilder.AddCase(@case.Key);
+                @case.Value(taskBuilder);
+            }
+
+            // Handle default case
+            if (decisionCases.DefaultCase != null)
+            {
+                taskBuilder.AddCase(null);
+                decisionCases.DefaultCase(taskBuilder);
             }
 
             builder.AddTaskBuilderToSequence(taskBuilder);
@@ -47,6 +54,7 @@ namespace ConductorSharp.Engine.Builders
     {
         private Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = new();
         private string _currentCaseName;
+        private List<ITaskBuilder> _defaultCase;
 
         public BuildContext BuildContext { get; }
         public BuildConfiguration BuildConfiguration { get; }
@@ -94,23 +102,30 @@ namespace ConductorSharp.Engine.Builders
                         _caseDictionary.Select(
                             a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(b => b.Build()), ConductorConstants.DefinitionsSerializer))
                         )
-                    }
+                    },
+                    DefaultCase = _defaultCase
+                        ?.SelectMany(builder => builder.Build())
+                        .Select(task => JObject.FromObject(task, ConductorConstants.DefinitionsSerializer))
+                        .ToList()
                 }
             };
         }
 
-        private void AddBuilder(ITaskBuilder builder)
+        public void AddTaskBuilderToSequence(ITaskBuilder builder)
         {
-            if (_caseDictionary.ContainsKey(_currentCaseName))
+            // Handle default case
+            if (_currentCaseName == null)
             {
-                _caseDictionary[_currentCaseName].Add(builder);
-            }
-            else
-            {
-                _caseDictionary.Add(_currentCaseName, new List<ITaskBuilder>() { builder });
-            }
-        }
+                if (_defaultCase == null)
+                    _defaultCase = new();
 
-        public void AddTaskBuilderToSequence(ITaskBuilder builder) => AddBuilder(builder);
+                _defaultCase.Add(builder);
+                return;
+            }
+
+            if (!_caseDictionary.ContainsKey(_currentCaseName))
+                _caseDictionary.Add(_currentCaseName, new List<ITaskBuilder>());
+            _caseDictionary[_currentCaseName].Add(builder);
+        }
     }
 }
