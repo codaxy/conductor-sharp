@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Util.Builders;
+﻿using ConductorSharp.Engine.Service;
+using ConductorSharp.Engine.Util.Builders;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -16,5 +17,6 @@ namespace ConductorSharp.Engine.Extensions
             params Assembly[] handlerAssemblies
         );
         IConductorSharpBuilder SetBuildConfiguration(BuildConfiguration buildConfiguration);
+        IConductorSharpBuilder AddWorkflowListener(Action<ListenerConfiguration> listenerOptions);
     }
 }

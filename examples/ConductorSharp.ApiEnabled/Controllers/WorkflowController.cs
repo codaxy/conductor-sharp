@@ -17,13 +17,29 @@ public class WorkflowController : ControllerBase
     private readonly IMetadataService metadataService;
     private readonly IWorkflowService workflowService;
     private readonly ITaskService taskService;
+    private readonly IWorkflowStarterService starterService;
     private const string NotificationWorfklowName = "NOTIFICATION_send_to_customer";
 
-    public WorkflowController(IMetadataService metadataService, IWorkflowService workflowService, ITaskService taskService)
+    public WorkflowController(
+        IMetadataService metadataService,
+        IWorkflowService workflowService,
+        ITaskService taskService,
+        IWorkflowStarterService starterService
+    )
     {
         this.metadataService = metadataService;
         this.workflowService = workflowService;
         this.taskService = taskService;
+        this.starterService = starterService;
+    }
+
+    [HttpGet("test")]
+    public async Task<ActionResult> Test()
+    {
+        var output = await starterService.StartWorkflowAsync<CSharpLambdaWorkflow, CSharpLambdaWorkflowInput, CSharpLambdaWorkflowOutput>(
+            new CSharpLambdaWorkflowInput { Input = "test", Operation = "upper" }
+        );
+        return Ok(output);
     }
 
     [HttpGet("get-workflows")]

@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ConductorSharp.Engine\ConductorSharp.Engine.csproj" />
+    <ProjectReference Include="..\..\src\ConductorSharp.Patterns\ConductorSharp.Patterns.csproj" />
   </ItemGroup>
 
 </Project>

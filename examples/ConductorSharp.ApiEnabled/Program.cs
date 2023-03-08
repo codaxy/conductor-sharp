@@ -17,7 +17,8 @@ builder.Services.AddHealthChecks().AddCheck<ConductorSharpHealthCheck>("running"
 
 //Autofac dependency injection
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureApiEnabled(configuration);
-builder.Host.UseSerilog((ctx, services, lc) => lc.Enrich.FromLogContext().WriteTo.Seq("http://host.docker.internal:5341").WriteTo.Console());
+
+//builder.Host.UseSerilog((ctx, services, lc) => lc.Enrich.FromLogContext().WriteTo.Seq("http://host.docker.internal:5341").WriteTo.Console());
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

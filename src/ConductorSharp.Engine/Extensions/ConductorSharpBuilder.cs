@@ -91,5 +91,18 @@ namespace ConductorSharp.Engine.Extensions
             Builder.RegisterInstance(buildConfiguration);
             return this;
         }
+
+        public IConductorSharpBuilder AddWorkflowListener(Action<ListenerConfiguration> listenerOptions)
+        {
+            var config = new ListenerConfiguration();
+            listenerOptions(config);
+            config.ValidateConfiguration();
+            Builder.RegisterInstance(config);
+            Builder.RegisterType<WorkflowStatusBackgroundService>().As<IHostedService>();
+            Builder.RegisterType<WorkflowTaskSourcesService>().SingleInstance();
+            Builder.RegisterType<WorkflowStarterService>().As<IWorkflowStarterService>();
+
+            return this;
+        }
     }
 }

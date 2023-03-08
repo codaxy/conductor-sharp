@@ -14,7 +14,8 @@ public class ConductorModule : Module
         RegisterTasks(builder);
         RegisterWorkflows(builder);
 
-        builder.RegisterType<TaskExecutionCounterService>().AsImplementedInterfaces().SingleInstance();
+        // TODO: Fix exception cause
+        //builder.RegisterType<TaskExecutionCounterService>().AsImplementedInterfaces().SingleInstance();
     }
 
     private static void RegisterTasks(ContainerBuilder builder)
@@ -22,5 +23,8 @@ public class ConductorModule : Module
         builder.RegisterWorkerTask<PrepareEmailHandler>();
     }
 
-    private static void RegisterWorkflows(ContainerBuilder builder) { }
+    private static void RegisterWorkflows(ContainerBuilder builder)
+    {
+        builder.RegisterWorkflow<CSharpLambdaWorkflow>();
+    }
 }

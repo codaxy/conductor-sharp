@@ -2,6 +2,7 @@
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
 using MediatR.Extensions.Autofac.DependencyInjection;
+using ConductorSharp.Patterns.Extensions;
 
 namespace ConductorSharp.ApiEnabled.Extensions;
 
@@ -17,6 +18,11 @@ public static class HostConfiguration
                     apiPath: configuration.GetValue<string>("Conductor:ApiUrl"),
                     preventErrorOnBadRequest: configuration.GetValue<bool>("Conductor:PreventErrorOnBadRequest")
                 )
+                .AddWorkflowListener(opts =>
+                {
+                    opts.Host = "localhost";
+                    opts.MachineIdentifier = typeof(HostConfiguration).Assembly.GetName().Name;
+                })
                 .AddExecutionManager(
                     maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
@@ -24,6 +30,7 @@ public static class HostConfiguration
                     domain: configuration.GetValue<string>("Conductor:WorkerDomain"),
                     typeof(HostConfiguration).Assembly
                 )
+                .AddCSharpLambdaTasks(typeof(HostConfiguration).Assembly.GetName().Name)
                 .SetHealthCheckService<FileHealthService>()
                 .AddPipelines(pipelines =>
                 {
