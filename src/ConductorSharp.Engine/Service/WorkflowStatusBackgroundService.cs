@@ -57,7 +57,7 @@ namespace ConductorSharp.Engine.Service
         {
             _logger.LogInformation("Starting workflow status listener");
             using var connection = await ConnectionMultiplexer.ConnectAsync($"{_redisConfig.Host}:{_redisConfig.Port}");
-            var queue = connection.GetSubscriber().Subscribe($"{ChannelPrefix}-{_redisConfig.MachineIdentifier}");
+            var queue = connection.GetSubscriber().Subscribe($"{ChannelPrefix}.{_redisConfig.MachineIdentifier}");
             queue.OnMessage(message =>
             {
                 _logger.LogInformation("Got message {}", message);

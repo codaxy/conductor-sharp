@@ -12,7 +12,7 @@ namespace ConductorSharp.Engine.Service
     internal class WorkflowStarterService : IWorkflowStarterService
     {
         private const string WorkflowIdInputName = $"ConductorSharp.Engine.{nameof(WorkflowIdInputName)}";
-        private const string WorkflowMachineIdentifierInputName = $"ConductorSharp.Engine.{nameof(WorkflowMachineIdentifierInputName)}";
+        private const string MachineIdentifierInputName = $"ConductorSharp.Engine.{nameof(MachineIdentifierInputName)}";
 
         private readonly IWorkflowService _workflowService;
         private readonly WorkflowTaskSourcesService _workflowTaskSourcesService;
@@ -45,7 +45,7 @@ namespace ConductorSharp.Engine.Service
             var inputObj = new JObject(input)
             {
                 { WorkflowIdInputName, workflowInputId },
-                { WorkflowMachineIdentifierInputName, _listenerConfiguration.MachineIdentifier }
+                { MachineIdentifierInputName, _listenerConfiguration.MachineIdentifier }
             };
             await _workflowService.QueueWorkflowStringResponse(workflowName, 1, inputObj);
             return await task;
