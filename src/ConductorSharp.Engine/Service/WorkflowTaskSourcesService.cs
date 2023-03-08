@@ -39,6 +39,7 @@ namespace ConductorSharp.Engine.Service
                 return;
             var workflowData = _completionSources[messageObj.WorkflowId];
             workflowData.TaskCompletionSource.SetResult(messageObj.WorkflowOutput);
+            _completionSources.Remove(messageObj.WorkflowId);
         }
 
         public Task<JObject> AllocateTask(string workflowInputId)
