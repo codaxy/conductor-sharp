@@ -10,7 +10,7 @@ public class SendCustomerNotificationInput : WorkflowInput<SendCustomerNotificat
 
 public class SendCustomerNotificationOutput : WorkflowOutput
 {
-    public dynamic EmailBody { get; set; }
+    public object EmailBody { get; set; }
 }
 #endregion
 [Version(3)]

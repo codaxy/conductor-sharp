@@ -9,12 +9,12 @@ namespace ConductorSharp.Definitions.Generated
         /// <originalName>
         /// address
         /// </originalName>
-        public dynamic Address { get; set; }
+        public object Address { get; set; }
 
         /// <originalName>
         /// name
         /// </originalName>
-        public dynamic Name { get; set; }
+        public object Name { get; set; }
     }
 
     public partial class EmailPrepareV1Output
@@ -22,7 +22,7 @@ namespace ConductorSharp.Definitions.Generated
         /// <originalName>
         /// email_body
         /// </originalName>
-        public dynamic EmailBody { get; set; }
+        public object EmailBody { get; set; }
     }
 
     /// <originalName>
@@ -36,7 +36,7 @@ namespace ConductorSharp.Definitions.Generated
         /// <originalName>
         /// customer_id
         /// </originalName>
-        public dynamic CustomerId { get; set; }
+        public object CustomerId { get; set; }
     }
 
     public partial class CustomerGetV1Output
@@ -44,12 +44,12 @@ namespace ConductorSharp.Definitions.Generated
         /// <originalName>
         /// name
         /// </originalName>
-        public dynamic Name { get; set; }
+        public object Name { get; set; }
 
         /// <originalName>
         /// address
         /// </originalName>
-        public dynamic Address { get; set; }
+        public object Address { get; set; }
     }
 
     /// <originalName>

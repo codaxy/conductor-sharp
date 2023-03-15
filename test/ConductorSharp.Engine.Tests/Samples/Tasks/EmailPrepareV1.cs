@@ -5,12 +5,12 @@ public partial class EmailPrepareV1Input : IRequest<EmailPrepareV1Output>
     /// <originalName>
     /// address
     /// </originalName>
-    public dynamic Address { get; set; }
+    public object Address { get; set; }
 
     /// <originalName>
     /// name
     /// </originalName>
-    public dynamic Name { get; set; }
+    public object Name { get; set; }
 }
 
 public partial class EmailPrepareV1Output
@@ -18,7 +18,7 @@ public partial class EmailPrepareV1Output
     /// <originalName>
     /// email_body
     /// </originalName>
-    public dynamic EmailBody { get; set; }
+    public object EmailBody { get; set; }
 }
 
 /// <originalName>

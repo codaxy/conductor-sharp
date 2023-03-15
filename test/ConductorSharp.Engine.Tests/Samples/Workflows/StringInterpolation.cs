@@ -15,7 +15,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class StringInterpolationOutput : WorkflowOutput
     {
-        public dynamic EmailBody { get; set; }
+        public object EmailBody { get; set; }
     }
 
     [OriginalName("TEST_StringInterpolation")]

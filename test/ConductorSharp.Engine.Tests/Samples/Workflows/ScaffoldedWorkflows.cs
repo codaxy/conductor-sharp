@@ -9,12 +9,12 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     #region s_one
     public class ScaffoldedOneInput : WorkflowInput<ScaffoldedOneOutput>
     {
-        public dynamic InputOne { get; set; }
+        public object InputOne { get; set; }
     }
 
     public class ScaffoldedOneOutput : WorkflowOutput
     {
-        public dynamic OutputOne { get; set; }
+        public object OutputOne { get; set; }
     }
 
     [OriginalName("SCAFFOLDED_one")]
@@ -23,12 +23,12 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     #region s_two
     public class ScaffoldedTwoInput : WorkflowInput<ScaffoldedTwoOutput>
     {
-        public dynamic Name { get; set; }
+        public object Name { get; set; }
     }
 
     public class ScaffoldedTwoOutput : WorkflowOutput
     {
-        public dynamic OutputName { get; set; }
+        public object OutputName { get; set; }
     }
 
     [OriginalName("SCAFFOLDED_two")]
