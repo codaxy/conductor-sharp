@@ -27,8 +27,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 wf =>
                     new PrepareEmailRequest()
                     {
-                        CustomerName = wf.GetCustomer.Output.FullName.FirstName,
-                        Address = wf.GetCustomer.Output.AddressString
+                        CustomerName = ((FullName)wf.GetCustomer.Output.Name).FirstName,
+                        Address = (string)wf.GetCustomer.Output.Address
                     }
             );
         }
