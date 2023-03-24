@@ -185,7 +185,6 @@ namespace ConductorSharp.Engine.Util
                     if (typeof(WorkflowId).IsAssignableFrom(propInfo.PropertyType))
                     {
                         memberList.AddRange(new[] { "workflowId", "workflow" });
-                        ;
                         return;
                     }
 
