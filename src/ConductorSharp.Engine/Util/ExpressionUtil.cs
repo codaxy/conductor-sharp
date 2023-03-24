@@ -210,7 +210,7 @@ namespace ConductorSharp.Engine.Util
                     break;
 
                 default:
-                    throw new NotSupportedException("test");
+                    throw new NotSupportedException($"Expression {expr} not supported while traversing members");
             }
         }
 
