@@ -14,13 +14,12 @@ namespace ConductorSharp.Engine.Builders
         public static ITaskOptionsBuilder AddTask<TWorkflow, Tinput, TOutput>(
             this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, SimpleTaskModel<Tinput, TOutput>>> refference,
-            Expression<Func<TWorkflow, Tinput>> input,
-            AdditionalTaskParameters additionalParameters = null
+            Expression<Func<TWorkflow, Tinput>> input
         )
             where TWorkflow : ITypedWorkflow
             where Tinput : IRequest<TOutput>
         {
-            var taskBuilder = new SimpleTaskBuilder<Tinput, TOutput>(refference.Body, input.Body, additionalParameters, builder.BuildConfiguration);
+            var taskBuilder = new SimpleTaskBuilder<Tinput, TOutput>(refference.Body, input.Body, builder.BuildConfiguration);
             builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
@@ -28,15 +27,8 @@ namespace ConductorSharp.Engine.Builders
 
     public class SimpleTaskBuilder<A, B> : BaseTaskBuilder<A, B> where A : IRequest<B>
     {
-        public SimpleTaskBuilder(
-            Expression taskExpression,
-            Expression inputExpression,
-            AdditionalTaskParameters additionalParameters,
-            BuildConfiguration buildConfiguration
-        ) : base(taskExpression, inputExpression, buildConfiguration)
-        {
-            _additionalParameters = additionalParameters ?? _additionalParameters;
-        }
+        public SimpleTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+            : base(taskExpression, inputExpression, buildConfiguration) { }
 
         public override WorkflowDefinition.Task[] Build() =>
             new WorkflowDefinition.Task[]
