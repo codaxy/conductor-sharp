@@ -1,19 +1,14 @@
 ﻿using ConductorSharp.Engine.Tests.Samples.Workers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
-    public class UntypedPropertyInput : WorkflowInput<UntypedPropertyOutput> { }
+    public class CastWorkflowInput : WorkflowInput<CastWorkflowOutput> { }
 
-    public class UntypedPropertyOutput : WorkflowOutput { }
+    public class CastWorkflowOutput : WorkflowOutput { }
 
-    public class UntypedProperty : Workflow<UntypedProperty, UntypedPropertyInput, UntypedPropertyOutput>
+    public class CastWorkflow : Workflow<CastWorkflow, CastWorkflowInput, CastWorkflowOutput>
     {
-        public UntypedProperty(WorkflowDefinitionBuilder<UntypedProperty, UntypedPropertyInput, UntypedPropertyOutput> builder) : base(builder) { }
+        public CastWorkflow(WorkflowDefinitionBuilder<CastWorkflow, CastWorkflowInput, CastWorkflowOutput> builder) : base(builder) { }
 
         public CustomerGetV1 GetCustomer { get; set; }
         public PrepareEmailHandler PrepareEmail { get; set; }
@@ -25,7 +20,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
             _builder.AddTask(
                 wf => wf.PrepareEmail,
                 wf =>
-                    new PrepareEmailRequest()
+                    new PrepareEmailRequest
                     {
                         CustomerName = ((FullName)wf.GetCustomer.Output.Name).FirstName,
                         Address = (string)wf.GetCustomer.Output.Address
