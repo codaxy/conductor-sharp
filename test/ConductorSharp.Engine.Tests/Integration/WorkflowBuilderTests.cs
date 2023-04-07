@@ -40,7 +40,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             _containerBuilder.RegisterWorkflow<ScaffoldedWorkflows>();
             _containerBuilder.RegisterWorkflow<VersionAttributeWorkflow>();
             _containerBuilder.RegisterWorkflow<PatternTasks>();
-            _containerBuilder.RegisterWorkflow<UntypedProperty>();
+            _containerBuilder.RegisterWorkflow<CastWorkflow>();
             _containerBuilder.RegisterWorkflow<StringAddition>();
             _containerBuilder.RegisterWorkflow<CSharpLambdaWorkflow>();
             _containerBuilder.RegisterWorkflow<DecisionTask>();
@@ -170,10 +170,10 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
-        public void BuilderReturnsCorrectDefinitionUntypedProperty()
+        public void BuilderReturnsCorrectDefinitionCastWorkflow()
         {
-            var definition = GetDefinitionFromWorkflow<UntypedProperty>();
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/UntypedProperty.json");
+            var definition = GetDefinitionFromWorkflow<CastWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/CastWorkflow.json");
 
             Assert.Equal(expectedDefinition, definition);
         }

@@ -138,12 +138,12 @@ namespace ConductorSharp.Toolkit.Service
                             {
                                 inputPropData.XmlComments["remark"] = $"Example: {value}";
                             }
-                            DefinePropertyParams(inputPropData, "dynamic", param.Key);
+                            DefinePropertyParams(inputPropData, "object", param.Key);
                             modelGenerator.AddInputProperty(inputPropData);
 
                             break;
                         case "toggle":
-                            DefinePropertyParams(inputPropData, "dynamic", param.Key);
+                            DefinePropertyParams(inputPropData, "object", param.Key);
                             modelGenerator.AddInputProperty(inputPropData);
                             break;
                         case "select":
@@ -158,7 +158,7 @@ namespace ConductorSharp.Toolkit.Service
                             if (options != null && options.Length > 0)
                                 inputPropData.XmlComments["remark"] = $"Options: {string.Join(',', options)}";
 
-                            DefinePropertyParams(inputPropData, "dynamic", param.Key);
+                            DefinePropertyParams(inputPropData, "object", param.Key);
                             modelGenerator.AddInputProperty(inputPropData);
                             break;
                         default:
@@ -216,7 +216,7 @@ namespace ConductorSharp.Toolkit.Service
             foreach (var property in taskDefinition.InputKeys)
             {
                 var inputPropData = new TaskModelGenerator.PropertyData();
-                DefinePropertyParams(inputPropData, "dynamic", property);
+                DefinePropertyParams(inputPropData, "object", property);
                 inputPropData.XmlComments["originalName"] = property;
                 modelGenerator.AddInputProperty(inputPropData);
             }
@@ -224,7 +224,7 @@ namespace ConductorSharp.Toolkit.Service
             foreach (var property in taskDefinition.OutputKeys)
             {
                 var inputPropData = new TaskModelGenerator.PropertyData();
-                DefinePropertyParams(inputPropData, "dynamic", property);
+                DefinePropertyParams(inputPropData, "object", property);
                 inputPropData.XmlComments["originalName"] = property;
                 modelGenerator.AddOutputProperty(inputPropData);
             }

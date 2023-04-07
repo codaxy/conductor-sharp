@@ -159,48 +159,58 @@ namespace ConductorSharp.Engine.Util
         {
             if (expr is MemberExpression)
                 return CreateExpressionString(expr);
-            else if (
+            if (
                 expr is MethodCallExpression methodExpr
                 && methodExpr.Method.DeclaringType == typeof(NamingUtil)
                 && methodExpr.Method.Name == nameof(NamingUtil.NameOf)
             )
                 return (string)methodExpr.Method.Invoke(null, null);
-            else
-                throw new Exception($"Expression {expr.GetType().Name} not supported");
+            throw new Exception($"Expression {expr.GetType().Name} not supported");
         }
 
         private static string CreateExpressionString(Expression expression)
         {
-            var expressionString = Traverse(expression).Split(".");
-            Array.Reverse(expressionString);
-            return $"${{{string.Join('.', expressionString)}}}";
+            var memberList = new List<string>();
+            Traverse(expression, memberList);
+            memberList.Reverse();
+            return $"${{{string.Join('.', memberList)}}}";
         }
 
-        private static string Traverse(Expression expr)
+        private static void Traverse(Expression expr, List<string> memberList)
         {
-            string memberName = default;
-
-            if (expr is MemberExpression mex)
+            switch (expr)
             {
-                var propInfo = mex.Member as PropertyInfo;
+                case MemberExpression { Member: PropertyInfo propInfo } memEx:
 
-                if (typeof(WorkflowId).IsAssignableFrom(propInfo.PropertyType))
-                    memberName = "workflowId.workflow";
-                else
-                    memberName = GetMemberName(propInfo);
+                    if (typeof(WorkflowId).IsAssignableFrom(propInfo.PropertyType))
+                    {
+                        memberList.AddRange(new[] { "workflowId", "workflow" });
+                        return;
+                    }
 
-                if (mex.Expression is MemberExpression mmex)
-                {
-                    var memberType = mmex.Member as PropertyInfo;
+                    if (typeof(IWorkflowInput).IsAssignableFrom(propInfo.PropertyType))
+                    {
+                        memberList.AddRange(new[] { "input", "workflow" });
+                        return;
+                    }
 
-                    if (typeof(IWorkflowInput).IsAssignableFrom(memberType.PropertyType))
-                        memberName = memberName + "." + "input.workflow";
-                    else
-                        memberName = memberName + "." + Traverse(mmex);
-                }
+                    var memberName = GetMemberName(propInfo);
+                    memberList.Add(memberName);
+                    Traverse(memEx.Expression, memberList);
+                    break;
+
+                case UnaryExpression { NodeType: ExpressionType.Convert } unaryEx:
+                    Traverse(unaryEx.Operand, memberList);
+                    break;
+
+                // Either we reached task property reference (ConstantExpression case) or workflow parameter (ParameterExpression case)
+                case ConstantExpression cex when typeof(ITypedWorkflow).IsAssignableFrom(cex.Type):
+                case ParameterExpression:
+                    break;
+
+                default:
+                    throw new NotSupportedException($"Expression {expr} not supported while traversing members");
             }
-
-            return memberName;
         }
 
         private static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
@@ -225,9 +235,6 @@ namespace ConductorSharp.Engine.Util
 
                 if (memberName == null)
                     memberName = propertyInfo.GetDocSection("originalName");
-
-            if (propertyInfo.IsTypedProperty())
-                return GetMemberName(propertyInfo.GetUntypedProperty());
 
             if (memberName == null)
                 memberName = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>(true)?.PropertyName;

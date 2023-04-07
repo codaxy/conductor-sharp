@@ -17,9 +17,9 @@ namespace ConductorSharp.Definitions.Workflows
 
     public class SendCustomerNotificationOutput : WorkflowOutput
     {
-        public dynamic CustomerId { get; set; }
-        public dynamic EmailBody { get; set; }
-        public dynamic Constant { get; set; }
+        public object CustomerId { get; set; }
+        public object EmailBody { get; set; }
+        public object Constant { get; set; }
     }
 
     public class ExpectedDynamicInput : CustomerGetV1Input, IRequest<ExpectedDynamicOutput> { }

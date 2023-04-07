@@ -8,7 +8,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Tasks
 {
     public class TaskNestedObjectsInput : IRequest<TaskNestedObjectsOutput>
     {
-        public dynamic NestedObjects { get; set; }
+        public object NestedObjects { get; set; }
     }
 
     public class TaskNestedObjectsOutput { }

@@ -16,7 +16,7 @@ namespace ConductorSharp.Engine.Model
     public class TerminateTaskInput : IRequest<NoOutput>
     {
         [JsonProperty("workflowOutput")]
-        public dynamic WorkflowOutput { get; set; }
+        public object WorkflowOutput { get; set; }
 
         [JsonProperty("terminationStatus")]
         public TerminationStatus TerminationStatus { get; set; }
