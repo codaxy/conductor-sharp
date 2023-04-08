@@ -10,7 +10,7 @@ namespace ConductorSharp.Client.Service
         Task<WorkflowDescriptorResponse> QueueWorkflow(string workflowName, int version, JObject input);
         Task<TResponse> QueueWorkflow<TResponse>(string workflowName, int version, JObject input);
         Task<string> QueueWorkflowStringResponse(string workflowName, int version, JObject input);
-        Task<JObject> GetWorkflowStatus(string workflowId, bool includeTasks = true);
+        Task<WorkflowStatusResponse> GetWorkflowStatus(string workflowId, bool includeTasks = true);
         Task<WorkflowSearchResponse> SearchWorkflows(WorkflowSearchRequest request);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ConductorSharp.Client.Model.Common;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,43 +8,23 @@ namespace ConductorSharp.Client.Model.Response
 {
     public class WorkflowStatusResponse
     {
-        [JsonProperty("workflowType")]
-        public string WorkflowType { get; set; }
-
-        [JsonProperty("version")]
-        public int Version { get; set; }
-
-        [JsonProperty("workflowId")]
-        public string WorkflowId { get; set; }
-
-        [JsonProperty("startTime")]
-        public DateTime StartTime { get; set; }
-
-        [JsonProperty("endTime")]
-        public DateTime EndTime { get; set; }
-
-        [JsonProperty("status")]
+        public string? OwnerApp { get; set; }
+        public long CreateTime { get; set; }
+        public long UpdateTime { get; set; }
+        public long StartTime { get; set; }
+        public long EndTime { get; set; }
         public string Status { get; set; }
-
-        [JsonProperty("input")]
-        public string Input { get; set; }
-
-        [JsonProperty("output")]
-        public string Output { get; set; }
-
-        [JsonProperty("executionTime")]
-        public int ExecutionTime { get; set; }
-
-        [JsonProperty("failedReferenceTaskNames")]
-        public string FailedReferenceTaskNames { get; set; }
-
-        [JsonProperty("priority")]
+        public string WorkflowName { get; set; }
+        public List<string> FailedReferenceTaskNames { get; set; } = new List<string>();
+        public int WorkflowVersion { get; set; }
+        public string WorkflowId { get; set; }
+        public string CorrelationId { get; set; }
+        public string ReasonForIncompletion { get; set; }
+        public JObject Input { get; set; }
+        public JObject Output { get; set; }
         public int Priority { get; set; }
-
-        [JsonProperty("inputSize")]
-        public int InputSize { get; set; }
-
-        [JsonProperty("outputSize")]
-        public int OutputSize { get; set; }
+        public long LastRetriedTime { get; set; }
+        public WorkflowDefinition WorkflowDefinition { get; set; }
+        public List<TaskStatusResponse> Tasks { get; set; }
     }
 }

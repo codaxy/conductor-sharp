@@ -27,8 +27,10 @@ namespace ConductorSharp.Client.Service
                 new Dictionary<string, string> { { "Accept", "*/*" } }
             );
 
-        public async Task<JObject> GetWorkflowStatus(string workflowId, bool includeTasks = true) =>
-            await _client.ExecuteRequestAsync<JObject>(ApiUrls.GetWorkflowStatus(workflowId, includeTasks), HttpMethod.Get);
+        public async Task<WorkflowStatusResponse> GetWorkflowStatus(string workflowId, bool includeTasks = true)
+        {
+            return await _client.ExecuteRequestAsync<WorkflowStatusResponse>(ApiUrls.GetWorkflowStatus(workflowId, includeTasks), HttpMethod.Get);
+        }
 
         public async Task<TResponse> QueueWorkflow<TResponse>(string workflowName, int version, JObject input) =>
             await _client.ExecuteRequestAsync<TResponse>(

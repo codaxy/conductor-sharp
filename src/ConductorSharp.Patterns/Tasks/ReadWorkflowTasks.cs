@@ -32,7 +32,7 @@ namespace ConductorSharp.Patterns.Tasks
 
     public class ReadWorkflowTasksResponse
     {
-        public Dictionary<string, TaskExecutionDetails> Tasks { get; set; }
+        public Dictionary<string, ConductorSharp.Client.Model.Response.TaskStatusResponse> Tasks { get; set; }
         public WorkflowDetails Workflow { get; set; }
     }
 
@@ -41,20 +41,6 @@ namespace ConductorSharp.Patterns.Tasks
         public JObject InputData { get; set; }
     }
 
-    public class TaskExecutionDetails
-    {
-        [JsonProperty("inputData")]
-        public JObject InputData { get; set; } = new JObject();
-
-        [JsonProperty("outputData")]
-        public JObject OutputData { get; set; } = new JObject();
-
-        [JsonProperty("referenceTaskName")]
-        public string ReferenceTaskName { get; set; }
-
-        [JsonProperty("status")]
-        public string Status { get; set; } = "NOT_FOUND";
-    }
     #endregion
     /// <summary>
     /// Uses the Conductor API to read the input/output and status of the specified tasks for the specified workflow.
@@ -83,17 +69,19 @@ namespace ConductorSharp.Patterns.Tasks
             if (starterWorkflow == null)
                 throw new Exception($"Could not find starter workflow by id {input.WorkflowId}");
 
-            var taskData = starterWorkflow.SelectToken("tasks").ToObject<List<TaskExecutionDetails>>();
-
             var output = new ReadWorkflowTasksResponse
             {
-                Workflow = new WorkflowDetails { InputData = starterWorkflow.SelectToken("input") as JObject },
-                Tasks = new Dictionary<string, TaskExecutionDetails>()
+                Workflow = new WorkflowDetails { InputData = starterWorkflow.Input },
+                Tasks = new Dictionary<string, ConductorSharp.Client.Model.Response.TaskStatusResponse>()
             };
 
             foreach (var task in tasknames)
             {
-                output.Tasks.Add(task, taskData.FirstOrDefault(a => a.ReferenceTaskName == task) ?? new TaskExecutionDetails());
+                output.Tasks.Add(
+                    task,
+                    starterWorkflow.Tasks.FirstOrDefault(a => a.ReferenceTaskName == task)
+                        ?? new ConductorSharp.Client.Model.Response.TaskStatusResponse()
+                );
             }
 
             return output;
