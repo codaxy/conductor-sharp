@@ -8,7 +8,7 @@ namespace ConductorSharp.Client.Model.Response
 {
     public class WorkflowStatusResponse
     {
-        public string? OwnerApp { get; set; }
+        public string OwnerApp { get; set; }
         public long CreateTime { get; set; }
         public long UpdateTime { get; set; }
         public long StartTime { get; set; }
