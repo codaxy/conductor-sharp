@@ -36,6 +36,10 @@ public class WorkflowController : ControllerBase
     public async Task<ActionResult<WorkflowSearchResponse>> SearchWorkflows([FromQuery] WorkflowSearchRequest request) =>
         await workflowService.SearchWorkflows(request);
 
+    [HttpGet("get-status/{workflowId}")]
+    public async Task<ActionResult<WorkflowStatusResponse>> GetStatus([FromRoute] string workflowId, [FromQuery] bool includeTasks) =>
+        await workflowService.GetWorkflowStatus(workflowId, includeTasks);
+
     [HttpPost("send-notification")]
     public async Task<ActionResult<string>> QueueWorkflow([FromBody] SendNotificationRequest request) =>
         await workflowService.QueueWorkflowStringResponse(
