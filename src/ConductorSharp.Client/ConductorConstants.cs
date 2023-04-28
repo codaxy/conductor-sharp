@@ -11,6 +11,7 @@ namespace ConductorSharp.Client
             new()
             {
                 ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
+                NullValueHandling = NullValueHandling.Ignore,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
                 TypeNameHandling = TypeNameHandling.Auto
