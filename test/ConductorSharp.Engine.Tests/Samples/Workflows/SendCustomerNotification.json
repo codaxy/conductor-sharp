@@ -14,7 +14,7 @@
       "taskReferenceName": "get_customer",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "customer_id": "${workflow.input.customer_id}"
+        "id": "${workflow.input.customer_id}"
       },
       "type": "SIMPLE",
       "dynamicTaskNameParam": null,
