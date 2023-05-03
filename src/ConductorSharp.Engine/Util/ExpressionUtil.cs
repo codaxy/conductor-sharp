@@ -227,22 +227,6 @@ namespace ConductorSharp.Engine.Util
             return false;
         }
 
-        private static string GetMemberName(PropertyInfo propertyInfo)
-        {
-            string memberName = default;
-
-            if (propertyInfo.PropertyType is IParameterKeyword keyword)
-
-                if (memberName == null)
-                    memberName = propertyInfo.GetDocSection("originalName");
-
-            if (memberName == null)
-                memberName = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>(true)?.PropertyName;
-
-            if (memberName == null)
-                memberName = SnakeCaseUtil.ToSnakeCase(propertyInfo.Name);
-
-            return memberName;
-        }
+        private static string GetMemberName(PropertyInfo propertyInfo) => NamingUtil.GetParameterName(propertyInfo);
     }
 }

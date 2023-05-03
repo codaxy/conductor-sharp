@@ -1,5 +1,8 @@
 ﻿using ConductorSharp.Engine.Interface;
 using System;
+using System.Reflection;
+using ConductorSharp.Client;
+using Newtonsoft.Json;
 
 namespace ConductorSharp.Engine.Util
 {
@@ -28,6 +31,9 @@ namespace ConductorSharp.Engine.Util
 
         public static string NameOf<TNameable>() where TNameable : INameable => DetermineRegistrationName(typeof(TNameable));
 
-        internal static string DetermineReferenceName(string referenceName) => SnakeCaseUtil.ToCapitalizedPrefixSnakeCase(referenceName);
+        internal static string GetParameterName(PropertyInfo propInfo) =>
+            propInfo.GetDocSection("originalName")
+            ?? propInfo.GetCustomAttribute<JsonPropertyAttribute>(true)?.PropertyName
+            ?? ConductorConstants.IoNamingStrategy.GetPropertyName(propInfo.Name, false);
     }
 }
