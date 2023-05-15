@@ -5,6 +5,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workers;
 public class GetCustomerRequest : IRequest<GetCustomerResponse>
 {
     [Required]
+    [JsonProperty("id")]
     public int CustomerId { get; set; }
 }
 

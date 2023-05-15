@@ -7,6 +7,10 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using ConductorSharp.Client;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -50,8 +54,8 @@ namespace ConductorSharp.Engine.Builders
                 Description = options.Description ?? DetermineDescription(taskType.GetDocSection("summary")),
                 RetryCount = options.RetryCount,
                 TimeoutSeconds = options.TimeoutSeconds,
-                InputKeys = inputType.GetProperties().Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(a.Name)).ToList(),
-                OutputKeys = outputType.GetProperties().Select(a => a.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(a.Name)).ToList(),
+                InputKeys = inputType.GetProperties().Select(NamingUtil.GetParameterName).ToList(),
+                OutputKeys = outputType.GetProperties().Select(NamingUtil.GetParameterName).ToList(),
                 TimeoutPolicy = options.TimeoutPolicy,
                 RetryLogic = options.RetryLogic,
                 RetryDelaySeconds = options.RetryDelaySeconds,
@@ -68,9 +72,7 @@ namespace ConductorSharp.Engine.Builders
             };
         }
 
-        private string DetermineRegistrationName(Type taskType) => _taskNameBuilder.Build(taskType);
-
-        private string DetermineDescription(string description, params string[] labels)
+        private static string DetermineDescription(string description)
         {
             var descriptionProperty = string.IsNullOrEmpty(description)
                 ? new JProperty("description", "Missing description")

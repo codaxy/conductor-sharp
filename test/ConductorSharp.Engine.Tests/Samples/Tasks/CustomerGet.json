@@ -9,7 +9,7 @@
   "retryCount": 0,
   "timeoutSeconds": 60,
   "inputKeys": [
-    "customer_id"
+    "id"
   ],
   "outputKeys": [
     "name",

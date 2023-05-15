@@ -40,7 +40,7 @@
                   "taskReferenceName": "send_notification_subworkflow",
                   "description": "{\"description\":null}",
                   "inputParameters": {
-                    "customer_id": "${workflow.input.customer_id}"
+                    "id": "${workflow.input.customer_id}"
                   },
                   "type": "SUB_WORKFLOW",
                   "startDelay": 0,

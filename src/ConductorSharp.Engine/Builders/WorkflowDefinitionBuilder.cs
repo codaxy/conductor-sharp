@@ -109,7 +109,7 @@ namespace ConductorSharp.Engine.Builders
                 var isRequired = prop.GetCustomAttribute<RequiredAttribute>();
                 var description = prop.GetDocSection("summary");
 
-                var propertyName = prop.GetDocSection("originalName") ?? SnakeCaseUtil.ToSnakeCase(prop.Name);
+                var propertyName = NamingUtil.GetParameterName(prop);
 
                 var requiredString = isRequired != null ? "(required)" : "(optional)";
                 BuildContext.Inputs.Add(

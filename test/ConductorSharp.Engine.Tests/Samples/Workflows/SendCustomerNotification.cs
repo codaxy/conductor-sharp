@@ -5,6 +5,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows;
 #region models
 public class SendCustomerNotificationInput : WorkflowInput<SendCustomerNotificationOutput>
 {
+    [JsonProperty("id")]
     public int CustomerId { get; set; }
 }
 
