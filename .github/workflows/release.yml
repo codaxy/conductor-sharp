@@ -3,6 +3,7 @@ name: Deploy packages
 on:
   push:
     tags: ["v2.*"]
+  workflow_dispatch:
 
 jobs:
   deploy-packages:
