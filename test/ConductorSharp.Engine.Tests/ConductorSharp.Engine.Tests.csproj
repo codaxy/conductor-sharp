@@ -18,6 +18,7 @@
     <None Remove="Samples\Workflows\DynamicTask.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\OptionalTaskWorkflow.json" />
+    <None Remove="Samples\Workflows\PassthroughTaskWorkflow.json" />
     <None Remove="Samples\Workflows\PatternTasks.json" />
     <None Remove="Samples\Workflows\ScaffoldedWorkflows.json" />
     <None Remove="Samples\Workflows\SendCustomerNotification.json" />
@@ -41,6 +42,7 @@
     <EmbeddedResource Include="Samples\Workflows\Arrays.json" />
     <EmbeddedResource Include="Samples\Workflows\DecisionTask.json" />
     <EmbeddedResource Include="Samples\Workflows\DynamicTask.json" />
+    <EmbeddedResource Include="Samples\Workflows\PassthroughTaskWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\PatternTasks.json" />
     <EmbeddedResource Include="Samples\Workflows\ScaffoldedWorkflows.json" />
     <EmbeddedResource Include="Samples\Workflows\OptionalTaskWorkflow.json" />
