@@ -8,13 +8,8 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class PassThroughTaskExtensions
     {
-        public static void AddTasks<TWorkflow, TInput, TOutput>(
-            this ITaskSequenceBuilder<TWorkflow> builder,
-            params WorkflowDefinition.Task[] taskDefinitions
-        )
-            where TWorkflow : ITypedWorkflow
-            where TInput : WorkflowInput<TOutput>
-            where TOutput : WorkflowOutput => builder.AddTaskBuilderToSequence(new PassThroughTaskBuilder(taskDefinitions));
+        public static void AddTasks<TWorkflow>(this ITaskSequenceBuilder<TWorkflow> builder, params WorkflowDefinition.Task[] taskDefinitions)
+            where TWorkflow : ITypedWorkflow => builder.AddTaskBuilderToSequence(new PassThroughTaskBuilder(taskDefinitions));
     }
 
     public class PassThroughTaskBuilder : ITaskBuilder
