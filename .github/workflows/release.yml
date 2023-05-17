@@ -30,4 +30,4 @@ jobs:
     - name: Publish ConductorSharp.Engine package
       run: dotnet nuget push ./src/ConductorSharp.Engine/bin/Release/ConductorSharp.Engine*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
     - name: Publish ConductorSharp.Patterns package
-      run: dotnet nuget push ./src/ConductorSharp.Patterns/bin/Release/ConductorSharp.Patterns*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/ConductorSharp.Toolkit/bin/Release/ConductorSharp.Patterns*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
