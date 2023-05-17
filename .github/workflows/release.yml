@@ -19,15 +19,19 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore ConductorSharp.sln
+
     - name: Create ConductorSharp.Client package
       run: dotnet pack --no-restore ./src/ConductorSharp.Client -c Release
     - name: Create ConductorSharp.Engine package
       run: dotnet pack --no-restore ./src/ConductorSharp.Engine -c Release
     - name: Create ConductorSharp.Patterns package
       run: dotnet pack --no-restore ./src/ConductorSharp.Patterns -c Release 
+
     - name: Publish ConductorSharp.Client package
       run: dotnet nuget push ./src/ConductorSharp.Client/bin/Release/ConductorSharp.Client*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
     - name: Publish ConductorSharp.Engine package
       run: dotnet nuget push ./src/ConductorSharp.Engine/bin/Release/ConductorSharp.Engine*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
     - name: Publish ConductorSharp.Patterns package
-      run: dotnet nuget push ./src/ConductorSharp.Toolkit/bin/Release/ConductorSharp.Patterns*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/ConductorSharp.Patterns/bin/Release/ConductorSharp.Patterns*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+    - name: Publish ConductorSharp.Toolkit package
+      run: dotnet nuget push ./src/ConductorSharp.Toolkit/bin/Release/ConductorSharp.Toolkit*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
