@@ -11,7 +11,7 @@ namespace ConductorSharp.Engine.Util
 
         private readonly static Regex _labelRegex = new(_labelRegexString);
 
-        private int _version;
+        private int _version = 1;
         private string _description;
         private string[] _labels;
         private string _ownerApp;
