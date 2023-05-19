@@ -32,8 +32,7 @@ namespace ConductorSharp.Engine.Util
             return string.Join("_", chunks);
         }
 
-        public static string ToSnakeCase(string str) =>
-            ConductorConstants.IoNamingStrategy.GetPropertyName(str, false)
+        public static string ToSnakeCase(string str) => ConductorConstants.IoNamingStrategy.GetPropertyName(str, false);
 
         public static string ToPascalCase(string str)
         {
