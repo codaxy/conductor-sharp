@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ConductorSharp.Client;
 
 namespace ConductorSharp.Engine.Util
 {
@@ -32,7 +33,7 @@ namespace ConductorSharp.Engine.Util
         }
 
         public static string ToSnakeCase(string str) =>
-            string.Concat(str.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
+            ConductorConstants.IoNamingStrategy.GetPropertyName(str, false)
 
         public static string ToPascalCase(string str)
         {
