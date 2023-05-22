@@ -122,7 +122,7 @@ namespace ConductorSharp.Toolkit.Service
                     var type = param.Value.SelectToken("type")?.Value<string>();
                     var description = param.Value.SelectToken("description")?.Value<string>();
 
-                    if (type == null)
+                    if (string.IsNullOrEmpty(type))
                         type = "string";
 
                     inputPropData.XmlComments["originalName"] = param.Key;
