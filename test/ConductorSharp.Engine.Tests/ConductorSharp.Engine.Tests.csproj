@@ -27,9 +27,11 @@
     <None Remove="Samples\Workflows\SwitchTask.json" />
     <None Remove="Samples\Workflows\TerminateTaskWorkflow.json" />
     <None Remove="Samples\Workflows\VersionAttributeWorkflow.json" />
+    <None Remove="Samples\Workflows\WaitTask.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Samples\Workflows\WaitTask.json" />
     <EmbeddedResource Include="Samples\Workflows\CSharpLambdaWorkflow.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>

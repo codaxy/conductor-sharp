@@ -1,0 +1,57 @@
+{
+  "ownerApp": null,
+  "createTime": 0,
+  "updateTime": 0,
+  "createdBy": null,
+  "updatedBy": null,
+  "name": "wait_task_workflow",
+  "description": "{\"description\":null,\"labels\":null}",
+  "version": 1,
+  "tasks": [
+    {
+      "queryExpression": null,
+      "name": "WAIT_wait",
+      "taskReferenceName": "wait",
+      "description": "{\"description\":null}",
+      "inputParameters": {
+        "duration": "1s"
+      },
+      "type": "WAIT",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": null,
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": null,
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    }
+  ],
+  "inputParameters": [
+    "{}"
+  ],
+  "outputParameters": null,
+  "failureWorkflow": null,
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": true,
+  "ownerEmail": null,
+  "timeoutPolicy": null,
+  "timeoutSeconds": 0,
+  "variables": null
+}
