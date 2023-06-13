@@ -46,6 +46,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             _containerBuilder.RegisterWorkflow<DecisionTask>();
             _containerBuilder.RegisterWorkflow<SwitchTask>();
             _containerBuilder.RegisterWorkflow<PassthroughTaskWorkflow>();
+            _containerBuilder.RegisterWorkflow<HumanTaskWorkflow>();
 
             _container = _containerBuilder.Build();
         }
@@ -220,6 +221,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         {
             var definition = GetDefinitionFromWorkflow<PassthroughTaskWorkflow>();
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/PassthroughTaskWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionHumanWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<HumanTaskWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/HumanTask.json");
 
             Assert.Equal(expectedDefinition, definition);
         }
