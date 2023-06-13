@@ -183,10 +183,10 @@ namespace ConductorSharp.Engine.Util
 
         private static string CreateExpressionString(Expression expression)
         {
-            return $"${{{CompileExpression(expression)}}}";
+            return $"${{{CompileToJsonPathExpression(expression)}}}";
         }
 
-        private static string CompileExpression(Expression expr)
+        private static string CompileToJsonPathExpression(Expression expr)
         {
             switch (expr)
             {
@@ -211,23 +211,23 @@ namespace ConductorSharp.Engine.Util
                         || memEx.Expression is ParameterExpression
                     )
                         return memberName;
-                    return $"{CompileExpression(memEx.Expression)}.{memberName}";
+                    return $"{CompileToJsonPathExpression(memEx.Expression)}.{memberName}";
 
                 case MethodCallExpression mex when IsDictionaryIndexExpression(mex):
-                    return $"{CompileExpression(mex.Object)}[{CompileExpression(mex.Arguments[0])}]";
+                    return $"{CompileToJsonPathExpression(mex.Object)}[{CompileToJsonPathExpression(mex.Arguments[0])}]";
 
                 case UnaryExpression { NodeType: ExpressionType.Convert } unaryEx:
-                    return CompileExpression(unaryEx.Operand);
+                    return CompileToJsonPathExpression(unaryEx.Operand);
 
                 case ConstantExpression constantExpr:
-                    return CompileExpressionConstant(constantExpr);
+                    return CompileJsonPathConstant(constantExpr);
 
                 default:
                     throw new NotSupportedException($"Expression {expr} not supported while traversing members");
             }
         }
 
-        private static string CompileExpressionConstant(ConstantExpression cex)
+        private static string CompileJsonPathConstant(ConstantExpression cex)
         {
             if (cex.Type == typeof(string))
                 return $"'{cex.Value}'";
