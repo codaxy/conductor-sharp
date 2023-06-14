@@ -100,6 +100,19 @@ namespace ConductorSharp.Engine.Util
                 return cex.Value;
         }
 
+        private static object ParseDictionaryIndexExpression(MethodCallExpression expression)
+        {
+            var index = expression.Arguments[0];
+            return $"{ParseExpression(expression.Object)}[{ParseExpression(index)}]";
+        }
+
+        private static bool IsDictionaryIndexExpression(Expression expr) =>
+            expr is MethodCallExpression mex
+            && mex.Method.Name == "get_Item"
+            && mex.Method.DeclaringType != null
+            && mex.Method.DeclaringType.IsGenericType
+            && mex.Method.DeclaringType.GetGenericTypeDefinition() == typeof(Dictionary<,>);
+
         private static JArray ParseArrayInitalization(NewArrayExpression newArrayExpression)
         {
             if (newArrayExpression.NodeType != ExpressionType.NewArrayInit)
@@ -157,7 +170,7 @@ namespace ConductorSharp.Engine.Util
 
         private static string CompileMemberOrNameExpressions(Expression expr)
         {
-            if (expr is MemberExpression)
+            if (expr is MemberExpression || IsDictionaryIndexExpression(expr))
                 return CreateExpressionString(expr);
             if (
                 expr is MethodCallExpression methodExpr
@@ -170,13 +183,10 @@ namespace ConductorSharp.Engine.Util
 
         private static string CreateExpressionString(Expression expression)
         {
-            var memberList = new List<string>();
-            Traverse(expression, memberList);
-            memberList.Reverse();
-            return $"${{{string.Join('.', memberList)}}}";
+            return $"${{{CompileToJsonPathExpression(expression)}}}";
         }
 
-        private static void Traverse(Expression expr, List<string> memberList)
+        private static string CompileToJsonPathExpression(Expression expr)
         {
             switch (expr)
             {
@@ -184,47 +194,44 @@ namespace ConductorSharp.Engine.Util
 
                     if (typeof(WorkflowId).IsAssignableFrom(propInfo.PropertyType))
                     {
-                        memberList.AddRange(new[] { "workflowId", "workflow" });
-                        return;
+                        return "workflow.workflowId";
                     }
 
                     if (typeof(IWorkflowInput).IsAssignableFrom(propInfo.PropertyType))
                     {
-                        memberList.AddRange(new[] { "input", "workflow" });
-                        return;
+                        return "workflow.input";
                     }
 
                     var memberName = GetMemberName(propInfo);
-                    memberList.Add(memberName);
-                    Traverse(memEx.Expression, memberList);
-                    break;
+
+                    // Either we reached task property reference (ConstantExpression case) or workflow parameter (ParameterExpression case)
+                    // case ConstantExpression cex when typeof(ITypedWorkflow).IsAssignableFrom(cex.Type)
+                    if (
+                        (memEx.Expression is ConstantExpression cex && typeof(ITypedWorkflow).IsAssignableFrom(cex.Type))
+                        || memEx.Expression is ParameterExpression
+                    )
+                        return memberName;
+                    return $"{CompileToJsonPathExpression(memEx.Expression)}.{memberName}";
+
+                case MethodCallExpression mex when IsDictionaryIndexExpression(mex):
+                    return $"{CompileToJsonPathExpression(mex.Object)}[{CompileToJsonPathExpression(mex.Arguments[0])}]";
 
                 case UnaryExpression { NodeType: ExpressionType.Convert } unaryEx:
-                    Traverse(unaryEx.Operand, memberList);
-                    break;
+                    return CompileToJsonPathExpression(unaryEx.Operand);
 
-                // Either we reached task property reference (ConstantExpression case) or workflow parameter (ParameterExpression case)
-                case ConstantExpression cex when typeof(ITypedWorkflow).IsAssignableFrom(cex.Type):
-                case ParameterExpression:
-                    break;
+                case ConstantExpression constantExpr:
+                    return CompileJsonPathConstant(constantExpr);
 
                 default:
                     throw new NotSupportedException($"Expression {expr} not supported while traversing members");
             }
         }
 
-        private static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
+        private static string CompileJsonPathConstant(ConstantExpression cex)
         {
-            while (toCheck != null && toCheck != typeof(object))
-            {
-                var cur = toCheck.GetTypeInfo().IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
-                if (generic == cur)
-                {
-                    return true;
-                }
-                toCheck = toCheck.GetTypeInfo().BaseType;
-            }
-            return false;
+            if (cex.Type == typeof(string))
+                return $"'{cex.Value}'";
+            return cex.Value.ToString();
         }
 
         private static string GetMemberName(PropertyInfo propertyInfo) => NamingUtil.GetParameterName(propertyInfo);
