@@ -16,6 +16,7 @@
     <None Remove="Samples\Workflows\DecisionInDecision.json" />
     <None Remove="Samples\Workflows\DecisionTask.json" />
     <None Remove="Samples\Workflows\DynamicTask.json" />
+    <None Remove="Samples\Workflows\HumanTask.json" />
     <None Remove="Samples\Workflows\IndexerWorkflow.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\OptionalTaskWorkflow.json" />
@@ -32,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Samples\Workflows\HumanTask.json" />
     <EmbeddedResource Include="Samples\Workflows\WaitTask.json" />
     <EmbeddedResource Include="Samples\Workflows\CSharpLambdaWorkflow.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
