@@ -14,7 +14,8 @@
       "taskReferenceName": "wait",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "duration": "1s"
+        "duration": "1s",
+        "until": "2022-12-31 11:59"
       },
       "type": "WAIT",
       "dynamicTaskNameParam": null,

@@ -13,7 +13,7 @@
 
         public override void BuildDefinition()
         {
-            _builder.AddTask(wf => wf.Wait, wf => new() { Duration = "1s" });
+            _builder.AddTask(wf => wf.Wait, wf => new() { Duration = "1s", Until = "2022-12-31 11:59" });
         }
     }
 }
