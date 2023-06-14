@@ -34,9 +34,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Samples\Workflows\HumanTask.json" />
-    <EmbeddedResource Include="Samples\Workflows\CSharpLambdaWorkflow.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="Samples\Workflows\WaitTask.json" />
     <EmbeddedResource Include="Samples\Workflows\CSharpLambdaWorkflow.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
