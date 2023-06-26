@@ -19,6 +19,14 @@
           2,
           3
         ],
+        "test_model_list": [
+          {
+            "string": "${workflow.input.test_value}"
+          },
+          {
+            "string": "List2"
+          }
+        ],
         "models": [
           {
             "string": "Test1"
@@ -98,7 +106,7 @@
     }
   ],
   "inputParameters": [
-    "{}"
+    "{\"test_value\":{\"value\":\"\",\"description\":\" (optional)\"}}"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

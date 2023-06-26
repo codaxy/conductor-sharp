@@ -14,6 +14,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Tasks
         }
 
         public int[] Integers { get; set; }
+        public List<TestModel> TestModelList { get; set; }
         public TestModel[] Models { get; set; }
         public object Objects { get; set; }
     }
