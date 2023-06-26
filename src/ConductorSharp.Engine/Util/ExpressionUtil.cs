@@ -64,6 +64,9 @@ namespace ConductorSharp.Engine.Util
             if (expression is NewArrayExpression newArrayExpression)
                 return ParseArrayInitalization(newArrayExpression);
 
+            if (expression is ListInitExpression listInitExpression)
+                return ParseListInit(listInitExpression);
+
             return CompileMemberOrNameExpressions(expression);
         }
 
@@ -119,6 +122,22 @@ namespace ConductorSharp.Engine.Util
                 throw new Exception("Only dimensionless array initialization is supported");
 
             return new JArray(newArrayExpression.Expressions.Select(ParseExpression));
+        }
+
+        private static JArray ParseListInit(ListInitExpression listInitExpression)
+        {
+            var array = new JArray();
+            foreach (ElementInit init in listInitExpression.Initializers)
+            {
+                // Assuming all initializers have one argument
+                if (init.Arguments.Count != 1)
+                {
+                    throw new NotSupportedException("Only single argument initializers are supported");
+                }
+
+                array.Add(ParseExpression(init.Arguments.Single()));
+            }
+            return array;
         }
 
         private static JObject ParseObjectInitialization(Expression expression)
