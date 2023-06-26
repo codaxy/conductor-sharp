@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
-    public class ArrayInput : WorkflowInput<ArrayOutput>
-    {
-        public string TestValue { get; set; }
-    }
+    public class ArrayInput : WorkflowInput<ArrayOutput> { }
 
     public class ArrayOutput : WorkflowOutput { }
 
@@ -28,11 +25,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     new()
                     {
                         Integers = new[] { 1, 2, 3 },
-                        TestModelList = new List<ArrayTaskInput.TestModel>
-                        {
-                            new ArrayTaskInput.TestModel { String = wf.Input.TestValue },
-                            new ArrayTaskInput.TestModel { String = "List2" }
-                        },
                         Models = new[]
                         {
                             new ArrayTaskInput.TestModel { String = "Test1" },
