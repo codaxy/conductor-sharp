@@ -50,7 +50,7 @@ namespace ConductorSharp.Engine.Util
                 && methodExpression.Method.DeclaringType == typeof(string)
             )
             {
-                var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileMemberOrNameExpressions).ToArray();
+                var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileInterpolatedStringArgument).ToArray();
                 var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
                 if (formatExpr == null)
                     throw new Exception("string.Format with non constant format string is not supported");
@@ -67,7 +67,7 @@ namespace ConductorSharp.Engine.Util
             if (expression is ListInitExpression listInitExpression)
                 return ParseListInit(listInitExpression);
 
-            return CompileMemberOrNameExpressions(expression);
+            return CompileInterpolatedStringArgument(expression);
         }
 
         private static object ParseBinaryExpression(BinaryExpression binaryEx)
@@ -99,8 +99,8 @@ namespace ConductorSharp.Engine.Util
                 var field = type.GetField(type.GetEnumName(cex.Value));
                 return field.GetCustomAttribute<EnumValueAttribute>()?.Value ?? cex.Value.ToString();
             }
-            else
-                return cex.Value;
+
+            return cex.Value;
         }
 
         private static object ParseDictionaryIndexExpression(MethodCallExpression expression)
@@ -187,7 +187,7 @@ namespace ConductorSharp.Engine.Util
             return inputParams;
         }
 
-        private static string CompileMemberOrNameExpressions(Expression expr)
+        private static string CompileInterpolatedStringArgument(Expression expr)
         {
             if (expr is MemberExpression || IsDictionaryIndexExpression(expr))
                 return CreateExpressionString(expr);
@@ -197,6 +197,8 @@ namespace ConductorSharp.Engine.Util
                 && methodExpr.Method.Name == nameof(NamingUtil.NameOf)
             )
                 return (string)methodExpr.Method.Invoke(null, null);
+            if (expr is ConstantExpression cex)
+                return (string)ParseConstantExpression(cex);
             throw new Exception($"Expression {expr.GetType().Name} not supported");
         }
 
