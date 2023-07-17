@@ -10,7 +10,7 @@
   "tasks": [
     {
       "queryExpression": null,
-      "name": "TEST.CONDUCTOR_SHARP_inline_lambda_task",
+      "name": "TEST.CSHRP_inln_lmbd",
       "taskReferenceName": "first_lambda_task",
       "description": "{\"description\":null}",
       "inputParameters": {
@@ -62,7 +62,7 @@
       "decisionCases": {
         "upper": [
           {
-            "name": "TEST.CONDUCTOR_SHARP_inline_lambda_task",
+            "name": "TEST.CSHRP_inln_lmbd",
             "taskReferenceName": "second_lambda_task",
             "description": "{\"description\":null}",
             "inputParameters": {
@@ -80,7 +80,7 @@
         ],
         "lower": [
           {
-            "name": "TEST.CONDUCTOR_SHARP_inline_lambda_task",
+            "name": "TEST.CSHRP_inln_lmbd",
             "taskReferenceName": "third_lambda_task",
             "description": "{\"description\":null}",
             "inputParameters": {

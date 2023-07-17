@@ -35,7 +35,7 @@ namespace ConductorSharp.Patterns.Tasks
     [OriginalName(TaskName)]
     internal class CSharpLambdaTask : ITaskRequestHandler<CSharpLambdaTaskInput, object>
     {
-        public const string TaskName = "CONDUCTOR_SHARP_inline_lambda_task";
+        public const string TaskName = "CSHRP_inln_lmbd";
         public const string LambdaTaskNameConfigurationProperty = nameof(LambdaTaskNameConfigurationProperty);
 
         private readonly WorkflowBuildItemRegistry _itemRegistry;
