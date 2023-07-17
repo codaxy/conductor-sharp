@@ -14,7 +14,7 @@
       "taskReferenceName": "email_prepare",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "address": "${workflow.input.first_input},${workflow.input.second_input}",
+        "address": "${workflow.input.first_input},${workflow.input.second_input},Value",
         "name": "Workflow name: TEST_StringInterpolation"
       },
       "type": "SIMPLE",

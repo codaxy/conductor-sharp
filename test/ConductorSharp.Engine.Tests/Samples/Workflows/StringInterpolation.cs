@@ -21,6 +21,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     [OriginalName("TEST_StringInterpolation")]
     public class StringInterpolation : Workflow<StringInterpolation, StringInterpolationInput, StringInterpolationOutput>
     {
+        public const string Constant = "Value";
+
         public StringInterpolation(WorkflowDefinitionBuilder<StringInterpolation, StringInterpolationInput, StringInterpolationOutput> builder)
             : base(builder) { }
 
@@ -33,7 +35,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 wf =>
                     new()
                     {
-                        Address = $"{wf.WorkflowInput.FirstInput},{wf.WorkflowInput.SecondInput}",
+                        Address = $"{wf.WorkflowInput.FirstInput},{wf.WorkflowInput.SecondInput},{Constant}",
                         Name = $"Workflow name: {NamingUtil.NameOf<StringInterpolation>()}"
                     }
             );
