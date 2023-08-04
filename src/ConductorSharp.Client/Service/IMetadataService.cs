@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Client.Model.Response;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace ConductorSharp.Client.Service
         Task<WorkflowDefinition> GetWorkflowDefinition(string name, int version);
         Task UpdateWorkflowDefinition(WorkflowDefinition workflowDefinition);
         Task DeleteWorkflowDefinition(string name, int version);
-        Task ValidateWorkflowDefinition(WorkflowDefinition workflowDefinition);
+        Task<ValidateWorkflowResponse> ValidateWorkflowDefinition(WorkflowDefinition workflowDefinition);
         Task<WorkflowDefinition[]> GetAllWorkflowDefinitions();
         Task<EventHandlerDefinition[]> GetAllEventHandlerDefinitions();
         Task UpdateEventHandlerDefinition(EventHandlerDefinition definition);
