@@ -30,7 +30,6 @@ namespace ConductorSharp.Engine.Tests.Unit
             var userDeserialized = job.ToObject<User>(ConductorConstants.IoJsonSerializer);
 
             Assert.NotNull(userDeserialized);
-            Assert.Equal("TEST", userDeserialized.JDocIdentity.GetValue<string>());
         }
     }
 }

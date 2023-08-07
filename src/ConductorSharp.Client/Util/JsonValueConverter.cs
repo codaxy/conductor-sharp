@@ -7,7 +7,7 @@ namespace ConductorSharp.Client.Util
     public class JsonValueConverter : JsonConverter<JsonValue>
     {
         public override void WriteJson(JsonWriter writer, JsonValue value, Newtonsoft.Json.JsonSerializer serializer) =>
-            writer.WriteRawValue(value.ToString());
+            writer.WriteValue(value.ToString());
 
         public override JsonValue ReadJson(
             JsonReader reader,
