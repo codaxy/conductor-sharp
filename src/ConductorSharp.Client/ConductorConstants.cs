@@ -10,6 +10,22 @@ namespace ConductorSharp.Client
 
         public static NamingStrategy IoNamingStrategy { get; } = new SnakeCaseNamingStrategy();
 
+        public static JsonSerializerSettings ConductorClientJsonSerializerSettings
+        {
+            get
+            {
+                JsonSerializerSettings settings =
+                    new()
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
+                    };
+
+                settings.Converters.Add(new JsonDocumentConverter());
+                return settings;
+            }
+        }
         public static JsonSerializer IoJsonSerializer
         {
             get

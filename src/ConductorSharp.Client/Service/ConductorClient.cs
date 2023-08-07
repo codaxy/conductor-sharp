@@ -30,7 +30,7 @@ namespace ConductorSharp.Client.Service
                 _restClient = new RestClient();
 
             // TODO: Make this not required, as we want to allow the user to init client as he likes
-            _restClient.UseNewtonsoftJson();
+            _restClient.UseNewtonsoftJson(ConductorConstants.ConductorClientJsonSerializerSettings);
         }
 
         private void CheckResponse(RestResponse response)
