@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ConductorSharp.Client.Util;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace ConductorSharp.Client
@@ -9,15 +10,24 @@ namespace ConductorSharp.Client
 
         public static NamingStrategy IoNamingStrategy { get; } = new SnakeCaseNamingStrategy();
 
-        public static JsonSerializer IoJsonSerializer { get; } =
-            new()
+        public static JsonSerializer IoJsonSerializer
+        {
+            get
             {
-                ContractResolver = new DefaultContractResolver { NamingStrategy = IoNamingStrategy },
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
-                TypeNameHandling = TypeNameHandling.Auto
-            };
+                var serializer = new JsonSerializer()
+                {
+                    ContractResolver = new DefaultContractResolver { NamingStrategy = IoNamingStrategy },
+                    NullValueHandling = NullValueHandling.Ignore,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
+                    TypeNameHandling = TypeNameHandling.Auto
+                };
+
+                serializer.Converters.Add(new JsonDocumentConverter());
+                return serializer;
+            }
+        }
+
         public static JsonSerializer DefinitionsSerializer { get; } = new() { NullValueHandling = NullValueHandling.Ignore };
     }
 }
