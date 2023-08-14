@@ -129,11 +129,7 @@ namespace ConductorSharp.Engine.Builders
                     BuildContext.WorkflowOptions.FailureWorkflow != null
                         ? NamingUtil.DetermineRegistrationName(BuildContext.WorkflowOptions.FailureWorkflow)
                         : null,
-                Description = new JObject()
-                {
-                    new JProperty("description", BuildContext.WorkflowOptions.Description),
-                    new JProperty("labels", BuildContext.WorkflowOptions.Labels)
-                }.ToString(Formatting.None),
+                Description = BuildConfiguration.WorkflowDescriptionBuilder.Build(BuildContext),
                 InputParameters = BuildContext.Inputs,
                 OutputParameters = BuildContext.Outputs,
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
