@@ -32,13 +32,7 @@ namespace ConductorSharp.Client.Model.Request
 
             public long QueueWaitTime { get; set; }
 
-            Dictionary<string, object> _additionalProperties;
-
-            public Dictionary<string, object> AdditionalProperties
-            {
-                get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
-                set { _additionalProperties = value; }
-            }
+            public Dictionary<string, object> AdditionalProperties { get; set; } = new();
         }
 
         public string Name { get; set; }
@@ -61,12 +55,6 @@ namespace ConductorSharp.Client.Model.Request
 
         public Dictionary<string, WorkflowTestRequest> SubWorkflowTestRequest { get; set; }
 
-        private Dictionary<string, object> _additionalProperties;
-
-        public Dictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
+        public Dictionary<string, object> AdditionalProperties { get; set; } = new();
     }
 }
