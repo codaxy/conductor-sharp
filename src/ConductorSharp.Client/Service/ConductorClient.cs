@@ -42,7 +42,7 @@ namespace ConductorSharp.Client.Service
             {
                 ConductorErrorResponse error = default;
 
-                _logger.LogDebug("Received {@Response} with status code {@StatusCode}", response.Content, (int)response.StatusCode);
+                _logger.LogInformation("Received {@Response} with status code {@StatusCode}", response.Content, (int)response.StatusCode);
 
                 error = JsonConvert.DeserializeObject<ConductorErrorResponse>(response.Content);
 
