@@ -35,7 +35,7 @@ namespace ConductorSharp.Client.Model.Response
         public bool SubworkflowChanged { get; set; }
         public TaskDefinition TaskDefinition { get; set; }
         public bool LoopOverTask { get; set; }
-        public int QueueWaitTime { get; set; }
+        public long QueueWaitTime { get; set; }
         public string SubWorkflowId { get; set; }
     }
 }
