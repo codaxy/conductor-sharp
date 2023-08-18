@@ -100,7 +100,7 @@ namespace ConductorSharp.Client.Service
         {
             var request = CreateRequest(relativeUrl, method);
 
-            var response = await _restClient.ExecuteAsync<T>(request);
+            var response = await _restClient.ExecuteAsync(request);
 
             CheckResponse(response);
 
