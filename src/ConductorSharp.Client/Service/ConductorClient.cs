@@ -47,7 +47,7 @@ namespace ConductorSharp.Client.Service
                 if (!string.IsNullOrEmpty(response.ErrorMessage))
                     throw new Exception(response.ErrorMessage);
 
-                error = JsonConvert.DeserializeObject<ConductorErrorResponse>(response.Content ?? "{}");
+                error = response.Content != null ? JsonConvert.DeserializeObject<ConductorErrorResponse>(response.Content) : null;
 
                 if (error == null || string.IsNullOrEmpty(error.Message))
                     throw new Exception("Unable to deserialize error");
