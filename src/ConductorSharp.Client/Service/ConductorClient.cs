@@ -44,7 +44,10 @@ namespace ConductorSharp.Client.Service
 
                 _logger.LogInformation("Received {@Response} with status code {@StatusCode}", response.Content, (int)response.StatusCode);
 
-                error = JsonConvert.DeserializeObject<ConductorErrorResponse>(response.Content);
+                if (!string.IsNullOrEmpty(response.ErrorMessage))
+                    throw new Exception(response.ErrorMessage);
+
+                error = JsonConvert.DeserializeObject<ConductorErrorResponse>(response.Content ?? "{}");
 
                 if (error == null || string.IsNullOrEmpty(error.Message))
                     throw new Exception("Unable to deserialize error");
