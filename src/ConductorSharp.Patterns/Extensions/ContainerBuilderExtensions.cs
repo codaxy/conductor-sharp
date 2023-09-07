@@ -27,7 +27,10 @@ namespace ConductorSharp.Patterns.Extensions
             string csharpLambdaTaskNamePrefix = null
         )
         {
-            executionManagerBuilder.Builder.RegisterWorkerTask<CSharpLambdaTask>();
+            executionManagerBuilder.Builder.RegisterWorkerTask<CSharpLambdaTask>(options =>
+            {
+                options.OwnerEmail = "owneremail@gmail.com";
+            });
             executionManagerBuilder.Builder.RegisterMediatR(typeof(CSharpLambdaTask).Assembly);
             executionManagerBuilder.Builder.RegisterInstance(
                 new ConfigurationProperty(CSharpLambdaTask.LambdaTaskNameConfigurationProperty, csharpLambdaTaskNamePrefix)

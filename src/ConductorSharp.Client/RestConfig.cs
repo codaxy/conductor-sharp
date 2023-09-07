@@ -1,5 +1,6 @@
 ﻿using RestSharp;
 using System;
+using System.Collections.Generic;
 
 namespace ConductorSharp.Client
 {
@@ -9,7 +10,7 @@ namespace ConductorSharp.Client
         public string ApiPath { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public Func<RestClient> CreateClient { get; set; }
+        public Dictionary<string, string> DefaultHeaders { get; set; }
         public bool IgnoreValidationErrors { get; set; }
     }
 }

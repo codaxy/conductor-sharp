@@ -16,7 +16,10 @@ namespace ConductorSharp.NoApi
 
         private static void RegisterTasks(ContainerBuilder builder)
         {
-            builder.RegisterWorkerTask<GetCustomerHandler>();
+            builder.RegisterWorkerTask<GetCustomerHandler>(options =>
+            {
+                options.OwnerEmail = "owneremail@gmail.com";
+            });
         }
 
         private static void RegisterWorkflows(ContainerBuilder builder) { }

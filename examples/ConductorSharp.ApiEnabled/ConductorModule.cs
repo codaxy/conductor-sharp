@@ -19,7 +19,10 @@ public class ConductorModule : Module
 
     private static void RegisterTasks(ContainerBuilder builder)
     {
-        builder.RegisterWorkerTask<PrepareEmailHandler>();
+        builder.RegisterWorkerTask<PrepareEmailHandler>(options =>
+        {
+            options.OwnerEmail = "owneremail@gmail.com";
+        });
     }
 
     private static void RegisterWorkflows(ContainerBuilder builder) { }

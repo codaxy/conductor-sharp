@@ -6,6 +6,7 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
 using RestSharp;
 using System;
+using System.Net.Http;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -29,7 +30,9 @@ namespace ConductorSharp.Engine.Extensions
                 }
             );
 
-            builder.RegisterType<ConductorClient>().As<IConductorClient>().SingleInstance();
+            builder.RegisterType<HttpClient>().AsSelf();
+
+            builder.RegisterType<ConductorHttpClient>().As<IConductorClient>().SingleInstance();
 
             builder.RegisterType<TaskService>().As<ITaskService>();
 
