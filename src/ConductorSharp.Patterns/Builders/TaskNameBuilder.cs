@@ -22,7 +22,9 @@ namespace ConductorSharp.Patterns.Builders
         private string GetLambdaTaskPrefix()
         {
             var prefix = (string)_configurationProperties.First(prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty).Value;
-            return prefix == null ? string.Empty : $"{prefix}.";
+            return MakeTaskNamePrefix(prefix);
         }
+
+        public static string MakeTaskNamePrefix(string prefix) => prefix == null ? string.Empty : $"{prefix}.";
     }
 }
