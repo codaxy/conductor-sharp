@@ -12,7 +12,7 @@ namespace ConductorSharp.Client.Service
         Task DeleteTaskDefinition(string name);
         Task UpdateTaskDefinition(TaskDefinition definition);
         Task<WorkflowDefinition> GetWorkflowDefinition(string name, int version);
-        Task UpdateWorkflowDefinition(WorkflowDefinition workflowDefinition);
+        Task UpdateWorkflowDefinitions(List<WorkflowDefinition> workflowDefinition);
         Task DeleteWorkflowDefinition(string name, int version);
         Task<WorkflowDefinition[]> GetAllWorkflowDefinitions();
         Task<EventHandlerDefinition[]> GetAllEventHandlerDefinitions();
