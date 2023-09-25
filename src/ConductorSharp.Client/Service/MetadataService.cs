@@ -43,8 +43,13 @@ namespace ConductorSharp.Client.Service
         public async Task<WorkflowDefinition[]> GetAllWorkflowDefinitions() =>
             (await _conductorClient.ExecuteRequestAsync<WorkflowDefinition[]>(ApiUrls.GetAlleWorkflowDefinitions(), HttpMethod.Get));
 
-        public async Task<WorkflowNamesAndVersionsResponse> GetAllWorkflowNamesAndVersions() =>
-            (await _conductorClient.ExecuteRequestAsync<WorkflowNamesAndVersionsResponse>(ApiUrls.GetAllWorkflowNamesAndVersions(), HttpMethod.Get));
+        public async Task<Dictionary<string, List<NameAndVersion>>> GetAllWorkflowNamesAndVersions() =>
+            (
+                await _conductorClient.ExecuteRequestAsync<Dictionary<string, List<NameAndVersion>>>(
+                    ApiUrls.GetAllWorkflowNamesAndVersions(),
+                    HttpMethod.Get
+                )
+            );
 
         public async Task<EventHandlerDefinition[]> GetAllEventHandlerDefinitions() =>
             await _conductorClient.ExecuteRequestAsync<EventHandlerDefinition[]>(ApiUrls.GetAllEventDefinitions(), HttpMethod.Get);

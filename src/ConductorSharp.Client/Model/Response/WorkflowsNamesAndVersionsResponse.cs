@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ConductorSharp.Client.Model.Response
 {
@@ -15,10 +12,5 @@ namespace ConductorSharp.Client.Model.Response
 
         [JsonProperty("createTime")]
         public long CreateTime { get; set; }
-    }
-
-    public class WorkflowNamesAndVersionsResponse
-    {
-        public Dictionary<string, List<NameAndVersion>> Data { get; set; }
     }
 }
