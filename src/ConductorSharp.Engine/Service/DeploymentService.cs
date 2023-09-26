@@ -35,7 +35,11 @@ namespace ConductorSharp.Engine.Service
 
             // TODO: Add registration for event handlers
 
-            _logger.LogInformation("Finished deploying conductor definitions");
+            _logger.LogInformation(
+                "Finished deploying conductor definitions ({registeredTasksCount} tasks, {registeredWorkflowsCount} workflows)",
+                deployment.TaskDefinitions.Count,
+                deployment.WorkflowDefinitions.Count
+            );
         }
 
         public async Task Remove(Deployment deployment)
