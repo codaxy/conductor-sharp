@@ -108,6 +108,7 @@ namespace ConductorSharp.Engine.Builders
             foreach (var prop in props)
             {
                 var isRequired = prop.GetCustomAttribute<RequiredAttribute>();
+                var defaultValue = prop.GetCustomAttribute<DefaultValueAttribute>()?.DefaultValue ?? string.Empty;
                 var description = prop.GetDocSection("summary");
 
                 var propertyName = NamingUtil.GetParameterName(prop);
@@ -116,7 +117,7 @@ namespace ConductorSharp.Engine.Builders
                 BuildContext.Inputs.Add(
                     new JProperty(
                         propertyName,
-                        new JObject { new JProperty("value", ""), new JProperty("description", $"{description} {requiredString}"), }
+                        new JObject { new JProperty("value", defaultValue), new JProperty("description", $"{description} {requiredString}"), }
                     )
                 );
             }
