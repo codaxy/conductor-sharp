@@ -50,12 +50,7 @@ namespace ConductorSharp.Engine.Util
                 && methodExpression.Method.DeclaringType == typeof(string)
             )
             {
-                var expressionStrings = methodExpression.Arguments.Skip(1).Select(CompileInterpolatedStringArgument).ToArray();
-                var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
-                if (formatExpr == null)
-                    throw new Exception("string.Format with non constant format string is not supported");
-                var formatString = (string)formatExpr.Value;
-                return string.Format(formatString, expressionStrings);
+                return CompileStringInterpolationExpression(methodExpression);
             }
 
             if (expression is NewExpression || expression is MemberInitExpression)
@@ -68,6 +63,27 @@ namespace ConductorSharp.Engine.Util
                 return ParseListInit(listInitExpression);
 
             return CompileInterpolatedStringArgument(expression);
+        }
+
+        private static object CompileStringInterpolationExpression(MethodCallExpression methodExpression)
+        {
+            var interpolationArguments = GetInterpolationArguments(methodExpression);
+            var expressionStrings = interpolationArguments.Select(CompileInterpolatedStringArgument).ToArray();
+            var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
+            if (formatExpr == null)
+                throw new Exception("string.Format with non constant format string is not supported");
+            var formatString = (string)formatExpr.Value;
+            return string.Format(formatString, expressionStrings);
+        }
+
+        private static IEnumerable<Expression> GetInterpolationArguments(MethodCallExpression methodExpression)
+        {
+            var methodParams = methodExpression.Method.GetParameters();
+
+            //If it is Format(String, Object[]) overload then extract arguments from array, otherwise we assume it is 1, 2, or 3 formatting argument method
+            return methodParams.Length == 2 && methodParams[0].ParameterType == typeof(string) && methodParams[1].ParameterType.IsArray
+                ? ((NewArrayExpression)methodExpression.Arguments[1]).Expressions
+                : methodExpression.Arguments.Skip(1); // Skip format string
         }
 
         private static object ParseBinaryExpression(BinaryExpression binaryEx)
@@ -187,7 +203,7 @@ namespace ConductorSharp.Engine.Util
             return inputParams;
         }
 
-        private static string CompileInterpolatedStringArgument(Expression expr)
+        private static object CompileInterpolatedStringArgument(Expression expr)
         {
             if (expr is MemberExpression || IsDictionaryIndexExpression(expr))
                 return CreateExpressionString(expr);
@@ -198,8 +214,11 @@ namespace ConductorSharp.Engine.Util
             )
                 return (string)methodExpr.Method.Invoke(null, null);
             if (expr is ConstantExpression cex)
-                return (string)ParseConstantExpression(cex);
-            throw new Exception($"Expression {expr.GetType().Name} not supported");
+                return ParseConstantExpression(cex);
+            if (expr is UnaryExpression uex && uex.NodeType == ExpressionType.Convert)
+                return CompileInterpolatedStringArgument(uex.Operand);
+
+            throw new Exception($"Expression {expr.GetType().Name} in interpolated string not supported");
         }
 
         private static string CreateExpressionString(Expression expression)
