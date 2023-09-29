@@ -19,6 +19,7 @@
     <None Remove="Samples\Workflows\DynamicTask.json" />
     <None Remove="Samples\Workflows\HumanTask.json" />
     <None Remove="Samples\Workflows\IndexerWorkflow.json" />
+    <None Remove="Samples\Workflows\ListInitializationWorkflow.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\OptionalTaskWorkflow.json" />
     <None Remove="Samples\Workflows\PassthroughTaskWorkflow.json" />
@@ -36,6 +37,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Samples\Workflows\DefaultValueWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\HumanTask.json" />
+    <EmbeddedResource Include="Samples\Workflows\ListInitializationWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\WaitTask.json" />
     <EmbeddedResource Include="Samples\Workflows\CSharpLambdaWorkflow.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
