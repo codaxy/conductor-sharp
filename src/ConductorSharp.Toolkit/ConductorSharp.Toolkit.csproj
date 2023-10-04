@@ -37,4 +37,14 @@
     <ProjectReference Include="..\ConductorSharp.Engine\ConductorSharp.Engine.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="conductorsharp.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Generated\" />
+  </ItemGroup>
+
 </Project>
