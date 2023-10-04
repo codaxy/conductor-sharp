@@ -5,14 +5,14 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "SCAFFOLDED_workflows",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
       "name": "SCAFFOLDED_one",
       "taskReferenceName": "scaff_one",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "input_one": "${workflow.input.customer_id}"
       },
@@ -50,7 +50,7 @@
       "queryExpression": null,
       "name": "SCAFFOLDED_two",
       "taskReferenceName": "scaff_two",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "name": "${scaff_one.output.output_one}"
       },
@@ -86,7 +86,7 @@
     }
   ],
   "inputParameters": [
-    "{\"customer_id\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "customer_id"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

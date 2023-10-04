@@ -14,7 +14,6 @@ namespace ConductorSharp.Toolkit.Service
     public class ScaffoldingService : IScaffoldingService
     {
         private readonly IMetadataService _metadataService;
-        private readonly ILogger<ScaffoldingService> _logger;
         private readonly ScaffoldingConfig _config;
 
         // Prefix prepended if member name is invalid
@@ -23,7 +22,6 @@ namespace ConductorSharp.Toolkit.Service
         public ScaffoldingService(IMetadataService metadataService, IOptions<ScaffoldingConfig> options, ILogger<ScaffoldingService> logger)
         {
             _metadataService = metadataService;
-            _logger = logger;
             _config = options.Value;
         }
 
@@ -91,98 +89,16 @@ namespace ConductorSharp.Toolkit.Service
                 OriginalName = workflowDefinition.Name,
                 Version = workflowDefinition.Version
             };
-            string workflowDescription = workflowDefinition.Description;
-            string[] labels;
 
-            try
+            foreach (var inputParam in workflowDefinition.InputParameters)
             {
-                var descriptionObject = JObject.Parse(workflowDescription);
-                workflowDescription = descriptionObject.SelectToken("description")?.Value<string>();
-                var labelsObject = descriptionObject.SelectToken("labels");
-
-                if (labelsObject is JArray labelsArray)
-                {
-                    labels = labelsArray.ToObject<string[]>();
-                }
-            }
-            catch (Exception)
-            {
-                _logger.LogWarning("Unable to parse description for workflow {0}", workflowDefinition.Name);
+                var inputPropData = new TaskModelGenerator.PropertyData();
+                inputPropData.XmlComments["originalName"] = inputParam;
+                DefinePropertyParams(inputPropData, "object", inputParam);
+                modelGenerator.AddInputProperty(inputPropData);
             }
 
-            try
-            {
-                var inputParameters = JObject.Parse(workflowDefinition.InputParametersJSON[0]);
-
-                foreach (var param in inputParameters)
-                {
-                    var inputPropData = new TaskModelGenerator.PropertyData();
-
-                    var value = param.Value.SelectToken("value")?.ToString(Newtonsoft.Json.Formatting.None);
-                    var type = param.Value.SelectToken("type")?.Value<string>();
-                    var description = param.Value.SelectToken("description")?.Value<string>();
-
-                    if (string.IsNullOrEmpty(type))
-                        type = "string";
-
-                    inputPropData.XmlComments["originalName"] = param.Key;
-
-                    if (!string.IsNullOrEmpty(description))
-                        inputPropData.XmlComments["summary"] = description;
-
-                    switch (type)
-                    {
-                        case "string":
-                        case "integer":
-                            if (!string.IsNullOrEmpty(value))
-                            {
-                                inputPropData.XmlComments["remark"] = $"Example: {value}";
-                            }
-                            DefinePropertyParams(inputPropData, "object", param.Key);
-                            modelGenerator.AddInputProperty(inputPropData);
-
-                            break;
-                        case "toggle":
-                            DefinePropertyParams(inputPropData, "object", param.Key);
-                            modelGenerator.AddInputProperty(inputPropData);
-                            break;
-                        case "select":
-                            var optionsToken = param.Value.SelectToken("options");
-
-                            string[] options = null;
-
-                            if (optionsToken is JArray optionsArray)
-                            {
-                                options = optionsArray.ToObject<string[]>();
-                            }
-                            if (options != null && options.Length > 0)
-                                inputPropData.XmlComments["remark"] = $"Options: {string.Join(',', options)}";
-
-                            DefinePropertyParams(inputPropData, "object", param.Key);
-                            modelGenerator.AddInputProperty(inputPropData);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                if (workflowDefinition.InputParametersJSON != null)
-                    Console.WriteLine(
-                        $"Unable to parse input parameters {string.Join(',', workflowDefinition.InputParametersJSON)} for {workflowDefinition.Name})"
-                    );
-                else
-                    Console.WriteLine($"No input parameters defined for {workflowDefinition.Name}");
-            }
-
-            if (string.IsNullOrEmpty(workflowDefinition.OwnerEmail))
-                _logger.LogWarning($"No owner email defined for task {workflowDefinition.Name}");
-
-            if (string.IsNullOrEmpty(workflowDefinition.OwnerApp))
-                _logger.LogWarning($"No owner app defined for task {workflowDefinition.Name}");
-
-            modelGenerator.AddXmlComment("summary", workflowDescription?.Replace('\n', ','));
+            modelGenerator.AddXmlComment("summary", workflowDefinition.Description?.Replace('\n', ','));
             modelGenerator.AddXmlComment("originalName", workflowDefinition.Name);
             modelGenerator.AddXmlComment("ownerApp", workflowDefinition.OwnerApp);
             modelGenerator.AddXmlComment("ownerEmail", workflowDefinition.OwnerEmail);
@@ -232,28 +148,7 @@ namespace ConductorSharp.Toolkit.Service
             modelGenerator.AddXmlComment("originalName", taskDefinition.Name);
             modelGenerator.AddXmlComment("ownerEmail", taskDefinition.OwnerEmail);
             modelGenerator.AddXmlComment("node", note);
-
-            var description = "";
-            try
-            {
-                description = JObject.Parse(taskDefinition.Description).SelectToken("description").Value<string>();
-            }
-            catch (Exception)
-            {
-                _logger.LogWarning($"Invalid description '{taskDefinition.Description}' in task {taskDefinition.Name}");
-            }
-
-            var ownerEmail = taskDefinition.OwnerEmail;
-            var ownerApp = taskDefinition.OwnerApp;
-
-            if (string.IsNullOrEmpty(ownerEmail))
-                _logger.LogWarning($"No owner email defined for task {taskDefinition.Name}");
-
-            if (string.IsNullOrEmpty(ownerApp))
-                _logger.LogWarning($"No owner app defined for task {taskDefinition.Name}");
-
-            modelGenerator.AddXmlComment("summary", description.Replace('\n', ','));
-
+            modelGenerator.AddXmlComment("summary", taskDefinition.Description.Replace('\n', ','));
             return (modelGenerator.Build(), name);
         }
 
@@ -284,7 +179,6 @@ namespace ConductorSharp.Toolkit.Service
         }
 
         // If filter list is empty then all workflows/tasks are returned
-
         private IEnumerable<WorkflowDefinition> Filter(IEnumerable<WorkflowDefinition> workflows, IWorkflowFilter[] filters) =>
             workflows.Where(wf => filters.All(filter => filter.Test(wf)));
 

@@ -39,7 +39,7 @@ namespace ConductorSharp.Engine.Builders
                     TaskReferenceName = _taskRefferenceName,
                     Type = "SIMPLE",
                     InputParameters = _inputParameters,
-                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
+                    Description = _description,
                     Optional = _additionalParameters?.Optional == true,
                 }
             };

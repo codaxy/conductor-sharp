@@ -5,7 +5,7 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "decision_task",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
@@ -28,7 +28,6 @@
           {
             "name": "CUSTOMER_get",
             "taskReferenceName": "get_customer",
-            "description": "{\"description\":null}",
             "inputParameters": {
               "customer_id": 1
             },
@@ -47,7 +46,6 @@
         {
           "name": "TERMINATE_terminate",
           "taskReferenceName": "terminate",
-          "description": "{\"description\":null}",
           "inputParameters": {
             "terminationStatus": "FAILED"
           },
@@ -72,9 +70,7 @@
       "loopOver": null
     }
   ],
-  "inputParameters": [
-    "{}"
-  ],
+  "inputParameters": [],
   "outputParameters": null,
   "failureWorkflow": null,
   "schemaVersion": 2,

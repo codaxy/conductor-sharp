@@ -35,8 +35,7 @@ namespace ConductorSharp.Engine.Builders
                     Name = $"WAIT_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
                     Type = "WAIT",
-                    InputParameters = _inputParameters,
-                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
+                    InputParameters = _inputParameters
                 }
             };
     }

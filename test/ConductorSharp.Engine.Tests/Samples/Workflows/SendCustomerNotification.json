@@ -5,14 +5,14 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "NOTIFICATION_send_to_customer",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 3,
   "tasks": [
     {
       "queryExpression": null,
       "name": "CUSTOMER_get",
       "taskReferenceName": "get_customer",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "id": "${workflow.input.id}"
       },
@@ -45,7 +45,7 @@
       "queryExpression": null,
       "name": "EMAIL_prepare",
       "taskReferenceName": "prepare_email",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "address": "${get_customer.output.address}",
         "name": "${get_customer.output.name}"
@@ -77,7 +77,7 @@
     }
   ],
   "inputParameters": [
-    "{\"id\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "id"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

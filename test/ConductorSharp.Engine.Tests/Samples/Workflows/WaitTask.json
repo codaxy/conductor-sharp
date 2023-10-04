@@ -5,14 +5,14 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "wait_task_workflow",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
       "name": "WAIT_wait",
       "taskReferenceName": "wait",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "duration": "1s",
         "until": "2022-12-31 11:59"
@@ -43,9 +43,7 @@
       "loopOver": null
     }
   ],
-  "inputParameters": [
-    "{}"
-  ],
+  "inputParameters": [],
   "outputParameters": null,
   "failureWorkflow": null,
   "schemaVersion": 2,

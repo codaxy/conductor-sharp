@@ -51,7 +51,7 @@ namespace ConductorSharp.Engine.Builders
             {
                 OwnerApp = BuildConfiguration.DefaultOwnerApp ?? options.OwnerApp,
                 Name = originalName,
-                Description = options.Description ?? DetermineDescription(taskType.GetDocSection("summary")),
+                Description = options.Description ?? taskType.GetDocSection("summary"),
                 RetryCount = options.RetryCount,
                 TimeoutSeconds = options.TimeoutSeconds,
                 InputKeys = inputType.GetProperties().Select(NamingUtil.GetParameterName).ToList(),
@@ -70,16 +70,6 @@ namespace ConductorSharp.Engine.Builders
                 InputTemplate = options.InputTemplate,
                 ExecutionNameSpace = options.ExecutionNameSpace,
             };
-        }
-
-        private static string DetermineDescription(string description)
-        {
-            var descriptionProperty = string.IsNullOrEmpty(description)
-                ? new JProperty("description", "Missing description")
-                : new JProperty("description", description);
-
-            var descriptionObject = new JObject(descriptionProperty);
-            return descriptionObject.ToString(Newtonsoft.Json.Formatting.None);
         }
     }
 }

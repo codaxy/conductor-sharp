@@ -5,14 +5,14 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "c_sharp_lambda_workflow",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
       "name": "TEST.CSHRP_inln_lmbd",
       "taskReferenceName": "first_lambda_task",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "lambda_identifier": "c_sharp_lambda_workflow.first_lambda_task",
         "task_input": {
@@ -64,7 +64,6 @@
           {
             "name": "TEST.CSHRP_inln_lmbd",
             "taskReferenceName": "second_lambda_task",
-            "description": "{\"description\":null}",
             "inputParameters": {
               "lambda_identifier": "c_sharp_lambda_workflow.second_lambda_task",
               "task_input": {
@@ -82,7 +81,6 @@
           {
             "name": "TEST.CSHRP_inln_lmbd",
             "taskReferenceName": "third_lambda_task",
-            "description": "{\"description\":null}",
             "inputParameters": {
               "lambda_identifier": "c_sharp_lambda_workflow.third_lambda_task",
               "task_input": {
@@ -116,7 +114,8 @@
     }
   ],
   "inputParameters": [
-    "{\"operation\":{\"value\":\"\",\"description\":\" (optional)\"},\"input\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "operation",
+    "input"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

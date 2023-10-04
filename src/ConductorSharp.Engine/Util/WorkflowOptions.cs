@@ -7,13 +7,8 @@ namespace ConductorSharp.Engine.Util
 {
     public class WorkflowOptions
     {
-        private readonly static string _labelRegexString = "[A-Z0-9]{1,25}";
-
-        private readonly static Regex _labelRegex = new(_labelRegexString);
-
         private int _version = 1;
         private string _description;
-        private string[] _labels;
         private string _ownerApp;
         private string _ownerEmail;
         private Type _failureWorkflow;
@@ -39,23 +34,7 @@ namespace ConductorSharp.Engine.Util
                 _description = value;
             }
         }
-        public string[] Labels
-        {
-            get => _labels;
-            set
-            {
-                if (value == null || value.Length == 0)
-                    throw new ArgumentException("Value cannot be empty", nameof(Labels));
 
-                if (value.Length > 10)
-                    throw new ArgumentException("Cannot have more than 10 labels", nameof(Labels));
-
-                if (value.Any(a => !_labelRegex.IsMatch(a)))
-                    throw new ArgumentException($"Labels must match regex {_labelRegexString}");
-
-                _labels = value;
-            }
-        }
         public string OwnerApp
         {
             get => _ownerApp;

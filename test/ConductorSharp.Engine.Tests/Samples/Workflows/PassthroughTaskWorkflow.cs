@@ -25,9 +25,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     Name = "LAMBDA_return_data",
                     TaskReferenceName = "return_data",
                     Type = "LAMBDA",
-                    Description = new JObject { new JProperty("description", "Lambda task to return data") }.ToString(
-                        Newtonsoft.Json.Formatting.None
-                    ),
+                    Description = "Lambda task to return data",
                     InputParameters = new JObject
                     {
                         new JProperty("hostname", "${workflow.input.hostname}"),

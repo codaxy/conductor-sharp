@@ -38,7 +38,6 @@ namespace ConductorSharp.Engine.Builders
                     TaskReferenceName = _taskRefferenceName,
                     Type = "TERMINATE",
                     InputParameters = _inputParameters,
-                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
                 }
             };
     }

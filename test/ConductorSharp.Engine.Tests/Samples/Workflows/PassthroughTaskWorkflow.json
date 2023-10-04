@@ -5,14 +5,14 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "passthrough_task_workflow",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
       "name": "LAMBDA_return_data",
       "taskReferenceName": "return_data",
-      "description": "{\"description\":\"Lambda task to return data\"}",
+      "description": "Lambda task to return data",
       "inputParameters": {
         "hostname": "${workflow.input.hostname}",
         "additional_template": "${workflow.input.additional_template}",
@@ -52,9 +52,7 @@
       "loopOver": null
     }
   ],
-  "inputParameters": [
-    "{}"
-  ],
+  "inputParameters": [],
   "outputParameters": null,
   "failureWorkflow": null,
   "schemaVersion": 2,
