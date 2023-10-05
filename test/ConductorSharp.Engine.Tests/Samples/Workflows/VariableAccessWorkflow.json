@@ -4,7 +4,7 @@
   "updateTime": 0,
   "createdBy": null,
   "updatedBy": null,
-  "name": "local_variable_access_workflow",
+  "name": "variable_access_workflow",
   "description": "{\"description\":null,\"labels\":null}",
   "version": 1,
   "tasks": [

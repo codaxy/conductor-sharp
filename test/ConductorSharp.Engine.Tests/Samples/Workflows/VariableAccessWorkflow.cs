@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
-    public class LocalVariableAccessWorkflowInput : WorkflowInput<LocalVariableAccessWorkflowOutput> { }
+    public class VariableAccessWorkflowInput : WorkflowInput<VariableAccessWorkflowOutput> { }
 
-    public class LocalVariableAccessWorkflowOutput : WorkflowOutput { }
+    public class VariableAccessWorkflowOutput : WorkflowOutput { }
 
-    public class LocalVariableAccessWorkflow
-        : Workflow<LocalVariableAccessWorkflow, LocalVariableAccessWorkflowInput, LocalVariableAccessWorkflowOutput>
+    public class VariableAccessWorkflow
+        : Workflow<VariableAccessWorkflow, VariableAccessWorkflowInput, VariableAccessWorkflowOutput>
     {
         public CustomerGetV1 CustomerGet { get; set; }
         public EmailPrepareV1 PrepareEmail { get; set; }
 
-        public LocalVariableAccessWorkflow(
-            WorkflowDefinitionBuilder<LocalVariableAccessWorkflow, LocalVariableAccessWorkflowInput, LocalVariableAccessWorkflowOutput> builder
+        public VariableAccessWorkflow(
+            WorkflowDefinitionBuilder<VariableAccessWorkflow, VariableAccessWorkflowInput, VariableAccessWorkflowOutput> builder
         ) : base(builder) { }
 
         public override void BuildDefinition()
