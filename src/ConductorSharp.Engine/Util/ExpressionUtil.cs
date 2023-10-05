@@ -229,6 +229,10 @@ namespace ConductorSharp.Engine.Util
                 return ParseConstantExpression(cex);
             if (expr is UnaryExpression uex && uex.NodeType == ExpressionType.Convert)
                 return CompileInterpolatedStringArgument(uex.Operand);
+            if (IsLocalVariableAccessExpression(expr))
+                return ReadMember((MemberExpression)expr);
+            if (IsStaticVariableOrPropAccessExpression(expr))
+                return ReadMember((MemberExpression)expr);
 
             throw new NotSupportedException($"Expression {expr.GetType().Name} in interpolated string not supported");
         }
