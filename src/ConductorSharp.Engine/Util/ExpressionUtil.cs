@@ -63,17 +63,17 @@ namespace ConductorSharp.Engine.Util
             if (expression is ListInitExpression listInitExpression)
                 return ParseListInit(listInitExpression);
 
-            if (IsLocalVariableAccessExpression(expression))
-                return ReadMember((MemberExpression)expression);
-
-            if (IsStaticVariableOrPropAccessExpression(expression))
-                return ReadMember((MemberExpression)expression);
-
             if (ShouldCompileToJsonPathExpression(expression))
                 return CreateExpressionString(expression);
 
             if (IsNameOfExpression(expression))
                 return CompileNameOfExpression((MethodCallExpression)expression);
+
+            if (IsLocalVariableAccessExpression(expression))
+                return ReadMember((MemberExpression)expression);
+
+            if (IsStaticVariableOrPropAccessExpression(expression))
+                return ReadMember((MemberExpression)expression);
 
             throw new NotSupportedException($"Expression {expression} not supported in current context");
         }
