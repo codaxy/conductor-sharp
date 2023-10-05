@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace ConductorSharp.Engine.Util
 {
@@ -62,6 +63,9 @@ namespace ConductorSharp.Engine.Util
             if (expression is ListInitExpression listInitExpression)
                 return ParseListInit(listInitExpression);
 
+            if (IsLocalVariableAccessExpression(expression))
+                return ReadMember((MemberExpression)expression);
+
             if (ShouldCompileToJsonPathExpression(expression))
                 return CreateExpressionString(expression);
 
@@ -71,7 +75,13 @@ namespace ConductorSharp.Engine.Util
             throw new NotSupportedException($"Expression {expression} not supported in current context");
         }
 
-        //private static bool Is
+        // Variable is wrapped in closure class, right hand side expression below performs this check
+
+        private static bool IsLocalVariableAccessExpression(Expression expression) =>
+            expression is MemberExpression mex && mex.Expression.Type.IsDefined(typeof(CompilerGeneratedAttribute));
+
+        private static object ReadMember(MemberExpression memberExpression) =>
+            Expression.Lambda(Expression.MakeMemberAccess(memberExpression.Expression, memberExpression.Member)).Compile().DynamicInvoke();
 
         private static object CompileStringInterpolationExpression(MethodCallExpression methodExpression)
         {
