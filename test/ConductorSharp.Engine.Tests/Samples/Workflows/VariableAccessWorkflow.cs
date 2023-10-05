@@ -10,11 +10,15 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class VariableAccessWorkflowOutput : WorkflowOutput { }
 
-    public class VariableAccessWorkflow
-        : Workflow<VariableAccessWorkflow, VariableAccessWorkflowInput, VariableAccessWorkflowOutput>
+    public class VariableAccessWorkflow : Workflow<VariableAccessWorkflow, VariableAccessWorkflowInput, VariableAccessWorkflowOutput>
     {
-        public CustomerGetV1 CustomerGet { get; set; }
+        public CustomerGetV1 FirstCustomerGet { get; set; }
+        public CustomerGetV1 SecondCustomerGet { get; set; }
+        public CustomerGetV1 ThirdCustomerGet { get; set; }
         public EmailPrepareV1 PrepareEmail { get; set; }
+
+        public static int StaticVar = int.Parse("1");
+        public static int StaticProp { get; set; } = int.Parse("1");
 
         public VariableAccessWorkflow(
             WorkflowDefinitionBuilder<VariableAccessWorkflow, VariableAccessWorkflowInput, VariableAccessWorkflowOutput> builder
@@ -22,14 +26,12 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public override void BuildDefinition()
         {
-            int myVar = int.Parse("2");
+            int myVar = int.Parse("1");
 
-            _builder.AddTask(wf => wf.CustomerGet, wf => new() { CustomerId = myVar });
+            _builder.AddTask(wf => wf.FirstCustomerGet, wf => new() { CustomerId = myVar });
+            _builder.AddTask(wf => wf.SecondCustomerGet, wf => new() { CustomerId = StaticVar });
 
-            //_builder.AddTask(wf => wf.PrepareEmail, wf => new()
-            //{
-            //    Address =
-            //});
+            _builder.AddTask(wf => wf.ThirdCustomerGet, wf => new() { CustomerId = StaticProp });
         }
     }
 }

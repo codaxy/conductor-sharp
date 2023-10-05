@@ -66,6 +66,9 @@ namespace ConductorSharp.Engine.Util
             if (IsLocalVariableAccessExpression(expression))
                 return ReadMember((MemberExpression)expression);
 
+            if (IsStaticVariableOrPropAccessExpression(expression))
+                return ReadMember((MemberExpression)expression);
+
             if (ShouldCompileToJsonPathExpression(expression))
                 return CreateExpressionString(expression);
 
@@ -76,9 +79,10 @@ namespace ConductorSharp.Engine.Util
         }
 
         // Variable is wrapped in closure class, right hand side expression below performs this check
-
         private static bool IsLocalVariableAccessExpression(Expression expression) =>
-            expression is MemberExpression mex && mex.Expression.Type.IsDefined(typeof(CompilerGeneratedAttribute));
+            expression is MemberExpression { Expression: { } } mex && mex.Expression.Type.IsDefined(typeof(CompilerGeneratedAttribute));
+
+        private static bool IsStaticVariableOrPropAccessExpression(Expression expression) => expression is MemberExpression { Expression: null };
 
         private static object ReadMember(MemberExpression memberExpression) =>
             Expression.Lambda(Expression.MakeMemberAccess(memberExpression.Expression, memberExpression.Member)).Compile().DynamicInvoke();
