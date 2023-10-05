@@ -62,8 +62,16 @@ namespace ConductorSharp.Engine.Util
             if (expression is ListInitExpression listInitExpression)
                 return ParseListInit(listInitExpression);
 
-            return CompileInterpolatedStringArgument(expression);
+            if (ShouldCompileToJsonPathExpression(expression))
+                return CreateExpressionString(expression);
+
+            if (IsNameOfExpression(expression))
+                return CompileNameOfExpression((MethodCallExpression)expression);
+
+            throw new NotSupportedException($"Expression {expression} not supported in current context");
         }
+
+        //private static bool Is
 
         private static object CompileStringInterpolationExpression(MethodCallExpression methodExpression)
         {
@@ -117,12 +125,6 @@ namespace ConductorSharp.Engine.Util
             }
 
             return cex.Value;
-        }
-
-        private static object ParseDictionaryIndexExpression(MethodCallExpression expression)
-        {
-            var index = expression.Arguments[0];
-            return $"{ParseExpression(expression.Object)}[{ParseExpression(index)}]";
         }
 
         private static bool IsDictionaryIndexExpression(Expression expr) =>
@@ -205,21 +207,24 @@ namespace ConductorSharp.Engine.Util
 
         private static object CompileInterpolatedStringArgument(Expression expr)
         {
-            if (expr is MemberExpression || IsDictionaryIndexExpression(expr))
+            if (ShouldCompileToJsonPathExpression(expr))
                 return CreateExpressionString(expr);
-            if (
-                expr is MethodCallExpression methodExpr
-                && methodExpr.Method.DeclaringType == typeof(NamingUtil)
-                && methodExpr.Method.Name == nameof(NamingUtil.NameOf)
-            )
-                return (string)methodExpr.Method.Invoke(null, null);
+            if (IsNameOfExpression(expr))
+                return CompileNameOfExpression((MethodCallExpression)expr);
             if (expr is ConstantExpression cex)
                 return ParseConstantExpression(cex);
             if (expr is UnaryExpression uex && uex.NodeType == ExpressionType.Convert)
                 return CompileInterpolatedStringArgument(uex.Operand);
 
-            throw new Exception($"Expression {expr.GetType().Name} in interpolated string not supported");
+            throw new NotSupportedException($"Expression {expr.GetType().Name} in interpolated string not supported");
         }
+
+        private static bool IsNameOfExpression(Expression expr) =>
+            expr is MethodCallExpression methodExpr
+            && methodExpr.Method.DeclaringType == typeof(NamingUtil)
+            && methodExpr.Method.Name == nameof(NamingUtil.NameOf);
+
+        private static string CompileNameOfExpression(MethodCallExpression methodExpr) => (string)methodExpr.Method.Invoke(null, null);
 
         private static string CreateExpressionString(Expression expression)
         {
@@ -264,6 +269,40 @@ namespace ConductorSharp.Engine.Util
 
                 default:
                     throw new NotSupportedException($"Expression {expr} not supported while traversing members");
+            }
+        }
+
+        private static bool ShouldCompileToJsonPathExpression(Expression expr)
+        {
+            if (expr is not MemberExpression && !IsDictionaryIndexExpression(expr))
+                return false;
+
+            return CheckIfRootExpressionIsTaskModel(expr);
+        }
+
+        private static bool CheckIfRootExpressionIsTaskModel(Expression expr)
+        {
+            switch (expr)
+            {
+                case MemberExpression { Member: PropertyInfo propInfo } memEx:
+
+                    if (
+                        typeof(WorkflowId).IsAssignableFrom(propInfo.PropertyType)
+                        || typeof(IWorkflowInput).IsAssignableFrom(propInfo.PropertyType)
+                        || typeof(ITaskModel).IsAssignableFrom(propInfo.PropertyType)
+                    )
+                        return true;
+
+                    return CheckIfRootExpressionIsTaskModel(memEx.Expression);
+
+                case MethodCallExpression mex when IsDictionaryIndexExpression(mex):
+                    return CheckIfRootExpressionIsTaskModel(mex.Object);
+
+                case UnaryExpression { NodeType: ExpressionType.Convert } unaryEx:
+                    return CheckIfRootExpressionIsTaskModel(unaryEx.Operand);
+
+                default:
+                    return false;
             }
         }
 
