@@ -26,12 +26,13 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public override void BuildDefinition()
         {
-            int myVar = int.Parse("1");
+            var localVar = int.Parse("1");
 
-            _builder.AddTask(wf => wf.FirstCustomerGet, wf => new() { CustomerId = myVar });
+            _builder.AddTask(wf => wf.FirstCustomerGet, wf => new() { CustomerId = localVar });
             _builder.AddTask(wf => wf.SecondCustomerGet, wf => new() { CustomerId = StaticVar });
 
             _builder.AddTask(wf => wf.ThirdCustomerGet, wf => new() { CustomerId = StaticProp });
+            _builder.AddTask(wf => wf.PrepareEmail, wf => new() { Address = $"{localVar}:{StaticVar}:{StaticProp}" });
         }
     }
 }
