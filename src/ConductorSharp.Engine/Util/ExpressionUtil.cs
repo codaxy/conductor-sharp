@@ -249,12 +249,7 @@ namespace ConductorSharp.Engine.Util
 
                     var memberName = GetMemberName(propInfo);
 
-                    // Either we reached task property reference (ConstantExpression case) or workflow parameter (ParameterExpression case)
-                    // case ConstantExpression cex when typeof(ITypedWorkflow).IsAssignableFrom(cex.Type)
-                    if (
-                        (memEx.Expression is ConstantExpression cex && typeof(ITypedWorkflow).IsAssignableFrom(cex.Type))
-                        || memEx.Expression is ParameterExpression
-                    )
+                    if (IsTerminalPropertyExpression(memEx.Expression))
                         return memberName;
                     return $"{CompileToJsonPathExpression(memEx.Expression)}.{memberName}";
 
@@ -280,6 +275,11 @@ namespace ConductorSharp.Engine.Util
             return CheckIfRootExpressionIsTaskModel(expr);
         }
 
+        // Either we reached task property reference (ConstantExpression case) or workflow parameter (ParameterExpression case)
+        // case ConstantExpression cex when typeof(ITypedWorkflow).IsAssignableFrom(cex.Type)
+        private static bool IsTerminalPropertyExpression(Expression expr) =>
+            (expr is ConstantExpression || expr is ParameterExpression) && typeof(ITypedWorkflow).IsAssignableFrom(expr.Type);
+
         private static bool CheckIfRootExpressionIsTaskModel(Expression expr)
         {
             switch (expr)
@@ -289,7 +289,7 @@ namespace ConductorSharp.Engine.Util
                     if (
                         typeof(WorkflowId).IsAssignableFrom(propInfo.PropertyType)
                         || typeof(IWorkflowInput).IsAssignableFrom(propInfo.PropertyType)
-                        || typeof(ITaskModel).IsAssignableFrom(propInfo.PropertyType)
+                        || (typeof(ITaskModel).IsAssignableFrom(propInfo.PropertyType) && IsTerminalPropertyExpression(memEx.Expression))
                     )
                         return true;
 
