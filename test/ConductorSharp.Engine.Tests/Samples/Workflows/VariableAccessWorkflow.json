@@ -109,11 +109,44 @@
     },
     {
       "queryExpression": null,
+      "name": "CUSTOMER_get",
+      "taskReferenceName": "fourth_customer_get",
+      "description": "{\"description\":null}",
+      "inputParameters": {
+        "customer_id": 1
+      },
+      "type": "SIMPLE",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": null,
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": null,
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    },
+    {
+      "queryExpression": null,
       "name": "EMAIL_prepare",
       "taskReferenceName": "prepare_email",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "address": "1:1:1"
+        "address": "1:1:1:1"
       },
       "type": "SIMPLE",
       "dynamicTaskNameParam": null,

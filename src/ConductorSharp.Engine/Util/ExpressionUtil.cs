@@ -69,20 +69,13 @@ namespace ConductorSharp.Engine.Util
             if (IsNameOfExpression(expression))
                 return CompileNameOfExpression((MethodCallExpression)expression);
 
-            if (IsLocalVariableAccessExpression(expression))
-                return ReadMember((MemberExpression)expression);
-
-            if (IsStaticVariableOrPropAccessExpression(expression))
+            if (IsMemberAccessExpression(expression))
                 return ReadMember((MemberExpression)expression);
 
             throw new NotSupportedException($"Expression {expression} not supported in current context");
         }
 
-        // Variable is wrapped in closure class, right hand side expression below performs this check
-        private static bool IsLocalVariableAccessExpression(Expression expression) =>
-            expression is MemberExpression { Expression: { } } mex && mex.Expression.Type.IsDefined(typeof(CompilerGeneratedAttribute));
-
-        private static bool IsStaticVariableOrPropAccessExpression(Expression expression) => expression is MemberExpression { Expression: null };
+        private static bool IsMemberAccessExpression(Expression expr) => expr is MemberExpression && !ShouldCompileToJsonPathExpression(expr);
 
         private static object ReadMember(MemberExpression memberExpression) =>
             Expression.Lambda(Expression.MakeMemberAccess(memberExpression.Expression, memberExpression.Member)).Compile().DynamicInvoke();
@@ -229,12 +222,10 @@ namespace ConductorSharp.Engine.Util
                 return ParseConstantExpression(cex);
             if (expr is UnaryExpression uex && uex.NodeType == ExpressionType.Convert)
                 return CompileInterpolatedStringArgument(uex.Operand);
-            if (IsLocalVariableAccessExpression(expr))
-                return ReadMember((MemberExpression)expr);
-            if (IsStaticVariableOrPropAccessExpression(expr))
+            if (IsMemberAccessExpression(expr))
                 return ReadMember((MemberExpression)expr);
 
-            throw new NotSupportedException($"Expression {expr.GetType().Name} in interpolated string not supported");
+            throw new NotSupportedException($"Expression {expr} in interpolated string not supported");
         }
 
         private static bool IsNameOfExpression(Expression expr) =>
