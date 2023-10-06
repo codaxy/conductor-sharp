@@ -20,15 +20,15 @@ namespace ConductorSharp.Engine.Extensions
             Func<RestClient> createClient = null
         )
         {
-            builder.RegisterInstance(
-                new RestConfig
-                {
-                    ApiPath = apiPath,
-                    BaseUrl = baseUrl,
-                    CreateClient = createClient,
-                    IgnoreValidationErrors = preventErrorOnBadRequest
-                }
-            );
+            /*          builder.RegisterInstance(
+                          new RestConfig
+                          {
+                              ApiPath = apiPath,
+                              BaseUrl = baseUrl,
+                              CreateClient = createClient,
+                              IgnoreValidationErrors = preventErrorOnBadRequest
+                          }
+                      );*/
 
             builder.RegisterType<HttpClient>().AsSelf();
 

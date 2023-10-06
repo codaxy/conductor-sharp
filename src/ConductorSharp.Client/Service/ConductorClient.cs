@@ -24,10 +24,10 @@ namespace ConductorSharp.Client.Service
             _logger = logger;
             _restConfig = restConfig;
 
-            if (_restConfig?.CreateClient != null)
-                _restClient = _restConfig.CreateClient();
-            else
-                _restClient = new RestClient();
+            //if (_restConfig?.CreateClient != null)
+            // _restClient = _restConfig.CreateClient();
+            //else
+            // _restClient = new RestClient();
 
             // TODO: Make this not required, as we want to allow the user to init client as he likes
             _restClient.UseNewtonsoftJson();
