@@ -16,20 +16,17 @@ namespace ConductorSharp.Engine.Extensions
             this ContainerBuilder builder,
             string baseUrl,
             string apiPath,
-            bool preventErrorOnBadRequest = false,
-            Func<RestClient> createClient = null
+            bool preventErrorOnBadRequest = false
         )
         {
-            /*          builder.RegisterInstance(
-                          new RestConfig
-                          {
-                              ApiPath = apiPath,
-                              BaseUrl = baseUrl,
-                              CreateClient = createClient,
-                              IgnoreValidationErrors = preventErrorOnBadRequest
-                          }
-                      );*/
-
+            builder.RegisterInstance(
+                new RestConfig
+                {
+                    ApiPath = apiPath,
+                    BaseUrl = baseUrl,
+                    IgnoreValidationErrors = preventErrorOnBadRequest
+                }
+            );
             builder.RegisterType<HttpClient>().AsSelf();
 
             builder.RegisterType<ConductorHttpClient>().As<IConductorClient>().SingleInstance();
