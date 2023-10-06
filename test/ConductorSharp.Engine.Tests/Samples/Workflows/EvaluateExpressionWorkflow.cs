@@ -44,7 +44,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
             _builder.AddTask(wf => wf.SecondCustomerGet, wf => new() { CustomerId = StaticVar });
             _builder.AddTask(wf => wf.ThirdCustomerGet, wf => new() { CustomerId = StaticProp });
             _builder.AddTask(wf => wf.FourthCustomerGet, wf => new() { CustomerId = ClassProp.Int });
-            _builder.AddTask(wf => wf.FifthCustomerGet, wf => new() { CustomerId = Fibonacci(10) });
+            _builder.AddTask(wf => wf.FifthCustomerGet, wf => new() { CustomerId = Fibonacci(10) + Fibonacci(1) });
             _builder.AddTask(
                 wf => wf.PrepareEmail,
                 wf =>
