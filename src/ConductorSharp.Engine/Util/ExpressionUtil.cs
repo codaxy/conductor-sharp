@@ -69,16 +69,10 @@ namespace ConductorSharp.Engine.Util
             if (IsNameOfExpression(expression))
                 return CompileNameOfExpression((MethodCallExpression)expression);
 
-            if (IsMemberAccessExpression(expression))
-                return ReadMember((MemberExpression)expression);
-
-            throw new NotSupportedException($"Expression {expression} not supported in current context");
+            return EvaluateExpression(expression);
         }
 
-        private static bool IsMemberAccessExpression(Expression expr) => expr is MemberExpression && !ShouldCompileToJsonPathExpression(expr);
-
-        private static object ReadMember(MemberExpression memberExpression) =>
-            Expression.Lambda(Expression.MakeMemberAccess(memberExpression.Expression, memberExpression.Member)).Compile().DynamicInvoke();
+        private static object EvaluateExpression(Expression expr) => Expression.Lambda(expr).Compile().DynamicInvoke();
 
         private static object CompileStringInterpolationExpression(MethodCallExpression methodExpression)
         {
@@ -106,19 +100,27 @@ namespace ConductorSharp.Engine.Util
             var left = ParseExpression(binaryEx.Left);
             var right = ParseExpression(binaryEx.Right);
 
-            switch (binaryEx.NodeType)
-            {
-                case ExpressionType.Add:
+            // Use these lambdas to extract MemberExpression for operands
+            Expression<Func<object>> leftExpr = () => left;
+            Expression<Func<object>> rightExpr = () => right;
 
-                    if (left is string leftStr)
-                        return leftStr + right;
-                    if (right is string rightStr)
-                        return left + rightStr;
+            // Compiler generates following expression tree for primitve + string concatenation operation
+            // (object)(primitive) + string
+            // Notice the casting to object, primitive is boxed before concatenation
 
-                    throw new NotSupportedException($"Expression {left} + {right} not supported");
-                default:
-                    throw new NotSupportedException($"Binary expression with node type {binaryEx.NodeType} not supported");
-            }
+
+            // If either of operands is string and the other one is primitive that means we are performing primitive + string concatenation
+            // We should not perform casting on primitive in this case (since it is object already)
+            // Otherwise cast it to concrete type, otherwise binary operation will fail
+            var lhs =
+                left.GetType().IsPrimitive && right.GetType() == typeof(string) ? leftExpr.Body : Expression.Convert(leftExpr.Body, left.GetType());
+            var rhs =
+                right.GetType().IsPrimitive && left.GetType() == typeof(string)
+                    ? rightExpr.Body
+                    : Expression.Convert(rightExpr.Body, right.GetType());
+            var expr = binaryEx.Update(lhs, null, rhs);
+
+            return EvaluateExpression(expr);
         }
 
         private static object ParseConstantExpression(ConstantExpression cex)
@@ -222,10 +224,7 @@ namespace ConductorSharp.Engine.Util
                 return ParseConstantExpression(cex);
             if (expr is UnaryExpression uex && uex.NodeType == ExpressionType.Convert)
                 return CompileInterpolatedStringArgument(uex.Operand);
-            if (IsMemberAccessExpression(expr))
-                return ReadMember((MemberExpression)expr);
-
-            throw new NotSupportedException($"Expression {expr} in interpolated string not supported");
+            return EvaluateExpression(expr);
         }
 
         private static bool IsNameOfExpression(Expression expr) =>
