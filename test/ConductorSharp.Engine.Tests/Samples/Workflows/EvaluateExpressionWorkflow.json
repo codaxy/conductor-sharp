@@ -4,7 +4,7 @@
   "updateTime": 0,
   "createdBy": null,
   "updatedBy": null,
-  "name": "variable_access_workflow",
+  "name": "evaluate_expression_workflow",
   "description": "{\"description\":null,\"labels\":null}",
   "version": 1,
   "tasks": [
@@ -142,11 +142,45 @@
     },
     {
       "queryExpression": null,
+      "name": "CUSTOMER_get",
+      "taskReferenceName": "fifth_customer_get",
+      "description": "{\"description\":null}",
+      "inputParameters": {
+        "customer_id": 34
+      },
+      "type": "SIMPLE",
+      "dynamicTaskNameParam": null,
+      "caseValueParam": null,
+      "caseExpression": null,
+      "expression": null,
+      "evaluatorType": null,
+      "scriptExpression": null,
+      "decisionCases": null,
+      "dynamicForkJoinTasksParam": null,
+      "dynamicForkTasksParam": null,
+      "dynamicForkTasksInputParamName": null,
+      "defaultCase": null,
+      "forkTasks": null,
+      "startDelay": 0,
+      "subWorkflowParam": null,
+      "joinOn": null,
+      "sink": null,
+      "optional": false,
+      "taskDefinition": null,
+      "rateLimited": false,
+      "defaultExclusiveJoinTask": null,
+      "asyncComplete": false,
+      "loopCondition": null,
+      "loopOver": null
+    },
+    {
+      "queryExpression": null,
       "name": "EMAIL_prepare",
       "taskReferenceName": "prepare_email",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "address": "1:1:1:1"
+        "name": "1:1:1:1:1",
+        "address": "${workflow.input.username}@test.com"
       },
       "type": "SIMPLE",
       "dynamicTaskNameParam": null,
@@ -175,7 +209,7 @@
     }
   ],
   "inputParameters": [
-    "{}"
+    "{\"username\":{\"value\":\"\",\"description\":\" (optional)\"}}"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

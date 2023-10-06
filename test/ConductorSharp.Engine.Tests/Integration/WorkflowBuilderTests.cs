@@ -228,10 +228,10 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
-        public void BuilderReturnsCorrectDefinitionVariableAccessWorkflow()
+        public void BuilderReturnsCorrectDefinitionEvaluateExpressionWorkflow()
         {
-            var definition = GetDefinitionFromWorkflow<VariableAccessWorkflow>();
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/VariableAccessWorkflow.json");
+            var definition = GetDefinitionFromWorkflow<EvaluateExpressionWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/EvaluateExpressionWorkflow.json");
 
             Assert.Equal(expectedDefinition, definition);
         }
