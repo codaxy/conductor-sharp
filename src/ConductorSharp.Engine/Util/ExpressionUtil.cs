@@ -113,7 +113,7 @@ namespace ConductorSharp.Engine.Util
 
 
             // If either of operands is string and the other one is primitive that means we are performing primitive + string concatenation
-            // We should not perform casting on primitive in this case (since it is object already)
+            // We should not box the primitive in this case (since it is object already)
             // Otherwise cast it to concrete type, otherwise binary operation will fail
             var lhs =
                 left.GetType().IsPrimitive && right.GetType() == typeof(string) ? leftExpr.Body : Expression.Convert(leftExpr.Body, left.GetType());
