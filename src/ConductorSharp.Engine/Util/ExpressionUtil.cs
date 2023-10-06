@@ -95,6 +95,9 @@ namespace ConductorSharp.Engine.Util
                 : methodExpression.Arguments.Skip(1); // Skip format string
         }
 
+        // We want to be able to specify input like this
+        // Input = wf.WorkflowInput.IpAddress + "/24"
+        // Hence why we should not evaluate binary expressions
         private static object ParseBinaryExpression(BinaryExpression binaryEx)
         {
             var left = ParseExpression(binaryEx.Left);
