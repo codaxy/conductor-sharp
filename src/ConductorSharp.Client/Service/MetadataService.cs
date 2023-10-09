@@ -31,8 +31,8 @@ namespace ConductorSharp.Client.Service
         public async Task<WorkflowDefinition> GetWorkflowDefinition(string name, int version) =>
             await _conductorClient.ExecuteRequestAsync<WorkflowDefinition>(ApiUrls.GetWorkflowDefinition(name, version), HttpMethod.Get);
 
-        public async Task UpdateWorkflowDefinition(WorkflowDefinition definition) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.UpdateWorkflowDefinition(), HttpMethod.Put, definition);
+        public async Task UpdateWorkflowDefinitions(List<WorkflowDefinition> definitions) =>
+            await _conductorClient.ExecuteRequestAsync(ApiUrls.UpdateWorkflowDefinitions(), HttpMethod.Put, definitions);
 
         public async Task DeleteWorkflowDefinition(string name, int version) =>
             await _conductorClient.ExecuteRequestAsync(ApiUrls.DeleteWorkflowDefinition(name, version), HttpMethod.Delete);
@@ -45,6 +45,14 @@ namespace ConductorSharp.Client.Service
 
         public async Task<WorkflowDefinition[]> GetAllWorkflowDefinitions() =>
             (await _conductorClient.ExecuteRequestAsync<WorkflowDefinition[]>(ApiUrls.GetAlleWorkflowDefinitions(), HttpMethod.Get));
+
+        public async Task<Dictionary<string, List<NameAndVersion>>> GetAllWorkflowNamesAndVersions() =>
+            (
+                await _conductorClient.ExecuteRequestAsync<Dictionary<string, List<NameAndVersion>>>(
+                    ApiUrls.GetAllWorkflowNamesAndVersions(),
+                    HttpMethod.Get
+                )
+            );
 
         public async Task<EventHandlerDefinition[]> GetAllEventHandlerDefinitions() =>
             await _conductorClient.ExecuteRequestAsync<EventHandlerDefinition[]>(ApiUrls.GetAllEventDefinitions(), HttpMethod.Get);

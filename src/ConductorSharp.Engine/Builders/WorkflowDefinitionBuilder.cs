@@ -108,6 +108,7 @@ namespace ConductorSharp.Engine.Builders
             foreach (var prop in props)
             {
                 var isRequired = prop.GetCustomAttribute<RequiredAttribute>();
+                var defaultValue = prop.GetCustomAttribute<DefaultValueAttribute>()?.DefaultValue ?? string.Empty;
                 var description = prop.GetDocSection("summary");
 
                 var propertyName = NamingUtil.GetParameterName(prop);
@@ -116,7 +117,7 @@ namespace ConductorSharp.Engine.Builders
                 BuildContext.Inputs.Add(
                     new JProperty(
                         propertyName,
-                        new JObject { new JProperty("value", ""), new JProperty("description", $"{description} {requiredString}"), }
+                        new JObject { new JProperty("value", defaultValue), new JProperty("description", $"{description} {requiredString}"), }
                     )
                 );
             }
@@ -129,11 +130,7 @@ namespace ConductorSharp.Engine.Builders
                     BuildContext.WorkflowOptions.FailureWorkflow != null
                         ? NamingUtil.DetermineRegistrationName(BuildContext.WorkflowOptions.FailureWorkflow)
                         : null,
-                Description = new JObject()
-                {
-                    new JProperty("description", BuildContext.WorkflowOptions.Description),
-                    new JProperty("labels", BuildContext.WorkflowOptions.Labels)
-                }.ToString(Formatting.None),
+                Description = BuildConfiguration.WorkflowDescriptionBuilder.Build(BuildContext),
                 InputParameters = BuildContext.Inputs,
                 OutputParameters = BuildContext.Outputs,
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,

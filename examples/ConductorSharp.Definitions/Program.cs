@@ -51,7 +51,7 @@ var builder = Host.CreateDefaultBuilder()
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
                 })
-                .AddCSharpLambdaTasks(typeof(ITaskRequestHandler<,>).Assembly.GetName().Name);
+                .AddCSharpLambdaTasks();
 
             builder.RegisterModule<ConductorModule>();
         }

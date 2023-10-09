@@ -13,10 +13,11 @@ namespace ConductorSharp.Client.Util
         private readonly static Uri _getAllQueues = new("tasks/queue/all", UriKind.Relative);
 
         private readonly static Uri _createWorkflowDefinition = new("metadata/workflow", UriKind.Relative);
-        private readonly static Uri _updateWorkflowDefinition = new("metadata/workflow", UriKind.Relative);
+        private readonly static Uri _updateWorkflowDefinitions = new("metadata/workflow", UriKind.Relative);
         private readonly static Uri _getAllWorkflowDefinitions = new("metadata/workflow", UriKind.Relative);
         private readonly static Uri _createWorkflowDefinitions = new("metadata/workflow", UriKind.Relative);
         private readonly static Uri _validateWorkflowDefinition = new("metadata/workflow/validate", UriKind.Relative);
+        private readonly static Uri _getAllWorkflowNamesAndVersions = new("metadata/workflow/names-and-versions", UriKind.Relative);.
 
         private readonly static Uri _queueWorkflow = new("workflow", UriKind.Relative);
 
@@ -80,13 +81,15 @@ namespace ConductorSharp.Client.Util
 
         public static Uri GetWorkflowDefinition(string name, int version) => "metadata/workflow/{0}?version={1}".ToRelativeUri(name, version);
 
-        public static Uri UpdateWorkflowDefinition() => _updateWorkflowDefinition;
+        public static Uri UpdateWorkflowDefinitions() => _updateWorkflowDefinitions;
 
         public static Uri DeleteWorkflowDefinition(string name, int version) => "metadata/workflow/{0}/{1}".ToRelativeUri(name, version);
 
         public static Uri ValidateWorkflowDefinition() => _validateWorkflowDefinition;
 
         public static Uri GetAlleWorkflowDefinitions() => _getAllWorkflowDefinitions;
+
+        public static Uri GetAllWorkflowNamesAndVersions() => _getAllWorkflowNamesAndVersions;
 
         public static Uri CreateWorkflowDefinitions() => _createWorkflowDefinitions;
 
