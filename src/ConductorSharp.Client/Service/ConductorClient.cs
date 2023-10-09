@@ -51,7 +51,7 @@ namespace ConductorSharp.Client.Service
 
                 _logger.LogError("{@conductorError}", error);
 
-                if (!_restConfig.IgnoreValidationErrors && error?.Message?.Contains("Validation failed") == true)
+                if (response.StatusCode == HttpStatusCode.BadRequest)
                     throw new Exception(response.Content);
 
                 if (response.StatusCode == HttpStatusCode.InternalServerError)

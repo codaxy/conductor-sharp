@@ -15,6 +15,7 @@ namespace ConductorSharp.Client.Service
         Task<WorkflowDefinition> GetWorkflowDefinition(string name, int version);
         Task UpdateWorkflowDefinitions(List<WorkflowDefinition> workflowDefinition);
         Task DeleteWorkflowDefinition(string name, int version);
+        Task ValidateWorkflowDefinition(WorkflowDefinition workflowDefinition);
         Task<WorkflowDefinition[]> GetAllWorkflowDefinitions();
         Task<Dictionary<string, List<NameAndVersion>>> GetAllWorkflowNamesAndVersions();
         Task<EventHandlerDefinition[]> GetAllEventHandlerDefinitions();
