@@ -20,6 +20,7 @@ namespace ConductorSharp.Client.Util
         private readonly static Uri _getAllWorkflowNamesAndVersions = new("metadata/workflow/names-and-versions", UriKind.Relative);
 
         private readonly static Uri _queueWorkflow = new("workflow", UriKind.Relative);
+        private readonly static Uri _testWorkflow = new("workflow/test", UriKind.Relative);
 
         private readonly static Uri _getAllEventDefinitions = new("event", UriKind.Relative);
         private readonly static Uri _updateEventHandlerDefinition = new("event", UriKind.Relative);
@@ -98,6 +99,8 @@ namespace ConductorSharp.Client.Util
         public static Uri CreateWorkflowDefinitions() => _createWorkflowDefinitions;
 
         public static Uri QueueWorkflow() => _queueWorkflow;
+
+        public static Uri TestWorkflow() => _testWorkflow;
 
         public static Uri GetWorkflowStatus(string workflowId, bool includeTasks)
         {
