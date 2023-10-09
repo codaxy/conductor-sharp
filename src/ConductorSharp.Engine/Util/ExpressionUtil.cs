@@ -45,14 +45,8 @@ namespace ConductorSharp.Engine.Util
             if (expression is BinaryExpression binaryEx)
                 return ParseBinaryExpression(binaryEx);
 
-            if (
-                expression is MethodCallExpression methodExpression
-                && methodExpression.Method.Name == nameof(string.Format)
-                && methodExpression.Method.DeclaringType == typeof(string)
-            )
-            {
-                return CompileStringInterpolationExpression(methodExpression);
-            }
+            if (IsStringInterpolation(expression))
+                return CompileStringInterpolationExpression((MethodCallExpression)expression);
 
             if (expression is NewExpression || expression is MemberInitExpression)
                 return ParseObjectInitialization(expression);
@@ -71,6 +65,10 @@ namespace ConductorSharp.Engine.Util
 
             return EvaluateExpression(expression);
         }
+
+        private static bool IsStringInterpolation(Expression expression) =>
+            expression is MethodCallExpression { Method.Name: nameof(string.Format) } methodExpression
+            && methodExpression.Method.DeclaringType == typeof(string);
 
         private static object EvaluateExpression(Expression expr) => Expression.Lambda(expr).Compile().DynamicInvoke();
 
