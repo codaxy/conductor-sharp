@@ -17,7 +17,7 @@ namespace ConductorSharp.Client.Util
         private readonly static Uri _getAllWorkflowDefinitions = new("metadata/workflow", UriKind.Relative);
         private readonly static Uri _createWorkflowDefinitions = new("metadata/workflow", UriKind.Relative);
         private readonly static Uri _validateWorkflowDefinition = new("metadata/workflow/validate", UriKind.Relative);
-        private readonly static Uri _getAllWorkflowNamesAndVersions = new("metadata/workflow/names-and-versions", UriKind.Relative);.
+        private readonly static Uri _getAllWorkflowNamesAndVersions = new("metadata/workflow/names-and-versions", UriKind.Relative);
 
         private readonly static Uri _queueWorkflow = new("workflow", UriKind.Relative);
 
