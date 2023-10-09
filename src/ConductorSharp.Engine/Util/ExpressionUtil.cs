@@ -1,15 +1,12 @@
 ﻿using ConductorSharp.Engine.Builders;
-using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Interface;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
+using ConductorSharp.Engine.Exceptions;
 
 namespace ConductorSharp.Engine.Util
 {
@@ -70,7 +67,31 @@ namespace ConductorSharp.Engine.Util
             expression is MethodCallExpression { Method.Name: nameof(string.Format) } methodExpression
             && methodExpression.Method.DeclaringType == typeof(string);
 
-        private static object EvaluateExpression(Expression expr) => Expression.Lambda(expr).Compile().DynamicInvoke();
+        private static object EvaluateExpression(Expression expr) =>
+            IsEvaluatable(expr) ? Expression.Lambda(expr).Compile().DynamicInvoke() : throw new NonEvaluatableExpressionException(expr);
+
+        private static bool IsEvaluatable(Expression expr)
+        {
+            switch (expr)
+            {
+                case MemberExpression memExpr:
+                    if (
+                        typeof(ITaskModel).IsAssignableFrom(memExpr.Type)
+                        || typeof(WorkflowId).IsAssignableFrom(memExpr.Type)
+                        || typeof(IWorkflowInput).IsAssignableFrom(memExpr.Type)
+                    )
+                        return false;
+                    return IsEvaluatable(memExpr.Expression);
+                case MethodCallExpression methodExpr:
+                    return IsEvaluatable(methodExpr.Object) && methodExpr.Arguments.All(IsEvaluatable);
+                case BinaryExpression binaryExpr:
+                    return IsEvaluatable(binaryExpr.Left) && IsEvaluatable(binaryExpr.Right);
+                case UnaryExpression unaryExpr:
+                    return IsEvaluatable(unaryExpr.Operand);
+                default:
+                    return true;
+            }
+        }
 
         private static object CompileStringInterpolationExpression(MethodCallExpression methodExpression)
         {
