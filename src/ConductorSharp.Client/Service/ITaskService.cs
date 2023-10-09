@@ -20,6 +20,8 @@ namespace ConductorSharp.Client.Service
         Task UpdateTaskFailed(object outputData, string taskId, string workflowId, string reasonForIncompletion, string logMessage);
         Task<PollTaskResponse> PollTasks(string name, string workerId);
         Task<PollTaskResponse> PollTasks(string name, string workerId, string domain);
+        Task<PollDataResponse[]> PollTaskQueueData(string taskType);
+        Task<PollDataResponse[]> PollAllTasksQueueData();
         Task<GetTaskLogsResponse[]> GetLogsForTask(string taskId);
     }
 }
