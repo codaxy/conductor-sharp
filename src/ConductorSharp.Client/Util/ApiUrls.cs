@@ -52,7 +52,7 @@ namespace ConductorSharp.Client.Util
         public static Uri PollTasks(string name, string workerId, string domain) =>
             "tasks/poll/{0}?workerId={1}&domain={2}".ToRelativeUri(name, workerId, domain);
 
-        public static Uri PollTaskQueueData(string taskType) => "tasks/queue/polldata/{0}".ToRelativeUri(taskType);
+        public static Uri PollTaskQueueData(string taskType) => "tasks/queue/polldata?taskType={0}".ToRelativeUri(taskType);
 
         public static Uri PollAllTasksQueueData() => "tasks/queue/polldata/all".ToRelativeUri();
 
