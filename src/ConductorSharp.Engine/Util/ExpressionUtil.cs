@@ -18,7 +18,7 @@ namespace ConductorSharp.Engine.Util
         public static string ParseToReferenceName(Expression expression)
         {
             if (!(expression is MemberExpression taskSelectExpression))
-                throw new Exception($"Only {nameof(MemberExpression)} expression allowed");
+                throw new NotSupportedException($"Only {nameof(MemberExpression)} expression allowed");
 
             return SnakeCaseUtil.ToSnakeCase(taskSelectExpression.Member.Name);
         }
@@ -26,7 +26,7 @@ namespace ConductorSharp.Engine.Util
         public static Type ParseToType(Expression expression)
         {
             if (!(expression is MemberExpression taskSelectExpression))
-                throw new Exception($"Only {nameof(MemberExpression)} expression allowed");
+                throw new NotSupportedException($"Only {nameof(MemberExpression)} expression allowed");
 
             return ((PropertyInfo)taskSelectExpression.Member).PropertyType;
         }
@@ -80,7 +80,7 @@ namespace ConductorSharp.Engine.Util
             var expressionStrings = interpolationArguments.Select(CompileInterpolatedStringArgument).ToArray();
             var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
             if (formatExpr == null)
-                throw new Exception("string.Format with non constant format string is not supported");
+                throw new NotSupportedException("string.Format with non constant format string is not supported");
             var formatString = (string)formatExpr.Value;
             return string.Format(formatString, expressionStrings);
         }
@@ -179,7 +179,7 @@ namespace ConductorSharp.Engine.Util
                 foreach (var binding in initExpression.Bindings)
                 {
                     if (binding.BindingType != MemberBindingType.Assignment)
-                        throw new Exception($"Only {nameof(MemberBindingType.Assignment)} binding type supported");
+                        throw new NotSupportedException($"Only {nameof(MemberBindingType.Assignment)} binding type supported");
 
                     var assignmentBinding = (MemberAssignment)binding;
                     var assignmentValue = ParseExpression(assignmentBinding.Expression);
@@ -210,7 +210,7 @@ namespace ConductorSharp.Engine.Util
                 }
             }
             else
-                throw new Exception(
+                throw new NotSupportedException(
                     $"Only {nameof(MemberInitExpression)} and {nameof(NewExpression)} without constructor arguments expressions are supported"
                 );
 
