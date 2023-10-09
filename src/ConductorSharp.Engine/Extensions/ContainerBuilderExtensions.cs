@@ -29,7 +29,7 @@ namespace ConductorSharp.Engine.Extensions
             );
             builder.RegisterType<HttpClient>().AsSelf();
 
-            builder.RegisterType<ConductorHttpClient>().As<IConductorClient>().SingleInstance();
+            builder.RegisterType<ConductorClient>().As<IConductorClient>().SingleInstance();
 
             builder.RegisterType<TaskService>().As<ITaskService>();
 
