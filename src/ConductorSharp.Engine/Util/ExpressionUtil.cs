@@ -260,9 +260,9 @@ namespace ConductorSharp.Engine.Util
 
                     var memberName = GetMemberName(propInfo);
 
-                    if (IsTerminalPropertyExpression(memEx.Expression))
-                        return memberName;
-                    return $"{CompileToJsonPathExpression(memEx.Expression)}.{memberName}";
+                    return IsTerminalPropertyExpression(memEx.Expression)
+                        ? memberName
+                        : $"{CompileToJsonPathExpression(memEx.Expression)}.{memberName}";
 
                 case MethodCallExpression mex when IsDictionaryIndexExpression(mex):
                     return $"{CompileToJsonPathExpression(mex.Object)}[{CompileToJsonPathExpression(mex.Arguments[0])}]";
