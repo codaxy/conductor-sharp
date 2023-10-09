@@ -39,7 +39,7 @@ namespace ConductorSharp.Engine.Util
                 return ParseConstantExpression(cex);
 
             // Handle boxing
-            if (expression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
+            if (expression is UnaryExpression { NodeType: ExpressionType.Convert } unaryEx)
                 return ParseExpression(unaryEx.Operand);
 
             if (expression is BinaryExpression binaryEx)
@@ -225,7 +225,7 @@ namespace ConductorSharp.Engine.Util
                 return CompileNameOfExpression((MethodCallExpression)expr);
             if (expr is ConstantExpression cex)
                 return ParseConstantExpression(cex);
-            if (expr is UnaryExpression uex && uex.NodeType == ExpressionType.Convert)
+            if (expr is UnaryExpression { NodeType: ExpressionType.Convert } uex)
                 return CompileInterpolatedStringArgument(uex.Operand);
             return EvaluateExpression(expr);
         }
