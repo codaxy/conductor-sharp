@@ -229,9 +229,8 @@ namespace ConductorSharp.Engine.Util
         }
 
         private static bool IsNameOfExpression(Expression expr) =>
-            expr is MethodCallExpression methodExpr
-            && methodExpr.Method.DeclaringType == typeof(NamingUtil)
-            && methodExpr.Method.Name == nameof(NamingUtil.NameOf);
+            expr is MethodCallExpression { Method.Name: nameof(NamingUtil.NameOf) } methodExpr
+            && methodExpr.Method.DeclaringType == typeof(NamingUtil);
 
         private static string CompileNameOfExpression(MethodCallExpression methodExpr) => (string)methodExpr.Method.Invoke(null, null);
 
