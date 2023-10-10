@@ -88,6 +88,8 @@ namespace ConductorSharp.Engine.Util
                     return IsEvaluatable(binaryExpr.Left) && IsEvaluatable(binaryExpr.Right);
                 case UnaryExpression unaryExpr:
                     return IsEvaluatable(unaryExpr.Operand);
+                case ConditionalExpression condExpr:
+                    return IsEvaluatable(condExpr.Test) && IsEvaluatable(condExpr.IfTrue) && IsEvaluatable(condExpr.IfFalse);
                 default:
                     return true;
             }
