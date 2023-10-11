@@ -95,6 +95,12 @@ namespace ConductorSharp.Client.Service
         public async Task<PollTaskResponse> PollTasks(string name, string workerId, string domain) =>
             await _client.ExecuteRequestAsync<PollTaskResponse>(ApiUrls.PollTasks(name, workerId, domain), HttpMethod.Get);
 
+        public async Task<PollDataResponse[]> PollTaskQueueData(string taskType) =>
+            await _client.ExecuteRequestAsync<PollDataResponse[]>(ApiUrls.PollTaskQueueData(taskType), HttpMethod.Get);
+
+        public async Task<PollDataResponse[]> PollAllTasksQueueData() =>
+            await _client.ExecuteRequestAsync<PollDataResponse[]>(ApiUrls.PollAllTasksQueueData(), HttpMethod.Get);
+
         public Task<GetTaskLogsResponse[]> GetLogsForTask(string taskId) =>
             _client.ExecuteRequestAsync<GetTaskLogsResponse[]>(ApiUrls.GetLogsForTask(taskId), HttpMethod.Get);
 

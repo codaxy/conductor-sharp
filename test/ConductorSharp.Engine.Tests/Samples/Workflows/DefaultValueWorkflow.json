@@ -4,18 +4,18 @@
   "updateTime": 0,
   "createdBy": null,
   "updatedBy": null,
-  "name": "TEST_StringInterpolation",
+  "name": "default_value_workflow",
   "description": "{\"description\":null,\"labels\":null}",
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
       "name": "EMAIL_prepare",
-      "taskReferenceName": "email_prepare",
+      "taskReferenceName": "prepare_email",
       "description": "{\"description\":null}",
       "inputParameters": {
-        "address": "${workflow.input.first_input},${workflow.input.second_input},Value,0",
-        "name": "Workflow name: TEST_StringInterpolation"
+        "name": "${workflow.input.name}",
+        "address": "${workflow.input.address}"
       },
       "type": "SIMPLE",
       "dynamicTaskNameParam": null,
@@ -44,11 +44,9 @@
     }
   ],
   "inputParameters": [
-    "{\"first_input\":{\"value\":\"\",\"description\":\" (optional)\"},\"second_input\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "{\"name\":{\"value\":\"Default name\",\"description\":\" (optional)\"},\"address\":{\"value\":\"Default address\",\"description\":\" (optional)\"}}"
   ],
-  "outputParameters": {
-    "email_body": "${email_prepare.output.email_body}"
-  },
+  "outputParameters": null,
   "failureWorkflow": null,
   "schemaVersion": 2,
   "restartable": true,

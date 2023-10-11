@@ -46,6 +46,9 @@ namespace ConductorSharp.Client.Service
                 new Dictionary<string, string> { { "Accept", "*/*" } }
             );
 
+        public async Task<WorkflowStatusResponse> TestWorkflow(WorkflowTestRequest testRequest) =>
+            await _client.ExecuteRequestAsync<WorkflowStatusResponse>(ApiUrls.TestWorkflow(), HttpMethod.Post, testRequest);
+
         public async Task<WorkflowSearchResponse> SearchWorkflows(WorkflowSearchRequest request) =>
             await _client.ExecuteRequestAsync<WorkflowSearchResponse>(ApiUrls.SearchWorkflows(request), HttpMethod.Get);
 

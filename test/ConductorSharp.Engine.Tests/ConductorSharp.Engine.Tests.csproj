@@ -15,9 +15,11 @@
     <None Remove="Samples\Workflows\CSharpLambdaWorkflow.json" />
     <None Remove="Samples\Workflows\DecisionInDecision.json" />
     <None Remove="Samples\Workflows\DecisionTask.json" />
+    <None Remove="Samples\Workflows\DefaultValueWorkflow.json" />
     <None Remove="Samples\Workflows\DynamicTask.json" />
     <None Remove="Samples\Workflows\HumanTask.json" />
     <None Remove="Samples\Workflows\IndexerWorkflow.json" />
+    <None Remove="Samples\Workflows\ListInitializationWorkflow.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
     <None Remove="Samples\Workflows\OptionalTaskWorkflow.json" />
     <None Remove="Samples\Workflows\PassthroughTaskWorkflow.json" />
@@ -27,13 +29,17 @@
     <None Remove="Samples\Workflows\StringAddition.json" />
     <None Remove="Samples\Workflows\StringInterpolation.json" />
     <None Remove="Samples\Workflows\SwitchTask.json" />
+    <None Remove="Samples\Workflows\TaskPropertiesWorkflow.json" />
     <None Remove="Samples\Workflows\TerminateTaskWorkflow.json" />
     <None Remove="Samples\Workflows\VersionAttributeWorkflow.json" />
     <None Remove="Samples\Workflows\WaitTask.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Samples\Workflows\DefaultValueWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\HumanTask.json" />
+    <EmbeddedResource Include="Samples\Workflows\ListInitializationWorkflow.json" />
+    <EmbeddedResource Include="Samples\Workflows\TaskPropertiesWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\WaitTask.json" />
     <EmbeddedResource Include="Samples\Workflows\CSharpLambdaWorkflow.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>

@@ -25,11 +25,14 @@ namespace ConductorSharp.Patterns.Builders
             where TWorkflow : ITypedWorkflow
             where TInput : IRequest<TOutput>
         {
-            var lambdaTaskNamePrefix = (string)
-                builder.ConfigurationProperties.FirstOrDefault(prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty).Value;
+            var prefixConfigProperty = builder.ConfigurationProperties.FirstOrDefault(
+                prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty
+            );
 
-            if (lambdaTaskNamePrefix == null)
+            if (prefixConfigProperty == null)
                 throw new LambdaTasksNotEnabledException();
+
+            var lambdaTaskNamePrefix = TaskNameBuilder.MakeTaskNamePrefix(prefixConfigProperty.Value as string);
 
             var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
                 task.Body,
@@ -73,7 +76,7 @@ namespace ConductorSharp.Patterns.Builders
             {
                 new WorkflowDefinition.Task
                 {
-                    Name = $"{_lambdaTaskNamePrefix}.{CSharpLambdaTask.TaskName}",
+                    Name = $"{_lambdaTaskNamePrefix}{CSharpLambdaTask.TaskName}",
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = new JObject
                     {

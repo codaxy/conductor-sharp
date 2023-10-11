@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Client.Model.Response;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,9 +13,11 @@ namespace ConductorSharp.Client.Service
         Task DeleteTaskDefinition(string name);
         Task UpdateTaskDefinition(TaskDefinition definition);
         Task<WorkflowDefinition> GetWorkflowDefinition(string name, int version);
-        Task UpdateWorkflowDefinition(WorkflowDefinition workflowDefinition);
+        Task UpdateWorkflowDefinitions(List<WorkflowDefinition> workflowDefinition);
         Task DeleteWorkflowDefinition(string name, int version);
+        Task ValidateWorkflowDefinition(WorkflowDefinition workflowDefinition);
         Task<WorkflowDefinition[]> GetAllWorkflowDefinitions();
+        Task<Dictionary<string, List<NameAndVersion>>> GetAllWorkflowNamesAndVersions();
         Task<EventHandlerDefinition[]> GetAllEventHandlerDefinitions();
         Task UpdateEventHandlerDefinition(EventHandlerDefinition definition);
         Task DeleteEventHandlerDefinition(string name);

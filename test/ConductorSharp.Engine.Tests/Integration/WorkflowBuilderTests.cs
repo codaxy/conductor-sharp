@@ -8,51 +8,6 @@ namespace ConductorSharp.Engine.Tests.Integration
 {
     public class WorkflowBuilderTests
     {
-        private readonly IContainer _container;
-
-        public WorkflowBuilderTests()
-        {
-            var _containerBuilder = new ContainerBuilder();
-
-            _containerBuilder
-                .AddConductorSharp("example.com", "api", false)
-                .AddExecutionManager(10, 100, 100, null, typeof(WorkflowBuilderTests).Assembly)
-                .AddPipelines(pipelines =>
-                {
-                    pipelines.AddContextLogging();
-                    pipelines.AddRequestResponseLogging();
-                    pipelines.AddValidation();
-                })
-                .AddCSharpLambdaTasks("TEST");
-
-            _containerBuilder.RegisterWorkflow<SendCustomerNotification>();
-            _containerBuilder.RegisterWorkflow<StringInterpolation>();
-            _containerBuilder.RegisterWorkflow<Samples.Workflows.NestedObjects>();
-            _containerBuilder.RegisterWorkflow<TaskInputInitializationNew>();
-            _containerBuilder.RegisterWorkflow<TaskInputInitializationMemberInit>();
-
-            _containerBuilder.RegisterWorkflow<Arrays>();
-            _containerBuilder.RegisterWorkflow<ConditionallySendCustomerNotification>();
-            _containerBuilder.RegisterWorkflow<DynamicTask>();
-            _containerBuilder.RegisterWorkflow<OptionalTaskWorkflow>();
-            _containerBuilder.RegisterWorkflow<TerminateTaskWorfklow>();
-            _containerBuilder.RegisterWorkflow<DecisionInDecision>();
-            _containerBuilder.RegisterWorkflow<ScaffoldedWorkflows>();
-            _containerBuilder.RegisterWorkflow<VersionAttributeWorkflow>();
-            _containerBuilder.RegisterWorkflow<PatternTasks>();
-            _containerBuilder.RegisterWorkflow<CastWorkflow>();
-            _containerBuilder.RegisterWorkflow<StringAddition>();
-            _containerBuilder.RegisterWorkflow<CSharpLambdaWorkflow>();
-            _containerBuilder.RegisterWorkflow<DecisionTask>();
-            _containerBuilder.RegisterWorkflow<SwitchTask>();
-            _containerBuilder.RegisterWorkflow<PassthroughTaskWorkflow>();
-            _containerBuilder.RegisterWorkflow<HumanTaskWorkflow>();
-            _containerBuilder.RegisterWorkflow<WaitTaskWorkflow>();
-            _containerBuilder.RegisterWorkflow<IndexerWorkflow>();
-
-            _container = _containerBuilder.Build();
-        }
-
         [Fact]
         public void BuilderReturnsCorrectDefinition()
         {
@@ -236,6 +191,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal(expectedDefinition, definition);
         }
 
+        [Fact]
         public void BuilderReturnsCorrectDefinitionWaitTaskWorkflow()
         {
             var definition = GetDefinitionFromWorkflow<WaitTaskWorkflow>();
@@ -244,6 +200,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal(expectedDefinition, definition);
         }
 
+        [Fact]
         public void BuilderReturnsCorrectDefinitionIndexerWorkflow()
         {
             var definition = GetDefinitionFromWorkflow<IndexerWorkflow>();
@@ -252,11 +209,59 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal(expectedDefinition, definition);
         }
 
-        private string GetDefinitionFromWorkflow<TNameable>() where TNameable : INameable
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionDefaultValueWorkflow()
         {
-            var workflow = _container.Resolve<IEnumerable<WorkflowDefinition>>().First(a => a.Name == NamingUtil.NameOf<TNameable>());
+            var definition = GetDefinitionFromWorkflow<DefaultValueWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/DefaultValueWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionListInitalizationWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<ListInitializationWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/ListInitializationWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionTaskPropertiesWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<TaskPropertiesWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/TaskPropertiesWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        private string GetDefinitionFromWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
+        {
+            var workflow = RegisterWorkflow<TWorkflow>()
+                .Resolve<IEnumerable<WorkflowDefinition>>()
+                .First(a => a.Name == NamingUtil.NameOf<TWorkflow>());
 
             return SerializationUtil.SerializeObject(workflow);
+        }
+
+        private IContainer RegisterWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
+        {
+            var containerBuilder = new ContainerBuilder();
+
+            containerBuilder
+                .AddConductorSharp("example.com", "api", false)
+                .AddExecutionManager(10, 100, 100, null, typeof(WorkflowBuilderTests).Assembly)
+                .AddPipelines(pipelines =>
+                {
+                    pipelines.AddContextLogging();
+                    pipelines.AddRequestResponseLogging();
+                    pipelines.AddValidation();
+                })
+                .AddCSharpLambdaTasks("TEST");
+
+            containerBuilder.RegisterWorkflow<TWorkflow>();
+            return containerBuilder.Build();
         }
     }
 }
