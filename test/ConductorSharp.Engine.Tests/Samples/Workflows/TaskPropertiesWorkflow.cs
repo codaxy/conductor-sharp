@@ -28,7 +28,8 @@
                         ScheduledTime = wf.GetCustomer.ScheduledTime,
                         TaskDefName = wf.GetCustomer.TaskDefName,
                         TaskId = wf.GetCustomer.TaskId,
-                        TaskType = wf.GetCustomer.TaskType
+                        TaskType = wf.GetCustomer.TaskType,
+                        CorrelationId = wf.GetCustomer.CorrelationId
                     }
             );
         }

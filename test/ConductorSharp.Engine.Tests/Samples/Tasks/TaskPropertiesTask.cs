@@ -10,6 +10,7 @@
         public string TaskDefName { get; set; }
         public long ScheduledTime { get; set; }
         public string ReferenceTaskName { get; set; }
+        public string CorrelationId { get; set; }
     }
 
     public class TaskPropertiesTaskOutput { }

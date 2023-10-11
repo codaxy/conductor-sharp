@@ -52,7 +52,8 @@
         "scheduled_time": "${get_customer.scheduledTime}",
         "task_def_name": "${get_customer.taskDefName}",
         "task_id": "${get_customer.taskId}",
-        "task_type": "${get_customer.taskType}"
+        "task_type": "${get_customer.taskType}",
+        "correlation_id": "${get_customer.correlationId}"
       },
       "type": "SIMPLE",
       "dynamicTaskNameParam": null,

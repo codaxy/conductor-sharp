@@ -33,5 +33,8 @@ namespace ConductorSharp.Engine.Model
 
         [JsonProperty("referenceTaskName")]
         public string ReferenceTaskName { get; set; }
+
+        [JsonProperty("correlationId")]
+        public string CorrelationId { get; set; }
     }
 }
