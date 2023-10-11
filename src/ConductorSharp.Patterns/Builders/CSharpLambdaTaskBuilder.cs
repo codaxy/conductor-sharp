@@ -83,7 +83,6 @@ namespace ConductorSharp.Patterns.Builders
                         new JProperty(CSharpLambdaTaskInput.LambdaIdenfitierParamName, LambdaIdentifer),
                         new JProperty(CSharpLambdaTaskInput.TaskInputParamName, _inputParameters)
                     },
-                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
                     Optional = _additionalParameters.Optional
                 }
             };

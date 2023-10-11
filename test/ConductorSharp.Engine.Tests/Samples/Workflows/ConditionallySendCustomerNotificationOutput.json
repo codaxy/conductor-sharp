@@ -5,7 +5,7 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "NOTIFICATION_conditionally_send_to_customer",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
@@ -28,7 +28,6 @@
           {
             "name": "NOTIFICATION_send_to_customer",
             "taskReferenceName": "send_notification_subworkflow",
-            "description": "{\"description\":null}",
             "inputParameters": {
               "id": "${workflow.input.customer_id}"
             },
@@ -63,7 +62,8 @@
     }
   ],
   "inputParameters": [
-    "{\"should_send_notification\":{\"value\":\"\",\"description\":\" (optional)\"},\"customer_id\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "should_send_notification",
+    "customer_id"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

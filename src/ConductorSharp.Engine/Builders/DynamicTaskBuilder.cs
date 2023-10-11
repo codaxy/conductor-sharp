@@ -60,7 +60,6 @@ namespace ConductorSharp.Engine.Builders
                     Type = TaskType,
                     InputParameters = parameters.TaskInput,
                     DynamicTaskNameParam = DynamicTasknameParam,
-                    Description = new JObject { new JProperty("description", "A dynamic task") }.ToString(Formatting.None)
                 }
             };
         }

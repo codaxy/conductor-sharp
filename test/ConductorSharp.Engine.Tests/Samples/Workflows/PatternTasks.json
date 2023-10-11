@@ -5,14 +5,14 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "pattern_tasks",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
       "name": "CSH_PATTERNS_read_tasks",
       "taskReferenceName": "read_workflow_tasks",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "task_names": "task1,task2",
         "workflow_id": "${workflow.input.workflow_id}"
@@ -46,7 +46,7 @@
       "queryExpression": null,
       "name": "CSH_PATTERNS_wait_seconds",
       "taskReferenceName": "wait_seconds",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "seconds": "${workflow.input.seconds}"
       },
@@ -77,7 +77,8 @@
     }
   ],
   "inputParameters": [
-    "{\"seconds\":{\"value\":\"\",\"description\":\" (optional)\"},\"workflow_id\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "seconds",
+    "workflow_id"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

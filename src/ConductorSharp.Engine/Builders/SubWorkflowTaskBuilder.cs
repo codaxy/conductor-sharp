@@ -44,7 +44,7 @@ namespace ConductorSharp.Engine.Builders
                     Type = "SUB_WORKFLOW",
                     InputParameters = _inputParameters,
                     SubWorkflowParam = new WorkflowDefinition.SubWorkflowParam { Name = _taskName, Version = _version },
-                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
+                    Description = _description,
                     Optional = _additionalParameters?.Optional == true
                 }
             };

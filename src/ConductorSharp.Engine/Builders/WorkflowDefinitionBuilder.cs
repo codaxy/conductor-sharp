@@ -84,7 +84,6 @@ namespace ConductorSharp.Engine.Builders
             var summary = _workflowType.GetDocSection("summary");
             var ownerApp = _workflowType.GetDocSection("ownerApp");
             var ownerEmail = _workflowType.GetDocSection("ownerEmail");
-            var labels = _workflowType.GetDocSection("labels");
 
             BuildContext.WorkflowOptions.Version =
                 _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? BuildContext.WorkflowOptions.Version;
@@ -99,27 +98,13 @@ namespace ConductorSharp.Engine.Builders
             if (!string.IsNullOrEmpty(ownerEmail))
                 BuildContext.WorkflowOptions.OwnerEmail = ownerEmail;
 
-            if (!string.IsNullOrEmpty(labels))
-                BuildContext.WorkflowOptions.Labels = labels.Split(",").Select(a => a.Trim()).ToArray();
-
             var input = _workflowType.BaseType.GenericTypeArguments[1];
             var props = input.GetProperties();
 
             foreach (var prop in props)
             {
-                var isRequired = prop.GetCustomAttribute<RequiredAttribute>();
-                var defaultValue = prop.GetCustomAttribute<DefaultValueAttribute>()?.DefaultValue ?? string.Empty;
-                var description = prop.GetDocSection("summary");
-
                 var propertyName = NamingUtil.GetParameterName(prop);
-
-                var requiredString = isRequired != null ? "(required)" : "(optional)";
-                BuildContext.Inputs.Add(
-                    new JProperty(
-                        propertyName,
-                        new JObject { new JProperty("value", defaultValue), new JProperty("description", $"{description} {requiredString}"), }
-                    )
-                );
+                BuildContext.Inputs.Add(propertyName);
             }
 
             return new WorkflowDefinition
@@ -130,8 +115,8 @@ namespace ConductorSharp.Engine.Builders
                     BuildContext.WorkflowOptions.FailureWorkflow != null
                         ? NamingUtil.DetermineRegistrationName(BuildContext.WorkflowOptions.FailureWorkflow)
                         : null,
-                Description = BuildConfiguration.WorkflowDescriptionBuilder.Build(BuildContext),
-                InputParameters = BuildContext.Inputs,
+                Description = BuildContext.WorkflowOptions.Description,
+                InputParameters = BuildContext.Inputs.ToArray(),
                 OutputParameters = BuildContext.Outputs,
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
                 OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
