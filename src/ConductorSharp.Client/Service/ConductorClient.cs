@@ -2,67 +2,59 @@
 using ConductorSharp.Client.Model.Response;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using RestSharp;
-using RestSharp.Serializers.NewtonsoftJson;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace ConductorSharp.Client.Service
 {
     public class ConductorClient : IConductorClient
     {
         private readonly ILogger<ConductorClient> _logger;
+        private readonly HttpClient _httpClient;
         private readonly RestConfig _restConfig;
-        private readonly RestClient _restClient;
 
-        public ConductorClient(ILogger<ConductorClient> logger, RestConfig restConfig)
+        public ConductorClient(ILogger<ConductorClient> logger, HttpClient httpClient, RestConfig restConfig)
         {
             _logger = logger;
+            _httpClient = httpClient;
             _restConfig = restConfig;
-
-            if (_restConfig?.CreateClient != null)
-                _restClient = _restConfig.CreateClient();
-            else
-                _restClient = new RestClient();
-
-            // TODO: Make this not required, as we want to allow the user to init client as he likes
-            _restClient.UseNewtonsoftJson();
         }
 
-        private void CheckResponse(RestResponse response)
+        private async void CheckResponse(HttpResponseMessage response)
         {
-            var bodyParameter = response.Request.Parameters.FirstOrDefault(a => a.Type == ParameterType.RequestBody);
-            var body = bodyParameter?.Value == null ? "" : JsonConvert.SerializeObject(bodyParameter.Value);
-
-            if (!response.IsSuccessful)
+            if (!response.IsSuccessStatusCode)
             {
+                var request = await response.RequestMessage.Content.ReadAsStringAsync();
+                var responseContent = await response.Content.ReadAsStringAsync();
                 ConductorErrorResponse error = default;
 
-                _logger.LogInformation("Received {@Response} with status code {@StatusCode}", response.Content, (int)response.StatusCode);
+                _logger.LogDebug("Received {@response}", response.Content);
 
-                error = response.Content != null ? JsonConvert.DeserializeObject<ConductorErrorResponse>(response.Content) : null;
+                error = JsonConvert.DeserializeObject<ConductorErrorResponse>(responseContent);
 
                 if (error == null || string.IsNullOrEmpty(error.Message))
-                    throw new Exception(response.ErrorMessage ?? "Unable to deserialize error");
+                    throw new Exception("Unable to deserialize error");
 
                 _logger.LogError("{@conductorError}", error);
 
-                if (response.StatusCode == HttpStatusCode.BadRequest)
-                    throw new Exception(response.Content);
+                if (!_restConfig.IgnoreValidationErrors && error?.Message?.Contains("Validation failed") == true)
+                    throw new Exception(responseContent);
 
                 if (response.StatusCode == HttpStatusCode.InternalServerError)
-                    throw new Exception(response.Content);
+                    throw new Exception(responseContent);
 
                 if (response.StatusCode == HttpStatusCode.NotFound)
                     throw new NotFoundException(error.Message);
             }
         }
 
-        private RestRequest CreateRequest(Uri relativeUrl, HttpMethod method, object body = null)
+        private HttpRequestMessage CreateRequest(Uri relativeUrl, HttpMethod method, object body = null)
         {
             Uri uri;
 
@@ -71,46 +63,39 @@ namespace ConductorSharp.Client.Service
             else
                 uri = new Uri($"{_restConfig.BaseUrl}/{_restConfig.ApiPath}/{relativeUrl.OriginalString}");
 
-            var request = new RestRequest(uri, (Method)Enum.Parse(typeof(Method), method.Method, true))
-            {
-                // TODO: This does not work with the latest version of restsharp
-                //OnBeforeDeserialization = resp =>
-                //{
-                //    resp.ContentType = "";
-                //}
-            };
+            var httpRequestMessage = new HttpRequestMessage(method, uri);
 
             if (body != null)
-                request.AddJsonBody(body);
+                httpRequestMessage.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
 
-            return request;
+            return httpRequestMessage;
         }
 
         public async Task<T> ExecuteRequestAsync<T>(Uri relativeUrl, HttpMethod method, object resource)
         {
             var request = CreateRequest(relativeUrl, method, resource);
-            var response = await _restClient.ExecuteAsync<T>(request);
+            var response = await _httpClient.SendAsync(request);
 
             CheckResponse(response);
 
-            return response.Data;
+            return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
         }
 
         public async Task<T> ExecuteRequestAsync<T>(Uri relativeUrl, HttpMethod method)
         {
             var request = CreateRequest(relativeUrl, method);
 
-            var response = await _restClient.ExecuteAsync(request);
+            var response = await _httpClient.SendAsync(request);
 
             CheckResponse(response);
 
-            return JsonConvert.DeserializeObject<T>(response.Content);
+            return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
         }
 
         public async Task ExecuteRequestAsync(Uri relativeUrl, HttpMethod method, object resource)
         {
             var request = CreateRequest(relativeUrl, method, resource);
-            var response = await _restClient.ExecuteAsync(request);
+            var response = await _httpClient.SendAsync(request);
 
             CheckResponse(response);
         }
@@ -118,7 +103,7 @@ namespace ConductorSharp.Client.Service
         public async Task ExecuteRequestAsync(Uri relativeUrl, HttpMethod method)
         {
             var request = CreateRequest(relativeUrl, method);
-            var response = await _restClient.ExecuteAsync(request);
+            var response = await _httpClient.SendAsync(request);
 
             CheckResponse(response);
         }
@@ -126,23 +111,29 @@ namespace ConductorSharp.Client.Service
         public async Task<T> ExecuteRequestAsync<T>(Uri relativeUrl, HttpMethod method, object resource, Dictionary<string, string> headers)
         {
             var request = CreateRequest(relativeUrl, method, resource);
-            request.AddHeaders(headers);
-            var response = await _restClient.ExecuteAsync<T>(request);
+
+            foreach (var header in headers)
+                request.Headers.Add(header.Key, header.Value);
+
+            var response = await _httpClient.SendAsync(request);
 
             CheckResponse(response);
 
-            return response.Data;
+            return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
         }
 
         public async Task<string> ExecuteRequestAsync(Uri relativeUrl, HttpMethod method, object resource, Dictionary<string, string> headers)
         {
             var request = CreateRequest(relativeUrl, method, resource);
-            request.AddHeaders(headers);
-            var response = await _restClient.ExecuteAsync(request);
+
+            foreach (var header in headers)
+                request.Headers.Add(header.Key, header.Value);
+
+            var response = await _httpClient.SendAsync(request);
 
             CheckResponse(response);
 
-            return response.Content;
+            return await response.Content.ReadAsStringAsync();
         }
     }
 }
