@@ -4,19 +4,16 @@
   "updateTime": 0,
   "createdBy": null,
   "updatedBy": null,
-  "name": "pattern_tasks",
+  "name": "task_properties_workflow",
   "description": null,
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
-      "name": "CSH_PATTERNS_read_tasks",
-      "taskReferenceName": "read_workflow_tasks",
+      "name": "CUSTOMER_get",
+      "taskReferenceName": "get_customer",
       "description": null,
-      "inputParameters": {
-        "task_names": "task1,task2",
-        "workflow_id": "${workflow.input.workflow_id}"
-      },
+      "inputParameters": {},
       "type": "SIMPLE",
       "dynamicTaskNameParam": null,
       "caseValueParam": null,
@@ -44,11 +41,19 @@
     },
     {
       "queryExpression": null,
-      "name": "CSH_PATTERNS_wait_seconds",
-      "taskReferenceName": "wait_seconds",
+      "name": "task_properties_task",
+      "taskReferenceName": "task_properties",
       "description": null,
       "inputParameters": {
-        "seconds": "${workflow.input.seconds}"
+        "status": "${get_customer.status}",
+        "reference_task_name": "${get_customer.referenceTaskName}",
+        "start_time": "${get_customer.startTime}",
+        "end_time": "${get_customer.endTime}",
+        "scheduled_time": "${get_customer.scheduledTime}",
+        "task_def_name": "${get_customer.taskDefName}",
+        "task_id": "${get_customer.taskId}",
+        "task_type": "${get_customer.taskType}",
+        "correlation_id": "${get_customer.correlationId}"
       },
       "type": "SIMPLE",
       "dynamicTaskNameParam": null,
@@ -76,10 +81,7 @@
       "loopOver": null
     }
   ],
-  "inputParameters": [
-    "seconds",
-    "workflow_id"
-  ],
+  "inputParameters": [],
   "outputParameters": null,
   "failureWorkflow": null,
   "schemaVersion": 2,

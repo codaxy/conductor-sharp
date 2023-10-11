@@ -127,17 +127,7 @@ namespace ConductorSharp.Toolkit
             });
 
             builder.Populate(serviceCollection);
-            builder.AddConductorSharp(
-                config.BaseUrl,
-                config.ApiPath,
-                createClient: () =>
-                {
-                    var client = new RestClient();
-                    client.UseNewtonsoftJson();
-                    client.AddDefaultHeaders(config.Headers);
-                    return client;
-                }
-            );
+            builder.AddConductorSharp(config.BaseUrl, config.ApiPath);
             builder.RegisterModule(new ToolkitModule());
 
             return builder.Build();

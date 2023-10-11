@@ -5,14 +5,14 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "TEST_dynamic_task",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
       "name": "dynamic_handler",
       "taskReferenceName": "dynamic_handler",
-      "description": "{\"description\":\"A dynamic task\"}",
+      "description": null,
       "inputParameters": {
         "count": "${workflow.input.count}",
         "should_use_next": "${workflow.input.should_use_next}",
@@ -45,7 +45,10 @@
     }
   ],
   "inputParameters": [
-    "{\"task_name\":{\"value\":\"\",\"description\":\" (optional)\"},\"workflow_version\":{\"value\":\"\",\"description\":\" (optional)\"},\"count\":{\"value\":\"\",\"description\":\" (optional)\"},\"should_use_next\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "task_name",
+    "workflow_version",
+    "count",
+    "should_use_next"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

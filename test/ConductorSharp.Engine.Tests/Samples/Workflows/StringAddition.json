@@ -5,14 +5,14 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "string_addition",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
       "name": "LAMBDA_string_task",
       "taskReferenceName": "string_task",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "input": "1Str_2Str_${workflow.input.input}My input: ${workflow.input.input}string_addition1",
         "scriptExpression": ""
@@ -44,7 +44,7 @@
     }
   ],
   "inputParameters": [
-    "{\"input\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "input"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

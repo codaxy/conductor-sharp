@@ -45,7 +45,6 @@ namespace ConductorSharp.Engine.Builders
                     Name = $"LAMBDA_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
                     Type = "LAMBDA",
-                    Description = new JObject { new JProperty("description", _description) }.ToString(Newtonsoft.Json.Formatting.None),
                     InputParameters = _inputParameters
                 }
             };

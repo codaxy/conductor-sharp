@@ -42,14 +42,12 @@ namespace ConductorSharp.Engine.Builders
                     DynamicForkTasksParam = "dynamic_tasks",
                     DynamicForkTasksInputParamName = "dynamic_tasks_i",
                     InputParameters = _inputParameters,
-                    Description = new JObject { new JProperty("description", "A dynamic fork.") }.ToString(Newtonsoft.Json.Formatting.None)
                 },
                 new WorkflowDefinition.Task
                 {
                     Name = joinTaskName,
                     TaskReferenceName = joinTaskName,
                     Type = "JOIN",
-                    Description = new JObject { new JProperty("description", "Join.") }.ToString(Newtonsoft.Json.Formatting.None)
                 }
             };
         }

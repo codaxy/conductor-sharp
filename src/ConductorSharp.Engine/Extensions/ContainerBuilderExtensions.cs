@@ -6,6 +6,7 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
 using RestSharp;
 using System;
+using System.Net.Http;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -15,8 +16,7 @@ namespace ConductorSharp.Engine.Extensions
             this ContainerBuilder builder,
             string baseUrl,
             string apiPath,
-            bool preventErrorOnBadRequest = false,
-            Func<RestClient> createClient = null
+            bool preventErrorOnBadRequest = false
         )
         {
             builder.RegisterInstance(
@@ -24,10 +24,10 @@ namespace ConductorSharp.Engine.Extensions
                 {
                     ApiPath = apiPath,
                     BaseUrl = baseUrl,
-                    CreateClient = createClient,
                     IgnoreValidationErrors = preventErrorOnBadRequest
                 }
             );
+            builder.RegisterType<HttpClient>().AsSelf();
 
             builder.RegisterType<ConductorClient>().As<IConductorClient>().SingleInstance();
 

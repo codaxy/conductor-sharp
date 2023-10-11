@@ -5,7 +5,7 @@
   "createdBy": "UNDEFINED",
   "updatedBy": "UNDEFINED",
   "name": "CUSTOMER_get",
-  "description": "{\"description\":\"Missing description\"}",
+  "description": null,
   "retryCount": 0,
   "timeoutSeconds": 60,
   "inputKeys": [

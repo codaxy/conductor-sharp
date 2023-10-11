@@ -9,7 +9,7 @@ namespace ConductorSharp.Engine.Util.Builders
 {
     public class BuildContext
     {
-        public JObject Inputs { get; set; }
+        public List<string> Inputs { get; set; }
         public JObject Outputs { get; set; }
         public WorkflowOptions WorkflowOptions { get; } = new();
         public string WorkflowName { get; set; }

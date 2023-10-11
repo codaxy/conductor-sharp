@@ -183,26 +183,8 @@ namespace ConductorSharp.Client.Model.Common
         [JsonProperty("tasks")]
         public List<Task> Tasks { get; set; }
 
-        // TODO: There are some input objects on conductor that are returning bad json. notify owners
         [JsonProperty("inputParameters")]
-        public string[] InputParametersJSON
-        {
-            get { return InputParameters != null ? new[] { InputParameters.ToString(Formatting.None) } : null; }
-            set
-            {
-                try
-                {
-                    InputParameters = value != null && value.Length > 0 ? JObject.Parse(value[0]) : null;
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine($"Bad JSON at {Name}");
-                }
-            }
-        }
-
-        [JsonIgnore()]
-        public JObject InputParameters { get; set; }
+        public string[] InputParameters { get; set; }
 
         [JsonProperty("outputParameters")]
         public JObject OutputParameters { get; set; }

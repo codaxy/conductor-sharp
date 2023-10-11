@@ -5,14 +5,14 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "evaluate_expression_workflow",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
       "queryExpression": null,
       "name": "CUSTOMER_get",
       "taskReferenceName": "first_customer_get",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "customer_id": 1
       },
@@ -45,7 +45,7 @@
       "queryExpression": null,
       "name": "CUSTOMER_get",
       "taskReferenceName": "second_customer_get",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "customer_id": 1
       },
@@ -78,7 +78,7 @@
       "queryExpression": null,
       "name": "CUSTOMER_get",
       "taskReferenceName": "third_customer_get",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "customer_id": 1
       },
@@ -111,7 +111,7 @@
       "queryExpression": null,
       "name": "CUSTOMER_get",
       "taskReferenceName": "fourth_customer_get",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "customer_id": 1
       },
@@ -144,7 +144,7 @@
       "queryExpression": null,
       "name": "CUSTOMER_get",
       "taskReferenceName": "fifth_customer_get",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "customer_id": 34
       },
@@ -177,7 +177,7 @@
       "queryExpression": null,
       "name": "EMAIL_prepare",
       "taskReferenceName": "prepare_email",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "name": "1:1:1:1:1",
         "address": "${workflow.input.username}@test.com"
@@ -209,7 +209,7 @@
     }
   ],
   "inputParameters": [
-    "{\"username\":{\"value\":\"\",\"description\":\" (optional)\"}}"
+    "username"
   ],
   "outputParameters": null,
   "failureWorkflow": null,

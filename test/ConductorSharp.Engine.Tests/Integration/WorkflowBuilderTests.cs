@@ -212,19 +212,19 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
-        public void BuilderReturnsCorrectDefinitionDefaultValueWorkflow()
+        public void BuilderReturnsCorrectDefinitionListInitalizationWorkflow()
         {
-            var definition = GetDefinitionFromWorkflow<DefaultValueWorkflow>();
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/DefaultValueWorkflow.json");
+            var definition = GetDefinitionFromWorkflow<ListInitializationWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/ListInitializationWorkflow.json");
 
             Assert.Equal(expectedDefinition, definition);
         }
 
         [Fact]
-        public void BuilderReturnsCorrectDefinitionListInitalizationWorkflow()
+        public void BuilderReturnsCorrectDefinitionTaskPropertiesWorkflow()
         {
-            var definition = GetDefinitionFromWorkflow<ListInitializationWorkflow>();
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/ListInitializationWorkflow.json");
+            var definition = GetDefinitionFromWorkflow<TaskPropertiesWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/TaskPropertiesWorkflow.json");
 
             Assert.Equal(expectedDefinition, definition);
         }

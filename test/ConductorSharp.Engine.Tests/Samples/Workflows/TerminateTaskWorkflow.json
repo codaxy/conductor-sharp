@@ -5,7 +5,7 @@
   "createdBy": null,
   "updatedBy": null,
   "name": "terminate_task_worfklow",
-  "description": "{\"description\":null,\"labels\":null}",
+  "description": null,
   "version": 1,
   "tasks": [
     {
@@ -28,7 +28,6 @@
           {
             "name": "TERMINATE_decision_terminate",
             "taskReferenceName": "decision_terminate",
-            "description": "{\"description\":null}",
             "inputParameters": {
               "workflowOutput": {
                 "property": "Test"
@@ -80,7 +79,6 @@
           {
             "name": "TERMINATE_switch_terminate",
             "taskReferenceName": "switch_terminate",
-            "description": "{\"description\":null}",
             "inputParameters": {
               "workflowOutput": {
                 "property": "Test"
@@ -116,7 +114,7 @@
       "queryExpression": null,
       "name": "TERMINATE_terminate",
       "taskReferenceName": "terminate",
-      "description": "{\"description\":null}",
+      "description": null,
       "inputParameters": {
         "terminationStatus": "FAILED",
         "workflowOutput": {
@@ -149,9 +147,7 @@
       "loopOver": null
     }
   ],
-  "inputParameters": [
-    "{}"
-  ],
+  "inputParameters": [],
   "outputParameters": null,
   "failureWorkflow": null,
   "schemaVersion": 2,

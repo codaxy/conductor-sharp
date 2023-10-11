@@ -37,6 +37,9 @@ namespace ConductorSharp.Client.Service
         public async Task DeleteWorkflowDefinition(string name, int version) =>
             await _conductorClient.ExecuteRequestAsync(ApiUrls.DeleteWorkflowDefinition(name, version), HttpMethod.Delete);
 
+        public async Task ValidateWorkflowDefinition(WorkflowDefinition workflowDefinition) =>
+            await _conductorClient.ExecuteRequestAsync(ApiUrls.ValidateWorkflowDefinition(), HttpMethod.Post, workflowDefinition);
+
         public async Task CreateWorkflowDefinitions(List<WorkflowDefinition> workflowDefinition) =>
             await _conductorClient.ExecuteRequestAsync(ApiUrls.CreateWorkflowDefinitions(), HttpMethod.Put, workflowDefinition);
 
