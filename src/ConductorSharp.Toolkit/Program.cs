@@ -1,16 +1,13 @@
-﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using CommandLine;
+using CommandLine.Text;
+using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Toolkit.Commands;
 using ConductorSharp.Toolkit.Models;
-using CommandLine;
-using CommandLine.Text;
-using System.Reflection;
+using ConductorSharp.Toolkit.Service;
+using Microsoft.Extensions.DependencyInjection;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using RestSharp;
-using RestSharp.Serializers.NewtonsoftJson;
 
 namespace ConductorSharp.Toolkit
 {
@@ -62,7 +59,7 @@ namespace ConductorSharp.Toolkit
                     return;
 
                 var container = BuildContainer(config, options);
-                var commandRegistry = container.Resolve<CommandRegistry>();
+                var commandRegistry = container.GetRequiredService<CommandRegistry>();
                 // Currently only scaffolding is supported
                 var command = commandRegistry.Get("scaffold");
                 await command.Execute(config);
@@ -104,15 +101,13 @@ namespace ConductorSharp.Toolkit
             return validConfiguration;
         }
 
-        private static IContainer BuildContainer(Configuration config, ToolkitOptions options)
+        private static IServiceProvider BuildContainer(Configuration config, ToolkitOptions options)
         {
-            var serviceCollection = new ServiceCollection();
+            var builder = new ServiceCollection();
 
-            serviceCollection.AddLogging();
+            builder.AddLogging();
 
-            var builder = new ContainerBuilder();
-
-            serviceCollection.Configure<ScaffoldingConfig>(scaffoldingConfig =>
+            builder.Configure<ScaffoldingConfig>(scaffoldingConfig =>
             {
                 scaffoldingConfig.ApiUrl = config.ApiPath;
                 scaffoldingConfig.BaseUrl = config.BaseUrl;
@@ -126,11 +121,14 @@ namespace ConductorSharp.Toolkit
                 scaffoldingConfig.DryRun = options.DryRun;
             });
 
-            builder.Populate(serviceCollection);
             builder.AddConductorSharp(config.BaseUrl, config.ApiPath);
-            builder.RegisterModule(new ToolkitModule());
+            builder.AddTransient<IConductorClient, ConductorClient>();
+            builder.AddTransient<IMetadataService, MetadataService>();
+            builder.AddTransient<IScaffoldingService, ScaffoldingService>();
+            builder.AddTransient<CommandRegistry>();
+            builder.AddTransient<Command, ScaffoldCommand>();
 
-            return builder.Build();
+            return builder.BuildServiceProvider();
         }
     }
 }

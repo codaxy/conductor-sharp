@@ -1,11 +1,9 @@
-﻿using Autofac;
-using ConductorSharp.Client;
+﻿using ConductorSharp.Client;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
-using RestSharp;
-using System;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 
 namespace ConductorSharp.Engine.Extensions
@@ -13,13 +11,13 @@ namespace ConductorSharp.Engine.Extensions
     public static class ContainerBuilderExtensions
     {
         public static IConductorSharpBuilder AddConductorSharp(
-            this ContainerBuilder builder,
+            this IServiceCollection builder,
             string baseUrl,
             string apiPath,
             bool preventErrorOnBadRequest = false
         )
         {
-            builder.RegisterInstance(
+            builder.AddSingleton(
                 new RestConfig
                 {
                     ApiPath = apiPath,
@@ -27,27 +25,28 @@ namespace ConductorSharp.Engine.Extensions
                     IgnoreValidationErrors = preventErrorOnBadRequest
                 }
             );
-            builder.RegisterType<HttpClient>().AsSelf();
 
-            builder.RegisterType<ConductorClient>().As<IConductorClient>().SingleInstance();
+            builder.AddTransient<HttpClient>();
 
-            builder.RegisterType<TaskService>().As<ITaskService>();
+            builder.AddSingleton<IConductorClient, ConductorClient>();
 
-            builder.RegisterType<HealthService>().As<IHealthService>();
+            builder.AddTransient<ITaskService, TaskService>();
 
-            builder.RegisterType<MetadataService>().As<IMetadataService>();
+            builder.AddTransient<IHealthService, HealthService>();
 
-            builder.RegisterType<WorkflowService>().As<IWorkflowService>();
+            builder.AddTransient<IMetadataService, MetadataService>();
 
-            builder.RegisterInstance(new BuildConfiguration());
+            builder.AddTransient<IWorkflowService, WorkflowService>();
 
-            builder.RegisterType<WorkflowBuildItemRegistry>().SingleInstance();
+            builder.AddSingleton(new BuildConfiguration());
 
-            builder.RegisterType<DefaultTaskNameBuilder>().As<ITaskNameBuilder>();
+            builder.AddSingleton<WorkflowBuildItemRegistry>();
 
-            builder.RegisterType<TaskDefinitionBuilder>();
+            builder.AddTransient<ITaskNameBuilder, DefaultTaskNameBuilder>();
 
-            builder.RegisterGeneric(typeof(WorkflowDefinitionBuilder<,,>));
+            builder.AddTransient<TaskDefinitionBuilder>();
+
+            builder.AddTransient(typeof(WorkflowDefinitionBuilder<,,>));
 
             return new ConductorSharpBuilder(builder);
         }

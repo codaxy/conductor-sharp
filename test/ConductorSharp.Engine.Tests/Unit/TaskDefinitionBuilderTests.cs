@@ -1,18 +1,18 @@
-﻿using Autofac;
+﻿using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workers;
 using ConductorSharp.Engine.Tests.Util;
 using ConductorSharp.Engine.Util.Builders;
-using ConductorSharp.Engine.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Engine.Tests.Unit
 {
     public class TaskDefinitionBuilderTests
     {
-        private readonly IContainer _container;
+        private readonly IServiceProvider _container;
 
         public TaskDefinitionBuilderTests()
         {
-            var _containerBuilder = new ContainerBuilder();
+            var _containerBuilder = new ServiceCollection();
 
             _containerBuilder
                 .AddConductorSharp("example.com", "api", false)
@@ -24,13 +24,13 @@ namespace ConductorSharp.Engine.Tests.Unit
                     pipelines.AddValidation();
                 });
 
-            _container = _containerBuilder.Build();
+            _container = _containerBuilder.BuildServiceProvider();
         }
 
         [Fact]
         public void ReturnsCorrectDefinition()
         {
-            var taskDefinitionBuilder = _container.Resolve<TaskDefinitionBuilder>();
+            var taskDefinitionBuilder = _container.GetRequiredService<TaskDefinitionBuilder>();
             var definition = SerializationUtil.SerializeObject(taskDefinitionBuilder.Build<GetCustomerHandler>(null));
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Tasks/CustomerGet.json");
 
@@ -40,17 +40,17 @@ namespace ConductorSharp.Engine.Tests.Unit
         [Fact]
         public void ConfigurableBuilderReturnsCorrectDefinition()
         {
-            var builder = new ContainerBuilder();
+            var builder = new ServiceCollection();
 
             builder.AddConductorSharp(baseUrl: "empty", apiPath: "empty");
 
-            builder.RegisterInstance(new BuildConfiguration { DefaultOwnerApp = "owner" });
+            builder.AddSingleton(new BuildConfiguration { DefaultOwnerApp = "owner" });
 
             builder.RegisterWorkerTask<GetCustomerHandler>();
 
-            var container = builder.Build();
+            var container = builder.BuildServiceProvider();
 
-            var definition = container.Resolve<TaskDefinition>();
+            var definition = container.GetRequiredService<TaskDefinition>();
 
             Assert.Equal("owner", definition.OwnerApp);
         }

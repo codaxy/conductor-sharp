@@ -1,5 +1,4 @@
-﻿using Autofac;
-using ConductorSharp.Engine.Behaviors;
+﻿using ConductorSharp.Engine.Behaviors;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
@@ -7,19 +6,19 @@ using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
-using MediatR.Extensions.Autofac.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace ConductorSharp.Engine.Extensions
 {
     public class ConductorSharpBuilder : IConductorSharpBuilder, IExecutionManagerBuilder, IPipelineBuilder
     {
-        public ContainerBuilder Builder { get; set; }
+        public IServiceCollection Builder { get; set; }
 
-        public ConductorSharpBuilder(ContainerBuilder builder) => Builder = builder;
+        public ConductorSharpBuilder(IServiceCollection builder) => Builder = builder;
 
         public IExecutionManagerBuilder AddExecutionManager(
             int maxConcurrentWorkers,
@@ -37,25 +36,25 @@ namespace ConductorSharp.Engine.Extensions
                 SleepInterval = sleepInterval
             };
 
-            Builder.RegisterInstance(workerConfig).SingleInstance();
+            Builder.AddSingleton(workerConfig);
 
-            Builder.RegisterType<WorkflowEngineBackgroundService>().As<IHostedService>();
+            Builder.AddTransient<IHostedService, WorkflowEngineBackgroundService>();
 
-            Builder.RegisterType<DeploymentService>().As<IDeploymentService>();
+            Builder.AddTransient<IDeploymentService, DeploymentService>();
 
-            Builder.RegisterType<ModuleDeployment>();
+            Builder.AddTransient<ModuleDeployment>();
 
-            Builder.RegisterType<ExecutionManager>().SingleInstance();
+            Builder.AddSingleton<ExecutionManager>();
 
-            Builder.RegisterType<ConductorSharpExecutionContext>().InstancePerLifetimeScope();
+            Builder.AddScoped<ConductorSharpExecutionContext>();
 
-            Builder.RegisterType<InMemoryHealthService>().As<IConductorSharpHealthService>().SingleInstance();
+            Builder.AddSingleton<IConductorSharpHealthService, InMemoryHealthService>();
 
-            Builder.RegisterType<InverseExponentialBackoff>().As<IPollTimingStrategy>();
+            Builder.AddTransient<IPollTimingStrategy, InverseExponentialBackoff>();
 
-            Builder.RegisterType<RandomOrdering>().As<IPollOrderStrategy>();
+            Builder.AddTransient<IPollOrderStrategy, RandomOrdering>();
 
-            Builder.RegisterMediatR(handlerAssemblies);
+            Builder.AddMediatR(handlerAssemblies);
 
             return this;
         }
@@ -66,18 +65,17 @@ namespace ConductorSharp.Engine.Extensions
             return this;
         }
 
-        public void AddRequestResponseLogging() =>
-            Builder.RegisterGeneric(typeof(RequestResponseLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+        public void AddRequestResponseLogging() => Builder.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestResponseLoggingBehavior<,>));
 
-        public void AddValidation() => Builder.RegisterGeneric(typeof(ValidationBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+        public void AddValidation() => Builder.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-        public void AddContextLogging() => Builder.RegisterGeneric(typeof(ContextLoggingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+        public void AddContextLogging() => Builder.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextLoggingBehavior<,>));
 
-        public void AddExecutionTaskTracking() => Builder.RegisterGeneric(typeof(TaskExecutionTrackingBehavior<,>)).As(typeof(IPipelineBehavior<,>));
+        public void AddExecutionTaskTracking() => Builder.AddTransient(typeof(IPipelineBehavior<,>), typeof(TaskExecutionTrackingBehavior<,>));
 
         public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
         {
-            Builder.RegisterType<T>().As<IConductorSharpHealthService>().SingleInstance();
+            Builder.AddSingleton(typeof(IConductorSharpHealthService), typeof(T));
             return this;
         }
 
@@ -88,7 +86,7 @@ namespace ConductorSharp.Engine.Extensions
                 throw new ArgumentNullException("Build configuration cannot be null");
             }
 
-            Builder.RegisterInstance(buildConfiguration);
+            Builder.AddSingleton(buildConfiguration);
             return this;
         }
     }

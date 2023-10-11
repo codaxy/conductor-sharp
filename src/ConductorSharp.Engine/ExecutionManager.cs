@@ -3,17 +3,16 @@ using ConductorSharp.Client.Model.Response;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Polling;
+using ConductorSharp.Engine.Util;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Autofac;
-using ConductorSharp.Engine.Util;
-using ConductorSharp.Engine.Health;
-using ConductorSharp.Engine.Polling;
 
 namespace ConductorSharp.Engine
 {
@@ -24,7 +23,7 @@ namespace ConductorSharp.Engine
         private readonly ILogger<ExecutionManager> _logger;
         private readonly ITaskService _taskManager;
         private readonly IEnumerable<TaskToWorker> _registeredWorkers;
-        private readonly ILifetimeScope _lifetimeScope;
+        private readonly IServiceScopeFactory _lifetimeScopeFactory;
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
 
@@ -33,7 +32,7 @@ namespace ConductorSharp.Engine
             ILogger<ExecutionManager> logger,
             ITaskService taskService,
             IEnumerable<TaskToWorker> workerMappings,
-            ILifetimeScope lifetimeScope,
+            IServiceScopeFactory lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy
         )
@@ -43,7 +42,7 @@ namespace ConductorSharp.Engine
             _logger = logger;
             _taskManager = taskService;
             _registeredWorkers = workerMappings;
-            _lifetimeScope = lifetimeScope;
+            _lifetimeScopeFactory = lifetimeScope;
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
         }
@@ -118,10 +117,10 @@ namespace ConductorSharp.Engine
                 var inputType = GetInputType(scheduledWorker.TaskType);
                 var inputData = pollResponse.InputData.ToObject(inputType, ConductorConstants.IoJsonSerializer);
 
-                using var scope = _lifetimeScope.BeginLifetimeScope();
+                using var scope = _lifetimeScopeFactory.CreateScope();
 
-                var context = scope.ResolveOptional<ConductorSharpExecutionContext>();
-                var mediator = scope.Resolve<IMediator>();
+                var context = scope.ServiceProvider.GetService<ConductorSharpExecutionContext>();
+                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
                 if (context != null)
                 {
