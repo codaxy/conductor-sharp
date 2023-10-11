@@ -307,7 +307,6 @@ namespace ConductorSharp.Engine.Util
         }
 
         // Either we reached task property reference (ConstantExpression case) or workflow parameter (ParameterExpression case)
-        // case ConstantExpression cex when typeof(ITypedWorkflow).IsAssignableFrom(cex.Type)
         private static bool IsTerminalPropertyExpression(Expression expr) =>
             (expr is ConstantExpression || expr is ParameterExpression) && typeof(ITypedWorkflow).IsAssignableFrom(expr.Type);
 
