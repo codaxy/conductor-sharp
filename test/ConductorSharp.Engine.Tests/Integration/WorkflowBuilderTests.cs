@@ -1,3 +1,4 @@
+using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
 using ConductorSharp.Engine.Tests.Util;
@@ -239,7 +240,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         [Fact]
         public void BuilderReturnsCorrectDefinitionNonEvaluatableWorkflow()
         {
-            var exception = Assert.Throws<DependencyResolutionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
+            var exception = Assert.Throws<InvalidOperationException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
             Assert.IsType<NonEvaluatableExpressionException>(exception.InnerException);
         }
 
