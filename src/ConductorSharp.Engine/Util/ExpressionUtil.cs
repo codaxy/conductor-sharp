@@ -1,14 +1,12 @@
 ﻿using ConductorSharp.Engine.Builders;
-using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Interface;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using ConductorSharp.Engine.Exceptions;
 
 namespace ConductorSharp.Engine.Util
 {
@@ -17,7 +15,7 @@ namespace ConductorSharp.Engine.Util
         public static string ParseToReferenceName(Expression expression)
         {
             if (!(expression is MemberExpression taskSelectExpression))
-                throw new Exception($"Only {nameof(MemberExpression)} expression allowed");
+                throw new NotSupportedException($"Only {nameof(MemberExpression)} expression allowed");
 
             return SnakeCaseUtil.ToSnakeCase(taskSelectExpression.Member.Name);
         }
@@ -25,7 +23,7 @@ namespace ConductorSharp.Engine.Util
         public static Type ParseToType(Expression expression)
         {
             if (!(expression is MemberExpression taskSelectExpression))
-                throw new Exception($"Only {nameof(MemberExpression)} expression allowed");
+                throw new NotSupportedException($"Only {nameof(MemberExpression)} expression allowed");
 
             return ((PropertyInfo)taskSelectExpression.Member).PropertyType;
         }
@@ -38,20 +36,14 @@ namespace ConductorSharp.Engine.Util
                 return ParseConstantExpression(cex);
 
             // Handle boxing
-            if (expression is UnaryExpression unaryEx && unaryEx.NodeType == ExpressionType.Convert)
+            if (expression is UnaryExpression { NodeType: ExpressionType.Convert } unaryEx)
                 return ParseExpression(unaryEx.Operand);
 
             if (expression is BinaryExpression binaryEx)
                 return ParseBinaryExpression(binaryEx);
 
-            if (
-                expression is MethodCallExpression methodExpression
-                && methodExpression.Method.Name == nameof(string.Format)
-                && methodExpression.Method.DeclaringType == typeof(string)
-            )
-            {
-                return CompileStringInterpolationExpression(methodExpression);
-            }
+            if (IsStringInterpolation(expression))
+                return CompileStringInterpolationExpression((MethodCallExpression)expression);
 
             if (expression is NewExpression || expression is MemberInitExpression)
                 return ParseObjectInitialization(expression);
@@ -62,7 +54,45 @@ namespace ConductorSharp.Engine.Util
             if (expression is ListInitExpression listInitExpression)
                 return ParseListInit(listInitExpression);
 
-            return CompileInterpolatedStringArgument(expression);
+            if (ShouldCompileToJsonPathExpression(expression))
+                return CreateExpressionString(expression);
+
+            if (IsNameOfExpression(expression))
+                return CompileNameOfExpression((MethodCallExpression)expression);
+
+            return EvaluateExpression(expression);
+        }
+
+        private static bool IsStringInterpolation(Expression expression) =>
+            expression is MethodCallExpression { Method.Name: nameof(string.Format) } methodExpression
+            && methodExpression.Method.DeclaringType == typeof(string);
+
+        private static object EvaluateExpression(Expression expr) =>
+            IsEvaluatable(expr) ? Expression.Lambda(expr).Compile().DynamicInvoke() : throw new NonEvaluatableExpressionException(expr);
+
+        private static bool IsEvaluatable(Expression expr)
+        {
+            switch (expr)
+            {
+                case MemberExpression memExpr:
+                    if (
+                        typeof(ITaskModel).IsAssignableFrom(memExpr.Type)
+                        || typeof(WorkflowId).IsAssignableFrom(memExpr.Type)
+                        || typeof(IWorkflowInput).IsAssignableFrom(memExpr.Type)
+                    )
+                        return false;
+                    return IsEvaluatable(memExpr.Expression);
+                case MethodCallExpression methodExpr:
+                    return IsEvaluatable(methodExpr.Object) && methodExpr.Arguments.All(IsEvaluatable);
+                case BinaryExpression binaryExpr:
+                    return IsEvaluatable(binaryExpr.Left) && IsEvaluatable(binaryExpr.Right);
+                case UnaryExpression unaryExpr:
+                    return IsEvaluatable(unaryExpr.Operand);
+                case ConditionalExpression condExpr:
+                    return IsEvaluatable(condExpr.Test) && IsEvaluatable(condExpr.IfTrue) && IsEvaluatable(condExpr.IfFalse);
+                default:
+                    return true;
+            }
         }
 
         private static object CompileStringInterpolationExpression(MethodCallExpression methodExpression)
@@ -71,7 +101,7 @@ namespace ConductorSharp.Engine.Util
             var expressionStrings = interpolationArguments.Select(CompileInterpolatedStringArgument).ToArray();
             var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
             if (formatExpr == null)
-                throw new Exception("string.Format with non constant format string is not supported");
+                throw new NotSupportedException("string.Format with non constant format string is not supported");
             var formatString = (string)formatExpr.Value;
             return string.Format(formatString, expressionStrings);
         }
@@ -86,24 +116,35 @@ namespace ConductorSharp.Engine.Util
                 : methodExpression.Arguments.Skip(1); // Skip format string
         }
 
+        // We want to be able to specify input like this
+        // Input = wf.WorkflowInput.IpAddress + "/24"
+        // Hence why we should not evaluate binary expressions
         private static object ParseBinaryExpression(BinaryExpression binaryEx)
         {
             var left = ParseExpression(binaryEx.Left);
             var right = ParseExpression(binaryEx.Right);
 
-            switch (binaryEx.NodeType)
-            {
-                case ExpressionType.Add:
+            // Use these lambdas to extract MemberExpression for operands
+            Expression<Func<object>> leftExpr = () => left;
+            Expression<Func<object>> rightExpr = () => right;
 
-                    if (left is string leftStr)
-                        return leftStr + right;
-                    if (right is string rightStr)
-                        return left + rightStr;
+            // Compiler generates following expression tree for primitve + string concatenation operation
+            // (object)(primitive) + string
+            // Notice the casting to object, primitive is boxed before concatenation
 
-                    throw new NotSupportedException($"Expression {left} + {right} not supported");
-                default:
-                    throw new NotSupportedException($"Binary expression with node type {binaryEx.NodeType} not supported");
-            }
+
+            // If either of operands is string and the other one is primitive that means we are performing primitive + string concatenation
+            // We should not box the primitive in this case (since it is object already)
+            // In this case we should cast it to concrete type, otherwise binary operation will fail
+            var lhs =
+                left.GetType().IsPrimitive && right.GetType() == typeof(string) ? leftExpr.Body : Expression.Convert(leftExpr.Body, left.GetType());
+            var rhs =
+                right.GetType().IsPrimitive && left.GetType() == typeof(string)
+                    ? rightExpr.Body
+                    : Expression.Convert(rightExpr.Body, right.GetType());
+            var expr = binaryEx.Update(lhs, null, rhs);
+
+            return EvaluateExpression(expr);
         }
 
         private static object ParseConstantExpression(ConstantExpression cex)
@@ -117,12 +158,6 @@ namespace ConductorSharp.Engine.Util
             }
 
             return cex.Value;
-        }
-
-        private static object ParseDictionaryIndexExpression(MethodCallExpression expression)
-        {
-            var index = expression.Arguments[0];
-            return $"{ParseExpression(expression.Object)}[{ParseExpression(index)}]";
         }
 
         private static bool IsDictionaryIndexExpression(Expression expr) =>
@@ -165,7 +200,7 @@ namespace ConductorSharp.Engine.Util
                 foreach (var binding in initExpression.Bindings)
                 {
                     if (binding.BindingType != MemberBindingType.Assignment)
-                        throw new Exception($"Only {nameof(MemberBindingType.Assignment)} binding type supported");
+                        throw new NotSupportedException($"Only {nameof(MemberBindingType.Assignment)} binding type supported");
 
                     var assignmentBinding = (MemberAssignment)binding;
                     var assignmentValue = ParseExpression(assignmentBinding.Expression);
@@ -196,7 +231,7 @@ namespace ConductorSharp.Engine.Util
                 }
             }
             else
-                throw new Exception(
+                throw new NotSupportedException(
                     $"Only {nameof(MemberInitExpression)} and {nameof(NewExpression)} without constructor arguments expressions are supported"
                 );
 
@@ -205,21 +240,22 @@ namespace ConductorSharp.Engine.Util
 
         private static object CompileInterpolatedStringArgument(Expression expr)
         {
-            if (expr is MemberExpression || IsDictionaryIndexExpression(expr))
+            if (ShouldCompileToJsonPathExpression(expr))
                 return CreateExpressionString(expr);
-            if (
-                expr is MethodCallExpression methodExpr
-                && methodExpr.Method.DeclaringType == typeof(NamingUtil)
-                && methodExpr.Method.Name == nameof(NamingUtil.NameOf)
-            )
-                return (string)methodExpr.Method.Invoke(null, null);
+            if (IsNameOfExpression(expr))
+                return CompileNameOfExpression((MethodCallExpression)expr);
             if (expr is ConstantExpression cex)
                 return ParseConstantExpression(cex);
-            if (expr is UnaryExpression uex && uex.NodeType == ExpressionType.Convert)
+            if (expr is UnaryExpression { NodeType: ExpressionType.Convert } uex)
                 return CompileInterpolatedStringArgument(uex.Operand);
-
-            throw new Exception($"Expression {expr.GetType().Name} in interpolated string not supported");
+            return EvaluateExpression(expr);
         }
+
+        private static bool IsNameOfExpression(Expression expr) =>
+            expr is MethodCallExpression { Method.Name: nameof(NamingUtil.NameOf) } methodExpr
+            && methodExpr.Method.DeclaringType == typeof(NamingUtil);
+
+        private static string CompileNameOfExpression(MethodCallExpression methodExpr) => (string)methodExpr.Method.Invoke(null, null);
 
         private static string CreateExpressionString(Expression expression)
         {
@@ -244,14 +280,9 @@ namespace ConductorSharp.Engine.Util
 
                     var memberName = GetMemberName(propInfo);
 
-                    // Either we reached task property reference (ConstantExpression case) or workflow parameter (ParameterExpression case)
-                    // case ConstantExpression cex when typeof(ITypedWorkflow).IsAssignableFrom(cex.Type)
-                    if (
-                        (memEx.Expression is ConstantExpression cex && typeof(ITypedWorkflow).IsAssignableFrom(cex.Type))
-                        || memEx.Expression is ParameterExpression
-                    )
-                        return memberName;
-                    return $"{CompileToJsonPathExpression(memEx.Expression)}.{memberName}";
+                    return IsTerminalPropertyExpression(memEx.Expression)
+                        ? memberName
+                        : $"{CompileToJsonPathExpression(memEx.Expression)}.{memberName}";
 
                 case MethodCallExpression mex when IsDictionaryIndexExpression(mex):
                     return $"{CompileToJsonPathExpression(mex.Object)}[{CompileToJsonPathExpression(mex.Arguments[0])}]";
@@ -264,6 +295,44 @@ namespace ConductorSharp.Engine.Util
 
                 default:
                     throw new NotSupportedException($"Expression {expr} not supported while traversing members");
+            }
+        }
+
+        private static bool ShouldCompileToJsonPathExpression(Expression expr)
+        {
+            if (expr is not MemberExpression && !IsDictionaryIndexExpression(expr))
+                return false;
+
+            return CheckIfRootExpressionIsTaskModel(expr);
+        }
+
+        // Either we reached task property reference (ConstantExpression case) or workflow parameter (ParameterExpression case)
+        private static bool IsTerminalPropertyExpression(Expression expr) =>
+            (expr is ConstantExpression || expr is ParameterExpression) && typeof(ITypedWorkflow).IsAssignableFrom(expr.Type);
+
+        private static bool CheckIfRootExpressionIsTaskModel(Expression expr)
+        {
+            switch (expr)
+            {
+                case MemberExpression { Member: PropertyInfo propInfo } memEx:
+
+                    if (
+                        typeof(WorkflowId).IsAssignableFrom(propInfo.PropertyType)
+                        || typeof(IWorkflowInput).IsAssignableFrom(propInfo.PropertyType)
+                        || (typeof(ITaskModel).IsAssignableFrom(propInfo.PropertyType) && IsTerminalPropertyExpression(memEx.Expression))
+                    )
+                        return true;
+
+                    return CheckIfRootExpressionIsTaskModel(memEx.Expression);
+
+                case MethodCallExpression mex when IsDictionaryIndexExpression(mex):
+                    return CheckIfRootExpressionIsTaskModel(mex.Object);
+
+                case UnaryExpression { NodeType: ExpressionType.Convert } unaryEx:
+                    return CheckIfRootExpressionIsTaskModel(unaryEx.Operand);
+
+                default:
+                    return false;
             }
         }
 

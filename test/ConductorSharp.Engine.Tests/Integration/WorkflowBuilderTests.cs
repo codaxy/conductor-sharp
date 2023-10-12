@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Engine.Extensions;
+using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
 using ConductorSharp.Engine.Tests.Util;
 using ConductorSharp.Patterns.Extensions;
@@ -225,6 +225,22 @@ namespace ConductorSharp.Engine.Tests.Integration
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/TaskPropertiesWorkflow.json");
 
             Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionEvaluateExpressionWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<EvaluateExpressionWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/EvaluateExpressionWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionNonEvaluatableWorkflow()
+        {
+            var exception = Assert.Throws<DependencyResolutionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
+            Assert.IsType<NonEvaluatableExpressionException>(exception.InnerException);
         }
 
         private string GetDefinitionFromWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
