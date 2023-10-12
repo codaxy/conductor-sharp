@@ -240,8 +240,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         [Fact]
         public void BuilderReturnsCorrectDefinitionNonEvaluatableWorkflow()
         {
-            var exception = Assert.Throws<InvalidOperationException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
-            Assert.IsType<NonEvaluatableExpressionException>(exception.InnerException);
+            Assert.Throws<NonEvaluatableExpressionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
         }
 
         private string GetDefinitionFromWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
