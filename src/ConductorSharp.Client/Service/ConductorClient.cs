@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace ConductorSharp.Client.Service
@@ -18,6 +19,8 @@ namespace ConductorSharp.Client.Service
         private readonly ILogger<ConductorClient> _logger;
         private readonly HttpClient _httpClient;
         private readonly RestConfig _restConfig;
+        private readonly JsonSerializerSettings _serializerSettings =
+            new() { ContractResolver = new CamelCasePropertyNamesContractResolver(), NullValueHandling = NullValueHandling.Ignore };
 
         public ConductorClient(ILogger<ConductorClient> logger, HttpClient httpClient, RestConfig restConfig)
         {
@@ -36,7 +39,7 @@ namespace ConductorSharp.Client.Service
 
                 _logger.LogDebug("Received {@response}", response.Content);
 
-                error = JsonConvert.DeserializeObject<ConductorErrorResponse>(responseContent);
+                error = DeserializeObject<ConductorErrorResponse>(responseContent);
 
                 if (error == null || string.IsNullOrEmpty(error.Message))
                     throw new Exception("Unable to deserialize error");
@@ -54,6 +57,10 @@ namespace ConductorSharp.Client.Service
             }
         }
 
+        private string SerializeObject(object body) => JsonConvert.SerializeObject(body, _serializerSettings);
+
+        private T DeserializeObject<T>(string body) => JsonConvert.DeserializeObject<T>(body, _serializerSettings);
+
         private HttpRequestMessage CreateRequest(Uri relativeUrl, HttpMethod method, object body = null)
         {
             Uri uri;
@@ -66,7 +73,7 @@ namespace ConductorSharp.Client.Service
             var httpRequestMessage = new HttpRequestMessage(method, uri);
 
             if (body != null)
-                httpRequestMessage.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+                httpRequestMessage.Content = new StringContent(SerializeObject(body), Encoding.UTF8, "application/json");
 
             return httpRequestMessage;
         }
@@ -78,7 +85,7 @@ namespace ConductorSharp.Client.Service
 
             CheckResponse(response);
 
-            return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+            return DeserializeObject<T>(await response.Content.ReadAsStringAsync());
         }
 
         public async Task<T> ExecuteRequestAsync<T>(Uri relativeUrl, HttpMethod method)
@@ -89,7 +96,7 @@ namespace ConductorSharp.Client.Service
 
             CheckResponse(response);
 
-            return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+            return DeserializeObject<T>(await response.Content.ReadAsStringAsync());
         }
 
         public async Task ExecuteRequestAsync(Uri relativeUrl, HttpMethod method, object resource)
@@ -119,7 +126,7 @@ namespace ConductorSharp.Client.Service
 
             CheckResponse(response);
 
-            return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+            return DeserializeObject<T>(await response.Content.ReadAsStringAsync());
         }
 
         public async Task<string> ExecuteRequestAsync(Uri relativeUrl, HttpMethod method, object resource, Dictionary<string, string> headers)
