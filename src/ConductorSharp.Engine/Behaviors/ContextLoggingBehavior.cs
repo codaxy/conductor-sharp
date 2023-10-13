@@ -21,7 +21,7 @@ namespace ConductorSharp.Engine.Behaviors
             _executionContext = executionContext;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             using var _ = LogContext.PushProperty(LoggerPropertyName, _executionContext, true);
             return await next();

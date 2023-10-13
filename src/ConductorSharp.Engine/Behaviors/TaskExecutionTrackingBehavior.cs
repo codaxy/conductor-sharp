@@ -23,7 +23,7 @@ namespace ConductorSharp.Engine.Behaviors
             _taskExecutionServices = taskExecutionServices;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             var trackedTask = new RunningTask
             {
