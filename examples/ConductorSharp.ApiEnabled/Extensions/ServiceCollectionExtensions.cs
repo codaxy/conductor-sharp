@@ -32,7 +32,6 @@ public static class ServiceCollectionExtensions
                 pipelines.AddValidation();
             });
 
-        hostBuilder.AddMediatR(typeof(Program).Assembly);
         hostBuilder.AddSingleton<ITaskExecutionCounterService, TaskExecutionCounterService>();
         hostBuilder.RegisterWorkerTask<PrepareEmailHandler>(options =>
         {

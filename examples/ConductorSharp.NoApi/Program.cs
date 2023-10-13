@@ -41,7 +41,6 @@ var builder = Host.CreateDefaultBuilder()
                     pipelines.AddValidation();
                 });
 
-            services.AddMediatR(typeof(Program).Assembly);
             services.RegisterWorkerTask<GetCustomerHandler>();
         }
     );
