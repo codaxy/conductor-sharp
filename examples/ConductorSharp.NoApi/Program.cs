@@ -1,9 +1,7 @@
-﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using ConductorSharp.Engine.Extensions;
+﻿using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
-using ConductorSharp.NoApi;
-using MediatR.Extensions.Autofac.DependencyInjection;
+using ConductorSharp.NoApi.Handlers;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,17 +16,11 @@ var builder = Host.CreateDefaultBuilder()
             configuration = config.Build();
         }
     )
-    .UseServiceProviderFactory(new AutofacServiceProviderFactory())
     .ConfigureServices(
         (_, services) =>
         {
             services.AddAutoMapper(typeof(Program));
-        }
-    )
-    .ConfigureContainer<ContainerBuilder>(
-        (container, builder) =>
-        {
-            builder
+            services
                 .AddConductorSharp(
                     baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"),
                     apiPath: configuration.GetValue<string>("Conductor:ApiUrl"),
@@ -49,8 +41,7 @@ var builder = Host.CreateDefaultBuilder()
                     pipelines.AddValidation();
                 });
 
-            builder.RegisterMediatR(typeof(Program).Assembly);
-            builder.RegisterModule<ConductorModule>();
+            services.RegisterWorkerTask<GetCustomerHandler>();
         }
     );
 

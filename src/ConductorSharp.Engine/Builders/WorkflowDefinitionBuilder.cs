@@ -1,9 +1,7 @@
-﻿using Autofac;
-using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

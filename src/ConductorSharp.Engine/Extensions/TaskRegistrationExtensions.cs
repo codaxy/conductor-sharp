@@ -1,8 +1,8 @@
-using Autofac;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace ConductorSharp.Engine.Extensions
@@ -10,16 +10,14 @@ namespace ConductorSharp.Engine.Extensions
     public static class TaskRegistrationExtensions
     {
         public static void RegisterWorkerTask<TWorkerTask>(
-            this ContainerBuilder builder,
+            this IServiceCollection builder,
             Action<TaskDefinitionOptions> updateOptions = null,
             BuildConfiguration buildConfiguration = null
         ) where TWorkerTask : IWorker
         {
-            builder.RegisterType<TWorkerTask>();
+            builder.AddSingleton(ctx => ctx.ResolveTaskDefinitionBuilder(buildConfiguration).Build<TWorkerTask>(updateOptions));
 
-            builder.Register(ctx => ctx.ResolveTaskDefinitionBuilder(buildConfiguration).Build<TWorkerTask>(updateOptions)).SingleInstance();
-
-            builder.Register(
+            builder.AddTransient(
                 ctx =>
                     new TaskToWorker
                     {
@@ -30,11 +28,11 @@ namespace ConductorSharp.Engine.Extensions
         }
 
         private static TaskDefinitionBuilder ResolveTaskDefinitionBuilder(
-            this IComponentContext componentContext,
+            this IServiceProvider componentContext,
             BuildConfiguration buildConfiguration
         )
         {
-            var builder = componentContext.Resolve<TaskDefinitionBuilder>();
+            var builder = componentContext.GetRequiredService<TaskDefinitionBuilder>();
 
             builder.BuildConfiguration = buildConfiguration ?? builder.BuildConfiguration;
 

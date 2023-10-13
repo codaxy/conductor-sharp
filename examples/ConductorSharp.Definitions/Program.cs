@@ -1,12 +1,7 @@
-﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using ConductorSharp.Definitions;
+﻿using ConductorSharp.Definitions.Workflows;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
-using ConductorSharp.Engine.Interface;
-using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Extensions;
-using MediatR.Extensions.Autofac.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,17 +16,11 @@ var builder = Host.CreateDefaultBuilder()
             configuration = config.Build();
         }
     )
-    .UseServiceProviderFactory(new AutofacServiceProviderFactory())
     .ConfigureServices(
         (_, services) =>
         {
             services.AddAutoMapper(typeof(Program));
-        }
-    )
-    .ConfigureContainer<ContainerBuilder>(
-        (container, builder) =>
-        {
-            builder
+            services
                 .AddConductorSharp(
                     baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"),
                     apiPath: configuration.GetValue<string>("Conductor:ApiUrl"),
@@ -53,7 +42,9 @@ var builder = Host.CreateDefaultBuilder()
                 })
                 .AddCSharpLambdaTasks();
 
-            builder.RegisterModule<ConductorModule>();
+            services.RegisterWorkflow<SendCustomerNotification>();
+            services.RegisterWorkflow<HandleNotificationFailure>();
+            services.RegisterWorkflow<CSharpLambdaWorkflow>();
         }
     );
 

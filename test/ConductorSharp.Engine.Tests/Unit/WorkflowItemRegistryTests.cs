@@ -1,7 +1,6 @@
-﻿using Autofac;
-using ConductorSharp.Engine.Extensions;
+﻿using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
-using ConductorSharp.Engine.Util.Builders;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Engine.Tests.Unit
 {
@@ -10,7 +9,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         [Fact]
         public void RegisteredItemsResolve()
         {
-            var builder = new ContainerBuilder();
+            var builder = new ServiceCollection();
 
             builder
                 .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
@@ -23,12 +22,12 @@ namespace ConductorSharp.Engine.Tests.Unit
                 );
 
             builder.RegisterWorkflow<WorkflowItemTestWorkflow>();
-            var container = builder.Build();
+            var container = builder.BuildServiceProvider();
 
             // Items are registered when building the workflow definition, so we have to resolve them first
-            _ = container.Resolve<IEnumerable<WorkflowDefinition>>().ToList();
+            _ = container.GetRequiredService<IEnumerable<WorkflowDefinition>>().ToList();
 
-            var registry = container.Resolve<WorkflowBuildItemRegistry>();
+            var registry = container.GetRequiredService<WorkflowBuildItemRegistry>();
 
             registry.TryGet<WorkflowItemTestWorkflow>(out var items);
 
@@ -38,7 +37,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         [Fact]
         public void GetAllCorrectlyResolves()
         {
-            var builder = new ContainerBuilder();
+            var builder = new ServiceCollection();
 
             builder
                 .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
@@ -51,12 +50,12 @@ namespace ConductorSharp.Engine.Tests.Unit
                 );
 
             builder.RegisterWorkflow<WorkflowItemTestWorkflow>();
-            var container = builder.Build();
+            var container = builder.BuildServiceProvider();
 
             // Items are registered when building the workflow definition, so we have to resolve them first
-            _ = container.Resolve<IEnumerable<WorkflowDefinition>>().ToList();
+            _ = container.GetRequiredService<IEnumerable<WorkflowDefinition>>().ToList();
 
-            var registry = container.Resolve<WorkflowBuildItemRegistry>();
+            var registry = container.GetRequiredService<WorkflowBuildItemRegistry>();
 
             registry.Register<WorkflowItemTestWorkflow>("definition", new TaskDefinition { CreatedBy = "test1test1" });
 

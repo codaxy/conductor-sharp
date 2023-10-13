@@ -1,8 +1,4 @@
-﻿using RestSharp;
-using System;
-using System.Collections.Generic;
-
-namespace ConductorSharp.Client
+﻿namespace ConductorSharp.Client
 {
     public class RestConfig
     {

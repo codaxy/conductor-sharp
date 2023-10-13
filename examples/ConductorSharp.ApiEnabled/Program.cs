@@ -1,7 +1,5 @@
-using Autofac.Extensions.DependencyInjection;
 using ConductorSharp.ApiEnabled.Extensions;
 using ConductorSharp.Engine.Health;
-using ConductorSharp.Engine.Util;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,10 +17,8 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks().AddCheck<ConductorSharpHealthCheck>("running");
+builder.Services.ConfigureApiEnabled(configuration);
 
-//Autofac dependency injection
-builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureApiEnabled(configuration);
-builder.Host.UseSerilog((ctx, services, lc) => lc.Enrich.FromLogContext().WriteTo.Seq("http://host.docker.internal:5341").WriteTo.Console());
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

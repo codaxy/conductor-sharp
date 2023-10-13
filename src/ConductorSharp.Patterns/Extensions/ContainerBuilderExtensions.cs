@@ -1,13 +1,10 @@
 ﻿using ConductorSharp.Engine.Extensions;
-using ConductorSharp.Patterns.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using MediatR.Extensions.Autofac.DependencyInjection;
-using Autofac;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Patterns.Builders;
-using ConductorSharp.Engine.Interface;
+using ConductorSharp.Patterns.Tasks;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Patterns.Extensions
 {
@@ -17,7 +14,7 @@ namespace ConductorSharp.Patterns.Extensions
         {
             executionManagerBuilder.Builder.RegisterWorkerTask<ReadWorkflowTasks>();
             executionManagerBuilder.Builder.RegisterWorkerTask<WaitSeconds>();
-            executionManagerBuilder.Builder.RegisterMediatR(typeof(WaitSeconds).Assembly);
+            executionManagerBuilder.Builder.AddMediatR(typeof(WaitSeconds).Assembly);
 
             return executionManagerBuilder;
         }
@@ -31,11 +28,11 @@ namespace ConductorSharp.Patterns.Extensions
             {
                 options.OwnerEmail = "owneremail@gmail.com";
             });
-            executionManagerBuilder.Builder.RegisterMediatR(typeof(CSharpLambdaTask).Assembly);
-            executionManagerBuilder.Builder.RegisterInstance(
+            executionManagerBuilder.Builder.AddMediatR(typeof(CSharpLambdaTask).Assembly);
+            executionManagerBuilder.Builder.AddSingleton(
                 new ConfigurationProperty(CSharpLambdaTask.LambdaTaskNameConfigurationProperty, csharpLambdaTaskNamePrefix)
             );
-            executionManagerBuilder.Builder.RegisterType<TaskNameBuilder>().As<ITaskNameBuilder>();
+            executionManagerBuilder.Builder.AddTransient<ITaskNameBuilder, TaskNameBuilder>();
 
             return executionManagerBuilder;
         }

@@ -1,7 +1,7 @@
-﻿using Autofac;
-using ConductorSharp.Engine.Extensions;
+﻿using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
 using ConductorSharp.Engine.Util.Builders;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Engine.Tests.Unit
 {
@@ -10,7 +10,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         [Fact]
         public void AppliesBuildConfigurationDefaults()
         {
-            var builder = new ContainerBuilder();
+            var builder = new ServiceCollection();
 
             builder
                 .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
@@ -31,9 +31,9 @@ namespace ConductorSharp.Engine.Tests.Unit
                 );
 
             builder.RegisterWorkflow<StringInterpolation>();
-            var container = builder.Build();
+            var container = builder.BuildServiceProvider();
 
-            var definitions = container.Resolve<IEnumerable<WorkflowDefinition>>().ToList();
+            var definitions = container.GetRequiredService<IEnumerable<WorkflowDefinition>>().ToList();
 
             Assert.True(definitions.All(a => a.OwnerApp == "testApp"));
         }
@@ -41,7 +41,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         [Fact]
         public void OverridesBuildConfigurationDefaults()
         {
-            var builder = new ContainerBuilder();
+            var builder = new ServiceCollection();
             var overrideValue = "override";
             builder
                 .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
@@ -62,9 +62,9 @@ namespace ConductorSharp.Engine.Tests.Unit
                 );
 
             builder.RegisterWorkflow<StringInterpolation>(new BuildConfiguration { DefaultOwnerApp = overrideValue });
-            var container = builder.Build();
+            var container = builder.BuildServiceProvider();
 
-            var definitions = container.Resolve<IEnumerable<WorkflowDefinition>>().ToList();
+            var definitions = container.GetRequiredService<IEnumerable<WorkflowDefinition>>().ToList();
 
             Assert.True(definitions.All(a => a.OwnerApp == overrideValue));
         }

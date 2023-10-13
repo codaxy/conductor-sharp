@@ -1,10 +1,9 @@
-﻿using Autofac;
-using Autofac.Core;
 using ConductorSharp.Engine.Exceptions;
+using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
 using ConductorSharp.Engine.Tests.Util;
-using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Patterns.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Engine.Tests.Integration
 {
@@ -241,22 +240,21 @@ namespace ConductorSharp.Engine.Tests.Integration
         [Fact]
         public void BuilderReturnsCorrectDefinitionNonEvaluatableWorkflow()
         {
-            var exception = Assert.Throws<DependencyResolutionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
-            Assert.IsType<NonEvaluatableExpressionException>(exception.InnerException);
+            Assert.Throws<NonEvaluatableExpressionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
         }
 
         private string GetDefinitionFromWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
         {
             var workflow = RegisterWorkflow<TWorkflow>()
-                .Resolve<IEnumerable<WorkflowDefinition>>()
+                .GetRequiredService<IEnumerable<WorkflowDefinition>>()
                 .First(a => a.Name == NamingUtil.NameOf<TWorkflow>());
 
             return SerializationUtil.SerializeObject(workflow);
         }
 
-        private IContainer RegisterWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
+        private IServiceProvider RegisterWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
         {
-            var containerBuilder = new ContainerBuilder();
+            var containerBuilder = new ServiceCollection();
 
             containerBuilder
                 .AddConductorSharp("example.com", "api", false)
@@ -270,7 +268,7 @@ namespace ConductorSharp.Engine.Tests.Integration
                 .AddCSharpLambdaTasks("TEST");
 
             containerBuilder.RegisterWorkflow<TWorkflow>();
-            return containerBuilder.Build();
+            return containerBuilder.BuildServiceProvider();
         }
     }
 }
