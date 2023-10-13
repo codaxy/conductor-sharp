@@ -148,7 +148,7 @@ namespace ConductorSharp.Toolkit.Service
             modelGenerator.AddXmlComment("originalName", taskDefinition.Name);
             modelGenerator.AddXmlComment("ownerEmail", taskDefinition.OwnerEmail);
             modelGenerator.AddXmlComment("node", note);
-            modelGenerator.AddXmlComment("summary", taskDefinition.Description.Replace('\n', ','));
+            modelGenerator.AddXmlComment("summary", taskDefinition.Description?.Replace('\n', ','));
             return (modelGenerator.Build(), name);
         }
 
