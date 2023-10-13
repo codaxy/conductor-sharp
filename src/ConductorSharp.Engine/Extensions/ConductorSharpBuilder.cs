@@ -54,7 +54,7 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.AddTransient<IPollOrderStrategy, RandomOrdering>();
 
-            Builder.AddMediatR(handlerAssemblies);
+            Builder.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(handlerAssemblies));
 
             return this;
         }

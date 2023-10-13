@@ -20,7 +20,7 @@ namespace ConductorSharp.Engine.Behaviors
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             var stopwatch = new Stopwatch();
             _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}}", request);
