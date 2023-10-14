@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -41,40 +40,23 @@ namespace ConductorSharp.Engine.Extensions
                     builder.GetType().GetProperty("BuildConfiguration").SetValue(builder, buildConfiguration);
                 }
 
-                if (!HasConstructorWithParameters<TWorkflow>(new Type[] { builder.GetType() }))
-                {
-                    throw new ArgumentException($"Configurable workflow constructor must have a {builder.GetType().Name} parameter");
-                }
+                var ctors = typeof(TWorkflow).GetConstructors();
+                if (ctors.Length != 1)
+                    throw new InvalidOperationException($"Workflow {typeof(TWorkflow).Name} must have exactly one constructor");
 
-                var workflow = Activator.CreateInstance(typeof(TWorkflow), builder) as ITypedWorkflow;
+                // Check if wf has ctor with builder type parameter
+                var ctorParamTypes = ctors[0].GetParameters().Select(p => p.ParameterType).ToArray();
+                var hasBuilderType = ctorParamTypes.Contains(builder.GetType());
+                if (!hasBuilderType)
+                    throw new ArgumentException($"Configurable workflow constructor must have a {builder.GetType().Name} parameter");
+
+                // Resolve each wf parameter
+                var wfParams = ctorParamTypes.Select(t => t == builder.GetType() ? builder : ctx.GetRequiredService(t)).ToArray();
+                var workflow = Activator.CreateInstance(typeof(TWorkflow), wfParams) as ITypedWorkflow;
 
                 var definition = workflow.GetDefinition();
                 return definition;
             });
-        }
-
-        private static bool HasConstructorWithParameters<T>(Type[] providedParameters)
-        {
-            return typeof(T)
-                .GetConstructors()
-                .Any(c =>
-                {
-                    var constructorParameters = c.GetParameters();
-                    if (constructorParameters.Length != providedParameters.Length)
-                    {
-                        return false;
-                    }
-
-                    for (int i = 0; i < providedParameters.Length; i++)
-                    {
-                        if (constructorParameters[i].ParameterType != providedParameters[i])
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                });
         }
     }
 }
