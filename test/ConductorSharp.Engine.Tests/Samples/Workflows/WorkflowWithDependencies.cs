@@ -8,9 +8,19 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class WorkflowWithDependencies : Workflow<WorkflowWithDependencies, WorkflowWithDependenciesInput, WorkflowWithDependenciesOutput>
     {
+        private readonly IConfigurationService _testService;
+
         public WorkflowWithDependencies(
-            ITestService testService,
+            IConfigurationService testService,
             WorkflowDefinitionBuilder<WorkflowWithDependencies, WorkflowWithDependenciesInput, WorkflowWithDependenciesOutput> builder
-        ) : base(builder) { }
+        ) : base(builder)
+        {
+            _testService = testService;
+        }
+
+        public override void BuildDefinition()
+        {
+            _b
+        }
     }
 }

@@ -84,7 +84,7 @@ namespace ConductorSharp.Engine.Tests.Unit
                     handlerAssemblies: typeof(ContainerBuilderTests).Assembly
                 );
 
-            builder.AddTransient<ITestService, TestService>();
+            builder.AddTransient<IConfigurationService, ConfigurationService>();
             builder.RegisterWorkflow<WorkflowWithDependencies>();
             var container = builder.BuildServiceProvider();
             var definitions = container.GetRequiredService<IEnumerable<WorkflowDefinition>>();
