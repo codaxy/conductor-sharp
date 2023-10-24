@@ -17,14 +17,11 @@ namespace ConductorSharp.Engine.Builders
         protected readonly string _taskRefferenceName;
         protected readonly string _taskName;
         private readonly BuildConfiguration _buildConfiguration;
-        protected string _description;
         protected AdditionalTaskParameters _additionalParameters = new();
 
         public BaseTaskBuilder(Expression taskExpression, Expression memberExpression, BuildConfiguration buildConfiguration)
         {
             var taskType = ExpressionUtil.ParseToType(taskExpression);
-
-            _description = taskType.GetDocSection("summary");
             _taskRefferenceName = ExpressionUtil.ParseToReferenceName(taskExpression);
             _inputParameters = ExpressionUtil.ParseToParameters(memberExpression);
             _taskName = NamingUtil.DetermineRegistrationName(taskType);

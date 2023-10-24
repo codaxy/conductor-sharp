@@ -67,8 +67,6 @@ namespace ConductorSharp.Engine.Builders
 
         public WorkflowDefinition Build()
         {
-            XmlDocumentationReader.LoadXmlDocumentation(_workflowType.Assembly);
-
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
                 BuildContext.WorkflowOptions.OwnerApp = BuildConfiguration.DefaultOwnerApp;
@@ -79,22 +77,9 @@ namespace ConductorSharp.Engine.Builders
                 BuildContext.WorkflowOptions.OwnerEmail = BuildConfiguration.DefaultOwnerEmail;
             }
 
-            var summary = _workflowType.GetDocSection("summary");
-            var ownerApp = _workflowType.GetDocSection("ownerApp");
-            var ownerEmail = _workflowType.GetDocSection("ownerEmail");
-
             BuildContext.WorkflowOptions.Version =
                 _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? BuildContext.WorkflowOptions.Version;
             BuildContext.Inputs = new();
-
-            if (!string.IsNullOrEmpty(summary))
-                BuildContext.WorkflowOptions.Description = summary;
-
-            if (!string.IsNullOrEmpty(ownerApp))
-                BuildContext.WorkflowOptions.OwnerApp = ownerApp;
-
-            if (!string.IsNullOrEmpty(ownerEmail))
-                BuildContext.WorkflowOptions.OwnerEmail = ownerEmail;
 
             var input = _workflowType.BaseType.GenericTypeArguments[1];
             var props = input.GetProperties();

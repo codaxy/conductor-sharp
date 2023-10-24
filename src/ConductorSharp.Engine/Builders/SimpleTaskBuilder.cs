@@ -39,7 +39,6 @@ namespace ConductorSharp.Engine.Builders
                     TaskReferenceName = _taskRefferenceName,
                     Type = "SIMPLE",
                     InputParameters = _inputParameters,
-                    Description = _description,
                     Optional = _additionalParameters?.Optional == true,
                 }
             };
