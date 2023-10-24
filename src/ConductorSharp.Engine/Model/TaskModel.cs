@@ -6,10 +6,9 @@ namespace ConductorSharp.Engine.Model
 {
     public abstract class TaskModel<I, O> : ITaskModel where I : IRequest<O>
     {
-        // TODO: Remove set
-        public I Input { get; set; }
+        public I Input { get; }
 
-        public O Output { get; set; }
+        public O Output { get; }
 
         public string Status { get; }
 
@@ -26,15 +25,15 @@ namespace ConductorSharp.Engine.Model
         public string TaskId { get; }
 
         [JsonProperty("taskDefName")]
-        public string TaskDefName { get; set; }
+        public string TaskDefName { get; }
 
         [JsonProperty("scheduledTime")]
-        public long ScheduledTime { get; set; }
+        public long ScheduledTime { get; }
 
         [JsonProperty("referenceTaskName")]
-        public string ReferenceTaskName { get; set; }
+        public string ReferenceTaskName { get; }
 
         [JsonProperty("correlationId")]
-        public string CorrelationId { get; set; }
+        public string CorrelationId { get; }
     }
 }
