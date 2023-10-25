@@ -3,15 +3,16 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConductorSharp.Engine.Util;
 
 namespace ConductorSharp.Engine.Model
 {
     public class WaitTaskInput : IRequest<NoOutput>
     {
-        [JsonProperty("duration")]
+        [PropertyName("duration")]
         public string Duration { get; set; }
 
-        [JsonProperty("until")]
+        [PropertyName("until")]
         public string Until { get; set; }
     }
 

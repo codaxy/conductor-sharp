@@ -13,7 +13,7 @@ namespace ConductorSharp.Definitions.Workflows
 {
     public class HandleNotificationFailureInput : WorkflowInput<HandleNotificationFailureOutput>
     {
-        [JsonProperty("workflowId")]
+        [PropertyName("workflowId")]
         public string WorkflowId { get; set; }
     }
 

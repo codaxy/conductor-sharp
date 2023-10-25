@@ -23,11 +23,11 @@ namespace ConductorSharp.Patterns.Tasks
         public const string LambdaIdenfitierParamName = "lambda_identifier";
         public const string TaskInputParamName = "task_input";
 
-        [JsonProperty(LambdaIdenfitierParamName)]
+        [PropertyName(LambdaIdenfitierParamName)]
         [Required]
         public string LambdaIdentifier { get; set; }
 
-        [JsonProperty(TaskInputParamName)]
+        [PropertyName(TaskInputParamName)]
         [Required]
         public JObject TaskInput { get; set; }
     }

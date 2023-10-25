@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -12,7 +13,7 @@ namespace ConductorSharp.Engine.Util
             // This also means that other Newtonsoft.Json property attributes (like JsonIgnore) are ignored
             var property = new JsonProperty
             {
-                PropertyType = ((PropertyInfo)member).PropertyType,
+                PropertyType = GetMemberType(member),
                 DeclaringType = member.DeclaringType,
                 ValueProvider = CreateMemberValueProvider(member),
                 AttributeProvider = new ReflectionAttributeProvider(member),
@@ -24,6 +25,14 @@ namespace ConductorSharp.Engine.Util
 
             return property;
         }
+
+        private Type GetMemberType(MemberInfo member) =>
+            member switch
+            {
+                PropertyInfo prop => prop.PropertyType,
+                FieldInfo field => field.FieldType,
+                _ => throw new NotSupportedException($"Unable to serializer MemberInfo type {member.GetType().Name}")
+            };
 
         private string DeterminePropertyName(MemberInfo member)
         {

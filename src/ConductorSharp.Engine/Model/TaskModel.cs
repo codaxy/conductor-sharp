@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
 using MediatR;
 using Newtonsoft.Json;
 
@@ -12,28 +13,28 @@ namespace ConductorSharp.Engine.Model
 
         public string Status { get; }
 
-        [JsonProperty("taskType")]
+        [PropertyName("taskType")]
         public string TaskType { get; }
 
-        [JsonProperty("startTime")]
+        [PropertyName("startTime")]
         public long StartTime { get; }
 
-        [JsonProperty("endTime")]
+        [PropertyName("endTime")]
         public long EndTime { get; }
 
-        [JsonProperty("taskId")]
+        [PropertyName("taskId")]
         public string TaskId { get; }
 
-        [JsonProperty("taskDefName")]
+        [PropertyName("taskDefName")]
         public string TaskDefName { get; }
 
-        [JsonProperty("scheduledTime")]
+        [PropertyName("scheduledTime")]
         public long ScheduledTime { get; }
 
-        [JsonProperty("referenceTaskName")]
+        [PropertyName("referenceTaskName")]
         public string ReferenceTaskName { get; }
 
-        [JsonProperty("correlationId")]
+        [PropertyName("correlationId")]
         public string CorrelationId { get; }
     }
 }

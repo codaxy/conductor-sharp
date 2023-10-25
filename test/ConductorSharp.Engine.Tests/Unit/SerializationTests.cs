@@ -26,8 +26,8 @@ namespace ConductorSharp.Engine.Tests.Unit
 
             user.JDocIdentity = JsonValue.Create(anon);
 
-            var job = JObject.FromObject(user, ConductorConstants.IoJsonSerializer);
-            var userDeserialized = job.ToObject<User>(ConductorConstants.IoJsonSerializer);
+            var job = JObject.FromObject(user, Serializers.IOSerializer);
+            var userDeserialized = job.ToObject<User>(Serializers.IOSerializer);
 
             Assert.NotNull(userDeserialized);
         }

@@ -15,10 +15,10 @@ namespace ConductorSharp.Engine.Model
 
     public class TerminateTaskInput : IRequest<NoOutput>
     {
-        [JsonProperty("workflowOutput")]
+        [PropertyName("workflowOutput")]
         public object WorkflowOutput { get; set; }
 
-        [JsonProperty("terminationStatus")]
+        [PropertyName("terminationStatus")]
         public TerminationStatus TerminationStatus { get; set; }
     }
 
