@@ -31,7 +31,7 @@ namespace ConductorSharp.Engine.Util
             {
                 PropertyInfo prop => prop.PropertyType,
                 FieldInfo field => field.FieldType,
-                _ => throw new NotSupportedException($"Unable to serializer MemberInfo type {member.GetType().Name}")
+                _ => throw new NotSupportedException($"Unable to serialize MemberInfo type {member.GetType().Name}")
             };
 
         private string DeterminePropertyName(MemberInfo member)
