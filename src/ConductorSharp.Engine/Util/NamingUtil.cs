@@ -34,8 +34,7 @@ namespace ConductorSharp.Engine.Util
 
         internal static string GetParameterName(PropertyInfo propInfo) =>
             propInfo.GetDocSection("originalName")
-            ?? propInfo.GetCustomAttribute<JsonPropertyAttribute>(true)?.PropertyName
-            ?? propInfo.GetCustomAttribute<JsonPropertyNameAttribute>(true)?.Name
+            ?? propInfo.GetCustomAttribute<PropertyNameAttribute>(true)?.Name
             ?? ConductorConstants.IoNamingStrategy.GetPropertyName(propInfo.Name, false);
     }
 }

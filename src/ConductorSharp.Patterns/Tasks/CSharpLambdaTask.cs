@@ -50,9 +50,7 @@ namespace ConductorSharp.Patterns.Tasks
 
             try
             {
-                return Task.FromResult(
-                    lambda.Handler.DynamicInvoke(request.TaskInput.ToObject(lambda.TaskInputType, ConductorConstants.IoJsonSerializer))
-                );
+                return Task.FromResult(lambda.Handler.DynamicInvoke(request.TaskInput.ToObject(lambda.TaskInputType, Serializers.IOSerializer)));
             }
             catch (TargetInvocationException ex)
             {

@@ -47,12 +47,12 @@ namespace ConductorSharp.Client.Service
         public async Task<IDictionary<string, int>> GetAllQueues() =>
             await _client.ExecuteRequestAsync<IDictionary<string, int>>(ApiUrls.GetAllQueues(), HttpMethod.Get);
 
-        public Task UpdateTaskCompleted(object outputData, string taskId, string workflowId) =>
+        public Task UpdateTaskCompleted(JObject outputData, string taskId, string workflowId) =>
             UpdateTask(
                 new UpdateTaskRequest
                 {
                     Status = "COMPLETED",
-                    OutputData = JObject.FromObject(outputData, ConductorConstants.IoJsonSerializer),
+                    OutputData = outputData,
                     TaskId = taskId,
                     WorkflowInstanceId = workflowId
                 }
@@ -104,13 +104,13 @@ namespace ConductorSharp.Client.Service
         public Task<GetTaskLogsResponse[]> GetLogsForTask(string taskId) =>
             _client.ExecuteRequestAsync<GetTaskLogsResponse[]>(ApiUrls.GetLogsForTask(taskId), HttpMethod.Get);
 
-        public Task UpdateTaskFailed(object outputData, string taskId, string workflowId, string reasonForIncompletion, string logMessage) =>
+        public Task UpdateTaskFailed(JObject outputData, string taskId, string workflowId, string reasonForIncompletion, string logMessage) =>
             UpdateTask(
                 new UpdateTaskRequest
                 {
                     Status = "FAILED",
                     TaskId = taskId,
-                    OutputData = JObject.FromObject(outputData, ConductorConstants.IoJsonSerializer),
+                    OutputData = outputData,
                     WorkflowInstanceId = workflowId,
                     ReasonForIncompletion = reasonForIncompletion,
                     Logs = new List<LogData>

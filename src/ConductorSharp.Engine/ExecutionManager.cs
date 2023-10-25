@@ -13,6 +13,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using ConductorSharp.Client.Util;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace ConductorSharp.Engine
 {
@@ -115,7 +119,7 @@ namespace ConductorSharp.Engine
             try
             {
                 var inputType = GetInputType(scheduledWorker.TaskType);
-                var inputData = pollResponse.InputData.ToObject(inputType, ConductorConstants.IoJsonSerializer);
+                var inputData = pollResponse.InputData.ToObject(inputType, Serializers.IOSerializer);
 
                 using var scope = _lifetimeScopeFactory.CreateScope();
 
@@ -135,7 +139,11 @@ namespace ConductorSharp.Engine
 
                 var response = await mediator.Send(inputData, cancellationToken);
 
-                await _taskManager.UpdateTaskCompleted(response, pollResponse.TaskId, pollResponse.WorkflowInstanceId);
+                await _taskManager.UpdateTaskCompleted(
+                    JObject.FromObject(response, Serializers.IOSerializer),
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowInstanceId
+                );
             }
             catch (Exception exception)
             {
@@ -150,7 +158,7 @@ namespace ConductorSharp.Engine
                 var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
 
                 await _taskManager.UpdateTaskFailed(
-                    errorMessage,
+                    JObject.FromObject(errorMessage, Serializers.IOSerializer),
                     pollResponse.TaskId,
                     pollResponse.WorkflowInstanceId,
                     exception.Message,
