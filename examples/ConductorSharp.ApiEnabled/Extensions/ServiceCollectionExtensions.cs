@@ -2,6 +2,7 @@
 using ConductorSharp.ApiEnabled.Services;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
+using ConductorSharp.Patterns.Extensions;
 using MediatR;
 
 namespace ConductorSharp.ApiEnabled.Extensions;
@@ -30,7 +31,8 @@ public static class ServiceCollectionExtensions
                 pipelines.AddContextLogging();
                 pipelines.AddRequestResponseLogging();
                 pipelines.AddValidation();
-            });
+            })
+            .AddConductorSharpPatterns();
 
         hostBuilder.AddSingleton<ITaskExecutionCounterService, TaskExecutionCounterService>();
         hostBuilder.RegisterWorkerTask<PrepareEmailHandler>(options =>
