@@ -19,7 +19,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="RestSharp" Version="107.3.0" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="107.3.0" />
-    <PackageReference Include="System.Json" Version="4.7.1" />
     <PackageReference Include="System.Text.Json" Version="7.0.3" />
   </ItemGroup>
 	<Target Name="husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">
