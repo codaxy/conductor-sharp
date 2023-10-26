@@ -23,8 +23,7 @@ namespace ConductorSharp.Client
                     TypeNameHandling = TypeNameHandling.Auto
                 };
 
-                serializer.Converters.Add(new JsonValueConverter());
-                serializer.Converters.Add(new JsonDocumentConverter());
+                serializer.Converters.Add(new JsonNodeConverter());
                 return serializer;
             }
         }
