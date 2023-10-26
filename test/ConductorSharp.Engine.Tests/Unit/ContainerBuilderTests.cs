@@ -14,14 +14,7 @@ namespace ConductorSharp.Engine.Tests.Unit
 
             builder
                 .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
-                .SetBuildConfiguration(
-                    new BuildConfiguration
-                    {
-                        DefaultOwnerApp = "testApp",
-                        DefaultOwnerEmail = "owner@test.app",
-                        WorkflowPrefix = "TEST_APP_"
-                    }
-                )
+                .SetBuildConfiguration(new BuildConfiguration { DefaultOwnerApp = "testApp", DefaultOwnerEmail = "owner@test.app" })
                 .AddExecutionManager(
                     maxConcurrentWorkers: 1,
                     sleepInterval: 1,
@@ -45,14 +38,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             var overrideValue = "override";
             builder
                 .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
-                .SetBuildConfiguration(
-                    new BuildConfiguration
-                    {
-                        DefaultOwnerApp = "testApp",
-                        DefaultOwnerEmail = "owner@test.app",
-                        WorkflowPrefix = "TEST_APP_"
-                    }
-                )
+                .SetBuildConfiguration(new BuildConfiguration { DefaultOwnerApp = "testApp", DefaultOwnerEmail = "owner@test.app", })
                 .AddExecutionManager(
                     maxConcurrentWorkers: 1,
                     sleepInterval: 1,
