@@ -34,8 +34,8 @@ namespace ConductorSharp.Engine.Tests.Unit
             };
 
             var job = JObject.FromObject(user, ConductorConstants.IoJsonSerializer);
-            var json = job.ToString(Formatting.None);
             var userDeserialized = job.ToObject<User>(ConductorConstants.IoJsonSerializer);
+
             Assert.NotNull(userDeserialized);
             Assert.Equal(user.JDocString.ToString(), userDeserialized.JDocString.ToString());
             Assert.Equal(user.JDocBool.ToString(), userDeserialized.JDocBool.ToString());
