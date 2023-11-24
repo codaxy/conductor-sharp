@@ -8,6 +8,5 @@ namespace ConductorSharp.Engine.Util.Builders
     {
         public string DefaultOwnerEmail { get; set; }
         public string DefaultOwnerApp { get; set; }
-        public string WorkflowPrefix { get; set; }
     }
 }

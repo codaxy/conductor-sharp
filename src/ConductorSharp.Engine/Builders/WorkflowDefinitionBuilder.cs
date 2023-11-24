@@ -56,14 +56,7 @@ namespace ConductorSharp.Engine.Builders
             GenerateWorkflowName();
         }
 
-        private void GenerateWorkflowName()
-        {
-            BuildContext.WorkflowName = NamingUtil.DetermineRegistrationName(_workflowType);
-            if (!string.IsNullOrEmpty(BuildConfiguration.WorkflowPrefix))
-            {
-                BuildContext.WorkflowName = $"{BuildConfiguration.WorkflowPrefix}{BuildContext.WorkflowName}";
-            }
-        }
+        private void GenerateWorkflowName() => BuildContext.WorkflowName = NamingUtil.DetermineRegistrationName(_workflowType);
 
         public WorkflowDefinition Build()
         {
