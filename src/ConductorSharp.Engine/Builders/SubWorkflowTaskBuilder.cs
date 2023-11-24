@@ -44,7 +44,6 @@ namespace ConductorSharp.Engine.Builders
                     Type = "SUB_WORKFLOW",
                     InputParameters = _inputParameters,
                     SubWorkflowParam = new WorkflowDefinition.SubWorkflowParam { Name = _taskName, Version = _version },
-                    Description = _description,
                     Optional = _additionalParameters?.Optional == true
                 }
             };

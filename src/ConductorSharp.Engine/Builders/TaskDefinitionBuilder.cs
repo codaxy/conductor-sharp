@@ -33,8 +33,6 @@ namespace ConductorSharp.Engine.Builders
 
             updateOptions?.Invoke(options);
 
-            XmlDocumentationReader.LoadXmlDocumentation(taskType.Assembly);
-
             var interfaces = taskType
                 .GetInterfaces()
                 .Where(a => a.IsGenericType && a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
@@ -51,7 +49,7 @@ namespace ConductorSharp.Engine.Builders
             {
                 OwnerApp = BuildConfiguration.DefaultOwnerApp ?? options.OwnerApp,
                 Name = originalName,
-                Description = options.Description ?? taskType.GetDocSection("summary"),
+                Description = options.Description,
                 RetryCount = options.RetryCount,
                 TimeoutSeconds = options.TimeoutSeconds,
                 InputKeys = inputType.GetProperties().Select(NamingUtil.GetParameterName).ToList(),
