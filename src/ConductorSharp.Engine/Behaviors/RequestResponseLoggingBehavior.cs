@@ -33,7 +33,7 @@ namespace ConductorSharp.Engine.Behaviors
                 stopwatch.Stop();
 
                 _logger.LogInformation(
-                    $"Received response {{@{typeof(TResponse).Name}}} for request {typeof(TRequest).Name} (exec time = {{@EllapsedMilliseconds}})",
+                    $"Received response {{@{typeof(TResponse).Name}}} for request {typeof(TRequest).Name} (exec time = {{@ElapsedMilliseconds}})",
                     response,
                     stopwatch.ElapsedMilliseconds
                 );
