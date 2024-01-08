@@ -27,8 +27,6 @@
         "case_value_param": "${workflow.input.operation}"
       },
       "type": "DECISION",
-      "caseValueParam": "case_value_param",
-      "caseExpression": "case_value_param",
       "scriptExpression": "case_value_param",
       "decisionCases": {
         "upper": [

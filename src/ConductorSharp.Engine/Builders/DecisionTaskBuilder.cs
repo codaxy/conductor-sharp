@@ -86,9 +86,7 @@ namespace ConductorSharp.Engine.Builders
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                     Type = "DECISION",
-                    CaseValueParam = "case_value_param",
                     ScriptExpression = "case_value_param",
-                    CaseExpression = "case_value_param",
                     DecisionCases = new JObject
                     {
                         _caseDictionary.Select(

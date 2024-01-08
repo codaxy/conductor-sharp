@@ -11,8 +11,6 @@
         "case_value_param": "value"
       },
       "type": "DECISION",
-      "caseValueParam": "case_value_param",
-      "caseExpression": "case_value_param",
       "scriptExpression": "case_value_param",
       "decisionCases": {
         "value": [
