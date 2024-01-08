@@ -22,10 +22,10 @@ public class WorkflowController : ControllerBase
     }
 
     [HttpGet("get-workflows")]
-    public async Task<ICollection<WorkflowDef>> GetRegisteredWorkflows() => await _metadataService.GetAllWorkflowsAsync();
+    public async Task<ICollection<WorkflowDef>> GetRegisteredWorkflows() => await _metadataService.ListWorkflowsAsync();
 
     [HttpGet("get-task-logs")]
-    public async Task<ICollection<TaskExecLog>> GetTaskLogs(string taskId) => await _taskService.GetLogsAsync(taskId);
+    public async Task<ICollection<TaskExecLog>> GetTaskLogs(string taskId) => await _taskService.ListLogsAsync(taskId);
 
     [HttpGet("get-executions")]
     public async Task<SearchResultWorkflow> SearchWorkflows([FromQuery] int? start = null, [FromQuery] int? size = null) =>

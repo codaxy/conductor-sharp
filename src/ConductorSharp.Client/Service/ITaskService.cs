@@ -50,7 +50,7 @@ namespace ConductorSharp.Client.Service
         /// <param name="taskId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<ICollection<TaskExecLog>> GetLogsAsync(string taskId, CancellationToken cancellationToken = default);
+        Task<ICollection<TaskExecLog>> ListLogsAsync(string taskId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get the last poll data for a given task type

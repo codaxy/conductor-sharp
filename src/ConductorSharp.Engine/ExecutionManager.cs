@@ -119,7 +119,7 @@ namespace ConductorSharp.Engine
                 );
 
                 // TODO: iffy
-                var file = await _externalPayloadService.GetExternalStorageData(externalStorageLocation.Path, cancellationToken);
+                var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, cancellationToken);
 
                 using TextReader textReader = new StreamReader(file.Stream);
                 var json = textReader.ReadToEnd();

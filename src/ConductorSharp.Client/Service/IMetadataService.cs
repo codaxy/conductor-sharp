@@ -1,7 +1,4 @@
 ﻿using ConductorSharp.Client.Generated;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ConductorSharp.Client.Service;
 
@@ -10,22 +7,22 @@ public interface IMetadataService
     /// <summary>
     /// Create a new workflow definition
     /// </summary>
-    System.Threading.Tasks.Task CreateWorkflowAsync(WorkflowDef workflowDef, CancellationToken cancellationToken = default);
+    Task AddWorkflowAsync(WorkflowDef workflowDef, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Remove a task definition
     /// </summary>
-    System.Threading.Tasks.Task DeleteTaskDefAsync(string taskType, CancellationToken cancellationToken = default);
+    Task DeleteTaskAsync(string taskType, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Removes workflow definition. It does not remove workflows associated with the definition.
     /// </summary>
-    System.Threading.Tasks.Task DeleteWorkflowAsync(string name, int version, CancellationToken cancellationToken = default);
+    Task DeleteWorkflowAsync(string name, int version, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieves all workflow definition along with blueprint
     /// </summary>
-    Task<ICollection<WorkflowDef>> GetAllWorkflowsAsync(CancellationToken cancellationToken = default);
+    Task<ICollection<WorkflowDef>> ListWorkflowsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns only the latest version of all workflow definitions
@@ -35,12 +32,12 @@ public interface IMetadataService
     /// <summary>
     /// Gets the task definition
     /// </summary>
-    Task<TaskDef> GetTaskDefAsync(string taskType, CancellationToken cancellationToken = default);
+    Task<TaskDef> GetTaskAsync(string taskType, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all task definition
     /// </summary>
-    Task<ICollection<TaskDef>> GetTaskDefsAsync(CancellationToken cancellationToken = default);
+    Task<ICollection<TaskDef>> ListTasksAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieves workflow definition along with blueprint
@@ -55,12 +52,12 @@ public interface IMetadataService
     /// <summary>
     /// Update an existing task
     /// </summary>
-    System.Threading.Tasks.Task RegisterTaskAsync(TaskDef taskDef, CancellationToken cancellationToken = default);
+    Task AddTaskAsync(TaskDef taskDef, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Create new task definition(s)
     /// </summary>
-    System.Threading.Tasks.Task RegisterTasksAsync(IEnumerable<TaskDef> taskDefs, CancellationToken cancellationToken = default);
+    Task AddTasksAsync(IEnumerable<TaskDef> taskDefs, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Create or update workflow definition
@@ -70,5 +67,5 @@ public interface IMetadataService
     /// <summary>
     /// Validates a new workflow definition
     /// </summary>
-    System.Threading.Tasks.Task ValidateWorkflowAsync(WorkflowDef workflowDef, CancellationToken cancellationToken = default);
+    Task ValidateWorkflowAsync(WorkflowDef workflowDef, CancellationToken cancellationToken = default);
 }

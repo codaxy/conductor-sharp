@@ -5,7 +5,7 @@ namespace ConductorSharp.Client.Service
 {
     public class EventService(ConductorClient client) : IEventService
     {
-        public async Task<ICollection<Generated.EventHandler>> ListAsync(CancellationToken cancellationToken = default)
+        public async Task<ICollection<EventHandler>> ListAsync(CancellationToken cancellationToken = default)
             => await client.GetEventHandlersAsync(cancellationToken);
 
         public async Task UpdateAsync(EventHandler eventHandler, CancellationToken cancellationToken = default)
@@ -14,7 +14,7 @@ namespace ConductorSharp.Client.Service
         public async Task AddAsync(EventHandler eventHandler, CancellationToken cancellationToken = default)
             => await client.AddEventHandlerAsync(eventHandler, cancellationToken);
 
-        public async Task GetEventHandlersForEventAsync(string @event, bool? activeOnly = null,
+        public async Task<ICollection<EventHandler>> ListForEventAsync(string @event, bool? activeOnly = null,
             CancellationToken cancellationToken = default)
             => await client.GetEventHandlersForEventAsync(@event, activeOnly, cancellationToken);
 

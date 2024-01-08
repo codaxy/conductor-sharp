@@ -13,7 +13,7 @@ namespace ConductorSharp.Client.Service
         /// <summary>
         /// Get event handlers for a given event
         /// </summary>
-        Task GetEventHandlersForEventAsync(string @event, bool? activeOnly = null, CancellationToken cancellationToken = default);
+        Task<ICollection<EventHandler>> ListForEventAsync(string @event, bool? activeOnly = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get all the event handlers

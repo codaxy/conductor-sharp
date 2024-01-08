@@ -17,7 +17,7 @@ namespace ConductorSharp.Engine.Service
             _logger.LogInformation("Deploying conductor definitions");
 
             if (deployment.TaskDefinitions.Count > 0)
-                await _metadataService.RegisterTasksAsync(deployment.TaskDefinitions);
+                await _metadataService.AddTasksAsync(deployment.TaskDefinitions);
 
             _logger.LogDebug("Registered {registeredTasksCount} tasks", deployment.TaskDefinitions.Count);
 
@@ -39,10 +39,10 @@ namespace ConductorSharp.Engine.Service
         {
             foreach (var definition in deployment.TaskDefinitions)
             {
-                var oldDefinition = await _metadataService.GetTaskDefAsync(definition.Name);
+                var oldDefinition = await _metadataService.GetTaskAsync(definition.Name);
 
                 if (oldDefinition?.Name != null)
-                    await _metadataService.DeleteTaskDefAsync(definition.Name);
+                    await _metadataService.DeleteTaskAsync(definition.Name);
             }
 
             foreach (var definition in deployment.WorkflowDefinitions)

@@ -9,6 +9,6 @@ namespace ConductorSharp.Client.Service
         /// <summary>
         /// Get task or workflow by externalPayloadPath from External PostgreSQL Storage
         /// </summary>
-        Task<FileResponse> GetExternalStorageData(string externalPayloadPath, CancellationToken cancellationToken = default);
+        Task<FileResponse> GetExternalStorageDataAsync(string externalPayloadPath, CancellationToken cancellationToken = default);
     }
 }

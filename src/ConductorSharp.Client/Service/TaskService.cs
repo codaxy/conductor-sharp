@@ -9,7 +9,7 @@ namespace ConductorSharp.Client.Service
         public async Task<string> UpdateAsync(TaskResult updateRequest, CancellationToken cancellationToken = default)
             => await _client.UpdateTaskAsync(updateRequest, cancellationToken);
 
-        public async Task<ICollection<TaskExecLog>> GetLogsAsync(string taskId, CancellationToken cancellationToken = default)
+        public async Task<ICollection<TaskExecLog>> ListLogsAsync(string taskId, CancellationToken cancellationToken = default)
             => await _client.GetTaskLogsAsync(taskId, cancellationToken);
 
         public async Task LogAsync(string taskId, string message, CancellationToken cancellationToken = default)
@@ -18,7 +18,7 @@ namespace ConductorSharp.Client.Service
         public async Task<string> RequeuePendingAsync(string taskType, CancellationToken cancellationToken = default)
           => await _client.RequeuePendingTaskAsync(taskType, cancellationToken);
 
-        public async Task<ConductorSharp.Client.Generated.Task> GetAsync(string taskId, CancellationToken cancellationToken = default)
+        public async Task<Generated.Task> GetAsync(string taskId, CancellationToken cancellationToken = default)
           => await _client.GetTaskAsync(taskId, cancellationToken);
 
         public async Task<SearchResultTaskSummary> SearchAsync(int? start = null, int? size = null, string? sort = null, string? freeText = null, string? query = null, CancellationToken cancellationToken = default)

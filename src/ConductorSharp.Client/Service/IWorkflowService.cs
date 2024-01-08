@@ -28,7 +28,7 @@ public interface IWorkflowService
     /// <summary>
     /// Lists workflows for the given correlation id
     /// </summary>
-    Task<ICollection<Workflow>> GetCorrelatedAsync(
+    Task<ICollection<Workflow>> ListCorrelatedAsync(
         string name,
         string correlationId,
         bool? includeClosed = false,

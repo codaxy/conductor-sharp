@@ -29,7 +29,7 @@ namespace ConductorSharp.Toolkit.Service
 
             if (!_config.IgnoreWorkflows)
             {
-                var workflowDefinitions = await _metadataService.GetAllWorkflowsAsync();
+                var workflowDefinitions = await _metadataService.ListWorkflowsAsync();
                 workflowDefinitions = Filter(workflowDefinitions, workflowFilters).ToArray();
                 var workflowDirectory = Path.Combine(_config.Destination, "Workflows");
                 Directory.CreateDirectory(workflowDirectory);
@@ -51,7 +51,7 @@ namespace ConductorSharp.Toolkit.Service
 
             if (!_config.IgnoreTasks)
             {
-                var taskDefinitions = await _metadataService.GetTaskDefsAsync();
+                var taskDefinitions = await _metadataService.ListTasksAsync();
                 taskDefinitions = Filter(taskDefinitions, taskFilters).ToArray();
                 var tasksDirectory = Path.Combine(_config.Destination, "Tasks");
                 Directory.CreateDirectory(tasksDirectory);

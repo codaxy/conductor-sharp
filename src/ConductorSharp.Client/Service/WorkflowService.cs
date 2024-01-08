@@ -93,7 +93,7 @@ namespace ConductorSharp.Client.Service
         /// <summary>
         /// Lists workflows for the given correlation id
         /// </summary>
-        public async Task<ICollection<Workflow>> GetCorrelatedAsync(string name, string correlationId, bool? includeClosed = false, bool? includeTasks = false, CancellationToken cancellationToken = default)
+        public async Task<ICollection<Workflow>> ListCorrelatedAsync(string name, string correlationId, bool? includeClosed = false, bool? includeTasks = false, CancellationToken cancellationToken = default)
             => await _client.GetWorkflows_1Async(name, correlationId, includeClosed, includeTasks, cancellationToken);
 
 
