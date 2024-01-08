@@ -50,6 +50,7 @@ namespace ConductorSharp.Definitions.Workflows
                 }
             );
 
+#pragma warning disable CS0618 // Type or member is obsolete
             _builder.AddTask(
                 wf => wf.DecisionTask,
                 wf => new DecisionTaskInput() { CaseValueParam = wf.WorkflowInput.Operation },
@@ -79,6 +80,7 @@ namespace ConductorSharp.Definitions.Workflows
                     }
                 }
             );
+#pragma warning restore CS0618 // Type or member is obsolete
 
             _builder.SetOptions(options => options.OwnerEmail = "test@test.com");
         }

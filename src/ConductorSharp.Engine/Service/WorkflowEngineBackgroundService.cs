@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
 namespace ConductorSharp.Engine.Service
@@ -13,14 +12,12 @@ namespace ConductorSharp.Engine.Service
     internal class WorkflowEngineBackgroundService(
         IConductorSharpHealthService healthService,
         ILogger<WorkflowEngineBackgroundService> logger,
-        IHostApplicationLifetime hostApplicationLifetime,
         IDeploymentService deploymentService,
         ExecutionManager executionManager,
         ModuleDeployment deployment
         ) : IHostedService, IDisposable
     {
         private readonly ILogger<WorkflowEngineBackgroundService> _logger = logger;
-        private readonly IHostApplicationLifetime _hostApplicationLifetime = hostApplicationLifetime;
         private readonly IDeploymentService _deploymentService = deploymentService;
         private readonly ExecutionManager _executionManager = executionManager;
         private readonly ModuleDeployment _deployment = deployment;

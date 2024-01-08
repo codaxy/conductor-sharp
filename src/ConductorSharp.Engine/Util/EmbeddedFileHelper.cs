@@ -11,11 +11,7 @@ namespace ConductorSharp.Engine.Util
     {
         private static string ReadAssemblyFile(Assembly assembly, string name)
         {
-            var stream = assembly.GetManifestResourceStream(name);
-
-            if (stream == null)
-                throw new InvalidOperationException($"Resource {name} does not exist.");
-
+            var stream = assembly.GetManifestResourceStream(name) ?? throw new InvalidOperationException($"Resource {name} does not exist.");
             using var reader = new StreamReader(stream, Encoding.UTF8);
 
             return reader.ReadToEnd();

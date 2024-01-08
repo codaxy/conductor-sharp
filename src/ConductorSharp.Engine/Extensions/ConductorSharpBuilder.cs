@@ -80,7 +80,7 @@ namespace ConductorSharp.Engine.Extensions
         {
             if (buildConfiguration is null)
             {
-                throw new ArgumentNullException("Build configuration cannot be null");
+                throw new ArgumentNullException(nameof(buildConfiguration));
             }
 
             Builder.AddSingleton(buildConfiguration);
