@@ -64,7 +64,7 @@ namespace ConductorSharp.Engine.Tests.Unit
 
             registry.Register<WorkflowItemTestWorkflow>("definition3", new WorkflowDef { CreatedBy = "test1workflow1" });
 
-            registry.TryGet<WorkflowItemTestWorkflow>(out var items);
+            registry.TryGet<WorkflowItemTestWorkflow>(out _);
 
             var taskDefs = registry.GetAll<TaskDef>();
             var workflowDefs = registry.GetAll<WorkflowDef>();

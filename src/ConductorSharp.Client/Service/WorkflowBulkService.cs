@@ -12,7 +12,7 @@ public class WorkflowBulkService(ConductorClient client) : IWorkflowBulkService
         CancellationToken cancellationToken = default)
         => await client.PauseWorkflow_1Async(workflowIds, cancellationToken);
 
-    public async Task<BulkResponse> TerminateWorkflowsAsync(IEnumerable<string> worklowIds, string reason = null,
+    public async Task<BulkResponse> TerminateWorkflowsAsync(IEnumerable<string> worklowIds, string? reason = null,
         CancellationToken cancellationToken = default)
         => await client.TerminateAsync(worklowIds, reason, cancellationToken);
 

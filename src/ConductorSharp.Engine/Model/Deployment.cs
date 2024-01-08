@@ -8,11 +8,11 @@ namespace ConductorSharp.Engine.Model
 {
     public class Deployment
     {
-        public List<TaskDef> TaskDefinitions { get; set; } = new List<TaskDef>();
+        public List<TaskDef> TaskDefinitions { get; set; } = [];
 
-        public List<WorkflowDef> WorkflowDefinitions { get; set; } = new List<WorkflowDef>();
+        public List<WorkflowDef> WorkflowDefinitions { get; set; } = [];
 
-        public List<EventHandler> EventHandlerDefinitions { get; set; } = new List<EventHandler>();
+        public List<EventHandler> EventHandlerDefinitions { get; set; } = [];
 
         public TaskDef FindTaskByName(string name) => TaskDefinitions.Where(a => a.Name == name).SingleOrDefault();
 

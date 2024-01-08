@@ -9,35 +9,35 @@ namespace ConductorSharp.ApiEnabled.Controllers;
 [ApiController]
 public class WorkflowController : ControllerBase
 {
-    private readonly IMetadataService metadataService;
-    private readonly IWorkflowService workflowService;
-    private readonly ITaskService taskService;
+    private readonly IMetadataService _metadataService;
+    private readonly IWorkflowService _workflowService;
+    private readonly ITaskService _taskService;
     private const string NotificationWorfklowName = "NOTIFICATION_send_to_customer";
 
     public WorkflowController(IMetadataService metadataService, IWorkflowService workflowService, ITaskService taskService)
     {
-        this.metadataService = metadataService;
-        this.workflowService = workflowService;
-        this.taskService = taskService;
+        _metadataService = metadataService;
+        _workflowService = workflowService;
+        _taskService = taskService;
     }
 
     [HttpGet("get-workflows")]
-    public async Task<ICollection<WorkflowDef>> GetRegisteredWorkflows() => await metadataService.GetAllWorkflowsAsync();
+    public async Task<ICollection<WorkflowDef>> GetRegisteredWorkflows() => await _metadataService.GetAllWorkflowsAsync();
 
     [HttpGet("get-task-logs")]
-    public async Task<ICollection<TaskExecLog>> GetTaskLogs(string taskId) => await taskService.GetLogsAsync(taskId);
+    public async Task<ICollection<TaskExecLog>> GetTaskLogs(string taskId) => await _taskService.GetLogsAsync(taskId);
 
     [HttpGet("get-executions")]
     public async Task<SearchResultWorkflow> SearchWorkflows([FromQuery] int? start = null, [FromQuery] int? size = null) =>
-        await workflowService.SearchV2Async(start, size);
+        await _workflowService.SearchV2Async(start, size);
 
     [HttpGet("get-status/{workflowId}")]
     public async Task<Workflow> GetStatus([FromRoute] string workflowId, [FromQuery] bool includeTasks) =>
-        await workflowService.GetExecutionStatusAsync(workflowId, includeTasks);
+        await _workflowService.GetExecutionStatusAsync(workflowId, includeTasks);
 
     [HttpPost("send-notification")]
     public async Task<ActionResult<string>> QueueWorkflow([FromBody] SendNotificationRequest request) =>
-        await workflowService.StartAsync(
+        await _workflowService.StartAsync(
             new StartWorkflowRequest
             {
                 Name = NotificationWorfklowName,

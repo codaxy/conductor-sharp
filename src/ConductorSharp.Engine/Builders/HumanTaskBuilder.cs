@@ -22,11 +22,8 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    internal class HumanTaskBuilder : BaseTaskBuilder<HumanTaskInput, NoOutput>
+    internal class HumanTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<HumanTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration)
     {
-        public HumanTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration) { }
-
         public override WorkflowTask[] Build() =>
 
             [

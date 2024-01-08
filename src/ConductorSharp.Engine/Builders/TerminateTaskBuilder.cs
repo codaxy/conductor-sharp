@@ -22,11 +22,8 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    internal class TerminateTaskBuilder : BaseTaskBuilder<TerminateTaskInput, NoOutput>
+    internal class TerminateTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<TerminateTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration)
     {
-        public TerminateTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration) { }
-
         public override WorkflowTask[] Build() =>
             [
                 new()

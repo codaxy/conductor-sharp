@@ -22,11 +22,8 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class DynamicForkJoinTaskBuilder : BaseTaskBuilder<DynamicForkJoinInput, NoOutput>
+    public class DynamicForkJoinTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<DynamicForkJoinInput, NoOutput>(taskExpression, inputExpression, buildConfiguration)
     {
-        public DynamicForkJoinTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration) { }
-
         public override WorkflowTask[] Build()
         {
             var dynamicTaskName = $"FORK_JOIN_DYNAMIC_{_taskRefferenceName}";

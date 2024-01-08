@@ -2,7 +2,6 @@
 using ConductorSharp.Engine;
 using ConductorSharp.Engine.Util;
 using MediatR;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -46,16 +45,9 @@ namespace ConductorSharp.Patterns.Tasks
     /// Uses the Conductor API to read the input/output and status of the specified tasks for the specified workflow.
     /// </summary>
     [OriginalName(Constants.TaskNamePrefix + "_read_tasks")]
-    public class ReadWorkflowTasks : TaskRequestHandler<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
+    public class ReadWorkflowTasks(IWorkflowService workflowService) : TaskRequestHandler<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
     {
-        private readonly ILogger<ReadWorkflowTasks> _logger;
-        private readonly IWorkflowService _workflowService;
-
-        public ReadWorkflowTasks(ILogger<ReadWorkflowTasks> logger, IWorkflowService workflowService)
-        {
-            _logger = logger;
-            _workflowService = workflowService;
-        }
+        private readonly IWorkflowService _workflowService = workflowService;
 
         public async override Task<ReadWorkflowTasksResponse> Handle(ReadWorkflowTasksRequest input, CancellationToken cancellationToken)
         {
@@ -64,15 +56,12 @@ namespace ConductorSharp.Patterns.Tasks
 
             var tasknames = input.TaskNames.Split(",").Where(a => !string.IsNullOrEmpty(a)).ToList();
 
-            var starterWorkflow = await _workflowService.GetExecutionStatusAsync(input.WorkflowId, cancellationToken: cancellationToken);
-
-            if (starterWorkflow == null)
-                throw new Exception($"Could not find starter workflow by id {input.WorkflowId}");
-
+            var starterWorkflow = await _workflowService.GetExecutionStatusAsync(input.WorkflowId, cancellationToken: cancellationToken) ?? throw new Exception($"Could not find starter workflow by id {input.WorkflowId}");
+            
             var output = new ReadWorkflowTasksResponse
             {
                 Workflow = new WorkflowDetails { InputData = JObject.FromObject(starterWorkflow.Input) },
-                Tasks = new Dictionary<string, Client.Generated.Task>()
+                Tasks = []
             };
 
             foreach (var task in tasknames)

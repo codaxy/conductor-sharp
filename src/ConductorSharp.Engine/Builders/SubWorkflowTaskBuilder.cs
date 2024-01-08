@@ -27,12 +27,9 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class SubWorkflowTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput> where TInput : IRequest<TOutput>
+    public class SubWorkflowTaskBuilder<TInput, TOutput>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<TInput, TOutput>(taskExpression, inputExpression, buildConfiguration) where TInput : IRequest<TOutput>
     {
-        private readonly int _version;
-
-        public SubWorkflowTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration) => _version = GetVersion(taskExpression);
+        private readonly int _version = GetVersion(taskExpression);
 
         public override WorkflowTask[] Build() =>
             [

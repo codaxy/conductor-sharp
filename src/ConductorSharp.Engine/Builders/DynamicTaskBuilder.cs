@@ -27,13 +27,10 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class DynamicTaskBuilder<I, O> : BaseTaskBuilder<DynamicTaskInput<I, O>, O>
+    public class DynamicTaskBuilder<I, O>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<DynamicTaskInput<I, O>, O>(taskExpression, inputExpression, buildConfiguration)
     {
         private const string TaskType = "DYNAMIC";
         private const string DynamicTasknameParam = "task_to_execute";
-
-        public DynamicTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration) { }
 
         private class DynamicTaskParameters
         {

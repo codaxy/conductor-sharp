@@ -35,7 +35,7 @@ namespace ConductorSharp.Engine.Builders
         where TOutput : WorkflowOutput
     {
         private readonly Type _workflowType = typeof(TWorkflow);
-        private readonly List<ITaskBuilder> _taskBuilders = new();
+        private readonly List<ITaskBuilder> _taskBuilders = [];
 
         public BuildContext BuildContext { get; } = new();
         public BuildConfiguration BuildConfiguration { get; set; }
@@ -70,7 +70,7 @@ namespace ConductorSharp.Engine.Builders
 
             BuildContext.WorkflowOptions.Version =
                 _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? BuildContext.WorkflowOptions.Version;
-            BuildContext.Inputs = new();
+            BuildContext.Inputs = [];
 
             var input = _workflowType.BaseType.GenericTypeArguments[1];
             var props = input.GetProperties();
@@ -91,7 +91,7 @@ namespace ConductorSharp.Engine.Builders
                         : null,
                 Description = BuildContext.WorkflowOptions.Description,
                 InputParameters = BuildContext.Inputs.ToArray(),
-                OutputParameters = (BuildContext.Outputs ?? new Newtonsoft.Json.Linq.JObject()).ToObject<IDictionary<string, object>>(),
+                OutputParameters = (BuildContext.Outputs ?? []).ToObject<IDictionary<string, object>>(),
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
                 OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
                 Version = BuildContext.WorkflowOptions.Version

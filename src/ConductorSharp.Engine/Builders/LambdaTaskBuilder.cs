@@ -28,12 +28,9 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class LambdaTaskBuilder<A, B> : BaseTaskBuilder<A, B> where A : IRequest<B>
+    public class LambdaTaskBuilder<A, B>(string script, Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<A, B>(taskExpression, inputExpression, buildConfiguration) where A : IRequest<B>
     {
-        private readonly string _script;
-
-        public LambdaTaskBuilder(string script, Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration) => _script = script;
+        private readonly string _script = script;
 
         public override WorkflowTask[] Build()
         {

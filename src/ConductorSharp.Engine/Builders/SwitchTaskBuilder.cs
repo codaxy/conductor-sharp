@@ -48,32 +48,24 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class SwitchTaskBuilder<TWorkflow> : BaseTaskBuilder<SwitchTaskInput, NoOutput>, ITaskSequenceBuilder<TWorkflow>
+    public class SwitchTaskBuilder<TWorkflow>(
+        Expression taskExpression,
+        Expression inputExpression,
+        BuildConfiguration buildConfiguration,
+        WorkflowBuildItemRegistry workflowBuildItemRegistry,
+        IEnumerable<ConfigurationProperty> configurationProperties,
+        BuildContext buildContext
+        ) : BaseTaskBuilder<SwitchTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration), ITaskSequenceBuilder<TWorkflow>
         where TWorkflow : ITypedWorkflow
     {
-        private Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = new();
+        private readonly Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = [];
         private string _currentCaseName;
         private List<ITaskBuilder> _defaultCase;
 
-        public BuildContext BuildContext { get; }
-        public BuildConfiguration BuildConfiguration { get; }
-        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
-        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; }
-
-        public SwitchTaskBuilder(
-            Expression taskExpression,
-            Expression inputExpression,
-            BuildConfiguration buildConfiguration,
-            WorkflowBuildItemRegistry workflowBuildItemRegistry,
-            IEnumerable<ConfigurationProperty> configurationProperties,
-            BuildContext buildContext
-        ) : base(taskExpression, inputExpression, buildConfiguration)
-        {
-            BuildConfiguration = buildConfiguration;
-            WorkflowBuildRegistry = workflowBuildItemRegistry;
-            ConfigurationProperties = configurationProperties;
-            BuildContext = buildContext;
-        }
+        public BuildContext BuildContext { get; } = buildContext;
+        public BuildConfiguration BuildConfiguration { get; } = buildConfiguration;
+        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; } = workflowBuildItemRegistry;
+        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; } = configurationProperties;
 
         public SwitchTaskBuilder<TWorkflow> AddCase(string caseName)
         {

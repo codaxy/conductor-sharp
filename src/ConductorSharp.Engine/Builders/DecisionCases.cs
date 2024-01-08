@@ -6,7 +6,7 @@ namespace ConductorSharp.Engine.Builders
 {
     public class DecisionCases<TWorkflow> where TWorkflow : ITypedWorkflow
     {
-        internal Dictionary<string, Action<ITaskSequenceBuilder<TWorkflow>>> Cases { get; } = new();
+        internal Dictionary<string, Action<ITaskSequenceBuilder<TWorkflow>>> Cases { get; } = [];
 
         public Action<ITaskSequenceBuilder<TWorkflow>> DefaultCase { get; set; }
         public Action<ITaskSequenceBuilder<TWorkflow>> this[string @case]

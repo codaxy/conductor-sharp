@@ -30,11 +30,7 @@ namespace ConductorSharp.Engine.Builders
         public JsonJqTransformTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
             : base(taskExpression, inputExpression, buildConfiguration)
         {
-            var queryExpressionValue = _inputParameters.GetValue("query_expression");
-
-            if (queryExpressionValue == null)
-                throw new InvalidOperationException("Query expression is a mandatory field");
-
+            var queryExpressionValue = _inputParameters.GetValue("query_expression") ?? throw new InvalidOperationException("Query expression is a mandatory field");
             _inputParameters.Remove("query_expression");
             _inputParameters.Add("queryExpression", queryExpressionValue);
         }

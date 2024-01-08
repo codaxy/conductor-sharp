@@ -1,5 +1,4 @@
 ﻿using ConductorSharp.Client.Service;
-using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using Microsoft.Extensions.Logging;
@@ -7,17 +6,11 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Service
 {
-    internal class DeploymentService : IDeploymentService
+    internal class DeploymentService(IMetadataService metadataService, ILogger<DeploymentService> logger) : IDeploymentService
     {
-        private readonly IMetadataService _metadataService;
+        private readonly IMetadataService _metadataService = metadataService;
 
-        private readonly ILogger<DeploymentService> _logger;
-
-        public DeploymentService(IMetadataService metadataService, ILogger<DeploymentService> logger)
-        {
-            _metadataService = metadataService;
-            _logger = logger;
-        }
+        private readonly ILogger<DeploymentService> _logger = logger;
 
         public async Task Deploy(Deployment deployment)
         {

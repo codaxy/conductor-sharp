@@ -9,16 +9,10 @@ using System.Linq;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public class TaskDefinitionBuilder
+    public class TaskDefinitionBuilder(BuildConfiguration buildConfiguration, ITaskNameBuilder taskNameBuilder)
     {
-        public BuildConfiguration BuildConfiguration { get; set; }
-        private readonly ITaskNameBuilder _taskNameBuilder;
-
-        public TaskDefinitionBuilder(BuildConfiguration buildConfiguration, ITaskNameBuilder taskNameBuilder)
-        {
-            BuildConfiguration = buildConfiguration;
-            _taskNameBuilder = taskNameBuilder;
-        }
+        public BuildConfiguration BuildConfiguration { get; set; } = buildConfiguration;
+        private readonly ITaskNameBuilder _taskNameBuilder = taskNameBuilder;
 
         public TaskDef Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
 
@@ -60,7 +54,7 @@ namespace ConductorSharp.Engine.Builders
                 PollTimeoutSeconds = options.PollTimeoutSeconds,
                 CreatedBy = options.CreatedBy,
                 UpdatedBy = options.UpdatedBy,
-                InputTemplate = (options.InputTemplate ?? new Newtonsoft.Json.Linq.JObject()).ToObject<IDictionary<string, object>>(),
+                InputTemplate = (options.InputTemplate ?? []).ToObject<IDictionary<string, object>>(),
                 ExecutionNameSpace = options.ExecutionNameSpace,
             };
         }

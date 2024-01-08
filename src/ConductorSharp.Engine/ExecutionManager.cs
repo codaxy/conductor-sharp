@@ -84,7 +84,7 @@ namespace ConductorSharp.Engine
             }
         }
 
-        private Type GetInputType(Type workerType)
+        private static Type GetInputType(Type workerType)
         {
             var interfaces = workerType
                 .GetInterfaces()
@@ -109,7 +109,7 @@ namespace ConductorSharp.Engine
 
             if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStoragePath))
             {
-                _logger.LogDebug($"Fetching storage location {pollResponse.ExternalInputPayloadStoragePath}");
+                _logger.LogDebug("Fetching storage {location}", pollResponse.ExternalInputPayloadStoragePath);
                 // TODO: Check what the operation and payload type are
                 var externalStorageLocation = await _taskManager.GetExternalStorageLocationAsync(
                     pollResponse.ExternalInputPayloadStoragePath,

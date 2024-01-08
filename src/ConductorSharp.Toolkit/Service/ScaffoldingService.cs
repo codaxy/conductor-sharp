@@ -3,7 +3,6 @@ using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Toolkit.Filters;
 using ConductorSharp.Toolkit.Util;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Task = System.Threading.Tasks.Task;
 
@@ -17,7 +16,7 @@ namespace ConductorSharp.Toolkit.Service
         // Prefix prepended if member name is invalid
         private const string MemberNamePrefix = "A";
 
-        public ScaffoldingService(IMetadataService metadataService, IOptions<ScaffoldingConfig> options, ILogger<ScaffoldingService> logger)
+        public ScaffoldingService(IMetadataService metadataService, IOptions<ScaffoldingConfig> options)
         {
             _metadataService = metadataService;
             _config = options.Value;
@@ -105,7 +104,7 @@ namespace ConductorSharp.Toolkit.Service
             return (modelGenerator.Build(), name);
         }
 
-        private void DefinePropertyParams(TaskModelGenerator.PropertyData propData, string type, string originalName)
+        private static void DefinePropertyParams(TaskModelGenerator.PropertyData propData, string type, string originalName)
         {
             LangUtils.MakeValidMemberName(SnakeCaseUtil.ToPascalCase(originalName), MemberNamePrefix, out var propertyName);
             propData.OriginalName = originalName;
@@ -177,10 +176,10 @@ namespace ConductorSharp.Toolkit.Service
         }
 
         // If filter list is empty then all workflows/tasks are returned
-        private IEnumerable<WorkflowDef> Filter(IEnumerable<WorkflowDef> workflows, IWorkflowFilter[] filters) =>
+        private static IEnumerable<WorkflowDef> Filter(IEnumerable<WorkflowDef> workflows, IWorkflowFilter[] filters) =>
             workflows.Where(wf => filters.All(filter => filter.Test(wf)));
 
-        private IEnumerable<TaskDef> Filter(IEnumerable<TaskDef> tasks, ITaskFilter[] filters) =>
+        private static IEnumerable<TaskDef> Filter(IEnumerable<TaskDef> tasks, ITaskFilter[] filters) =>
             tasks.Where(task => filters.All(filter => filter.Test(task)));
     }
 }

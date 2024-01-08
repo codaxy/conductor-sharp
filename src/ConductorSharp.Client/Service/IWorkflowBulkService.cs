@@ -17,7 +17,7 @@ public interface IWorkflowBulkService
     /// <summary>
     /// Terminate workflows execution
     /// </summary>
-    Task<BulkResponse> TerminateWorkflowsAsync(IEnumerable<string> worklowIds, string reason = null, CancellationToken cancellationToken = default);
+    Task<BulkResponse> TerminateWorkflowsAsync(IEnumerable<string> worklowIds, string? reason = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retry the last failed task for each workflow from the list

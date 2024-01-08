@@ -22,11 +22,8 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    internal class WaitTaskBuilder : BaseTaskBuilder<WaitTaskInput, NoOutput>
+    internal class WaitTaskBuilder(Expression taskExpression, Expression memberExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<WaitTaskInput, NoOutput>(taskExpression, memberExpression, buildConfiguration)
     {
-        public WaitTaskBuilder(Expression taskExpression, Expression memberExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, memberExpression, buildConfiguration) { }
-
         public override WorkflowTask[] Build() =>
             [
                 new()

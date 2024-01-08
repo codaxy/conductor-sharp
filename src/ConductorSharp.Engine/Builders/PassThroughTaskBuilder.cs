@@ -9,14 +9,9 @@ namespace ConductorSharp.Engine.Builders
             where TWorkflow : ITypedWorkflow => builder.AddTaskBuilderToSequence(new PassThroughTaskBuilder(taskDefinitions));
     }
 
-    public class PassThroughTaskBuilder : ITaskBuilder
+    public class PassThroughTaskBuilder(WorkflowTask[] tasks) : ITaskBuilder
     {
-        private readonly WorkflowTask[] _tasks;
-
-        public PassThroughTaskBuilder(WorkflowTask[] tasks)
-        {
-            _tasks = tasks;
-        }
+        private readonly WorkflowTask[] _tasks = tasks;
 
         public WorkflowTask[] Build() => _tasks;
     }

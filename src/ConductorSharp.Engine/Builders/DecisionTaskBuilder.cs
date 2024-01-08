@@ -48,32 +48,24 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput>, ITaskSequenceBuilder<TWorkflow>
+    public class DecisionTaskBuilder<TWorkflow>(
+        Expression taskExpression,
+        Expression inputExpression,
+        BuildConfiguration buildConfiguration,
+        WorkflowBuildItemRegistry buildItemRegistry,
+        IEnumerable<ConfigurationProperty> configurationProperties,
+        BuildContext buildContext
+        ) : BaseTaskBuilder<DecisionTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration), ITaskSequenceBuilder<TWorkflow>
         where TWorkflow : ITypedWorkflow
     {
-        private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
+        private readonly Dictionary<string, List<ITaskBuilder>> _caseDictionary = [];
         private List<ITaskBuilder> _defaultCase;
         private string _currentCaseName;
 
-        public BuildContext BuildContext { get; }
-        public BuildConfiguration BuildConfiguration { get; }
-        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
-        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; }
-
-        public DecisionTaskBuilder(
-            Expression taskExpression,
-            Expression inputExpression,
-            BuildConfiguration buildConfiguration,
-            WorkflowBuildItemRegistry buildItemRegistry,
-            IEnumerable<ConfigurationProperty> configurationProperties,
-            BuildContext buildContext
-        ) : base(taskExpression, inputExpression, buildConfiguration)
-        {
-            BuildConfiguration = buildConfiguration;
-            BuildContext = buildContext;
-            WorkflowBuildRegistry = buildItemRegistry;
-            ConfigurationProperties = configurationProperties;
-        }
+        public BuildContext BuildContext { get; } = buildContext;
+        public BuildConfiguration BuildConfiguration { get; } = buildConfiguration;
+        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; } = buildItemRegistry;
+        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; } = configurationProperties;
 
         internal DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
         {
@@ -86,9 +78,9 @@ namespace ConductorSharp.Engine.Builders
         {
             var decisionTaskName = $"DECISION_{_taskRefferenceName}";
 
-            return new WorkflowTask[]
-            {
-                new WorkflowTask
+            return
+            [
+                new()
                 {
                     Name = decisionTaskName,
                     TaskReferenceName = _taskRefferenceName,
@@ -105,7 +97,7 @@ namespace ConductorSharp.Engine.Builders
                     }.ToObject<IDictionary<string, ICollection<WorkflowTask>>>(),
                     DefaultCase = _defaultCase?.SelectMany(builder => builder.Build()).ToArray()
                 }
-            };
+            ];
         }
 
         public void AddTaskBuilderToSequence(ITaskBuilder builder)
@@ -114,13 +106,16 @@ namespace ConductorSharp.Engine.Builders
             if (_currentCaseName == null)
             {
                 _defaultCase ??= [];
-
                 _defaultCase.Add(builder);
+
                 return;
             }
 
             if (!_caseDictionary.ContainsKey(_currentCaseName))
-                _caseDictionary.Add(_currentCaseName, new List<ITaskBuilder>());
+            {
+                _caseDictionary.Add(_currentCaseName, []);
+            }
+
             _caseDictionary[_currentCaseName].Add(builder);
         }
     }

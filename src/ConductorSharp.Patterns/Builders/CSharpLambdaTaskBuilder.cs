@@ -28,10 +28,7 @@ namespace ConductorSharp.Patterns.Builders
         {
             var prefixConfigProperty = builder.ConfigurationProperties.FirstOrDefault(
                 prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty
-            );
-
-            if (prefixConfigProperty == null)
-                throw new LambdaTasksNotEnabledException();
+            ) ?? throw new LambdaTasksNotEnabledException();
 
             var lambdaTaskNamePrefix = TaskNameBuilder.MakeTaskNamePrefix(prefixConfigProperty.Value as string);
 
