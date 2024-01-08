@@ -1,10 +1,9 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Engine.Interface
 {
     public interface ITaskBuilder
     {
-        //void Build();
-        WorkflowDefinition.Task[] Build();
+        WorkflowTask[] Build();
     }
 }

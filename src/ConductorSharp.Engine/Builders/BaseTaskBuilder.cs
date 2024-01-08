@@ -1,12 +1,10 @@
-﻿using ConductorSharp.Client;
-using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
@@ -34,6 +32,6 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
-        public abstract WorkflowDefinition.Task[] Build();
+        public abstract WorkflowTask[] Build();
     }
 }

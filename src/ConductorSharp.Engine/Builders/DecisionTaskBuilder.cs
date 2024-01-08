@@ -1,10 +1,9 @@
 ﻿using ConductorSharp.Client;
-using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -83,29 +82,28 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
-        public override WorkflowDefinition.Task[] Build()
+        public override WorkflowTask[] Build()
         {
             var decisionTaskName = $"DECISION_{_taskRefferenceName}";
 
-            return new WorkflowDefinition.Task[]
+            return new WorkflowTask[]
             {
-                new WorkflowDefinition.Task
+                new WorkflowTask
                 {
                     Name = decisionTaskName,
                     TaskReferenceName = _taskRefferenceName,
-                    InputParameters = _inputParameters,
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                     Type = "DECISION",
                     CaseValueParam = "case_value_param",
+                    ScriptExpression = "case_value_param",
+                    CaseExpression = "case_value_param",
                     DecisionCases = new JObject
                     {
                         _caseDictionary.Select(
                             a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(a => a.Build()), ConductorConstants.DefinitionsSerializer))
                         )
-                    },
-                    DefaultCase = _defaultCase
-                        ?.SelectMany(builder => builder.Build())
-                        .Select(task => JObject.FromObject(task, ConductorConstants.DefinitionsSerializer))
-                        .ToList()
+                    }.ToObject<IDictionary<string, ICollection<WorkflowTask>>>(),
+                    DefaultCase = _defaultCase?.SelectMany(builder => builder.Build()).ToArray()
                 }
             };
         }

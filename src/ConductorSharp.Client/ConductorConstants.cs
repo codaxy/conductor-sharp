@@ -10,19 +10,22 @@ namespace ConductorSharp.Client
 
         public static JsonSerializer IoJsonSerializer
         {
+            get => JsonSerializer.Create(IoJsonSerializerSettings);
+        }
+
+        public static JsonSerializerSettings IoJsonSerializerSettings
+        {
             get
             {
-                var serializer = new JsonSerializer()
+                return new JsonSerializerSettings
                 {
                     ContractResolver = new DefaultContractResolver { NamingStrategy = IoNamingStrategy },
                     NullValueHandling = NullValueHandling.Ignore,
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                     MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
-                    TypeNameHandling = TypeNameHandling.Auto
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    Converters = new List<JsonConverter>() { new JsonNodeConverter() }
                 };
-
-                serializer.Converters.Add(new JsonNodeConverter());
-                return serializer;
             }
         }
 
