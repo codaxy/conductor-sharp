@@ -1,8 +1,21 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ConductorSharp.Client.Model.Response
+namespace ConductorSharp.Client
 {
+    public class ConductorValidationError
+    {
+        [JsonProperty("path")]
+        public string Path { get; set; }
+
+        [JsonProperty("message")]
+        public string Message { get; set; }
+    }
+
     public class ConductorErrorResponse
     {
         [JsonProperty("status")]

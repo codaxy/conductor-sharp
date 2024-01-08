@@ -1,10 +1,11 @@
-﻿using ConductorSharp.Client.Model.Response;
+﻿using ConductorSharp.Client.Generated;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ConductorSharp.Client.Service
 {
     public interface IHealthService
     {
-        Task<HealthResponse> CheckHealth();
+        Task<HealthCheckStatus> CheckHealthAsync(CancellationToken cancellationToken);
     }
 }
