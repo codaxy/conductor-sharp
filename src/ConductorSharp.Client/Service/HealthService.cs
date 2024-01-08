@@ -8,7 +8,7 @@ namespace ConductorSharp.Client.Service
     {
         private readonly ConductorClient _conductorClient = client;
 
-        public async Task<HealthCheckStatus> CheckHealthAsync(CancellationToken cancellationToken) =>
+        public async Task<HealthCheckStatus> CheckHealthAsync(CancellationToken cancellationToken = default) =>
             await _conductorClient.DoCheckAsync(cancellationToken);
     }
 }

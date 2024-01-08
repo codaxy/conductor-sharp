@@ -6,6 +6,6 @@ namespace ConductorSharp.Client.Service
 {
     public interface IHealthService
     {
-        Task<HealthCheckStatus> CheckHealthAsync(CancellationToken cancellationToken);
+        Task<HealthCheckStatus> CheckHealthAsync(CancellationToken cancellationToken = default);
     }
 }
