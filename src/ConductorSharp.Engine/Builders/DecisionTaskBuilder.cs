@@ -14,6 +14,7 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class DecisionTaskExtensions
     {
+        [Obsolete("Switch tasks should be used")]
         public static ITaskOptionsBuilder AddTask<TWorkflow>(
             this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
@@ -74,19 +75,21 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
+       
         public override WorkflowTask[] Build()
         {
             var decisionTaskName = $"DECISION_{_taskRefferenceName}";
 
+#pragma warning disable CS0612 // Type or member is obsolete
             return
             [
-                new()
+                new WorkflowTask()
                 {
                     Name = decisionTaskName,
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                     WorkflowTaskType = WorkflowTaskType.DECISION,
-                    ScriptExpression = "case_value_param",
+                    CaseExpression = "case_value_param",
                     DecisionCases = new JObject
                     {
                         _caseDictionary.Select(
@@ -96,6 +99,7 @@ namespace ConductorSharp.Engine.Builders
                     DefaultCase = _defaultCase?.SelectMany(builder => builder.Build()).ToArray()
                 }
             ];
+#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         public void AddTaskBuilderToSequence(ITaskBuilder builder)

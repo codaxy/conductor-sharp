@@ -10,7 +10,7 @@
       "inputParameters": {
         "case_value_param": "test"
       },
-      "scriptExpression": "case_value_param",
+      "caseExpression": "case_value_param",
       "decisionCases": {
         "test": [
           {

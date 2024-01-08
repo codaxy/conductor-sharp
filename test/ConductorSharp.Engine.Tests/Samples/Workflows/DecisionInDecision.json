@@ -10,7 +10,7 @@
       "inputParameters": {
         "case_value_param": "${workflow.input.should_send_notification}"
       },
-      "scriptExpression": "case_value_param",
+      "caseExpression": "case_value_param",
       "decisionCases": {
         "YES": [
           {
@@ -19,7 +19,7 @@
             "inputParameters": {
               "case_value_param": "${workflow.input.should_send_notification}"
             },
-            "scriptExpression": "case_value_param",
+            "caseExpression": "case_value_param",
             "decisionCases": {
               "YES": [
                 {
