@@ -26,7 +26,6 @@
       "inputParameters": {
         "case_value_param": "${workflow.input.operation}"
       },
-      "type": "DECISION",
       "scriptExpression": "case_value_param",
       "decisionCases": {
         "upper": [
@@ -71,7 +70,7 @@
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "DECISION"
     }
   ],
   "inputParameters": [
@@ -79,7 +78,7 @@
     "input"
   ],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "ownerEmail": "test@test.com",

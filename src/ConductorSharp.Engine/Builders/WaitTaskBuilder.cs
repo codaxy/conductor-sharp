@@ -30,7 +30,7 @@ namespace ConductorSharp.Engine.Builders
                 {
                     Name = $"WAIT_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
-                    Type = "WAIT",
+                    WorkflowTaskType = WorkflowTaskType.WAIT,
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>()
                 }
             ];

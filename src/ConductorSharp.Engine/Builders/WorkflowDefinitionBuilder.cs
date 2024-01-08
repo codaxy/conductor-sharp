@@ -94,7 +94,8 @@ namespace ConductorSharp.Engine.Builders
                 OutputParameters = (BuildContext.Outputs ?? []).ToObject<IDictionary<string, object>>(),
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
                 OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
-                Version = BuildContext.WorkflowOptions.Version
+                Version = BuildContext.WorkflowOptions.Version,
+                SchemaVersion = 2
             };
         }
 

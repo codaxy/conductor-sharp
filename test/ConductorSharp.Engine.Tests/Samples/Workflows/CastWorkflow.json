@@ -10,7 +10,6 @@
       "inputParameters": {
         "customer_id": 1
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -25,7 +24,6 @@
         "customer_name": "${get_customer.output.name.first_name}",
         "address": "${get_customer.output.address}"
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -36,7 +34,7 @@
   ],
   "inputParameters": [],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

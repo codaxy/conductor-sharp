@@ -10,7 +10,6 @@
       "inputParameters": {
         "case_value_param": "${workflow.input.should_send_notification}"
       },
-      "type": "DECISION",
       "scriptExpression": "case_value_param",
       "decisionCases": {
         "YES": [
@@ -20,7 +19,6 @@
             "inputParameters": {
               "id": "${workflow.input.customer_id}"
             },
-            "type": "SUB_WORKFLOW",
             "startDelay": 0,
             "subWorkflowParam": {
               "name": "NOTIFICATION_send_to_customer",
@@ -30,7 +28,7 @@
             "rateLimited": false,
             "asyncComplete": false,
             "retryCount": 0,
-            "workflowTaskType": "SIMPLE"
+            "workflowTaskType": "SUB_WORKFLOW"
           }
         ]
       },
@@ -39,7 +37,7 @@
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "DECISION"
     }
   ],
   "inputParameters": [
@@ -47,7 +45,7 @@
     "customer_id"
   ],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

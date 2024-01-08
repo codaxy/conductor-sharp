@@ -17,24 +17,21 @@ namespace ConductorSharp.Engine.Extensions
 
             builder.AddSingleton((ctx) => new ConductorClient(new HttpClient { BaseAddress = new Uri(baseUrl) }));
 
+            builder.AddTransient<IAdminService, AdminService>();
+            builder.AddTransient<IEventService, EventService>();
+            builder.AddTransient<IExternalPayloadService, ExternalPayloadService>();
+            builder.AddTransient<IQueueAdminService, QueueAdminService>();
+            builder.AddTransient<IWorkflowBulkService, WorkflowBulkService>();
             builder.AddTransient<ITaskService, TaskService>();
-
             builder.AddTransient<IHealthService, HealthService>();
-
             builder.AddTransient<IMetadataService, MetadataService>();
-
             builder.AddTransient<IWorkflowService, WorkflowService>();
 
             builder.AddSingleton(new BuildConfiguration());
-
             builder.AddSingleton<WorkflowBuildItemRegistry>();
-
             builder.AddTransient<ITaskNameBuilder, DefaultTaskNameBuilder>();
-
             builder.AddTransient<TaskDefinitionBuilder>();
-
             builder.AddTransient(typeof(WorkflowDefinitionBuilder<,,>));
-
             return new ConductorSharpBuilder(builder);
         }
     }

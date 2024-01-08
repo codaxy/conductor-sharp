@@ -85,7 +85,7 @@ namespace ConductorSharp.Engine.Builders
                     Name = decisionTaskName,
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
-                    Type = "DECISION",
+                    WorkflowTaskType = WorkflowTaskType.DECISION,
                     ScriptExpression = "case_value_param",
                     DecisionCases = new JObject
                     {

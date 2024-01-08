@@ -41,7 +41,7 @@ namespace ConductorSharp.Engine.Builders
                 {
                     Name = $"LAMBDA_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
-                    Type = "LAMBDA",
+                    WorkflowTaskType = WorkflowTaskType.LAMBDA,
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>()
                 }
             ];

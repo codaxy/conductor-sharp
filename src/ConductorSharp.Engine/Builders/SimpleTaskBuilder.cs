@@ -33,9 +33,9 @@ namespace ConductorSharp.Engine.Builders
                 {
                     Name = _taskName,
                     TaskReferenceName = _taskRefferenceName,
-                    Type = "SIMPLE",
+                    WorkflowTaskType = WorkflowTaskType.SIMPLE,
                     InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
-                    Optional = _additionalParameters?.Optional == true,
+                    Optional = _additionalParameters?.Optional == true
                 }
             ];
     }

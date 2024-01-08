@@ -32,7 +32,7 @@
   ],
   "inputParameters": [],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

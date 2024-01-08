@@ -11,7 +11,6 @@
         "task_names": "task1,task2",
         "workflow_id": "${workflow.input.workflow_id}"
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -25,7 +24,6 @@
       "inputParameters": {
         "seconds": "${workflow.input.seconds}"
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -39,7 +37,7 @@
     "workflow_id"
   ],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

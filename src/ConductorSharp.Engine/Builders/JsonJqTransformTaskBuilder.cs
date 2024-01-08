@@ -42,7 +42,7 @@ namespace ConductorSharp.Engine.Builders
                 {
                     Name = _taskName,
                     TaskReferenceName = _taskRefferenceName,
-                    Type = "JSON_JQ_TRANSFORM",
+                    WorkflowTaskType = WorkflowTaskType.JSON_JQ_TRANSFORM,
                     InputParameters = _inputParameters.ToObject<IDictionary<string,object>>()
                 }
             ];

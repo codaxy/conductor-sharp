@@ -2,7 +2,7 @@
 
 namespace ConductorSharp.Client.Generated
 {
-    internal class ApiException(
+    public class ApiException(
         string message,
         int statusCode,
         string responseData,

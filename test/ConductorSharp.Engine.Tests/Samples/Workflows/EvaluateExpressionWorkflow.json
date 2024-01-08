@@ -10,7 +10,6 @@
       "inputParameters": {
         "customer_id": 1
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -24,7 +23,6 @@
       "inputParameters": {
         "customer_id": 1
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -38,7 +36,6 @@
       "inputParameters": {
         "customer_id": 1
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -52,7 +49,6 @@
       "inputParameters": {
         "customer_id": 1
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -66,7 +62,6 @@
       "inputParameters": {
         "customer_id": 34
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -81,7 +76,6 @@
         "name": "1:1:1:1:1",
         "address": "${workflow.input.username}@test.com"
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -94,7 +88,7 @@
     "username"
   ],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

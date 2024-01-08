@@ -37,7 +37,7 @@ namespace ConductorSharp.Engine.Builders
                 {
                     Name = _taskName,
                     TaskReferenceName = _taskRefferenceName,
-                    Type = "SUB_WORKFLOW",
+                    WorkflowTaskType = WorkflowTaskType.SUB_WORKFLOW,
                     InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
                     SubWorkflowParam = new SubWorkflowParams { Name = _taskName, Version = _version },
                     Optional = _additionalParameters?.Optional == true

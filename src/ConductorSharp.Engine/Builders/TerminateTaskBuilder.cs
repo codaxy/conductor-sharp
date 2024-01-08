@@ -30,7 +30,7 @@ namespace ConductorSharp.Engine.Builders
                 {
                     Name = $"TERMINATE_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
-                    Type = "TERMINATE",
+                    WorkflowTaskType = WorkflowTaskType.TERMINATE,
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                 }
             ];

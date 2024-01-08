@@ -85,7 +85,7 @@ namespace ConductorSharp.Engine.Builders
                     Name = decisionTaskName,
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
-                    Type = "SWITCH",
+                    WorkflowTaskType = WorkflowTaskType.SWITCH,
                     Expression = "switch_case_value",
                     EvaluatorType = "value-param",
                     DecisionCases = new JObject

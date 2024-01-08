@@ -8,7 +8,6 @@
       "name": "TEST_subworkflow",
       "taskReferenceName": "test_subworkflow",
       "inputParameters": {},
-      "type": "SUB_WORKFLOW",
       "startDelay": 0,
       "subWorkflowParam": {
         "name": "TEST_subworkflow",
@@ -18,12 +17,12 @@
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "SUB_WORKFLOW"
     }
   ],
   "inputParameters": [],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

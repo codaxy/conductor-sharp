@@ -12,14 +12,13 @@
         "should_use_next": "${workflow.input.should_use_next}",
         "task_to_execute": "${workflow.input.task_name}"
       },
-      "type": "DYNAMIC",
       "dynamicTaskNameParam": "task_to_execute",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "DYNAMIC"
     }
   ],
   "inputParameters": [
@@ -29,7 +28,7 @@
     "should_use_next"
   ],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

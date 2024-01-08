@@ -1,40 +1,32 @@
-﻿using ConductorSharp.Engine.Health;
+﻿using ConductorSharp.Client.Generated;
+using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace ConductorSharp.Engine.Service
 {
-    internal class WorkflowEngineBackgroundService : IHostedService, IDisposable
+    internal class WorkflowEngineBackgroundService(
+        IConductorSharpHealthService healthService,
+        ILogger<WorkflowEngineBackgroundService> logger,
+        IHostApplicationLifetime hostApplicationLifetime,
+        IDeploymentService deploymentService,
+        ExecutionManager executionManager,
+        ModuleDeployment deployment
+        ) : IHostedService, IDisposable
     {
-        private readonly ILogger<WorkflowEngineBackgroundService> _logger;
-        private readonly IHostApplicationLifetime _hostApplicationLifetime;
-        private readonly IDeploymentService _deploymentService;
-        private readonly ExecutionManager _executionManager;
-        private readonly ModuleDeployment _deployment;
-        private readonly IConductorSharpHealthService _healthService;
+        private readonly ILogger<WorkflowEngineBackgroundService> _logger = logger;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime = hostApplicationLifetime;
+        private readonly IDeploymentService _deploymentService = deploymentService;
+        private readonly ExecutionManager _executionManager = executionManager;
+        private readonly ModuleDeployment _deployment = deployment;
+        private readonly IConductorSharpHealthService _healthService = healthService;
         private Task _executingTask;
         private readonly CancellationTokenSource _stoppingCts = new();
-
-        public WorkflowEngineBackgroundService(
-            IConductorSharpHealthService healthService,
-            ILogger<WorkflowEngineBackgroundService> logger,
-            IHostApplicationLifetime hostApplicationLifetime,
-            IDeploymentService deploymentService,
-            ExecutionManager executionManager,
-            ModuleDeployment deployment
-        )
-        {
-            _logger = logger;
-            _hostApplicationLifetime = hostApplicationLifetime;
-            _deploymentService = deploymentService;
-            _executionManager = executionManager;
-            _deployment = deployment;
-            _healthService = healthService;
-        }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -57,9 +49,15 @@ namespace ConductorSharp.Engine.Service
                 await _healthService.SetExecutionManagerRunning(cancellationToken);
                 await _executionManager.StartAsync(cancellationToken);
             }
+            catch (ApiException exception)
+            {
+                await _healthService.UnsetExecutionManagerRunning(cancellationToken);
+                _logger.LogCritical(exception, "Workflow Engine Background Service encountered an API error");
+                throw;
+            }
             catch (Exception exception)
             {
-                await _healthService.UnsetExecutionManagerRunning();
+                await _healthService.UnsetExecutionManagerRunning(cancellationToken);
                 _logger.LogCritical(exception, "Workflow Engine Background Service encountered an error");
                 throw;
             }

@@ -10,7 +10,6 @@
       "inputParameters": {
         "input_one": "${workflow.input.customer_id}"
       },
-      "type": "SUB_WORKFLOW",
       "startDelay": 0,
       "subWorkflowParam": {
         "name": "SCAFFOLDED_one",
@@ -20,7 +19,7 @@
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "SUB_WORKFLOW"
     },
     {
       "name": "SCAFFOLDED_two",
@@ -28,7 +27,6 @@
       "inputParameters": {
         "name": "${scaff_one.output.output_one}"
       },
-      "type": "SUB_WORKFLOW",
       "startDelay": 0,
       "subWorkflowParam": {
         "name": "SCAFFOLDED_two",
@@ -38,14 +36,14 @@
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "SUB_WORKFLOW"
     }
   ],
   "inputParameters": [
     "customer_id"
   ],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

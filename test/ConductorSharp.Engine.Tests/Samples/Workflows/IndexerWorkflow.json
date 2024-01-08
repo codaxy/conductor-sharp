@@ -11,7 +11,6 @@
         "customer_name": "${workflow.input.dictionary['test'].customer_name}",
         "address": "${workflow.input.double_dictionary['test']['address']}"
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -25,7 +24,7 @@
     "double_dictionary"
   ],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

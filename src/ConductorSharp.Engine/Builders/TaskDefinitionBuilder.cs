@@ -56,6 +56,7 @@ namespace ConductorSharp.Engine.Builders
                 UpdatedBy = options.UpdatedBy,
                 InputTemplate = (options.InputTemplate ?? []).ToObject<IDictionary<string, object>>(),
                 ExecutionNameSpace = options.ExecutionNameSpace,
+                BackoffScaleFactor = 1
             };
         }
     }

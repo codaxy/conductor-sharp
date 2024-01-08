@@ -29,7 +29,6 @@ namespace ConductorSharp.Engine.Builders
 
     public class DynamicTaskBuilder<I, O>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<DynamicTaskInput<I, O>, O>(taskExpression, inputExpression, buildConfiguration)
     {
-        private const string TaskType = "DYNAMIC";
         private const string DynamicTasknameParam = "task_to_execute";
 
         private class DynamicTaskParameters
@@ -52,7 +51,7 @@ namespace ConductorSharp.Engine.Builders
                 new() {
                     Name = _taskRefferenceName,
                     TaskReferenceName = _taskRefferenceName,
-                    Type = TaskType,
+                    WorkflowTaskType = WorkflowTaskType.DYNAMIC,
                     InputParameters = parameters.TaskInput.ToObject<IDictionary<string,object>>(),
                     DynamicTaskNameParam = DynamicTasknameParam,
                 }

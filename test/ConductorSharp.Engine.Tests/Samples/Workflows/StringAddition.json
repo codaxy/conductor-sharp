@@ -11,20 +11,19 @@
         "input": "1Str_2Str_${workflow.input.input}My input: ${workflow.input.input}string_addition1",
         "scriptExpression": ""
       },
-      "type": "LAMBDA",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "LAMBDA"
     }
   ],
   "inputParameters": [
     "input"
   ],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

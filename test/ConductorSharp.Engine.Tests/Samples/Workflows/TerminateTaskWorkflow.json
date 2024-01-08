@@ -10,7 +10,6 @@
       "inputParameters": {
         "case_value_param": "value"
       },
-      "type": "DECISION",
       "scriptExpression": "case_value_param",
       "decisionCases": {
         "value": [
@@ -23,13 +22,12 @@
               },
               "terminationStatus": "COMPLETED"
             },
-            "type": "TERMINATE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
             "asyncComplete": false,
             "retryCount": 0,
-            "workflowTaskType": "SIMPLE"
+            "workflowTaskType": "TERMINATE"
           }
         ]
       },
@@ -38,7 +36,7 @@
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "DECISION"
     },
     {
       "name": "SWITCH_switch_task",
@@ -46,7 +44,6 @@
       "inputParameters": {
         "switch_case_value": "value"
       },
-      "type": "SWITCH",
       "decisionCases": {
         "value": [
           {
@@ -58,13 +55,12 @@
               },
               "terminationStatus": "FAILED"
             },
-            "type": "TERMINATE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
             "asyncComplete": false,
             "retryCount": 0,
-            "workflowTaskType": "SIMPLE"
+            "workflowTaskType": "TERMINATE"
           }
         ]
       },
@@ -75,7 +71,7 @@
       "retryCount": 0,
       "evaluatorType": "value-param",
       "expression": "switch_case_value",
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "SWITCH"
     },
     {
       "name": "TERMINATE_terminate",
@@ -86,18 +82,17 @@
           "property": "Test"
         }
       },
-      "type": "TERMINATE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "TERMINATE"
     }
   ],
   "inputParameters": [],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

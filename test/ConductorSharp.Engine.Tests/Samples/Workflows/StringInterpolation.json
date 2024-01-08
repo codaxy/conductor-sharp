@@ -11,7 +11,6 @@
         "address": "${workflow.input.first_input},${workflow.input.second_input},Value,0",
         "name": "Workflow name: TEST_StringInterpolation"
       },
-      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -27,7 +26,7 @@
   "outputParameters": {
     "email_body": "${email_prepare.output.email_body}"
   },
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

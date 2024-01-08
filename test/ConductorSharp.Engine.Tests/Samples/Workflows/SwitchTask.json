@@ -10,7 +10,6 @@
       "inputParameters": {
         "switch_case_value": "test"
       },
-      "type": "SWITCH",
       "decisionCases": {
         "test": [
           {
@@ -19,7 +18,6 @@
             "inputParameters": {
               "customer_id": 1
             },
-            "type": "SIMPLE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
@@ -36,13 +34,12 @@
           "inputParameters": {
             "terminationStatus": "FAILED"
           },
-          "type": "TERMINATE",
           "startDelay": 0,
           "optional": false,
           "rateLimited": false,
           "asyncComplete": false,
           "retryCount": 0,
-          "workflowTaskType": "SIMPLE"
+          "workflowTaskType": "TERMINATE"
         }
       ],
       "startDelay": 0,
@@ -52,12 +49,12 @@
       "retryCount": 0,
       "evaluatorType": "value-param",
       "expression": "switch_case_value",
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "SWITCH"
     }
   ],
   "inputParameters": [],
   "outputParameters": {},
-  "schemaVersion": 0,
+  "schemaVersion": 2,
   "restartable": false,
   "workflowStatusListenerEnabled": false,
   "timeoutPolicy": "TIME_OUT_WF",

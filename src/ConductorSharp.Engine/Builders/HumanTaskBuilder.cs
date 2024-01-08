@@ -31,7 +31,7 @@ namespace ConductorSharp.Engine.Builders
                 {
                     Name = $"HUMAN_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
-                    Type = "HUMAN",
+                    WorkflowTaskType = WorkflowTaskType.HUMAN,
                     InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
                 }
             ];
