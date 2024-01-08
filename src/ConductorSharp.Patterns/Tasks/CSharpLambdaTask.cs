@@ -1,18 +1,14 @@
 ﻿using ConductorSharp.Client;
 using ConductorSharp.Engine.Builders;
-using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Patterns.Exceptions;
 using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,21 +29,16 @@ namespace ConductorSharp.Patterns.Tasks
     }
 
     [OriginalName(TaskName)]
-    internal class CSharpLambdaTask : ITaskRequestHandler<CSharpLambdaTaskInput, object>
+    internal class CSharpLambdaTask(WorkflowBuildItemRegistry itemRegistry) : ITaskRequestHandler<CSharpLambdaTaskInput, object>
     {
         public const string TaskName = "CSHRP_inln_lmbd";
         public const string LambdaTaskNameConfigurationProperty = nameof(LambdaTaskNameConfigurationProperty);
 
-        private readonly WorkflowBuildItemRegistry _itemRegistry;
-
-        public CSharpLambdaTask(WorkflowBuildItemRegistry itemRegistry) => _itemRegistry = itemRegistry;
+        private readonly WorkflowBuildItemRegistry _itemRegistry = itemRegistry;
 
         public Task<object> Handle(CSharpLambdaTaskInput request, CancellationToken cancellationToken)
         {
-            var lambda = _itemRegistry.GetAll<CSharpLambdaHandler>().FirstOrDefault(lambda => lambda.LambdaIdentifier == request.LambdaIdentifier);
-            if (lambda == null)
-                throw new NoLambdaException(request.LambdaIdentifier);
-
+            var lambda = _itemRegistry.GetAll<CSharpLambdaHandler>().FirstOrDefault(lambda => lambda.LambdaIdentifier == request.LambdaIdentifier) ?? throw new NoLambdaException(request.LambdaIdentifier);
             try
             {
                 return Task.FromResult(

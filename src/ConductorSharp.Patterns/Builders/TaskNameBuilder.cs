@@ -7,11 +7,9 @@ using System.Linq;
 
 namespace ConductorSharp.Patterns.Builders
 {
-    internal class TaskNameBuilder : DefaultTaskNameBuilder
+    internal class TaskNameBuilder(IEnumerable<ConfigurationProperty> configurationProperties) : DefaultTaskNameBuilder
     {
-        private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
-
-        public TaskNameBuilder(IEnumerable<ConfigurationProperty> configurationProperties) => _configurationProperties = configurationProperties;
+        private readonly IEnumerable<ConfigurationProperty> _configurationProperties = configurationProperties;
 
         public override string Build(Type taskType) =>
             taskType == typeof(CSharpLambdaTask) ? $"{GetLambdaTaskPrefix()}{base.Build(taskType)}" : base.Build(taskType);

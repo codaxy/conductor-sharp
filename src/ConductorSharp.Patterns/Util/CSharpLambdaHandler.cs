@@ -2,17 +2,10 @@
 
 namespace ConductorSharp.Engine.Util
 {
-    internal class CSharpLambdaHandler
+    internal class CSharpLambdaHandler(string lambdaIdentifier, Type taskInputType, Delegate handler)
     {
-        public string LambdaIdentifier { get; }
-        public Type TaskInputType { get; }
-        public Delegate Handler { get; }
-
-        public CSharpLambdaHandler(string lambdaIdentifier, Type taskInputType, Delegate handler)
-        {
-            LambdaIdentifier = lambdaIdentifier;
-            TaskInputType = taskInputType;
-            Handler = handler;
-        }
+        public string LambdaIdentifier { get; } = lambdaIdentifier;
+        public Type TaskInputType { get; } = taskInputType;
+        public Delegate Handler { get; } = handler;
     }
 }
