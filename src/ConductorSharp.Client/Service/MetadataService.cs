@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using ConductorSharp.Client.Generated;
-using Task = System.Threading.Tasks.Task;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Client.Service
 {

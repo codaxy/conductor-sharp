@@ -1,14 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using ConductorSharp.Client.Generated;
-using Task = System.Threading.Tasks.Task;
+﻿using ConductorSharp.Client.Generated;
+using EventHandler = ConductorSharp.Client.Generated.EventHandler;
 
 namespace ConductorSharp.Client.Service
 {
     public class EventService(ConductorClient client) : IEventService
     {
-        public async Task<ICollection<EventHandler>> ListAsync(CancellationToken cancellationToken = default)
+        public async Task<ICollection<Generated.EventHandler>> ListAsync(CancellationToken cancellationToken = default)
             => await client.GetEventHandlersAsync(cancellationToken);
 
         public async Task UpdateAsync(EventHandler eventHandler, CancellationToken cancellationToken = default)

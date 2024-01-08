@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using ConductorSharp.Client.Generated;
-using Task = ConductorSharp.Client.Generated.Task;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Client.Service
 {
@@ -15,7 +11,7 @@ namespace ConductorSharp.Client.Service
             CancellationToken cancellationToken = default)
             => await client.VerifyAndRepairWorkflowConsistencyAsync(workflowId, cancellationToken);
 
-        public async Task<ICollection<Task>> GetPendingTasks(string taskType, int? start, int? count,
+        public async Task<ICollection<ConductorSharp.Client.Generated.Task>> GetPendingTasks(string taskType, int? start, int? count,
             CancellationToken cancellationToken = default)
             => await client.ViewAsync(taskType, start, count, cancellationToken);
 

@@ -20,7 +20,7 @@ namespace ConductorSharp.Client.Service
         /// <summary>
         /// Publish a message in queue to mark a wait task as completed.
         /// </summary>
-        System.Threading.Tasks.Task MarkWaitTaskAsAsync(
+        Task MarkWaitTaskAsAsync(
             string workflowid,
             string taskRefName,
             Status status,
@@ -31,7 +31,7 @@ namespace ConductorSharp.Client.Service
         /// <summary>
         /// Publish a message in queue to mark a wait task (by taskId) as completed.
         /// </summary>
-        System.Threading.Tasks.Task MarkWaitTaskByTaskIdAsAsync(
+        Task MarkWaitTaskByTaskIdAsAsync(
             string workflowId,
             string taskId,
             Status2 status,
