@@ -1,6 +1,5 @@
 ﻿using ConductorSharp.Client;
-using ConductorSharp.Client.Model.Response;
-using ConductorSharp.Client.Service;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Polling;
@@ -13,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace ConductorSharp.Engine
 {
@@ -21,7 +21,7 @@ namespace ConductorSharp.Engine
         private readonly SemaphoreSlim _semaphore;
         private readonly WorkerSetConfig _configuration;
         private readonly ILogger<ExecutionManager> _logger;
-        private readonly ITaskService _taskManager;
+        private readonly ConductorClient _taskManager;
         private readonly IEnumerable<TaskToWorker> _registeredWorkers;
         private readonly IServiceScopeFactory _lifetimeScopeFactory;
         private readonly IPollTimingStrategy _pollTimingStrategy;
@@ -30,7 +30,7 @@ namespace ConductorSharp.Engine
         public ExecutionManager(
             WorkerSetConfig options,
             ILogger<ExecutionManager> logger,
-            ITaskService taskService,
+            ConductorClient taskService,
             IEnumerable<TaskToWorker> workerMappings,
             IServiceScopeFactory lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
@@ -53,7 +53,7 @@ namespace ConductorSharp.Engine
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var queuedTasks = (await _taskManager.GetAllQueues())
+                var queuedTasks = (await _taskManager.all)
                     .Where(a => _registeredWorkers.Any(b => b.TaskName == a.Key) && a.Value > 0)
                     .ToDictionary(a => a.Key, a => a.Value);
 

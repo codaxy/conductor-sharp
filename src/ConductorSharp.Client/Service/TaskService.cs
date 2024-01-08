@@ -1,124 +1,55 @@
-﻿using ConductorSharp.Client.Model.Request;
-using ConductorSharp.Client.Model.Response;
-using ConductorSharp.Client.Util;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using static ConductorSharp.Client.Model.Request.UpdateTaskRequest;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Client.Service
 {
-    public class TaskService : ITaskService
+    public class TaskService(ConductorClient client) : ITaskService
     {
-        private readonly IConductorClient _client;
+        private readonly ConductorClient _client = client;
 
-        public TaskService(IConductorClient client) => _client = client;
+        public async Task<string> UpdateAsync(TaskResult updateRequest, CancellationToken cancellationToken = default)
+            => await _client.UpdateTaskAsync(updateRequest, cancellationToken);
 
-        public async Task<PollTaskResponse[]> PollBatch(string name, string workerId, int count, int timeout) =>
-            (
-                await _client.ExecuteRequestAsync<List<PollTaskResponse>>(ApiUrls.BatchPollTasks(name, workerId, count, timeout), HttpMethod.Get)
-            ).ToArray();
+        public async Task<ICollection<TaskExecLog>> GetLogsAsync(string taskId, CancellationToken cancellationToken = default)
+            => await _client.GetTaskLogsAsync(taskId, cancellationToken);
 
-        public async Task<PollTaskResponse[]> PollBatch(string name, string workerId, int count, int timeout, string domain) =>
-            (
-                await _client.ExecuteRequestAsync<List<PollTaskResponse>>(
-                    ApiUrls.BatchPollTasks(name, workerId, count, timeout, domain),
-                    HttpMethod.Get
-                )
-            ).ToArray();
+        public async Task LogAsync(string taskId, string message, CancellationToken cancellationToken = default)
+            => await _client.LogAsync(taskId, message, cancellationToken);
 
-        public async Task<ExternalStorageResponse> FetchExternalStorageLocation(string name) =>
-            await _client.ExecuteRequestAsync<ExternalStorageResponse>(ApiUrls.FetchExternalStorageLocation(name), HttpMethod.Get);
+        public async Task<string> RequeuePendingAsync(string taskType, CancellationToken cancellationToken = default)
+          => await _client.RequeuePendingTaskAsync(taskType, cancellationToken);
 
-        // TODO: Check if this is actually relative url
-        public async Task<JObject> FetchExternalStorage(string filename) =>
-            await _client.ExecuteRequestAsync<JObject>(ApiUrls.GetExternalStorage(filename), HttpMethod.Get);
+        public async Task<ConductorSharp.Client.Generated.Task> GetAsync(string taskId, CancellationToken cancellationToken = default)
+          => await _client.GetTaskAsync(taskId, cancellationToken);
 
-        private async Task UpdateTask(UpdateTaskRequest data) => await _client.ExecuteRequestAsync(ApiUrls.UpdateTask(), HttpMethod.Post, data);
+        public async Task<SearchResultTaskSummary> SearchAsync(int? start = null, int? size = null, string? sort = null, string? freeText = null, string? query = null, CancellationToken cancellationToken = default)
+            => await _client.Search_1Async(start, size, sort, freeText, query, cancellationToken);
 
-        public async Task<JObject> TaskSearch(int size, string query) =>
-            await _client.ExecuteRequestAsync<JObject>(ApiUrls.SearchTask(size, query), HttpMethod.Get);
+        public async Task<SearchResultTask> SearchV2Async(int? start = null, int? size = null, string? sort = null, string? freeText = null, string? query = null, CancellationToken cancellationToken = default)
+            => await _client.SearchV2_1Async(start, size, sort, freeText, query, cancellationToken);
 
-        public async Task<IDictionary<string, int>> GetQueue(string name) =>
-            await _client.ExecuteRequestAsync<IDictionary<string, int>>(ApiUrls.GetTaskQueue(name), HttpMethod.Get);
+        public async Task<int> GetQueueAsync(string taskType, string? domain = null, string? isolationGroupId = null, string? executionNamespace = null, CancellationToken cancellationToken = default)
+            => await _client.TaskDepthAsync(taskType, domain, isolationGroupId, executionNamespace, cancellationToken);
 
-        public async Task<IDictionary<string, int>> GetAllQueues() =>
-            await _client.ExecuteRequestAsync<IDictionary<string, int>>(ApiUrls.GetAllQueues(), HttpMethod.Get);
+        public async Task<ICollection<PollData>> GetPollDataAsync(string taskType, CancellationToken cancellationToken = default)
+            => await _client.GetPollDataAsync(taskType, cancellationToken);
 
-        public Task UpdateTaskCompleted(object outputData, string taskId, string workflowId) =>
-            UpdateTask(
-                new UpdateTaskRequest
-                {
-                    Status = "COMPLETED",
-                    OutputData = JObject.FromObject(outputData, ConductorConstants.IoJsonSerializer),
-                    TaskId = taskId,
-                    WorkflowInstanceId = workflowId
-                }
-            );
+        public async Task<ICollection<PollData>> ListPollDataAsync(CancellationToken cancellationToken = default)
+            => await _client.GetAllPollDataAsync(cancellationToken);
 
-        public Task UpdateTaskFailed(string taskId, string workflowId, string reasonForIncompletion) =>
-            UpdateTask(
-                new UpdateTaskRequest
-                {
-                    Status = "FAILED",
-                    TaskId = taskId,
-                    WorkflowInstanceId = workflowId,
-                    ReasonForIncompletion = reasonForIncompletion,
-                    Logs = new List<LogData>
-                    {
-                        new LogData { Log = reasonForIncompletion, CreatedTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() }
-                    }
-                }
-            );
+        public async Task<IDictionary<string, long>> ListQueuesAsync(CancellationToken cancellationToken = default)
+            => await _client.AllAsync(cancellationToken);
 
-        public Task UpdateTaskFailed(string taskId, string workflowId, string reasonForIncompletion, string logMessage) =>
-            UpdateTask(
-                new UpdateTaskRequest
-                {
-                    Status = "FAILED",
-                    TaskId = taskId,
-                    WorkflowInstanceId = workflowId,
-                    ReasonForIncompletion = reasonForIncompletion,
-                    Logs = new List<LogData>
-                    {
-                        new LogData { Log = reasonForIncompletion, CreatedTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() },
-                        new LogData { Log = logMessage, CreatedTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() }
-                    }
-                }
-            );
+        public async Task<IDictionary<string, IDictionary<string, IDictionary<string, long>>>> ListQueuesVerboseAsync(CancellationToken cancellationToken = default)
+          => await _client.AllVerboseAsync(cancellationToken);
 
-        public async Task<PollTaskResponse> PollTasks(string name, string workerId) =>
-            await _client.ExecuteRequestAsync<PollTaskResponse>(ApiUrls.PollTasks(name, workerId), HttpMethod.Get);
+        public async Task<Generated.Task> PollAsync(string taskType, string? workerId, string? domain, CancellationToken cancellationToken = default)
+         => await _client.PollAsync(taskType, workerId, domain, cancellationToken);
 
-        public async Task<PollTaskResponse> PollTasks(string name, string workerId, string domain) =>
-            await _client.ExecuteRequestAsync<PollTaskResponse>(ApiUrls.PollTasks(name, workerId, domain), HttpMethod.Get);
+        public async Task<ICollection<Generated.Task>> BatchPollAsync(string taskType, string? workerId, string? domain, int? count = null, int? timeout = null, CancellationToken cancellationToken = default)
+            => await _client.BatchPollAsync(taskType, workerId, domain, count, timeout, cancellationToken);
 
-        public async Task<PollDataResponse[]> PollTaskQueueData(string taskType) =>
-            await _client.ExecuteRequestAsync<PollDataResponse[]>(ApiUrls.PollTaskQueueData(taskType), HttpMethod.Get);
+        public async Task<ExternalStorageLocation> GetExternalStorageLocationAsync(string path, string operation, string payloadType, CancellationToken cancellationToken = default)
+          => await _client.GetExternalStorageLocation_1Async(path, operation, payloadType, cancellationToken);
 
-        public async Task<PollDataResponse[]> PollAllTasksQueueData() =>
-            await _client.ExecuteRequestAsync<PollDataResponse[]>(ApiUrls.PollAllTasksQueueData(), HttpMethod.Get);
-
-        public Task<GetTaskLogsResponse[]> GetLogsForTask(string taskId) =>
-            _client.ExecuteRequestAsync<GetTaskLogsResponse[]>(ApiUrls.GetLogsForTask(taskId), HttpMethod.Get);
-
-        public Task UpdateTaskFailed(object outputData, string taskId, string workflowId, string reasonForIncompletion, string logMessage) =>
-            UpdateTask(
-                new UpdateTaskRequest
-                {
-                    Status = "FAILED",
-                    TaskId = taskId,
-                    OutputData = JObject.FromObject(outputData, ConductorConstants.IoJsonSerializer),
-                    WorkflowInstanceId = workflowId,
-                    ReasonForIncompletion = reasonForIncompletion,
-                    Logs = new List<LogData>
-                    {
-                        new LogData { Log = reasonForIncompletion, CreatedTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() },
-                        new LogData { Log = logMessage, CreatedTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() }
-                    }
-                }
-            );
     }
 }

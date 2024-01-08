@@ -6,8 +6,6 @@ namespace ConductorSharp.Client
 {
     public static class ConductorConstants
     {
-        public static string SimpleTask => "SIMPLE";
-
         public static NamingStrategy IoNamingStrategy { get; } = new SnakeCaseNamingStrategy();
 
         public static JsonSerializer IoJsonSerializer
