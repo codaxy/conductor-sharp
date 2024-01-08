@@ -1,10 +1,11 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
@@ -34,19 +35,19 @@ namespace ConductorSharp.Engine.Builders
         public LambdaTaskBuilder(string script, Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
             : base(taskExpression, inputExpression, buildConfiguration) => _script = script;
 
-        public override WorkflowDefinition.Task[] Build()
+        public override WorkflowTask[] Build()
         {
             _inputParameters.Add(new JProperty("scriptExpression", _script));
-            return new WorkflowDefinition.Task[]
-            {
-                new WorkflowDefinition.Task
+            return
+                [
+                new()
                 {
                     Name = $"LAMBDA_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
                     Type = "LAMBDA",
-                    InputParameters = _inputParameters
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>()
                 }
-            };
+            ];
         }
     }
 }

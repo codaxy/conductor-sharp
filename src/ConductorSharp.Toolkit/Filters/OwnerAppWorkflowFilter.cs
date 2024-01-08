@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Toolkit.Filters
 {
@@ -8,7 +8,7 @@ namespace ConductorSharp.Toolkit.Filters
 
         public OwnerAppWorkflowFilter(IEnumerable<string> ownerApps) => _ownerApps = ownerApps.ToArray();
 
-        public bool Test(WorkflowDefinition workflowDefinition) =>
+        public bool Test(WorkflowDef workflowDefinition) =>
             workflowDefinition.OwnerApp != null && _ownerApps.Any(app => app == workflowDefinition.OwnerApp);
     }
 }

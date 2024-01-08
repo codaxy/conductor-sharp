@@ -1,12 +1,10 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -29,16 +27,15 @@ namespace ConductorSharp.Engine.Builders
         public TerminateTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
             : base(taskExpression, inputExpression, buildConfiguration) { }
 
-        public override WorkflowDefinition.Task[] Build() =>
-            new[]
-            {
-                new WorkflowDefinition.Task
+        public override WorkflowTask[] Build() =>
+            [
+                new()
                 {
                     Name = $"TERMINATE_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
                     Type = "TERMINATE",
-                    InputParameters = _inputParameters,
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                 }
-            };
+            ];
     }
 }

@@ -1,11 +1,9 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -58,7 +56,7 @@ namespace ConductorSharp.Engine.Builders
 
         private void GenerateWorkflowName() => BuildContext.WorkflowName = NamingUtil.DetermineRegistrationName(_workflowType);
 
-        public WorkflowDefinition Build()
+        public WorkflowDef Build()
         {
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
@@ -83,7 +81,7 @@ namespace ConductorSharp.Engine.Builders
                 BuildContext.Inputs.Add(propertyName);
             }
 
-            return new WorkflowDefinition
+            return new WorkflowDef
             {
                 Name = BuildContext.WorkflowName,
                 Tasks = _taskBuilders.SelectMany(a => a.Build()).ToList(),
@@ -93,7 +91,7 @@ namespace ConductorSharp.Engine.Builders
                         : null,
                 Description = BuildContext.WorkflowOptions.Description,
                 InputParameters = BuildContext.Inputs.ToArray(),
-                OutputParameters = BuildContext.Outputs,
+                OutputParameters = (BuildContext.Outputs ?? new Newtonsoft.Json.Linq.JObject()).ToObject<IDictionary<string, object>>(),
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
                 OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
                 Version = BuildContext.WorkflowOptions.Version

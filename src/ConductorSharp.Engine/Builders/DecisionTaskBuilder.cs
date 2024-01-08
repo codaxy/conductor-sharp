@@ -113,8 +113,7 @@ namespace ConductorSharp.Engine.Builders
             // Handle default case
             if (_currentCaseName == null)
             {
-                if (_defaultCase == null)
-                    _defaultCase = new();
+                _defaultCase ??= [];
 
                 _defaultCase.Add(builder);
                 return;

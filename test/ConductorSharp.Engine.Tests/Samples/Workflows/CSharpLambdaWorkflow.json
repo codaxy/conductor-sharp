@@ -1,64 +1,35 @@
 {
-  "ownerApp": null,
   "createTime": 0,
   "updateTime": 0,
-  "createdBy": null,
-  "updatedBy": null,
   "name": "c_sharp_lambda_workflow",
-  "description": null,
   "version": 1,
   "tasks": [
     {
-      "queryExpression": null,
       "name": "TEST.CSHRP_inln_lmbd",
       "taskReferenceName": "first_lambda_task",
-      "description": null,
       "inputParameters": {
         "lambda_identifier": "c_sharp_lambda_workflow.first_lambda_task",
         "task_input": {
           "lambda_input": "${workflow.input.input}"
         }
       },
-      "type": "SIMPLE",
-      "dynamicTaskNameParam": null,
-      "caseValueParam": null,
-      "caseExpression": null,
-      "expression": null,
-      "evaluatorType": null,
-      "scriptExpression": null,
-      "decisionCases": null,
-      "dynamicForkJoinTasksParam": null,
-      "dynamicForkTasksParam": null,
-      "dynamicForkTasksInputParamName": null,
-      "defaultCase": null,
-      "forkTasks": null,
       "startDelay": 0,
-      "subWorkflowParam": null,
-      "joinOn": null,
-      "sink": null,
       "optional": false,
-      "taskDefinition": null,
       "rateLimited": false,
-      "defaultExclusiveJoinTask": null,
       "asyncComplete": false,
-      "loopCondition": null,
-      "loopOver": null
+      "retryCount": 0,
+      "workflowTaskType": "SIMPLE"
     },
     {
-      "queryExpression": null,
       "name": "DECISION_decision_task",
       "taskReferenceName": "decision_task",
-      "description": null,
       "inputParameters": {
         "case_value_param": "${workflow.input.operation}"
       },
       "type": "DECISION",
-      "dynamicTaskNameParam": null,
       "caseValueParam": "case_value_param",
-      "caseExpression": null,
-      "expression": null,
-      "evaluatorType": null,
-      "scriptExpression": null,
+      "caseExpression": "case_value_param",
+      "scriptExpression": "case_value_param",
       "decisionCases": {
         "upper": [
           {
@@ -70,11 +41,12 @@
                 "lambda_input": "${workflow.input.input}"
               }
             },
-            "type": "SIMPLE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
-            "asyncComplete": false
+            "asyncComplete": false,
+            "retryCount": 0,
+            "workflowTaskType": "SIMPLE"
           }
         ],
         "lower": [
@@ -87,43 +59,32 @@
                 "lambda_input": "${workflow.input.input}"
               }
             },
-            "type": "SIMPLE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
-            "asyncComplete": false
+            "asyncComplete": false,
+            "retryCount": 0,
+            "workflowTaskType": "SIMPLE"
           }
         ]
       },
-      "dynamicForkJoinTasksParam": null,
-      "dynamicForkTasksParam": null,
-      "dynamicForkTasksInputParamName": null,
-      "defaultCase": null,
-      "forkTasks": null,
       "startDelay": 0,
-      "subWorkflowParam": null,
-      "joinOn": null,
-      "sink": null,
       "optional": false,
-      "taskDefinition": null,
       "rateLimited": false,
-      "defaultExclusiveJoinTask": null,
       "asyncComplete": false,
-      "loopCondition": null,
-      "loopOver": null
+      "retryCount": 0,
+      "workflowTaskType": "SIMPLE"
     }
   ],
   "inputParameters": [
     "operation",
     "input"
   ],
-  "outputParameters": null,
-  "failureWorkflow": null,
-  "schemaVersion": 2,
-  "restartable": true,
-  "workflowStatusListenerEnabled": true,
+  "outputParameters": {},
+  "schemaVersion": 0,
+  "restartable": false,
+  "workflowStatusListenerEnabled": false,
   "ownerEmail": "test@test.com",
-  "timeoutPolicy": null,
-  "timeoutSeconds": 0,
-  "variables": null
+  "timeoutPolicy": "TIME_OUT_WF",
+  "timeoutSeconds": 0
 }

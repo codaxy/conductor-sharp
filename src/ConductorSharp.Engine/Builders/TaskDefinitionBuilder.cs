@@ -1,16 +1,11 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using ConductorSharp.Client;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -25,9 +20,9 @@ namespace ConductorSharp.Engine.Builders
             _taskNameBuilder = taskNameBuilder;
         }
 
-        public TaskDefinition Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
+        public TaskDef Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
 
-        public TaskDefinition Build(Type taskType, Action<TaskDefinitionOptions> updateOptions = null)
+        public TaskDef Build(Type taskType, Action<TaskDefinitionOptions> updateOptions = null)
         {
             var options = new TaskDefinitionOptions();
 
@@ -45,7 +40,7 @@ namespace ConductorSharp.Engine.Builders
 
             var originalName = _taskNameBuilder.Build(taskType);
 
-            return new TaskDefinition
+            return new TaskDef
             {
                 OwnerApp = BuildConfiguration.DefaultOwnerApp ?? options.OwnerApp,
                 Name = originalName,
@@ -65,7 +60,7 @@ namespace ConductorSharp.Engine.Builders
                 PollTimeoutSeconds = options.PollTimeoutSeconds,
                 CreatedBy = options.CreatedBy,
                 UpdatedBy = options.UpdatedBy,
-                InputTemplate = options.InputTemplate,
+                InputTemplate = (options.InputTemplate ?? new Newtonsoft.Json.Linq.JObject()).ToObject<IDictionary<string, object>>(),
                 ExecutionNameSpace = options.ExecutionNameSpace,
             };
         }

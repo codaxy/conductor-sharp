@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
@@ -9,6 +9,7 @@ using ConductorSharp.Patterns.Tasks;
 using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -70,11 +71,11 @@ namespace ConductorSharp.Patterns.Builders
             _lambdaTaskNamePrefix = lambdaTaskNamePrefix;
         }
 
-        public override WorkflowDefinition.Task[] Build()
+        public override WorkflowTask[] Build()
         {
-            return new[]
-            {
-                new WorkflowDefinition.Task
+            return 
+            [
+                new()
                 {
                     Name = $"{_lambdaTaskNamePrefix}{CSharpLambdaTask.TaskName}",
                     TaskReferenceName = _taskRefferenceName,
@@ -82,10 +83,10 @@ namespace ConductorSharp.Patterns.Builders
                     {
                         new JProperty(CSharpLambdaTaskInput.LambdaIdenfitierParamName, LambdaIdentifer),
                         new JProperty(CSharpLambdaTaskInput.TaskInputParamName, _inputParameters)
-                    },
+                    }.ToObject<IDictionary<string,object>>(),
                     Optional = _additionalParameters.Optional
                 }
-            };
+            ];
         }
     }
 }

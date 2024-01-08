@@ -1,3 +1,4 @@
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
@@ -246,7 +247,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         private string GetDefinitionFromWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
         {
             var workflow = RegisterWorkflow<TWorkflow>()
-                .GetRequiredService<IEnumerable<WorkflowDefinition>>()
+                .GetRequiredService<IEnumerable<WorkflowDef>>()
                 .First(a => a.Name == NamingUtil.NameOf<TWorkflow>());
 
             return SerializationUtil.SerializeObject(workflow);
@@ -257,7 +258,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             var containerBuilder = new ServiceCollection();
 
             containerBuilder
-                .AddConductorSharp("example.com", "api", false)
+                .AddConductorSharp("example.com/api")
                 .AddExecutionManager(10, 100, 100, null, typeof(WorkflowBuilderTests).Assembly)
                 .AddPipelines(pipelines =>
                 {

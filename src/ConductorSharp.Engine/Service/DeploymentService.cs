@@ -24,12 +24,12 @@ namespace ConductorSharp.Engine.Service
             _logger.LogInformation("Deploying conductor definitions");
 
             if (deployment.TaskDefinitions.Count > 0)
-                await _metadataService.CreateTaskDefinitions(deployment.TaskDefinitions);
+                await _metadataService.RegisterTasksAsync(deployment.TaskDefinitions);
 
             _logger.LogDebug("Registered {registeredTasksCount} tasks", deployment.TaskDefinitions.Count);
 
             if (deployment.WorkflowDefinitions.Count > 0)
-                await _metadataService.CreateWorkflowDefinitions(deployment.WorkflowDefinitions);
+                await _metadataService.UpdateWorkflowsAsync(deployment.WorkflowDefinitions);
 
             _logger.LogDebug("Registered {registeredWorkflowsCount} workflows ", deployment.WorkflowDefinitions.Count);
 
@@ -46,18 +46,18 @@ namespace ConductorSharp.Engine.Service
         {
             foreach (var definition in deployment.TaskDefinitions)
             {
-                var oldDefinition = await _metadataService.GetTaskDefinition(definition.Name);
+                var oldDefinition = await _metadataService.GetTaskDefAsync(definition.Name);
 
                 if (oldDefinition?.Name != null)
-                    await _metadataService.DeleteTaskDefinition(definition.Name);
+                    await _metadataService.DeleteTaskDefAsync(definition.Name);
             }
 
             foreach (var definition in deployment.WorkflowDefinitions)
             {
-                var oldDefinition = await _metadataService.GetWorkflowDefinition(definition.Name, definition.Version);
+                var oldDefinition = await _metadataService.GetWorkflowAsync(definition.Name, definition.Version);
 
                 if (oldDefinition?.Name != null)
-                    await _metadataService.DeleteWorkflowDefinition(definition.Name, definition.Version);
+                    await _metadataService.DeleteWorkflowAsync(definition.Name, definition.Version);
             }
         }
     }

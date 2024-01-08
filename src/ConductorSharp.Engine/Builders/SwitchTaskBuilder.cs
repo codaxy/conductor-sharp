@@ -1,10 +1,9 @@
 ﻿using ConductorSharp.Client;
-using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -83,17 +82,17 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
-        public override WorkflowDefinition.Task[] Build()
+        public override WorkflowTask[] Build()
         {
             var decisionTaskName = $"SWITCH_{_taskRefferenceName}";
 
-            return new WorkflowDefinition.Task[]
-            {
-                new WorkflowDefinition.Task
+            return
+            [
+                new()
                 {
                     Name = decisionTaskName,
                     TaskReferenceName = _taskRefferenceName,
-                    InputParameters = _inputParameters,
+                    InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
                     Type = "SWITCH",
                     Expression = "switch_case_value",
                     EvaluatorType = "value-param",
@@ -102,13 +101,11 @@ namespace ConductorSharp.Engine.Builders
                         _caseDictionary.Select(
                             a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(b => b.Build()), ConductorConstants.DefinitionsSerializer))
                         )
-                    },
+                    }.ToObject<IDictionary<string, ICollection<WorkflowTask>>>(),
                     DefaultCase = _defaultCase
-                        ?.SelectMany(builder => builder.Build())
-                        .Select(task => JObject.FromObject(task, ConductorConstants.DefinitionsSerializer))
-                        .ToList()
+                        ?.SelectMany(builder => builder.Build()).ToArray()
                 }
-            };
+            ];
         }
 
         public void AddTaskBuilderToSequence(ITaskBuilder builder)
@@ -116,8 +113,7 @@ namespace ConductorSharp.Engine.Builders
             // Handle default case
             if (_currentCaseName == null)
             {
-                if (_defaultCase == null)
-                    _defaultCase = new();
+                _defaultCase ??= [];
 
                 _defaultCase.Add(builder);
                 return;

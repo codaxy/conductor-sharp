@@ -1,11 +1,11 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
-using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -34,21 +34,20 @@ namespace ConductorSharp.Engine.Builders
         public SubWorkflowTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
             : base(taskExpression, inputExpression, buildConfiguration) => _version = GetVersion(taskExpression);
 
-        public override WorkflowDefinition.Task[] Build() =>
-            new WorkflowDefinition.Task[]
-            {
-                new WorkflowDefinition.Task
+        public override WorkflowTask[] Build() =>
+            [
+                new()
                 {
                     Name = _taskName,
                     TaskReferenceName = _taskRefferenceName,
                     Type = "SUB_WORKFLOW",
-                    InputParameters = _inputParameters,
-                    SubWorkflowParam = new WorkflowDefinition.SubWorkflowParam { Name = _taskName, Version = _version },
+                    InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
+                    SubWorkflowParam = new SubWorkflowParams { Name = _taskName, Version = _version },
                     Optional = _additionalParameters?.Optional == true
                 }
-            };
+            ];
 
-        private int GetVersion(Expression taskExpression)
+        private static int GetVersion(Expression taskExpression)
         {
             var type = ExpressionUtil.ParseToType(taskExpression);
             return type.GetCustomAttribute<VersionAttribute>()?.Version ?? 1;

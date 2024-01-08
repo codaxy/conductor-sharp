@@ -1,9 +1,10 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
@@ -38,16 +39,16 @@ namespace ConductorSharp.Engine.Builders
             _inputParameters.Add("queryExpression", queryExpressionValue);
         }
 
-        public override WorkflowDefinition.Task[] Build() =>
-            new WorkflowDefinition.Task[]
-            {
-                new WorkflowDefinition.Task
+        public override WorkflowTask[] Build() =>
+
+            [
+                new()
                 {
                     Name = _taskName,
                     TaskReferenceName = _taskRefferenceName,
                     Type = "JSON_JQ_TRANSFORM",
-                    InputParameters = _inputParameters
+                    InputParameters = _inputParameters.ToObject<IDictionary<string,object>>()
                 }
-            };
+            ];
     }
 }

@@ -32,7 +32,7 @@ namespace ConductorSharp.Patterns.Tasks
 
     public class ReadWorkflowTasksResponse
     {
-        public Dictionary<string, ConductorSharp.Client.Model.Response.TaskStatusResponse> Tasks { get; set; }
+        public Dictionary<string, ConductorSharp.Client.Generated.Task> Tasks { get; set; }
         public WorkflowDetails Workflow { get; set; }
     }
 
@@ -64,24 +64,20 @@ namespace ConductorSharp.Patterns.Tasks
 
             var tasknames = input.TaskNames.Split(",").Where(a => !string.IsNullOrEmpty(a)).ToList();
 
-            var starterWorkflow = await _workflowService.GetWorkflowStatus(input.WorkflowId);
+            var starterWorkflow = await _workflowService.GetExecutionStatusAsync(input.WorkflowId, cancellationToken: cancellationToken);
 
             if (starterWorkflow == null)
                 throw new Exception($"Could not find starter workflow by id {input.WorkflowId}");
 
             var output = new ReadWorkflowTasksResponse
             {
-                Workflow = new WorkflowDetails { InputData = starterWorkflow.Input },
-                Tasks = new Dictionary<string, ConductorSharp.Client.Model.Response.TaskStatusResponse>()
+                Workflow = new WorkflowDetails { InputData = JObject.FromObject(starterWorkflow.Input) },
+                Tasks = new Dictionary<string, Client.Generated.Task>()
             };
 
             foreach (var task in tasknames)
             {
-                output.Tasks.Add(
-                    task,
-                    starterWorkflow.Tasks.FirstOrDefault(a => a.ReferenceTaskName == task)
-                        ?? new ConductorSharp.Client.Model.Response.TaskStatusResponse()
-                );
+                output.Tasks.Add(task, starterWorkflow.Tasks.FirstOrDefault(a => a.ReferenceTaskName == task) ?? new Client.Generated.Task());
             }
 
             return output;

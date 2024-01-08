@@ -1,9 +1,9 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Toolkit.Filters
 {
     public interface ITaskFilter
     {
-        bool Test(TaskDefinition taskDefinition);
+        bool Test(TaskDef taskDefinition);
     }
 }

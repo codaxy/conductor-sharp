@@ -1,9 +1,9 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
@@ -27,16 +27,15 @@ namespace ConductorSharp.Engine.Builders
         public WaitTaskBuilder(Expression taskExpression, Expression memberExpression, BuildConfiguration buildConfiguration)
             : base(taskExpression, memberExpression, buildConfiguration) { }
 
-        public override WorkflowDefinition.Task[] Build() =>
-            new[]
-            {
-                new WorkflowDefinition.Task
+        public override WorkflowTask[] Build() =>
+            [
+                new()
                 {
                     Name = $"WAIT_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
                     Type = "WAIT",
-                    InputParameters = _inputParameters
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>()
                 }
-            };
+            ];
     }
 }

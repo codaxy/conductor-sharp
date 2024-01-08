@@ -1,18 +1,12 @@
 {
-  "ownerApp": null,
   "createTime": 0,
   "updateTime": 0,
-  "createdBy": null,
-  "updatedBy": null,
   "name": "list_initialization_workflow",
-  "description": null,
   "version": 1,
   "tasks": [
     {
-      "queryExpression": null,
       "name": "list_task",
       "taskReferenceName": "list_task",
-      "description": null,
       "inputParameters": {
         "list": [
           1,
@@ -26,39 +20,19 @@
         ]
       },
       "type": "SIMPLE",
-      "dynamicTaskNameParam": null,
-      "caseValueParam": null,
-      "caseExpression": null,
-      "expression": null,
-      "evaluatorType": null,
-      "scriptExpression": null,
-      "decisionCases": null,
-      "dynamicForkJoinTasksParam": null,
-      "dynamicForkTasksParam": null,
-      "dynamicForkTasksInputParamName": null,
-      "defaultCase": null,
-      "forkTasks": null,
       "startDelay": 0,
-      "subWorkflowParam": null,
-      "joinOn": null,
-      "sink": null,
       "optional": false,
-      "taskDefinition": null,
       "rateLimited": false,
-      "defaultExclusiveJoinTask": null,
       "asyncComplete": false,
-      "loopCondition": null,
-      "loopOver": null
+      "retryCount": 0,
+      "workflowTaskType": "SIMPLE"
     }
   ],
   "inputParameters": [],
-  "outputParameters": null,
-  "failureWorkflow": null,
-  "schemaVersion": 2,
-  "restartable": true,
-  "workflowStatusListenerEnabled": true,
-  "ownerEmail": null,
-  "timeoutPolicy": null,
-  "timeoutSeconds": 0,
-  "variables": null
+  "outputParameters": {},
+  "schemaVersion": 0,
+  "restartable": false,
+  "workflowStatusListenerEnabled": false,
+  "timeoutPolicy": "TIME_OUT_WF",
+  "timeoutSeconds": 0
 }

@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
@@ -8,7 +8,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -45,23 +44,22 @@ namespace ConductorSharp.Engine.Builders
             public string TaskToExecute { get; set; }
         }
 
-        public override WorkflowDefinition.Task[] Build()
+        public override WorkflowTask[] Build()
         {
             var parameters = _inputParameters.ToObject<DynamicTaskParameters>();
 
             parameters.TaskInput.Add(new JProperty(DynamicTasknameParam, parameters.TaskToExecute));
 
-            return new WorkflowDefinition.Task[]
-            {
-                new WorkflowDefinition.Task
-                {
+            return
+            [
+                new() {
                     Name = _taskRefferenceName,
                     TaskReferenceName = _taskRefferenceName,
                     Type = TaskType,
-                    InputParameters = parameters.TaskInput,
+                    InputParameters = parameters.TaskInput.ToObject<IDictionary<string,object>>(),
                     DynamicTaskNameParam = DynamicTasknameParam,
                 }
-            };
+            ];
         }
     }
 }

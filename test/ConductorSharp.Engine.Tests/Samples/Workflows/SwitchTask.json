@@ -1,28 +1,16 @@
 {
-  "ownerApp": null,
   "createTime": 0,
   "updateTime": 0,
-  "createdBy": null,
-  "updatedBy": null,
   "name": "switch_task",
-  "description": null,
   "version": 1,
   "tasks": [
     {
-      "queryExpression": null,
       "name": "SWITCH_switch",
       "taskReferenceName": "switch",
-      "description": null,
       "inputParameters": {
         "switch_case_value": "test"
       },
       "type": "SWITCH",
-      "dynamicTaskNameParam": null,
-      "caseValueParam": null,
-      "caseExpression": null,
-      "expression": "switch_case_value",
-      "evaluatorType": "value-param",
-      "scriptExpression": null,
       "decisionCases": {
         "test": [
           {
@@ -35,13 +23,12 @@
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
-            "asyncComplete": false
+            "asyncComplete": false,
+            "retryCount": 0,
+            "workflowTaskType": "SIMPLE"
           }
         ]
       },
-      "dynamicForkJoinTasksParam": null,
-      "dynamicForkTasksParam": null,
-      "dynamicForkTasksInputParamName": null,
       "defaultCase": [
         {
           "name": "TERMINATE_terminate",
@@ -53,31 +40,26 @@
           "startDelay": 0,
           "optional": false,
           "rateLimited": false,
-          "asyncComplete": false
+          "asyncComplete": false,
+          "retryCount": 0,
+          "workflowTaskType": "SIMPLE"
         }
       ],
-      "forkTasks": null,
       "startDelay": 0,
-      "subWorkflowParam": null,
-      "joinOn": null,
-      "sink": null,
       "optional": false,
-      "taskDefinition": null,
       "rateLimited": false,
-      "defaultExclusiveJoinTask": null,
       "asyncComplete": false,
-      "loopCondition": null,
-      "loopOver": null
+      "retryCount": 0,
+      "evaluatorType": "value-param",
+      "expression": "switch_case_value",
+      "workflowTaskType": "SIMPLE"
     }
   ],
   "inputParameters": [],
-  "outputParameters": null,
-  "failureWorkflow": null,
-  "schemaVersion": 2,
-  "restartable": true,
-  "workflowStatusListenerEnabled": true,
-  "ownerEmail": null,
-  "timeoutPolicy": null,
-  "timeoutSeconds": 0,
-  "variables": null
+  "outputParameters": {},
+  "schemaVersion": 0,
+  "restartable": false,
+  "workflowStatusListenerEnabled": false,
+  "timeoutPolicy": "TIME_OUT_WF",
+  "timeoutSeconds": 0
 }

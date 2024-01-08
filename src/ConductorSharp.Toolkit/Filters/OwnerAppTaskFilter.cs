@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Toolkit.Filters
 {
@@ -8,6 +8,6 @@ namespace ConductorSharp.Toolkit.Filters
 
         public OwnerAppTaskFilter(IEnumerable<string> ownerApps) => _ownerApps = ownerApps.ToArray();
 
-        public bool Test(TaskDefinition taskDefinition) => taskDefinition.OwnerApp != null && _ownerApps.Any(app => app == taskDefinition.OwnerApp);
+        public bool Test(TaskDef taskDefinition) => taskDefinition.OwnerApp != null && _ownerApps.Any(app => app == taskDefinition.OwnerApp);
     }
 }

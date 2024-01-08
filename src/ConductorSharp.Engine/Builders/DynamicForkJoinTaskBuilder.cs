@@ -1,9 +1,9 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
@@ -27,29 +27,27 @@ namespace ConductorSharp.Engine.Builders
         public DynamicForkJoinTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
             : base(taskExpression, inputExpression, buildConfiguration) { }
 
-        public override WorkflowDefinition.Task[] Build()
+        public override WorkflowTask[] Build()
         {
             var dynamicTaskName = $"FORK_JOIN_DYNAMIC_{_taskRefferenceName}";
             var joinTaskName = $"JOIN_{_taskRefferenceName}";
 
-            return new WorkflowDefinition.Task[]
-            {
-                new WorkflowDefinition.Task
-                {
+            return
+            [
+                new() {
                     Name = dynamicTaskName,
                     TaskReferenceName = dynamicTaskName,
                     Type = "FORK_JOIN_DYNAMIC",
                     DynamicForkTasksParam = "dynamic_tasks",
                     DynamicForkTasksInputParamName = "dynamic_tasks_i",
-                    InputParameters = _inputParameters,
+                    InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
                 },
-                new WorkflowDefinition.Task
-                {
+                new() {
                     Name = joinTaskName,
                     TaskReferenceName = joinTaskName,
                     Type = "JOIN",
                 }
-            };
+            ];
         }
     }
 }

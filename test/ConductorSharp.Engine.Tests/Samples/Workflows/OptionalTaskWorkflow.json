@@ -1,62 +1,35 @@
 {
-  "ownerApp": null,
   "createTime": 0,
   "updateTime": 0,
-  "createdBy": null,
-  "updatedBy": null,
   "name": "TEST_optional_task_workflow",
-  "description": null,
   "version": 1,
   "tasks": [
     {
-      "queryExpression": null,
       "name": "NOTIFICATION_send_to_customer",
       "taskReferenceName": "send_notification_subworkflow",
-      "description": null,
       "inputParameters": {
         "id": "${workflow.input.customer_id}"
       },
       "type": "SUB_WORKFLOW",
-      "dynamicTaskNameParam": null,
-      "caseValueParam": null,
-      "caseExpression": null,
-      "expression": null,
-      "evaluatorType": null,
-      "scriptExpression": null,
-      "decisionCases": null,
-      "dynamicForkJoinTasksParam": null,
-      "dynamicForkTasksParam": null,
-      "dynamicForkTasksInputParamName": null,
-      "defaultCase": null,
-      "forkTasks": null,
       "startDelay": 0,
       "subWorkflowParam": {
         "name": "NOTIFICATION_send_to_customer",
-        "version": 3,
-        "taskToDomain": null,
-        "workflowDefinition": null
+        "version": 3
       },
-      "joinOn": null,
-      "sink": null,
       "optional": true,
-      "taskDefinition": null,
       "rateLimited": false,
-      "defaultExclusiveJoinTask": null,
       "asyncComplete": false,
-      "loopCondition": null,
-      "loopOver": null
+      "retryCount": 0,
+      "workflowTaskType": "SIMPLE"
     }
   ],
   "inputParameters": [
     "customer_id"
   ],
-  "outputParameters": null,
-  "failureWorkflow": null,
-  "schemaVersion": 2,
-  "restartable": true,
-  "workflowStatusListenerEnabled": true,
-  "ownerEmail": null,
-  "timeoutPolicy": null,
-  "timeoutSeconds": 0,
-  "variables": null
+  "outputParameters": {},
+  "schemaVersion": 0,
+  "restartable": false,
+  "workflowStatusListenerEnabled": false,
+  "timeoutPolicy": "TIME_OUT_WF",
+  "timeoutSeconds": 0
 }

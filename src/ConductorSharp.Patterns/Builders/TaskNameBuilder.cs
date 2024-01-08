@@ -1,12 +1,9 @@
-﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Engine.Builders;
-using ConductorSharp.Engine.Interface;
+﻿using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Patterns.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ConductorSharp.Patterns.Builders
 {
