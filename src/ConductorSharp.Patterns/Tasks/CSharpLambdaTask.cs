@@ -6,6 +6,7 @@ using ConductorSharp.Patterns.Exceptions;
 using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
@@ -21,11 +22,11 @@ namespace ConductorSharp.Patterns.Tasks
 
         [JsonProperty(LambdaIdenfitierParamName)]
         [Required]
-        public string LambdaIdentifier { get; set; }
+        public string? LambdaIdentifier { get; set; }
 
         [JsonProperty(TaskInputParamName)]
         [Required]
-        public JObject TaskInput { get; set; }
+        public JObject TaskInput { get; set; } = [];
     }
 
     [OriginalName(TaskName)]
@@ -38,11 +39,16 @@ namespace ConductorSharp.Patterns.Tasks
 
         public Task<object> Handle(CSharpLambdaTaskInput request, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(request.LambdaIdentifier))
+            {
+                throw new ArgumentException($"Request parameter {request.LambdaIdentifier} cannot be empty");
+            }
+
             var lambda = _itemRegistry.GetAll<CSharpLambdaHandler>().FirstOrDefault(lambda => lambda.LambdaIdentifier == request.LambdaIdentifier) ?? throw new NoLambdaException(request.LambdaIdentifier);
             try
             {
                 return Task.FromResult(
-                    lambda.Handler.DynamicInvoke(request.TaskInput.ToObject(lambda.TaskInputType, ConductorConstants.IoJsonSerializer))
+                    lambda.Handler.DynamicInvoke(request.TaskInput.ToObject(lambda.TaskInputType, ConductorConstants.IoJsonSerializer))!
                 );
             }
             catch (TargetInvocationException ex)

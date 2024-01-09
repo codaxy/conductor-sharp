@@ -2,11 +2,9 @@
 using ConductorSharp.Engine;
 using ConductorSharp.Engine.Util;
 using MediatR;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,26 +17,16 @@ namespace ConductorSharp.Patterns.Tasks
         /// <summary>
         /// Comma separated list of task reference names to be read from specified workflow
         /// </summary>
-        [Required]
-        public string TaskNames { get; set; }
+        public string? TaskNames { get; set; }
 
         /// <summary>
         /// Id of the workflow to read tasks from
         /// </summary>
-        [Required]
-        public string WorkflowId { get; set; }
+        public string? WorkflowId { get; set; }
     }
 
-    public class ReadWorkflowTasksResponse
-    {
-        public Dictionary<string, ConductorSharp.Client.Generated.Task> Tasks { get; set; }
-        public WorkflowDetails Workflow { get; set; }
-    }
-
-    public class WorkflowDetails
-    {
-        public JObject InputData { get; set; }
-    }
+    public record ReadWorkflowTasksResponse(Dictionary<string, Client.Generated.Task> Tasks, WorkflowDetails Workflow);
+    public record WorkflowDetails(JObject InputData);
 
     #endregion
     /// <summary>
@@ -52,17 +40,20 @@ namespace ConductorSharp.Patterns.Tasks
         public async override Task<ReadWorkflowTasksResponse> Handle(ReadWorkflowTasksRequest input, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(input.TaskNames))
+            {
                 throw new Exception("No task names provided. Comma separated list of reference names expected");
+            }
+
+            if (string.IsNullOrEmpty(input.WorkflowId))
+            {
+                throw new Exception("No workflowId provided");
+            }
 
             var tasknames = input.TaskNames.Split(",").Where(a => !string.IsNullOrEmpty(a)).ToList();
 
             var starterWorkflow = await _workflowService.GetExecutionStatusAsync(input.WorkflowId, cancellationToken: cancellationToken) ?? throw new Exception($"Could not find starter workflow by id {input.WorkflowId}");
-            
-            var output = new ReadWorkflowTasksResponse
-            {
-                Workflow = new WorkflowDetails { InputData = JObject.FromObject(starterWorkflow.Input) },
-                Tasks = []
-            };
+
+            var output = new ReadWorkflowTasksResponse([],new WorkflowDetails(JObject.FromObject(starterWorkflow.Input)));
 
             foreach (var task in tasknames)
             {

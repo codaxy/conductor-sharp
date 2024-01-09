@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
 	<LangVersion>preview</LangVersion>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Authors>Codaxy</Authors>
     <Company>Codaxy</Company>
-    <Version>2.3.2</Version>
+    <Version>3.0.0-beta</Version>
   </PropertyGroup>
 
 	<ItemGroup>
