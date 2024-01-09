@@ -26,11 +26,11 @@ namespace ConductorSharp.Patterns.Builders
             where TWorkflow : ITypedWorkflow
             where TInput : IRequest<TOutput>
         {
-            var prefixString = builder.ConfigurationProperties.FirstOrDefault(
+            var configurationProp = builder.ConfigurationProperties.FirstOrDefault(
                 prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty
-            )?.Value as string ?? throw new LambdaTasksNotEnabledException();
+            ) ?? throw new LambdaTasksNotEnabledException(); ;
 
-            var lambdaTaskNamePrefix = TaskNameBuilder.MakeTaskNamePrefix(prefixString);
+            var lambdaTaskNamePrefix = TaskNameBuilder.MakeTaskNamePrefix(configurationProp?.Value as string);
 
             var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
                 task.Body,

@@ -20,6 +20,6 @@ namespace ConductorSharp.Patterns.Builders
             return MakeTaskNamePrefix(prefix);
         }
 
-        public static string MakeTaskNamePrefix(string prefix) => prefix == null ? string.Empty : $"{prefix}.";
+        public static string MakeTaskNamePrefix(string? prefix) => prefix == null ? string.Empty : $"{prefix}.";
     }
 }
