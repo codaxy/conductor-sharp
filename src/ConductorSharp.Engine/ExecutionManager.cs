@@ -1,4 +1,9 @@
-﻿using ConductorSharp.Client;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using ConductorSharp.Client;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Client.Util;
@@ -10,11 +15,6 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using Task = System.Threading.Tasks.Task;
 
 namespace ConductorSharp.Engine
@@ -176,20 +176,23 @@ namespace ConductorSharp.Engine
 
                 var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
 
-                await _taskManager.UpdateAsync(
-                    new TaskResult
-                    {
-                        TaskId = pollResponse.TaskId,
-                        Status = TaskResultStatus.FAILED,
-                        ReasonForIncompletion = exception.Message,
-                        OutputData = SerializationHelper.ObjectToDictionary(errorMessage, ConductorConstants.IoJsonSerializerSettings),
-                        WorkflowInstanceId = pollResponse.WorkflowInstanceId,
-                    },
-                    cancellationToken
+                await Task.WhenAll(
+                    [
+                        _taskManager.UpdateAsync(
+                            new TaskResult
+                            {
+                                TaskId = pollResponse.TaskId,
+                                Status = TaskResultStatus.FAILED,
+                                ReasonForIncompletion = exception.Message,
+                                OutputData = SerializationHelper.ObjectToDictionary(errorMessage, ConductorConstants.IoJsonSerializerSettings),
+                                WorkflowInstanceId = pollResponse.WorkflowInstanceId
+                            },
+                            cancellationToken
+                        ),
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.Message, cancellationToken),
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.StackTrace, cancellationToken)
+                    ]
                 );
-
-                await _taskManager.LogAsync(pollResponse.TaskId, exception.Message, cancellationToken);
-                await _taskManager.LogAsync(pollResponse.TaskId, exception.StackTrace, cancellationToken);
             }
         }
     }
