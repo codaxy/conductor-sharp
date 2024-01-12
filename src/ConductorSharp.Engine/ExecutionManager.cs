@@ -176,6 +176,10 @@ namespace ConductorSharp.Engine
 
                 var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
 
+                // TODO: We should verify that this is alright, it is possible that when executed concurrently,
+                // the updates caused by LogAsync will be discarded because the call of UpdateAsync(TaskResult...)
+                // sets the logs to null. Not sure how this is implemented in the backend, also, would have expected this to be a
+                // PUT or PATCH request, but by specs it is POST
                 await Task.WhenAll(
                     [
                         _taskManager.UpdateAsync(
