@@ -4,6 +4,7 @@ using System.Reflection;
 using ConductorSharp.Client;
 using Newtonsoft.Json;
 using System.Text.Json.Serialization;
+using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Engine.Util
 {

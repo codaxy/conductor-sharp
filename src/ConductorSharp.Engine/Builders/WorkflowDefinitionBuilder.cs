@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Client.Model.Common;
+using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
