@@ -56,8 +56,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     }
                 }
             );
-
-            _builder.SetOptions(opts => opts.Version = 1);
         }
     }
 }

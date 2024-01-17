@@ -1,4 +1,6 @@
-﻿namespace ConductorSharp.Engine.Tests.Samples.Workers;
+﻿using ConductorSharp.Engine.Builders.Metadata;
+
+namespace ConductorSharp.Engine.Tests.Samples.Workers;
 
 public class PrepareEmailRequest : IRequest<PrepareEmailResponse>
 {

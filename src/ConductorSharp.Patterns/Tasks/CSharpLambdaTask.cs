@@ -1,5 +1,6 @@
 ﻿using ConductorSharp.Client;
 using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;

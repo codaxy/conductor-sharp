@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Definitions.Generated;
 using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
@@ -27,6 +28,7 @@ namespace ConductorSharp.Definitions.Workflows
     public class ExpectedDynamicOutput : CustomerGetV1Output { }
 
     [OriginalName("NOTIFICATION_send_to_customer")]
+    [WorkflowMetadata(OwnerEmail = "example@example.local", FailureWorkflow = typeof(HandleNotificationFailure))]
     public class SendCustomerNotification : Workflow<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>
     {
         public SendCustomerNotification(
@@ -62,13 +64,6 @@ namespace ConductorSharp.Definitions.Workflows
                         Constant = 500
                     }
             );
-
-            _builder.SetOptions(options =>
-            {
-                options.Version = 1;
-                options.FailureWorkflow = typeof(HandleNotificationFailure);
-                options.OwnerEmail = "example@example.local";
-            });
         }
     }
 }

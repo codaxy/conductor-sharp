@@ -22,14 +22,6 @@ namespace ConductorSharp.Engine.Builders
         {
             builder.BuildContext.Outputs = ExpressionUtil.ParseToParameters(input.Body);
         }
-
-        public static void SetOptions<FWorkflow, F, G>(this WorkflowDefinitionBuilder<FWorkflow, F, G> builder, Action<WorkflowOptions> adjustOptions)
-            where FWorkflow : Workflow<FWorkflow, F, G>
-            where F : WorkflowInput<G>
-            where G : WorkflowOutput
-        {
-            adjustOptions?.Invoke(builder.BuildContext.WorkflowOptions);
-        }
     }
 
     public class WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> : ITaskSequenceBuilder<TWorkflow>
@@ -61,18 +53,23 @@ namespace ConductorSharp.Engine.Builders
 
         public WorkflowDefinition Build()
         {
+            var metadataAttribute = _workflowType.GetCustomAttribute<WorkflowMetadataAttribute>();
+            var ownerApp = metadataAttribute?.OwnerApp;
+            var ownerEmail = metadataAttribute?.OwnerEmail;
+            var description = metadataAttribute?.Description;
+            var failureWorkflow = metadataAttribute?.FailureWorkflow;
+
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
-                BuildContext.WorkflowOptions.OwnerApp = BuildConfiguration.DefaultOwnerApp;
+                ownerApp = BuildConfiguration.DefaultOwnerApp;
             }
 
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerEmail))
             {
-                BuildContext.WorkflowOptions.OwnerEmail = BuildConfiguration.DefaultOwnerEmail;
+                ownerEmail = BuildConfiguration.DefaultOwnerEmail;
             }
 
-            BuildContext.WorkflowOptions.Version =
-                _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? BuildContext.WorkflowOptions.Version;
+            var version = _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? 1;
             BuildContext.Inputs = new();
 
             var input = _workflowType.BaseType.GenericTypeArguments[1];
@@ -88,16 +85,13 @@ namespace ConductorSharp.Engine.Builders
             {
                 Name = BuildContext.WorkflowName,
                 Tasks = _taskBuilders.SelectMany(a => a.Build()).ToList(),
-                FailureWorkflow =
-                    BuildContext.WorkflowOptions.FailureWorkflow != null
-                        ? NamingUtil.DetermineRegistrationName(BuildContext.WorkflowOptions.FailureWorkflow)
-                        : null,
-                Description = BuildContext.WorkflowOptions.Description,
+                FailureWorkflow = failureWorkflow != null ? NamingUtil.DetermineRegistrationName(failureWorkflow) : null,
+                Description = description,
                 InputParameters = BuildContext.Inputs.ToArray(),
                 OutputParameters = BuildContext.Outputs,
-                OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
-                OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
-                Version = BuildContext.WorkflowOptions.Version
+                OwnerApp = ownerApp,
+                OwnerEmail = ownerEmail,
+                Version = version
             };
         }
 

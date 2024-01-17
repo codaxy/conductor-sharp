@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Model;
+﻿using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using MediatR;
 

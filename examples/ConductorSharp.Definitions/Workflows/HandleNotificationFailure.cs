@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Definitions.Workflows
 {
@@ -20,6 +21,7 @@ namespace ConductorSharp.Definitions.Workflows
     public class HandleNotificationFailureOutput : WorkflowOutput { }
 
     [OriginalName("NOTIFICATION_handle_failure")]
+    [WorkflowMetadata(OwnerEmail = "test@test.com")]
     public class HandleNotificationFailure : Workflow<HandleNotificationFailure, HandleNotificationFailureInput, HandleNotificationFailureOutput>
     {
         public HandleNotificationFailure(
@@ -31,7 +33,6 @@ namespace ConductorSharp.Definitions.Workflows
         public override void BuildDefinition()
         {
             _builder.AddTask(a => a.ReadExecutedTasks, b => new() { TaskNames = "dynamic_handler", WorkflowId = b.WorkflowInput.WorkflowId });
-            _builder.SetOptions(options => options.OwnerEmail = "test@test.com");
         }
     }
 }

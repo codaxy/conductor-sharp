@@ -2,6 +2,7 @@
 using ConductorSharp.Engine.Util;
 using MediatR;
 using System.Text;
+using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.ApiEnabled.Handlers;
 

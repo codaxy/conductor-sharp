@@ -11,6 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Patterns.Tasks
 {
