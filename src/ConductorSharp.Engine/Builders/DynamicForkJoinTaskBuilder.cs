@@ -1,10 +1,10 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -14,7 +14,8 @@ namespace ConductorSharp.Engine.Builders
             this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, DynamicForkJoinTaskModel>> refference,
             Expression<Func<TWorkflow, DynamicForkJoinInput>> input
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new DynamicForkJoinTaskBuilder(refference.Body, input.Body, builder.BuildConfiguration);
             builder.AddTaskBuilderToSequence(taskBuilder);
@@ -22,7 +23,8 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class DynamicForkJoinTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<DynamicForkJoinInput, NoOutput>(taskExpression, inputExpression, buildConfiguration)
+    public class DynamicForkJoinTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<DynamicForkJoinInput, NoOutput>(taskExpression, inputExpression, buildConfiguration)
     {
         public override WorkflowTask[] Build()
         {
@@ -31,18 +33,20 @@ namespace ConductorSharp.Engine.Builders
 
             return
             [
-                new() {
+                new()
+                {
                     Name = dynamicTaskName,
                     TaskReferenceName = dynamicTaskName,
                     WorkflowTaskType = WorkflowTaskType.FORK_JOIN_DYNAMIC,
                     DynamicForkTasksParam = "dynamic_tasks",
                     DynamicForkTasksInputParamName = "dynamic_tasks_i",
-                    InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                 },
-                new() {
+                new()
+                {
                     Name = joinTaskName,
                     TaskReferenceName = joinTaskName,
-                    Type = "JOIN",
+                    WorkflowTaskType = WorkflowTaskType.JOIN
                 }
             ];
         }

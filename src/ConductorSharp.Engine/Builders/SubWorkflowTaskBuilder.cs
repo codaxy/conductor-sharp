@@ -1,13 +1,13 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -27,7 +27,9 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class SubWorkflowTaskBuilder<TInput, TOutput>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<TInput, TOutput>(taskExpression, inputExpression, buildConfiguration) where TInput : IRequest<TOutput>
+    public class SubWorkflowTaskBuilder<TInput, TOutput>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<TInput, TOutput>(taskExpression, inputExpression, buildConfiguration)
+        where TInput : IRequest<TOutput>
     {
         private readonly int _version = GetVersion(taskExpression);
 
@@ -38,7 +40,7 @@ namespace ConductorSharp.Engine.Builders
                     Name = _taskName,
                     TaskReferenceName = _taskRefferenceName,
                     WorkflowTaskType = WorkflowTaskType.SUB_WORKFLOW,
-                    InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                     SubWorkflowParam = new SubWorkflowParams { Name = _taskName, Version = _version },
                     Optional = _additionalParameters?.Optional == true
                 }
