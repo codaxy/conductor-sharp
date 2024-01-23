@@ -19,6 +19,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public override void BuildDefinition()
         {
+            base.BuildDefinition();
+
             _builder.AddTask(wf => wf.HumanTask, wf => new() { });
         }
     }
