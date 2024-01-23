@@ -14,7 +14,7 @@ namespace ConductorSharp.Engine.Polling
         private DateTimeOffset _lastRecoveryTime = DateTimeOffset.UtcNow;
 
         public int CalculateDelay(
-            IDictionary<string, int> taskQueue,
+            IDictionary<string, long> taskQueue,
             List<TaskToWorker> taskToWorkerList,
             int baseSleepInterval,
             int currentSleepInterval

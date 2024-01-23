@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
@@ -12,8 +12,7 @@ namespace ConductorSharp.Engine.Extensions
 {
     public static class WorkflowRegistrationExtensions
     {
-        public static void RegisterWorkflowDefinition(this IServiceCollection builder, WorkflowDefinition definition) =>
-            builder.AddSingleton(definition);
+        public static void RegisterWorkflowDefinition(this IServiceCollection builder, WorkflowDef definition) => builder.AddSingleton(definition);
 
         public static void RegisterWorkflowDefinition(this IServiceCollection builder, string filename)
         {
@@ -21,7 +20,7 @@ namespace ConductorSharp.Engine.Extensions
                 throw new ArgumentException($"'{nameof(filename)}' cannot be null or empty.", nameof(filename));
 
             var fileContents = File.ReadAllText(filename);
-            var definition = JsonConvert.DeserializeObject<WorkflowDefinition>(fileContents);
+            var definition = JsonConvert.DeserializeObject<WorkflowDef>(fileContents);
 
             builder.AddSingleton(definition);
         }

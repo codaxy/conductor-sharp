@@ -1,11 +1,9 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -37,7 +35,7 @@ namespace ConductorSharp.Engine.Builders
         where TOutput : WorkflowOutput
     {
         private readonly Type _workflowType = typeof(TWorkflow);
-        private readonly List<ITaskBuilder> _taskBuilders = new();
+        private readonly List<ITaskBuilder> _taskBuilders = [];
 
         public BuildContext BuildContext { get; } = new();
         public BuildConfiguration BuildConfiguration { get; set; }
@@ -58,7 +56,7 @@ namespace ConductorSharp.Engine.Builders
 
         private void GenerateWorkflowName() => BuildContext.WorkflowName = NamingUtil.DetermineRegistrationName(_workflowType);
 
-        public WorkflowDefinition Build()
+        public WorkflowDef Build()
         {
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
@@ -72,7 +70,7 @@ namespace ConductorSharp.Engine.Builders
 
             BuildContext.WorkflowOptions.Version =
                 _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? BuildContext.WorkflowOptions.Version;
-            BuildContext.Inputs = new();
+            BuildContext.Inputs = [];
 
             var input = _workflowType.BaseType.GenericTypeArguments[1];
             var props = input.GetProperties();
@@ -83,7 +81,7 @@ namespace ConductorSharp.Engine.Builders
                 BuildContext.Inputs.Add(propertyName);
             }
 
-            return new WorkflowDefinition
+            return new WorkflowDef
             {
                 Name = BuildContext.WorkflowName,
                 Tasks = _taskBuilders.SelectMany(a => a.Build()).ToList(),
@@ -93,10 +91,11 @@ namespace ConductorSharp.Engine.Builders
                         : null,
                 Description = BuildContext.WorkflowOptions.Description,
                 InputParameters = BuildContext.Inputs.ToArray(),
-                OutputParameters = BuildContext.Outputs,
+                OutputParameters = (BuildContext.Outputs ?? []).ToObject<IDictionary<string, object>>(),
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
                 OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
-                Version = BuildContext.WorkflowOptions.Version
+                Version = BuildContext.WorkflowOptions.Version,
+                SchemaVersion = 2
             };
         }
 

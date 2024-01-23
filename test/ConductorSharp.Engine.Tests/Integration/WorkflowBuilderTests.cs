@@ -1,3 +1,4 @@
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
@@ -243,21 +244,21 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Throws<NonEvaluatableExpressionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
         }
 
-        private string GetDefinitionFromWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
+        private static string GetDefinitionFromWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
         {
             var workflow = RegisterWorkflow<TWorkflow>()
-                .GetRequiredService<IEnumerable<WorkflowDefinition>>()
+                .GetRequiredService<IEnumerable<WorkflowDef>>()
                 .First(a => a.Name == NamingUtil.NameOf<TWorkflow>());
 
             return SerializationUtil.SerializeObject(workflow);
         }
 
-        private IServiceProvider RegisterWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
+        private static IServiceProvider RegisterWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
         {
             var containerBuilder = new ServiceCollection();
 
             containerBuilder
-                .AddConductorSharp("example.com", "api", false)
+                .AddConductorSharp("example.com/api")
                 .AddExecutionManager(10, 100, 100, null, typeof(WorkflowBuilderTests).Assembly)
                 .AddPipelines(pipelines =>
                 {

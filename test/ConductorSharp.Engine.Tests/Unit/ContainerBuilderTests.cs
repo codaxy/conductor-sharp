@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Extensions;
+﻿using ConductorSharp.Client.Generated;
+using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
 using ConductorSharp.Engine.Tests.Util;
 using ConductorSharp.Engine.Util.Builders;
@@ -14,7 +15,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             var builder = new ServiceCollection();
 
             builder
-                .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
+                .AddConductorSharp(baseUrl: "http://empty/empty")
                 .SetBuildConfiguration(new BuildConfiguration { DefaultOwnerApp = "testApp", DefaultOwnerEmail = "owner@test.app" })
                 .AddExecutionManager(
                     maxConcurrentWorkers: 1,
@@ -27,7 +28,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             builder.RegisterWorkflow<StringInterpolation>();
             var container = builder.BuildServiceProvider();
 
-            var definitions = container.GetRequiredService<IEnumerable<WorkflowDefinition>>().ToList();
+            var definitions = container.GetRequiredService<IEnumerable<WorkflowDef>>().ToList();
 
             Assert.True(definitions.All(a => a.OwnerApp == "testApp"));
         }
@@ -38,7 +39,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             var builder = new ServiceCollection();
             var overrideValue = "override";
             builder
-                .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
+                .AddConductorSharp(baseUrl: "http://empty/empty")
                 .SetBuildConfiguration(new BuildConfiguration { DefaultOwnerApp = "testApp", DefaultOwnerEmail = "owner@test.app", })
                 .AddExecutionManager(
                     maxConcurrentWorkers: 1,
@@ -51,7 +52,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             builder.RegisterWorkflow<StringInterpolation>(new BuildConfiguration { DefaultOwnerApp = overrideValue });
             var container = builder.BuildServiceProvider();
 
-            var definitions = container.GetRequiredService<IEnumerable<WorkflowDefinition>>().ToList();
+            var definitions = container.GetRequiredService<IEnumerable<WorkflowDef>>().ToList();
 
             Assert.True(definitions.All(a => a.OwnerApp == overrideValue));
         }
@@ -61,7 +62,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         {
             var builder = new ServiceCollection();
             builder
-                .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
+                .AddConductorSharp(baseUrl: "http://empty/empty")
                 .AddExecutionManager(
                     maxConcurrentWorkers: 1,
                     sleepInterval: 1,
@@ -73,7 +74,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             builder.AddTransient<IConfigurationService, ConfigurationService>();
             builder.RegisterWorkflow<WorkflowWithDependencies>();
             var container = builder.BuildServiceProvider();
-            var definitions = container.GetRequiredService<IEnumerable<WorkflowDefinition>>();
+            var definitions = container.GetRequiredService<IEnumerable<WorkflowDef>>();
             Assert.Contains(definitions, def => def.Name == NamingUtil.NameOf<WorkflowWithDependencies>());
         }
 
@@ -82,7 +83,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         {
             var builder = new ServiceCollection();
             builder
-                .AddConductorSharp(baseUrl: "empty", apiPath: "empty")
+                .AddConductorSharp(baseUrl: "http://empty/empty")
                 .AddExecutionManager(
                     maxConcurrentWorkers: 1,
                     sleepInterval: 1,
@@ -93,7 +94,7 @@ namespace ConductorSharp.Engine.Tests.Unit
 
             builder.RegisterWorkflow<WorkflowWithDependencies>();
             var container = builder.BuildServiceProvider();
-            Assert.Throws<InvalidOperationException>(() => container.GetRequiredService<IEnumerable<WorkflowDefinition>>());
+            Assert.Throws<InvalidOperationException>(() => container.GetRequiredService<IEnumerable<WorkflowDef>>());
         }
     }
 }

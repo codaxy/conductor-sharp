@@ -1,4 +1,8 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
@@ -8,9 +12,6 @@ using ConductorSharp.Patterns.Model;
 using ConductorSharp.Patterns.Tasks;
 using MediatR;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Patterns.Builders
 {
@@ -25,14 +26,12 @@ namespace ConductorSharp.Patterns.Builders
             where TWorkflow : ITypedWorkflow
             where TInput : IRequest<TOutput>
         {
-            var prefixConfigProperty = builder.ConfigurationProperties.FirstOrDefault(
-                prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty
-            );
+            var configurationProp =
+                builder.ConfigurationProperties.FirstOrDefault(prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty)
+                ?? throw new LambdaTasksNotEnabledException();
+            ;
 
-            if (prefixConfigProperty == null)
-                throw new LambdaTasksNotEnabledException();
-
-            var lambdaTaskNamePrefix = TaskNameBuilder.MakeTaskNamePrefix(prefixConfigProperty.Value as string);
+            var lambdaTaskNamePrefix = TaskNameBuilder.MakeTaskNamePrefix(configurationProp?.Value as string);
 
             var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
                 task.Body,
@@ -50,7 +49,8 @@ namespace ConductorSharp.Patterns.Builders
         }
     }
 
-    internal class CSharpLambdaTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput> where TInput : IRequest<TOutput>
+    internal class CSharpLambdaTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput>
+        where TInput : IRequest<TOutput>
     {
         public const string LambdaIdStorageKey = "ConductorSharp.Engine.CSharpLambdaTaskBuilder.LambdaId";
 
@@ -64,17 +64,18 @@ namespace ConductorSharp.Patterns.Builders
             BuildConfiguration buildConfiguration,
             string lambdaTaskNamePrefix,
             string workflowName
-        ) : base(taskExpression, memberExpression, buildConfiguration)
+        )
+            : base(taskExpression, memberExpression, buildConfiguration)
         {
             LambdaIdentifer = $"{workflowName}.{_taskRefferenceName}";
             _lambdaTaskNamePrefix = lambdaTaskNamePrefix;
         }
 
-        public override WorkflowDefinition.Task[] Build()
+        public override WorkflowTask[] Build()
         {
-            return new[]
-            {
-                new WorkflowDefinition.Task
+            return
+            [
+                new()
                 {
                     Name = $"{_lambdaTaskNamePrefix}{CSharpLambdaTask.TaskName}",
                     TaskReferenceName = _taskRefferenceName,
@@ -82,10 +83,12 @@ namespace ConductorSharp.Patterns.Builders
                     {
                         new JProperty(CSharpLambdaTaskInput.LambdaIdenfitierParamName, LambdaIdentifer),
                         new JProperty(CSharpLambdaTaskInput.TaskInputParamName, _inputParameters)
-                    },
-                    Optional = _additionalParameters.Optional
+                    }.ToObject<IDictionary<string, object>>(),
+                    Optional = _additionalParameters.Optional,
+                    WorkflowTaskType = WorkflowTaskType.SIMPLE,
+                    Type = WorkflowTaskType.SIMPLE.ToString()
                 }
-            };
+            ];
         }
     }
 }

@@ -7,18 +7,15 @@ using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Reflection;
 
 namespace ConductorSharp.Engine.Extensions
 {
-    public class ConductorSharpBuilder : IConductorSharpBuilder, IExecutionManagerBuilder, IPipelineBuilder
+    public class ConductorSharpBuilder(IServiceCollection builder) : IConductorSharpBuilder, IExecutionManagerBuilder, IPipelineBuilder
     {
-        public IServiceCollection Builder { get; set; }
-
-        public ConductorSharpBuilder(IServiceCollection builder) => Builder = builder;
+        public IServiceCollection Builder { get; set; } = builder;
 
         public IExecutionManagerBuilder AddExecutionManager(
             int maxConcurrentWorkers,
@@ -83,7 +80,7 @@ namespace ConductorSharp.Engine.Extensions
         {
             if (buildConfiguration is null)
             {
-                throw new ArgumentNullException("Build configuration cannot be null");
+                throw new ArgumentNullException(nameof(buildConfiguration));
             }
 
             Builder.AddSingleton(buildConfiguration);

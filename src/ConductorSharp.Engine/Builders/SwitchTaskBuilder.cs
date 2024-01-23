@@ -1,15 +1,14 @@
-﻿using ConductorSharp.Client;
-using ConductorSharp.Client.Model.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using ConductorSharp.Client;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -20,7 +19,8 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, SwitchTaskModel>> taskSelector,
             Expression<Func<TWorkflow, SwitchTaskInput>> expression,
             DecisionCases<TWorkflow> decisionCases
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new SwitchTaskBuilder<TWorkflow>(
                 taskSelector.Body,
@@ -49,32 +49,24 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class SwitchTaskBuilder<TWorkflow> : BaseTaskBuilder<SwitchTaskInput, NoOutput>, ITaskSequenceBuilder<TWorkflow>
+    public class SwitchTaskBuilder<TWorkflow>(
+        Expression taskExpression,
+        Expression inputExpression,
+        BuildConfiguration buildConfiguration,
+        WorkflowBuildItemRegistry workflowBuildItemRegistry,
+        IEnumerable<ConfigurationProperty> configurationProperties,
+        BuildContext buildContext
+    ) : BaseTaskBuilder<SwitchTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration), ITaskSequenceBuilder<TWorkflow>
         where TWorkflow : ITypedWorkflow
     {
-        private Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = new();
+        private readonly Dictionary<string, ICollection<ITaskBuilder>> _caseDictionary = [];
         private string _currentCaseName;
         private List<ITaskBuilder> _defaultCase;
 
-        public BuildContext BuildContext { get; }
-        public BuildConfiguration BuildConfiguration { get; }
-        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
-        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; }
-
-        public SwitchTaskBuilder(
-            Expression taskExpression,
-            Expression inputExpression,
-            BuildConfiguration buildConfiguration,
-            WorkflowBuildItemRegistry workflowBuildItemRegistry,
-            IEnumerable<ConfigurationProperty> configurationProperties,
-            BuildContext buildContext
-        ) : base(taskExpression, inputExpression, buildConfiguration)
-        {
-            BuildConfiguration = buildConfiguration;
-            WorkflowBuildRegistry = workflowBuildItemRegistry;
-            ConfigurationProperties = configurationProperties;
-            BuildContext = buildContext;
-        }
+        public BuildContext BuildContext { get; } = buildContext;
+        public BuildConfiguration BuildConfiguration { get; } = buildConfiguration;
+        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; } = workflowBuildItemRegistry;
+        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; } = configurationProperties;
 
         public SwitchTaskBuilder<TWorkflow> AddCase(string caseName)
         {
@@ -83,18 +75,19 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
-        public override WorkflowDefinition.Task[] Build()
+        public override WorkflowTask[] Build()
         {
             var decisionTaskName = $"SWITCH_{_taskRefferenceName}";
 
-            return new WorkflowDefinition.Task[]
-            {
-                new WorkflowDefinition.Task
+            return
+            [
+                new()
                 {
                     Name = decisionTaskName,
                     TaskReferenceName = _taskRefferenceName,
-                    InputParameters = _inputParameters,
-                    Type = "SWITCH",
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
+                    WorkflowTaskType = WorkflowTaskType.SWITCH,
+                    Type = WorkflowTaskType.SWITCH.ToString(),
                     Expression = "switch_case_value",
                     EvaluatorType = "value-param",
                     DecisionCases = new JObject
@@ -102,13 +95,10 @@ namespace ConductorSharp.Engine.Builders
                         _caseDictionary.Select(
                             a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(b => b.Build()), ConductorConstants.DefinitionsSerializer))
                         )
-                    },
-                    DefaultCase = _defaultCase
-                        ?.SelectMany(builder => builder.Build())
-                        .Select(task => JObject.FromObject(task, ConductorConstants.DefinitionsSerializer))
-                        .ToList()
+                    }.ToObject<IDictionary<string, ICollection<WorkflowTask>>>(),
+                    DefaultCase = _defaultCase?.SelectMany(builder => builder.Build()).ToArray()
                 }
-            };
+            ];
         }
 
         public void AddTaskBuilderToSequence(ITaskBuilder builder)
@@ -116,8 +106,7 @@ namespace ConductorSharp.Engine.Builders
             // Handle default case
             if (_currentCaseName == null)
             {
-                if (_defaultCase == null)
-                    _defaultCase = new();
+                _defaultCase ??= [];
 
                 _defaultCase.Add(builder);
                 return;

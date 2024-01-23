@@ -7,6 +7,6 @@ namespace ConductorSharp.Engine.Polling
 {
     public interface IPollTimingStrategy
     {
-        int CalculateDelay(IDictionary<string, int> taskQueue, List<TaskToWorker> taskToWorkerList, int baseSleepInterval, int currentSleepInterval);
+        int CalculateDelay(IDictionary<string, long> taskQueue, List<TaskToWorker> taskToWorkerList, int baseSleepInterval, int currentSleepInterval);
     }
 }

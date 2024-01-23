@@ -2,13 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ConductorSharp.Engine.Builders
 {
     public class WorkflowBuildItemRegistry
     {
-        private readonly Dictionary<Type, Dictionary<string, object>> _items = new();
+        private readonly Dictionary<Type, Dictionary<string, object>> _items = [];
 
         public void Register<TWorkflow>(string key, object value) where TWorkflow : ITypedWorkflow
         {

@@ -1,4 +1,5 @@
 using ConductorSharp.ApiEnabled.Extensions;
+using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Health;
 using Serilog;
 

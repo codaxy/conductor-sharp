@@ -121,9 +121,7 @@ namespace ConductorSharp.Toolkit
                 scaffoldingConfig.DryRun = options.DryRun;
             });
 
-            builder.AddConductorSharp(config.BaseUrl, config.ApiPath);
-            builder.AddTransient<IConductorClient, ConductorClient>();
-            builder.AddTransient<IMetadataService, MetadataService>();
+            builder.AddConductorSharp(config.BaseUrl);
             builder.AddTransient<IScaffoldingService, ScaffoldingService>();
             builder.AddTransient<CommandRegistry>();
             builder.AddTransient<Command, ScaffoldCommand>();

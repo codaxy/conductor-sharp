@@ -1,9 +1,9 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Toolkit.Filters
 {
     public interface IWorkflowFilter
     {
-        bool Test(WorkflowDefinition workflowDefinition);
+        bool Test(WorkflowDef workflowDefinition);
     }
 }

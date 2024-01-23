@@ -1,28 +1,71 @@
-﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Client.Model.Response;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using ConductorSharp.Client.Generated;
 
-namespace ConductorSharp.Client.Service
+namespace ConductorSharp.Client.Service;
+
+public interface IMetadataService
 {
-    public interface IMetadataService
-    {
-        Task<TaskDefinition[]> GetAllTaskDefinitions();
-        Task CreateTaskDefinitions(List<TaskDefinition> definitions);
-        Task<TaskDefinition> GetTaskDefinition(string name);
-        Task DeleteTaskDefinition(string name);
-        Task UpdateTaskDefinition(TaskDefinition definition);
-        Task<WorkflowDefinition> GetWorkflowDefinition(string name, int version);
-        Task UpdateWorkflowDefinitions(List<WorkflowDefinition> workflowDefinition);
-        Task DeleteWorkflowDefinition(string name, int version);
-        Task ValidateWorkflowDefinition(WorkflowDefinition workflowDefinition);
-        Task<WorkflowDefinition[]> GetAllWorkflowDefinitions();
-        Task<Dictionary<string, List<NameAndVersion>>> GetAllWorkflowNamesAndVersions();
-        Task<EventHandlerDefinition[]> GetAllEventHandlerDefinitions();
-        Task UpdateEventHandlerDefinition(EventHandlerDefinition definition);
-        Task DeleteEventHandlerDefinition(string name);
-        Task CreateEventHandlerDefinition(EventHandlerDefinition definition);
-        Task<EventHandlerDefinition> GetEventHandlerDefinition(string name);
-        Task CreateWorkflowDefinitions(List<WorkflowDefinition> definition);
-    }
+    /// <summary>
+    /// Create a new workflow definition
+    /// </summary>
+    Task AddWorkflowAsync(WorkflowDef workflowDef, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Remove a task definition
+    /// </summary>
+    Task DeleteTaskAsync(string taskType, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Removes workflow definition. It does not remove workflows associated with the definition.
+    /// </summary>
+    Task DeleteWorkflowAsync(string name, int version, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves all workflow definition along with blueprint
+    /// </summary>
+    Task<ICollection<WorkflowDef>> ListWorkflowsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns only the latest version of all workflow definitions
+    /// </summary>
+    Task<ICollection<WorkflowDef>> GetAllWorkflowsWithLatestVersionsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the task definition
+    /// </summary>
+    Task<TaskDef> GetTaskAsync(string taskType, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets all task definition
+    /// </summary>
+    Task<ICollection<TaskDef>> ListTasksAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves workflow definition along with blueprint
+    /// </summary>
+    Task<WorkflowDef> GetWorkflowAsync(string name, int? version = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns workflow names and versions only (no definition bodies)
+    /// </summary>
+    Task<IDictionary<string, object>> GetWorkflowNamesAndVersionsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Update an existing task
+    /// </summary>
+    Task AddTaskAsync(TaskDef taskDef, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create new task definition(s)
+    /// </summary>
+    Task AddTasksAsync(IEnumerable<TaskDef> taskDefs, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create or update workflow definition
+    /// </summary>
+    Task<BulkResponse> UpdateWorkflowsAsync(IEnumerable<WorkflowDef> workflows, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Validates a new workflow definition
+    /// </summary>
+    Task ValidateWorkflowAsync(WorkflowDef workflowDef, CancellationToken cancellationToken = default);
 }

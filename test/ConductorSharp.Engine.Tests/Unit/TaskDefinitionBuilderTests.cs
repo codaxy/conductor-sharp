@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Extensions;
+﻿using ConductorSharp.Client.Generated;
+using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workers;
 using ConductorSharp.Engine.Tests.Util;
 using ConductorSharp.Engine.Util.Builders;
@@ -15,7 +16,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             var _containerBuilder = new ServiceCollection();
 
             _containerBuilder
-                .AddConductorSharp("example.com", "api", false)
+                .AddConductorSharp("http://example.com/api")
                 .AddExecutionManager(10, 100, 100, null, typeof(TaskDefinitionBuilderTests).Assembly)
                 .AddPipelines(pipelines =>
                 {
@@ -42,7 +43,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         {
             var builder = new ServiceCollection();
 
-            builder.AddConductorSharp(baseUrl: "empty", apiPath: "empty");
+            builder.AddConductorSharp(baseUrl: "http://empty/empty");
 
             builder.AddSingleton(new BuildConfiguration { DefaultOwnerApp = "owner" });
 
@@ -50,7 +51,7 @@ namespace ConductorSharp.Engine.Tests.Unit
 
             var container = builder.BuildServiceProvider();
 
-            var definition = container.GetRequiredService<TaskDefinition>();
+            var definition = container.GetRequiredService<TaskDef>();
 
             Assert.Equal("owner", definition.OwnerApp);
         }
