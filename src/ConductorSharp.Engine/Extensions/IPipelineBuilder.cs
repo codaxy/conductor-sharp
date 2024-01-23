@@ -1,4 +1,6 @@
-﻿namespace ConductorSharp.Engine.Extensions
+﻿using System;
+
+namespace ConductorSharp.Engine.Extensions
 {
     public interface IPipelineBuilder
     {
@@ -6,5 +8,6 @@
         void AddValidation();
         void AddContextLogging();
         void AddExecutionTaskTracking();
+        void AddCustomBehavior(Type behaviorType);
     }
 }
