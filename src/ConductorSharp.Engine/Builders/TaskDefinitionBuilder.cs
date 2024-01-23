@@ -16,12 +16,10 @@ namespace ConductorSharp.Engine.Builders
 {
     public class TaskDefinitionBuilder
     {
-        public BuildConfiguration BuildConfiguration { get; set; }
         private readonly ITaskNameBuilder _taskNameBuilder;
 
-        public TaskDefinitionBuilder(BuildConfiguration buildConfiguration, ITaskNameBuilder taskNameBuilder)
+        public TaskDefinitionBuilder(ITaskNameBuilder taskNameBuilder)
         {
-            BuildConfiguration = buildConfiguration;
             _taskNameBuilder = taskNameBuilder;
         }
 
@@ -47,7 +45,7 @@ namespace ConductorSharp.Engine.Builders
 
             return new TaskDefinition
             {
-                OwnerApp = BuildConfiguration.DefaultOwnerApp ?? options.OwnerApp,
+                OwnerApp = options.OwnerApp,
                 Name = originalName,
                 Description = options.Description,
                 RetryCount = options.RetryCount,
