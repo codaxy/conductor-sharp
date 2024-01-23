@@ -8,6 +8,7 @@
       "name": "CUSTOMER_get",
       "taskReferenceName": "get_customer",
       "inputParameters": {},
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -29,6 +30,7 @@
         "task_type": "${get_customer.taskType}",
         "correlation_id": "${get_customer.correlationId}"
       },
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,

@@ -1,11 +1,11 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -25,7 +25,9 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class SimpleTaskBuilder<A, B>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<A, B>(taskExpression, inputExpression, buildConfiguration) where A : IRequest<B>
+    public class SimpleTaskBuilder<A, B>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<A, B>(taskExpression, inputExpression, buildConfiguration)
+        where A : IRequest<B>
     {
         public override WorkflowTask[] Build() =>
             [
@@ -34,7 +36,8 @@ namespace ConductorSharp.Engine.Builders
                     Name = _taskName,
                     TaskReferenceName = _taskRefferenceName,
                     WorkflowTaskType = WorkflowTaskType.SIMPLE,
-                    InputParameters = _inputParameters.ToObject<IDictionary<string,object>>(),
+                    Type = WorkflowTaskType.SIMPLE.ToString(),
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                     Optional = _additionalParameters?.Optional == true
                 }
             ];

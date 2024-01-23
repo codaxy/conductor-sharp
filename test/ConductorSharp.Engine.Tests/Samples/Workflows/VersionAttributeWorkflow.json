@@ -8,6 +8,7 @@
       "name": "TEST_subworkflow",
       "taskReferenceName": "test_subworkflow",
       "inputParameters": {},
+      "type": "SUB_WORKFLOW",
       "startDelay": 0,
       "subWorkflowParam": {
         "name": "TEST_subworkflow",

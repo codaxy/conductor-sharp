@@ -8,6 +8,7 @@
       "name": "HUMAN_human_task",
       "taskReferenceName": "human_task",
       "inputParameters": {},
+      "type": "HUMAN",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,

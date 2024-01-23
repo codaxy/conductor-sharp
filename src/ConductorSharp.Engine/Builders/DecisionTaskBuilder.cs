@@ -1,14 +1,14 @@
-﻿using ConductorSharp.Client;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using ConductorSharp.Client;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -20,7 +20,8 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
             Expression<Func<TWorkflow, DecisionTaskInput>> expression,
             DecisionCases<TWorkflow> decisionCases
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new DecisionTaskBuilder<TWorkflow>(
                 taskSelector.Body,
@@ -56,7 +57,7 @@ namespace ConductorSharp.Engine.Builders
         WorkflowBuildItemRegistry buildItemRegistry,
         IEnumerable<ConfigurationProperty> configurationProperties,
         BuildContext buildContext
-        ) : BaseTaskBuilder<DecisionTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration), ITaskSequenceBuilder<TWorkflow>
+    ) : BaseTaskBuilder<DecisionTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration), ITaskSequenceBuilder<TWorkflow>
         where TWorkflow : ITypedWorkflow
     {
         private readonly Dictionary<string, List<ITaskBuilder>> _caseDictionary = [];
@@ -75,7 +76,6 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
-       
         public override WorkflowTask[] Build()
         {
             var decisionTaskName = $"DECISION_{_taskRefferenceName}";
@@ -89,6 +89,7 @@ namespace ConductorSharp.Engine.Builders
                     TaskReferenceName = _taskRefferenceName,
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                     WorkflowTaskType = WorkflowTaskType.DECISION,
+                    Type = WorkflowTaskType.DECISION.ToString(),
                     CaseExpression = "case_value_param",
                     DecisionCases = new JObject
                     {

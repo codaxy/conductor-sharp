@@ -11,6 +11,7 @@
         "duration": "1s",
         "until": "2022-12-31 11:59"
       },
+      "type": "WAIT",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,

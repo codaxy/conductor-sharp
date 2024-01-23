@@ -19,6 +19,7 @@
           }
         ]
       },
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,

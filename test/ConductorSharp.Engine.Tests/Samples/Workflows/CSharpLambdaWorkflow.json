@@ -13,6 +13,7 @@
           "lambda_input": "${workflow.input.input}"
         }
       },
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -26,6 +27,7 @@
       "inputParameters": {
         "case_value_param": "${workflow.input.operation}"
       },
+      "type": "DECISION",
       "caseExpression": "case_value_param",
       "decisionCases": {
         "upper": [
@@ -38,6 +40,7 @@
                 "lambda_input": "${workflow.input.input}"
               }
             },
+            "type": "SIMPLE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
@@ -56,6 +59,7 @@
                 "lambda_input": "${workflow.input.input}"
               }
             },
+            "type": "SIMPLE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,

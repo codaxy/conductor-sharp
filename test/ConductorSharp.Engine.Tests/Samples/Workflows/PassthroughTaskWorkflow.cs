@@ -11,7 +11,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     {
         public PassthroughTaskWorkflow(
             WorkflowDefinitionBuilder<PassthroughTaskWorkflow, PassthroughTaskWorkflowInput, PassthroughTaskWorkflowOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public override void BuildDefinition()
         {
@@ -20,7 +21,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 {
                     Name = "LAMBDA_return_data",
                     TaskReferenceName = "return_data",
-                    Type = "LAMBDA",
+                    WorkflowTaskType = WorkflowTaskType.LAMBDA,
+                    Type = WorkflowTaskType.LAMBDA.ToString(),
                     Description = "Lambda task to return data",
                     InputParameters = new JObject
                     {

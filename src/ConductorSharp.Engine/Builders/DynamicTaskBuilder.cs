@@ -1,13 +1,13 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -27,7 +27,8 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class DynamicTaskBuilder<I, O>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<DynamicTaskInput<I, O>, O>(taskExpression, inputExpression, buildConfiguration)
+    public class DynamicTaskBuilder<I, O>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<DynamicTaskInput<I, O>, O>(taskExpression, inputExpression, buildConfiguration)
     {
         private const string DynamicTasknameParam = "task_to_execute";
 
@@ -48,11 +49,13 @@ namespace ConductorSharp.Engine.Builders
 
             return
             [
-                new() {
+                new()
+                {
                     Name = _taskRefferenceName,
                     TaskReferenceName = _taskRefferenceName,
                     WorkflowTaskType = WorkflowTaskType.DYNAMIC,
-                    InputParameters = parameters.TaskInput.ToObject<IDictionary<string,object>>(),
+                    Type = WorkflowTaskType.DYNAMIC.ToString(),
+                    InputParameters = parameters.TaskInput.ToObject<IDictionary<string, object>>(),
                     DynamicTaskNameParam = DynamicTasknameParam,
                 }
             ];

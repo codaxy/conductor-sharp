@@ -38,6 +38,7 @@ namespace ConductorSharp.Engine.Builders
                     Name = dynamicTaskName,
                     TaskReferenceName = dynamicTaskName,
                     WorkflowTaskType = WorkflowTaskType.FORK_JOIN_DYNAMIC,
+                    Type = WorkflowTaskType.FORK_JOIN_DYNAMIC.ToString(),
                     DynamicForkTasksParam = "dynamic_tasks",
                     DynamicForkTasksInputParamName = "dynamic_tasks_i",
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
@@ -46,7 +47,8 @@ namespace ConductorSharp.Engine.Builders
                 {
                     Name = joinTaskName,
                     TaskReferenceName = joinTaskName,
-                    WorkflowTaskType = WorkflowTaskType.JOIN
+                    WorkflowTaskType = WorkflowTaskType.JOIN,
+                    Type = WorkflowTaskType.JOIN.ToString()
                 }
             ];
         }

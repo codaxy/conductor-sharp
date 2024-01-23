@@ -10,6 +10,7 @@
       "inputParameters": {
         "id": "${workflow.input.id}"
       },
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -24,6 +25,7 @@
         "address": "${get_customer.output.address}",
         "name": "${get_customer.output.name}"
       },
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,

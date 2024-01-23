@@ -11,6 +11,7 @@
         "task_names": "task1,task2",
         "workflow_id": "${workflow.input.workflow_id}"
       },
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,
@@ -24,6 +25,7 @@
       "inputParameters": {
         "seconds": "${workflow.input.seconds}"
       },
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,

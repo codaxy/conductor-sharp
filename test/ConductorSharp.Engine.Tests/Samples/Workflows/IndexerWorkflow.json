@@ -11,6 +11,7 @@
         "customer_name": "${workflow.input.dictionary['test'].customer_name}",
         "address": "${workflow.input.double_dictionary['test']['address']}"
       },
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,

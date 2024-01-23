@@ -1,12 +1,12 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -28,7 +28,9 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class LambdaTaskBuilder<A, B>(string script, Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration) : BaseTaskBuilder<A, B>(taskExpression, inputExpression, buildConfiguration) where A : IRequest<B>
+    public class LambdaTaskBuilder<A, B>(string script, Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<A, B>(taskExpression, inputExpression, buildConfiguration)
+        where A : IRequest<B>
     {
         private readonly string _script = script;
 
@@ -36,12 +38,13 @@ namespace ConductorSharp.Engine.Builders
         {
             _inputParameters.Add(new JProperty("scriptExpression", _script));
             return
-                [
+            [
                 new()
                 {
                     Name = $"LAMBDA_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
                     WorkflowTaskType = WorkflowTaskType.LAMBDA,
+                    Type = WorkflowTaskType.LAMBDA.ToString(),
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>()
                 }
             ];

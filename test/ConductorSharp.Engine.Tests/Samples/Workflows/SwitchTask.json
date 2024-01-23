@@ -10,6 +10,7 @@
       "inputParameters": {
         "switch_case_value": "test"
       },
+      "type": "SWITCH",
       "decisionCases": {
         "test": [
           {
@@ -18,6 +19,7 @@
             "inputParameters": {
               "customer_id": 1
             },
+            "type": "SIMPLE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
@@ -34,6 +36,7 @@
           "inputParameters": {
             "terminationStatus": "FAILED"
           },
+          "type": "TERMINATE",
           "startDelay": 0,
           "optional": false,
           "rateLimited": false,

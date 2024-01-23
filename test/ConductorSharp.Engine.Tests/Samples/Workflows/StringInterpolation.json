@@ -11,6 +11,7 @@
         "address": "${workflow.input.first_input},${workflow.input.second_input},Value,0",
         "name": "Workflow name: TEST_StringInterpolation"
       },
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,

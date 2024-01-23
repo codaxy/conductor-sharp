@@ -10,6 +10,7 @@
       "inputParameters": {
         "case_value_param": "value"
       },
+      "type": "DECISION",
       "caseExpression": "case_value_param",
       "decisionCases": {
         "value": [
@@ -22,6 +23,7 @@
               },
               "terminationStatus": "COMPLETED"
             },
+            "type": "TERMINATE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
@@ -44,6 +46,7 @@
       "inputParameters": {
         "switch_case_value": "value"
       },
+      "type": "SWITCH",
       "decisionCases": {
         "value": [
           {
@@ -55,6 +58,7 @@
               },
               "terminationStatus": "FAILED"
             },
+            "type": "TERMINATE",
             "startDelay": 0,
             "optional": false,
             "rateLimited": false,
@@ -82,6 +86,7 @@
           "property": "Test"
         }
       },
+      "type": "TERMINATE",
       "startDelay": 0,
       "optional": false,
       "rateLimited": false,

@@ -10,6 +10,7 @@
       "inputParameters": {
         "case_value_param": "${workflow.input.should_send_notification}"
       },
+      "type": "DECISION",
       "caseExpression": "case_value_param",
       "decisionCases": {
         "YES": [
@@ -19,6 +20,7 @@
             "inputParameters": {
               "case_value_param": "${workflow.input.should_send_notification}"
             },
+            "type": "DECISION",
             "caseExpression": "case_value_param",
             "decisionCases": {
               "YES": [
@@ -28,6 +30,7 @@
                   "inputParameters": {
                     "id": "${workflow.input.customer_id}"
                   },
+                  "type": "SUB_WORKFLOW",
                   "startDelay": 0,
                   "subWorkflowParam": {
                     "name": "NOTIFICATION_send_to_customer",

@@ -27,7 +27,7 @@
       "rateLimited": false,
       "asyncComplete": false,
       "retryCount": 0,
-      "workflowTaskType": "SIMPLE"
+      "workflowTaskType": "LAMBDA"
     }
   ],
   "inputParameters": [],
