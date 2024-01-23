@@ -1,6 +1,12 @@
-﻿using ConductorSharp.Client;
-using ConductorSharp.Client.Model.Response;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using ConductorSharp.Client;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
+using ConductorSharp.Client.Util;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Polling;
@@ -8,11 +14,8 @@ using ConductorSharp.Engine.Util;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Task = System.Threading.Tasks.Task;
 
 namespace ConductorSharp.Engine
 {
@@ -22,6 +25,7 @@ namespace ConductorSharp.Engine
         private readonly WorkerSetConfig _configuration;
         private readonly ILogger<ExecutionManager> _logger;
         private readonly ITaskService _taskManager;
+        private readonly IExternalPayloadService _externalPayloadService;
         private readonly IEnumerable<TaskToWorker> _registeredWorkers;
         private readonly IServiceScopeFactory _lifetimeScopeFactory;
         private readonly IPollTimingStrategy _pollTimingStrategy;
@@ -32,6 +36,7 @@ namespace ConductorSharp.Engine
             ILogger<ExecutionManager> logger,
             ITaskService taskService,
             IEnumerable<TaskToWorker> workerMappings,
+            IExternalPayloadService externalPayloadService,
             IServiceScopeFactory lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy
@@ -45,6 +50,7 @@ namespace ConductorSharp.Engine
             _lifetimeScopeFactory = lifetimeScope;
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
+            _externalPayloadService = externalPayloadService;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -53,7 +59,7 @@ namespace ConductorSharp.Engine
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var queuedTasks = (await _taskManager.GetAllQueues())
+                var queuedTasks = (await _taskManager.ListQueuesAsync(cancellationToken))
                     .Where(a => _registeredWorkers.Any(b => b.TaskName == a.Key) && a.Value > 0)
                     .ToDictionary(a => a.Key, a => a.Value);
 
@@ -78,7 +84,7 @@ namespace ConductorSharp.Engine
             }
         }
 
-        private Type GetInputType(Type workerType)
+        private static Type GetInputType(Type workerType)
         {
             var interfaces = workerType
                 .GetInterfaces()
@@ -95,27 +101,39 @@ namespace ConductorSharp.Engine
         private async Task PollAndHandle(TaskToWorker scheduledWorker, CancellationToken cancellationToken)
         {
             var workerId = Guid.NewGuid().ToString();
-            PollTaskResponse pollResponse;
 
-            if (string.IsNullOrEmpty(_configuration.Domain))
-                pollResponse = await _taskManager.PollTasks(scheduledWorker.TaskName, workerId);
-            else
-                pollResponse = await _taskManager.PollTasks(scheduledWorker.TaskName, workerId, _configuration.Domain);
+            var pollResponse = await _taskManager.PollAsync(scheduledWorker.TaskName, workerId, _configuration.Domain, cancellationToken);
 
             if (pollResponse == null)
                 return;
 
-            if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStorage))
+            if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStoragePath))
             {
-                _logger.LogDebug($"Fetching storage location {pollResponse.ExternalInputPayloadStorage}");
-                var externalStorageLocation = await _taskManager.FetchExternalStorageLocation(pollResponse.ExternalInputPayloadStorage);
-                pollResponse.InputData = await _taskManager.FetchExternalStorage(externalStorageLocation.Path);
+                _logger.LogDebug("Fetching storage {location}", pollResponse.ExternalInputPayloadStoragePath);
+                // TODO: Check what the operation and payload type are
+                var externalStorageLocation = await _taskManager.GetExternalStorageLocationAsync(
+                    pollResponse.ExternalInputPayloadStoragePath,
+                    "",
+                    "",
+                    cancellationToken
+                );
+
+                // TODO: iffy
+                var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, cancellationToken);
+
+                using TextReader textReader = new StreamReader(file.Stream);
+                var json = textReader.ReadToEnd();
+
+                pollResponse.InputData = JsonConvert.DeserializeObject<IDictionary<string, object>>(
+                    json,
+                    ConductorConstants.IoJsonSerializerSettings
+                );
             }
 
             try
             {
                 var inputType = GetInputType(scheduledWorker.TaskType);
-                var inputData = pollResponse.InputData.ToObject(inputType, ConductorConstants.IoJsonSerializer);
+                var inputData = SerializationHelper.DictonaryToObject(inputType, pollResponse.InputData, ConductorConstants.IoJsonSerializerSettings);
 
                 using var scope = _lifetimeScopeFactory.CreateScope();
 
@@ -135,7 +153,16 @@ namespace ConductorSharp.Engine
 
                 var response = await mediator.Send(inputData, cancellationToken);
 
-                await _taskManager.UpdateTaskCompleted(response, pollResponse.TaskId, pollResponse.WorkflowInstanceId);
+                await _taskManager.UpdateAsync(
+                    new TaskResult
+                    {
+                        TaskId = pollResponse.TaskId,
+                        Status = TaskResultStatus.COMPLETED,
+                        OutputData = SerializationHelper.ObjectToDictionary(response, ConductorConstants.IoJsonSerializerSettings),
+                        WorkflowInstanceId = pollResponse.WorkflowInstanceId
+                    },
+                    cancellationToken
+                );
             }
             catch (Exception exception)
             {
@@ -149,12 +176,26 @@ namespace ConductorSharp.Engine
 
                 var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
 
-                await _taskManager.UpdateTaskFailed(
-                    errorMessage,
-                    pollResponse.TaskId,
-                    pollResponse.WorkflowInstanceId,
-                    exception.Message,
-                    exception.StackTrace
+                // TODO: We should verify that this is alright, it is possible that when executed concurrently,
+                // the updates caused by LogAsync will be discarded because the call of UpdateAsync(TaskResult...)
+                // sets the logs to null. Not sure how this is implemented in the backend, also, would have expected this to be a
+                // PUT or PATCH request, but by specs it is POST
+                await Task.WhenAll(
+                    [
+                        _taskManager.UpdateAsync(
+                            new TaskResult
+                            {
+                                TaskId = pollResponse.TaskId,
+                                Status = TaskResultStatus.FAILED,
+                                ReasonForIncompletion = exception.Message,
+                                OutputData = SerializationHelper.ObjectToDictionary(errorMessage, ConductorConstants.IoJsonSerializerSettings),
+                                WorkflowInstanceId = pollResponse.WorkflowInstanceId
+                            },
+                            cancellationToken
+                        ),
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.Message, cancellationToken),
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.StackTrace, cancellationToken)
+                    ]
                 );
             }
         }

@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ConductorSharp.Client.Generated;
+using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
@@ -15,16 +11,18 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     {
         public PassthroughTaskWorkflow(
             WorkflowDefinitionBuilder<PassthroughTaskWorkflow, PassthroughTaskWorkflowInput, PassthroughTaskWorkflowOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public override void BuildDefinition()
         {
             _builder.AddTasks(
-                new WorkflowDefinition.Task
+                new WorkflowTask
                 {
                     Name = "LAMBDA_return_data",
                     TaskReferenceName = "return_data",
-                    Type = "LAMBDA",
+                    WorkflowTaskType = WorkflowTaskType.LAMBDA,
+                    Type = WorkflowTaskType.LAMBDA.ToString(),
                     Description = "Lambda task to return data",
                     InputParameters = new JObject
                     {
@@ -53,7 +51,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                                 + "upstream_switch_interface_name : $.upstream_switch_interface_name,"
                                 + "}"
                         )
-                    }
+                    }.ToObject<IDictionary<string, object>>()
                 }
             );
         }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using ConductorSharp.Client.Generated;
+using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Engine.Model
 {
@@ -10,8 +11,8 @@ namespace ConductorSharp.Engine.Model
         public string Description { get; set; }
         public int RetryCount { get; set; }
         public int TimeoutSeconds { get; set; } = 60;
-        public string TimeoutPolicy { get; set; } = "TIME_OUT_WF";
-        public string RetryLogic { get; set; } = "FIXED";
+        public TaskDefTimeoutPolicy TimeoutPolicy { get; set; } = TaskDefTimeoutPolicy.TIME_OUT_WF;
+        public TaskDefRetryLogic RetryLogic { get; set; } = TaskDefRetryLogic.FIXED;
         public int RetryDelaySeconds { get; set; }
         public int ResponseTimeoutSeconds { get; set; } = 60;
         public int ConcurrentExecLimit { get; set; }

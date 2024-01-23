@@ -1,20 +1,15 @@
-﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Engine.Builders;
-using ConductorSharp.Engine.Interface;
-using ConductorSharp.Engine.Util;
-using ConductorSharp.Patterns.Tasks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Util;
+using ConductorSharp.Patterns.Tasks;
 
 namespace ConductorSharp.Patterns.Builders
 {
-    internal class TaskNameBuilder : DefaultTaskNameBuilder
+    internal class TaskNameBuilder(IEnumerable<ConfigurationProperty> configurationProperties) : DefaultTaskNameBuilder
     {
-        private readonly IEnumerable<ConfigurationProperty> _configurationProperties;
-
-        public TaskNameBuilder(IEnumerable<ConfigurationProperty> configurationProperties) => _configurationProperties = configurationProperties;
+        private readonly IEnumerable<ConfigurationProperty> _configurationProperties = configurationProperties;
 
         public override string Build(Type taskType) =>
             taskType == typeof(CSharpLambdaTask) ? $"{GetLambdaTaskPrefix()}{base.Build(taskType)}" : base.Build(taskType);
@@ -25,6 +20,6 @@ namespace ConductorSharp.Patterns.Builders
             return MakeTaskNamePrefix(prefix);
         }
 
-        public static string MakeTaskNamePrefix(string prefix) => prefix == null ? string.Empty : $"{prefix}.";
+        public static string MakeTaskNamePrefix(string? prefix) => prefix == null ? string.Empty : $"{prefix}.";
     }
 }

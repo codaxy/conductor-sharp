@@ -1,7 +1,6 @@
 ﻿using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.NoApi.Handlers;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,11 +20,7 @@ var builder = Host.CreateDefaultBuilder()
         {
             services.AddAutoMapper(typeof(Program));
             services
-                .AddConductorSharp(
-                    baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"),
-                    apiPath: configuration.GetValue<string>("Conductor:ApiUrl"),
-                    preventErrorOnBadRequest: configuration.GetValue<bool>("Conductor:PreventErrorOnBadRequest")
-                )
+                .AddConductorSharp(baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"))
                 .AddExecutionManager(
                     maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),

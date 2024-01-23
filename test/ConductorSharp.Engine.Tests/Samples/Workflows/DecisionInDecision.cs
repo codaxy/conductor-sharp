@@ -27,6 +27,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public override void BuildDefinition()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             _builder.AddTask(
                 wf => wf.SendNotificationDecision,
                 wf => new() { CaseValueParam = wf.WorkflowInput.ShouldSendNotification },
@@ -44,6 +45,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                         )
                 }
             );
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

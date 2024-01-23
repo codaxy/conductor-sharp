@@ -1,15 +1,14 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using ConductorSharp.Client.Generated;
+using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -30,7 +29,7 @@ namespace ConductorSharp.Engine.Builders
         where TOutput : WorkflowOutput
     {
         private readonly Type _workflowType = typeof(TWorkflow);
-        private readonly List<ITaskBuilder> _taskBuilders = new();
+        private readonly List<ITaskBuilder> _taskBuilders = [];
 
         public BuildContext BuildContext { get; } = new();
         public BuildConfiguration BuildConfiguration { get; set; }
@@ -51,7 +50,7 @@ namespace ConductorSharp.Engine.Builders
 
         private void GenerateWorkflowName() => BuildContext.WorkflowName = NamingUtil.DetermineRegistrationName(_workflowType);
 
-        public WorkflowDefinition Build()
+        public WorkflowDef Build()
         {
             var metadataAttribute = _workflowType.GetCustomAttribute<WorkflowMetadataAttribute>();
             var ownerApp = metadataAttribute?.OwnerApp;
@@ -81,7 +80,7 @@ namespace ConductorSharp.Engine.Builders
                 BuildContext.Inputs.Add(propertyName);
             }
 
-            return new WorkflowDefinition
+            return new WorkflowDef
             {
                 Name = BuildContext.WorkflowName,
                 Tasks = _taskBuilders.SelectMany(a => a.Build()).ToList(),

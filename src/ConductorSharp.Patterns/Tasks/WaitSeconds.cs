@@ -1,15 +1,12 @@
-﻿using ConductorSharp.Engine;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
+using ConductorSharp.Engine;
+using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using MediatR;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Patterns.Tasks
 {
@@ -29,13 +26,9 @@ namespace ConductorSharp.Patterns.Tasks
     [OriginalName(Constants.TaskNamePrefix + "_wait_seconds")]
     public class WaitSeconds : TaskRequestHandler<WaitSecondsRequest, NoOutput>
     {
-        private readonly ILogger<WaitSeconds> _logger;
-
-        public WaitSeconds(ILogger<WaitSeconds> logger) => _logger = logger;
-
-        public async override Task<NoOutput> Handle(WaitSecondsRequest input, CancellationToken cancellationToken)
+        public override async Task<NoOutput> Handle(WaitSecondsRequest input, CancellationToken cancellationToken)
         {
-            await Task.Delay(input.Seconds * 1000);
+            await Task.Delay(input.Seconds * 1000, cancellationToken);
             return new NoOutput();
         }
     }

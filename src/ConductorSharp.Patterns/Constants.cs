@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ConductorSharp.Patterns
+﻿namespace ConductorSharp.Patterns
 {
     public static class Constants
     {

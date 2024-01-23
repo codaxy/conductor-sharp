@@ -21,13 +21,15 @@ public class ConditionallySendCustomerNotification
             ConditionallySendCustomerNotificationInput,
             ConditionallySendCustomerNotificationOutput
         > builder
-    ) : base(builder) { }
+    )
+        : base(builder) { }
 
     public DecisionTaskModel SendNotificationDecision { get; set; }
     public SendCustomerNotification SendNotificationSubworkflow { get; set; }
 
     public override void BuildDefinition()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         _builder.AddTask(
             wf => wf.SendNotificationDecision,
             wf => new() { CaseValueParam = wf.WorkflowInput.ShouldSendNotification },
@@ -36,5 +38,6 @@ public class ConditionallySendCustomerNotification
                 ["YES"] = builder => builder.AddTask(c => c.SendNotificationSubworkflow, wf => new() { CustomerId = wf.WorkflowInput.CustomerId })
             }
         );
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

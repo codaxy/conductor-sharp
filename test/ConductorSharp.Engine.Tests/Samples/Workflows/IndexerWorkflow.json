@@ -1,59 +1,33 @@
 {
-  "ownerApp": null,
   "createTime": 0,
   "updateTime": 0,
-  "createdBy": null,
-  "updatedBy": null,
   "name": "indexer_workflow",
-  "description": null,
   "version": 1,
   "tasks": [
     {
-      "queryExpression": null,
       "name": "EMAIL_prepare",
       "taskReferenceName": "prepare_email",
-      "description": null,
       "inputParameters": {
         "customer_name": "${workflow.input.dictionary['test'].customer_name}",
         "address": "${workflow.input.double_dictionary['test']['address']}"
       },
       "type": "SIMPLE",
-      "dynamicTaskNameParam": null,
-      "caseValueParam": null,
-      "caseExpression": null,
-      "expression": null,
-      "evaluatorType": null,
-      "scriptExpression": null,
-      "decisionCases": null,
-      "dynamicForkJoinTasksParam": null,
-      "dynamicForkTasksParam": null,
-      "dynamicForkTasksInputParamName": null,
-      "defaultCase": null,
-      "forkTasks": null,
       "startDelay": 0,
-      "subWorkflowParam": null,
-      "joinOn": null,
-      "sink": null,
       "optional": false,
-      "taskDefinition": null,
       "rateLimited": false,
-      "defaultExclusiveJoinTask": null,
       "asyncComplete": false,
-      "loopCondition": null,
-      "loopOver": null
+      "retryCount": 0,
+      "workflowTaskType": "SIMPLE"
     }
   ],
   "inputParameters": [
     "dictionary",
     "double_dictionary"
   ],
-  "outputParameters": null,
-  "failureWorkflow": null,
+  "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": true,
-  "workflowStatusListenerEnabled": true,
-  "ownerEmail": null,
-  "timeoutPolicy": null,
-  "timeoutSeconds": 0,
-  "variables": null
+  "restartable": false,
+  "workflowStatusListenerEnabled": false,
+  "timeoutPolicy": "TIME_OUT_WF",
+  "timeoutSeconds": 0
 }

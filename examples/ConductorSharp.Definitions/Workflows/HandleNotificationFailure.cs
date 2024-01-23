@@ -1,14 +1,7 @@
-﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Engine.Builders;
+﻿using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Patterns.Tasks;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Definitions.Workflows
 {
@@ -26,7 +19,8 @@ namespace ConductorSharp.Definitions.Workflows
     {
         public HandleNotificationFailure(
             WorkflowDefinitionBuilder<HandleNotificationFailure, HandleNotificationFailureInput, HandleNotificationFailureOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public ReadWorkflowTasks ReadExecutedTasks { get; set; }
 

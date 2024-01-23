@@ -1,10 +1,8 @@
-﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Definitions.Generated;
+﻿using ConductorSharp.Definitions.Generated;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
-using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Tasks;
 using MediatR;
 
@@ -33,7 +31,8 @@ namespace ConductorSharp.Definitions.Workflows
     {
         public SendCustomerNotification(
             WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public EmailPrepareV1 PrepareEmail { get; set; }
         public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput> DynamicHandler { get; set; }

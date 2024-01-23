@@ -3,7 +3,6 @@ using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Patterns.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 IConfiguration configuration = null;
@@ -19,13 +18,8 @@ var builder = Host.CreateDefaultBuilder()
     .ConfigureServices(
         (_, services) =>
         {
-            services.AddAutoMapper(typeof(Program));
             services
-                .AddConductorSharp(
-                    baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"),
-                    apiPath: configuration.GetValue<string>("Conductor:ApiUrl"),
-                    preventErrorOnBadRequest: configuration.GetValue<bool>("Conductor:PreventErrorOnBadRequest")
-                )
+                .AddConductorSharp(baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"))
                 .AddExecutionManager(
                     maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),

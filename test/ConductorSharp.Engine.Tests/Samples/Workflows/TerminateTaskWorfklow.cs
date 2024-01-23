@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ConductorSharp.Engine.Tests.Samples.Workflows
+﻿namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
     public class TerminateTaskWorfklowInput : WorkflowInput<TerminateTaskWorfklowOutput> { }
 
@@ -14,7 +8,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     {
         public TerminateTaskWorfklow(
             WorkflowDefinitionBuilder<TerminateTaskWorfklow, TerminateTaskWorfklowInput, TerminateTaskWorfklowOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public DecisionTaskModel DecisionTask { get; set; }
         public SwitchTaskModel SwitchTask { get; set; }
@@ -24,6 +19,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public override void BuildDefinition()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             _builder.AddTask(
                 wf => wf.DecisionTask,
                 wf => new() { CaseValueParam = "value" },
@@ -36,6 +32,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                         )
                 }
             );
+#pragma warning restore CS0618 // Type or member is obsolete
 
             _builder.AddTask(
                 wf => wf.SwitchTask,
