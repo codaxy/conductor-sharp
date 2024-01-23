@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace ConductorSharp.Engine.Extensions
@@ -24,6 +25,7 @@ namespace ConductorSharp.Engine.Extensions
             int maxConcurrentWorkers,
             int sleepInterval,
             int longPollInterval,
+            Assembly assembly,
             string domain = null,
             params Assembly[] handlerAssemblies
         )
@@ -54,7 +56,7 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.AddTransient<IPollOrderStrategy, RandomOrdering>();
 
-            Builder.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(handlerAssemblies));
+            Builder.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(new[] { assembly }.Concat(handlerAssemblies).ToArray()));
 
             return this;
         }

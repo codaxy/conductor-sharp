@@ -12,6 +12,7 @@ namespace ConductorSharp.Engine.Extensions
             int maxConcurrentWorkers,
             int sleepInterval,
             int longPollInterval,
+            Assembly assembly,
             string domain = null,
             params Assembly[] handlerAssemblies
         );
