@@ -25,22 +25,16 @@ namespace ConductorSharp.Engine.Builders
         public TOutput WorkflowOutput { get; set; }
         public WorkflowId Id { get; set; }
 
-        public virtual void BuildDefinition() { }
+        public abstract void BuildDefinition();
 
         public Workflow(WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder)
         {
             _builder = builder;
         }
 
-        public virtual WorkflowDefinition GetDefinition()
+        public WorkflowDefinition GetDefinition()
         {
-            if (_workflowDefinition == null)
-            {
-                BuildDefinition();
-                _workflowDefinition = _builder.Build();
-            }
-
-            return _workflowDefinition;
+            return _builder.Build();
         }
     }
 }
