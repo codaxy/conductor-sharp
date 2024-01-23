@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using ConductorSharp.Client.Generated;
-using ConductorSharp.Client.Model.Common;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
@@ -87,10 +86,11 @@ namespace ConductorSharp.Engine.Builders
                 FailureWorkflow = failureWorkflow != null ? NamingUtil.DetermineRegistrationName(failureWorkflow) : null,
                 Description = description,
                 InputParameters = BuildContext.Inputs.ToArray(),
-                OutputParameters = BuildContext.Outputs,
+                OutputParameters = (BuildContext.Outputs ?? []).ToObject<IDictionary<string, object>>(),
                 OwnerApp = ownerApp,
                 OwnerEmail = ownerEmail,
-                Version = version
+                Version = version,
+                SchemaVersion = 2
             };
         }
 

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ConductorSharp.Client;
 using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Patterns.Exceptions;
