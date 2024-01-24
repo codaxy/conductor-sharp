@@ -244,6 +244,15 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Throws<NonEvaluatableExpressionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
         }
 
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionWorkflowMetadataWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<WorkflowMetadataWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/WorkflowMetadataWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
         private static string GetDefinitionFromWorkflow<TWorkflow>()
             where TWorkflow : IConfigurableWorkflow
         {
