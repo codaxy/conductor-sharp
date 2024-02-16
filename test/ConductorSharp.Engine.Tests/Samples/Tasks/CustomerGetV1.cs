@@ -1,4 +1,6 @@
-﻿namespace ConductorSharp.Engine.Tests.Samples.Tasks;
+﻿using ConductorSharp.Engine.Builders.Metadata;
+
+namespace ConductorSharp.Engine.Tests.Samples.Tasks;
 
 public partial class CustomerGetV1Input : IRequest<CustomerGetV1Output>
 {

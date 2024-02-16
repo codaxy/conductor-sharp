@@ -1,8 +1,8 @@
-﻿using ConductorSharp.Client.Service;
+﻿using System.Threading.Tasks;
+using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Service
 {

@@ -8,7 +8,8 @@
     {
         public TerminateTaskWorfklow(
             WorkflowDefinitionBuilder<TerminateTaskWorfklow, TerminateTaskWorfklowInput, TerminateTaskWorfklowOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public DecisionTaskModel DecisionTask { get; set; }
         public SwitchTaskModel SwitchTask { get; set; }

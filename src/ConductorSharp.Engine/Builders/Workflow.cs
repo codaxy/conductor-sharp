@@ -5,7 +5,8 @@ using MediatR;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public class WorkflowInput<T> : IWorkflowInput, IRequest<T> where T : WorkflowOutput { }
+    public class WorkflowInput<T> : IWorkflowInput, IRequest<T>
+        where T : WorkflowOutput { }
 
     public class WorkflowOutput { }
 
@@ -13,7 +14,9 @@ namespace ConductorSharp.Engine.Builders
 
     public interface IWorkflowInput { }
 
-    public abstract class Workflow<TWorkflow, TInput, TOutput>(WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder) : SubWorkflowTaskModel<TInput, TOutput>, IConfigurableWorkflow
+    public abstract class Workflow<TWorkflow, TInput, TOutput>(WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> builder)
+        : SubWorkflowTaskModel<TInput, TOutput>,
+            IConfigurableWorkflow
         where TWorkflow : Workflow<TWorkflow, TInput, TOutput>
         where TInput : WorkflowInput<TOutput>
         where TOutput : WorkflowOutput

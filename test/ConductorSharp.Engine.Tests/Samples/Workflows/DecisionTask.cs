@@ -10,7 +10,8 @@
         public CustomerGetV1 GetCustomer { get; set; }
         public TerminateTaskModel Terminate { get; set; }
 
-        public DecisionTask(WorkflowDefinitionBuilder<DecisionTask, DecisionTaskInput, DecisionTaskOutput> builder) : base(builder) { }
+        public DecisionTask(WorkflowDefinitionBuilder<DecisionTask, DecisionTaskInput, DecisionTaskOutput> builder)
+            : base(builder) { }
 
         public override void BuildDefinition()
         {

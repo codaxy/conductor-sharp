@@ -15,7 +15,7 @@ namespace ConductorSharp.Toolkit
     {
         public const string Version = "3.0.0-alpha1";
 
-        public async static Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var parseResult = new Parser(opts => opts.HelpWriter = null).ParseArguments<ToolkitOptions>(args);
             var withParsed = await parseResult.WithParsedAsync(RunToolkit);

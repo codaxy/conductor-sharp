@@ -1,7 +1,7 @@
-﻿using ConductorSharp.Client.Generated;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConductorSharp.Client.Generated;
 using EventHandler = ConductorSharp.Client.Generated.EventHandler;
 
 namespace ConductorSharp.Engine.Model

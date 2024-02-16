@@ -1,6 +1,6 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System.Collections.Generic;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Model;
-using System.Collections.Generic;
 
 namespace ConductorSharp.Engine.Service
 {

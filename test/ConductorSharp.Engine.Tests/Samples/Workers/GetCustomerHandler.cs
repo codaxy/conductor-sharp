@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workers;
 

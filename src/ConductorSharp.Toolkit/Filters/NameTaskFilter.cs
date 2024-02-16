@@ -1,6 +1,6 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System.Text.RegularExpressions;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Toolkit.Util;
-using System.Text.RegularExpressions;
 
 namespace ConductorSharp.Toolkit.Filters
 {

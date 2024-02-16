@@ -1,12 +1,13 @@
-﻿using ConductorSharp.Client.Generated;
-using ConductorSharp.Engine.Interface;
-using ConductorSharp.Engine.Util;
-using ConductorSharp.Engine.Util.Builders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using ConductorSharp.Client.Generated;
+using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -18,14 +19,6 @@ namespace ConductorSharp.Engine.Builders
             where G : WorkflowOutput
         {
             builder.BuildContext.Outputs = ExpressionUtil.ParseToParameters(input.Body);
-        }
-
-        public static void SetOptions<FWorkflow, F, G>(this WorkflowDefinitionBuilder<FWorkflow, F, G> builder, Action<WorkflowOptions> adjustOptions)
-            where FWorkflow : Workflow<FWorkflow, F, G>
-            where F : WorkflowInput<G>
-            where G : WorkflowOutput
-        {
-            adjustOptions?.Invoke(builder.BuildContext.WorkflowOptions);
         }
     }
 
@@ -58,19 +51,24 @@ namespace ConductorSharp.Engine.Builders
 
         public WorkflowDef Build()
         {
+            var metadataAttribute = _workflowType.GetCustomAttribute<WorkflowMetadataAttribute>();
+            var ownerApp = metadataAttribute?.OwnerApp;
+            var ownerEmail = metadataAttribute?.OwnerEmail;
+            var description = metadataAttribute?.Description;
+            var failureWorkflow = metadataAttribute?.FailureWorkflow;
+
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
-                BuildContext.WorkflowOptions.OwnerApp = BuildConfiguration.DefaultOwnerApp;
+                ownerApp = BuildConfiguration.DefaultOwnerApp;
             }
 
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerEmail))
             {
-                BuildContext.WorkflowOptions.OwnerEmail = BuildConfiguration.DefaultOwnerEmail;
+                ownerEmail = BuildConfiguration.DefaultOwnerEmail;
             }
 
-            BuildContext.WorkflowOptions.Version =
-                _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? BuildContext.WorkflowOptions.Version;
-            BuildContext.Inputs = [];
+            var version = _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? 1;
+            BuildContext.Inputs = new();
 
             var input = _workflowType.BaseType.GenericTypeArguments[1];
             var props = input.GetProperties();
@@ -85,16 +83,13 @@ namespace ConductorSharp.Engine.Builders
             {
                 Name = BuildContext.WorkflowName,
                 Tasks = _taskBuilders.SelectMany(a => a.Build()).ToList(),
-                FailureWorkflow =
-                    BuildContext.WorkflowOptions.FailureWorkflow != null
-                        ? NamingUtil.DetermineRegistrationName(BuildContext.WorkflowOptions.FailureWorkflow)
-                        : null,
-                Description = BuildContext.WorkflowOptions.Description,
+                FailureWorkflow = failureWorkflow != null ? NamingUtil.DetermineRegistrationName(failureWorkflow) : null,
+                Description = description,
                 InputParameters = BuildContext.Inputs.ToArray(),
                 OutputParameters = (BuildContext.Outputs ?? []).ToObject<IDictionary<string, object>>(),
-                OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
-                OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
-                Version = BuildContext.WorkflowOptions.Version,
+                OwnerApp = ownerApp,
+                OwnerEmail = ownerEmail,
+                Version = version,
                 SchemaVersion = 2
             };
         }

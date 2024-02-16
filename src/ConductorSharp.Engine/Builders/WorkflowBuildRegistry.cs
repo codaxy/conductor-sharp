@@ -1,7 +1,7 @@
-﻿using ConductorSharp.Engine.Interface;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -9,7 +9,8 @@ namespace ConductorSharp.Engine.Builders
     {
         private readonly Dictionary<Type, Dictionary<string, object>> _items = [];
 
-        public void Register<TWorkflow>(string key, object value) where TWorkflow : ITypedWorkflow
+        public void Register<TWorkflow>(string key, object value)
+            where TWorkflow : ITypedWorkflow
         {
             if (_items.TryGetValue(typeof(TWorkflow), out var item))
             {
@@ -21,8 +22,8 @@ namespace ConductorSharp.Engine.Builders
             }
         }
 
-        public bool TryGet<TWorkflow>(out Dictionary<string, object> items) where TWorkflow : IConfigurableWorkflow =>
-            _items.TryGetValue(typeof(TWorkflow), out items);
+        public bool TryGet<TWorkflow>(out Dictionary<string, object> items)
+            where TWorkflow : IConfigurableWorkflow => _items.TryGetValue(typeof(TWorkflow), out items);
 
         public List<T> GetAll<T>()
         {

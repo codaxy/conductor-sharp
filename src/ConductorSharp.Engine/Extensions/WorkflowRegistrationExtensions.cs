@@ -1,12 +1,12 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System;
+using System.IO;
+using System.Linq;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Linq;
 
 namespace ConductorSharp.Engine.Extensions
 {

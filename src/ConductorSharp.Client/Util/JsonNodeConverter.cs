@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Nodes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text.Json.Nodes;
 
 namespace ConductorSharp.Client.Util
 {

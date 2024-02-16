@@ -8,7 +8,7 @@ namespace ConductorSharp.Client.Generated
         string responseData,
         IReadOnlyDictionary<string, IEnumerable<string>> headers,
         JsonException exception
-        ) : Exception(message, exception)
+    ) : Exception(message, exception)
     {
         public ConductorErrorResponse? Errors { get; private set; } = JsonConvert.DeserializeObject<ConductorErrorResponse>(responseData);
         public int StatusCode { get; private set; } = statusCode;

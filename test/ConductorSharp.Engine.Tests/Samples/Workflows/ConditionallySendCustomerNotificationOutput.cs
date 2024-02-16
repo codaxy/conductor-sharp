@@ -1,4 +1,6 @@
-﻿namespace ConductorSharp.Engine.Tests.Samples.Workflows;
+﻿using ConductorSharp.Engine.Builders.Metadata;
+
+namespace ConductorSharp.Engine.Tests.Samples.Workflows;
 
 #region models
 public class ConditionallySendCustomerNotificationInput : WorkflowInput<ConditionallySendCustomerNotificationOutput>
@@ -19,7 +21,8 @@ public class ConditionallySendCustomerNotification
             ConditionallySendCustomerNotificationInput,
             ConditionallySendCustomerNotificationOutput
         > builder
-    ) : base(builder) { }
+    )
+        : base(builder) { }
 
     public DecisionTaskModel SendNotificationDecision { get; set; }
     public SendCustomerNotification SendNotificationSubworkflow { get; set; }

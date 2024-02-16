@@ -1,7 +1,7 @@
-﻿using ConductorSharp.Engine.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ConductorSharp.Engine.Model;
 
 namespace ConductorSharp.Engine.Polling
 {

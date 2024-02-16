@@ -244,7 +244,17 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Throws<NonEvaluatableExpressionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
         }
 
-        private static string GetDefinitionFromWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionWorkflowMetadataWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<WorkflowMetadataWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/WorkflowMetadataWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        private static string GetDefinitionFromWorkflow<TWorkflow>()
+            where TWorkflow : IConfigurableWorkflow
         {
             var workflow = RegisterWorkflow<TWorkflow>()
                 .GetRequiredService<IEnumerable<WorkflowDef>>()
@@ -253,7 +263,8 @@ namespace ConductorSharp.Engine.Tests.Integration
             return SerializationUtil.SerializeObject(workflow);
         }
 
-        private static IServiceProvider RegisterWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
+        private static IServiceProvider RegisterWorkflow<TWorkflow>()
+            where TWorkflow : IConfigurableWorkflow
         {
             var containerBuilder = new ServiceCollection();
 

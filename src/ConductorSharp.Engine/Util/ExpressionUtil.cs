@@ -1,12 +1,12 @@
-﻿using ConductorSharp.Engine.Builders;
-using ConductorSharp.Engine.Exceptions;
-using ConductorSharp.Engine.Interface;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Exceptions;
+using ConductorSharp.Engine.Interface;
+using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Engine.Util
 {

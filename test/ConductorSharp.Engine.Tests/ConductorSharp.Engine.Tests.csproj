@@ -34,6 +34,7 @@
     <None Remove="Samples\Workflows\TerminateTaskWorkflow.json" />
     <None Remove="Samples\Workflows\VersionAttributeWorkflow.json" />
     <None Remove="Samples\Workflows\WaitTask.json" />
+    <None Remove="Samples\Workflows\WorkflowMetadataWorkflow.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,6 +68,7 @@
 	<EmbeddedResource Include="Samples\Workflows\TerminateTaskWorkflow.json" />
 	<EmbeddedResource Include="Samples\Workflows\CastWorkflow.json" />
 	<EmbeddedResource Include="Samples\Workflows\VersionAttributeWorkflow.json" />
+	<EmbeddedResource Include="Samples\Workflows\WorkflowMetadataWorkflow.json" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,11 +1,11 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ConductorSharp.Engine.Builders
 {

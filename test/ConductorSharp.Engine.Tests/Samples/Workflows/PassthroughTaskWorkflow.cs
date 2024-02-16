@@ -54,8 +54,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                     }.ToObject<IDictionary<string, object>>()
                 }
             );
-
-            _builder.SetOptions(opts => opts.Version = 1);
         }
     }
 }

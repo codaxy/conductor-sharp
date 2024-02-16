@@ -1,17 +1,18 @@
-﻿using ConductorSharp.Client;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using ConductorSharp.Client;
 using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Patterns.Exceptions;
 using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ConductorSharp.Patterns.Tasks
 {
@@ -44,7 +45,9 @@ namespace ConductorSharp.Patterns.Tasks
                 throw new ArgumentException($"Request parameter {request.LambdaIdentifier} cannot be empty");
             }
 
-            var lambda = _itemRegistry.GetAll<CSharpLambdaHandler>().FirstOrDefault(lambda => lambda.LambdaIdentifier == request.LambdaIdentifier) ?? throw new NoLambdaException(request.LambdaIdentifier);
+            var lambda =
+                _itemRegistry.GetAll<CSharpLambdaHandler>().FirstOrDefault(lambda => lambda.LambdaIdentifier == request.LambdaIdentifier)
+                ?? throw new NoLambdaException(request.LambdaIdentifier);
             try
             {
                 return Task.FromResult(

@@ -1,4 +1,6 @@
-﻿using ConductorSharp.Engine.Behaviors;
+﻿using System;
+using System.Reflection;
+using ConductorSharp.Engine.Behaviors;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
@@ -8,8 +10,6 @@ using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Reflection;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -70,7 +70,8 @@ namespace ConductorSharp.Engine.Extensions
 
         public void AddExecutionTaskTracking() => Builder.AddTransient(typeof(IPipelineBehavior<,>), typeof(TaskExecutionTrackingBehavior<,>));
 
-        public IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService
+        public IExecutionManagerBuilder SetHealthCheckService<T>()
+            where T : IConductorSharpHealthService
         {
             Builder.AddSingleton(typeof(IConductorSharpHealthService), typeof(T));
             return this;

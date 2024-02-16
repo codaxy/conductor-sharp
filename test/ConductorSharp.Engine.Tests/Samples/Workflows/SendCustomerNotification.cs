@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Tests.Samples.Workers;
+﻿using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Tests.Samples.Workers;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows;
 

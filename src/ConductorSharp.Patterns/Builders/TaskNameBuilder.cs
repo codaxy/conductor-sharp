@@ -1,9 +1,9 @@
-﻿using ConductorSharp.Engine.Builders;
-using ConductorSharp.Engine.Util;
-using ConductorSharp.Patterns.Tasks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Util;
+using ConductorSharp.Patterns.Tasks;
 
 namespace ConductorSharp.Patterns.Builders
 {

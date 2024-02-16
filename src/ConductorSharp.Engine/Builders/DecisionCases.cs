@@ -1,10 +1,11 @@
-﻿using ConductorSharp.Engine.Interface;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public class DecisionCases<TWorkflow> where TWorkflow : ITypedWorkflow
+    public class DecisionCases<TWorkflow>
+        where TWorkflow : ITypedWorkflow
     {
         internal Dictionary<string, Action<ITaskSequenceBuilder<TWorkflow>>> Cases { get; } = [];
 

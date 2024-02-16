@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Patterns.Builders;
+﻿using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Patterns.Builders;
 using ConductorSharp.Patterns.Model;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows
@@ -11,6 +12,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class CSharpLambdaWorkflowOutput : WorkflowOutput { }
 
+    [WorkflowMetadata(OwnerEmail = "test@test.com")]
     public class CSharpLambdaWorkflow : Workflow<CSharpLambdaWorkflow, CSharpLambdaWorkflowInput, CSharpLambdaWorkflowOutput>
     {
         public class LambdaTaskInput : IRequest<LambdaTaskOutput>
@@ -78,8 +80,6 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 }
             );
 #pragma warning restore CS0618 // Type or member is obsolete
-
-            _builder.SetOptions(options => options.OwnerEmail = "test@test.com");
         }
     }
 }

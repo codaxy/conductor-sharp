@@ -1,10 +1,10 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System;
+using System.Threading;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading;
 using Task = System.Threading.Tasks.Task;
 
 namespace ConductorSharp.Engine.Service
@@ -15,7 +15,7 @@ namespace ConductorSharp.Engine.Service
         IDeploymentService deploymentService,
         ExecutionManager executionManager,
         ModuleDeployment deployment
-        ) : IHostedService, IDisposable
+    ) : IHostedService, IDisposable
     {
         private readonly ILogger<WorkflowEngineBackgroundService> _logger = logger;
         private readonly IDeploymentService _deploymentService = deploymentService;

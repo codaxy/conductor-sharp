@@ -1,11 +1,11 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System;
+using System.Net.Http;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Net.Http;
 
 namespace ConductorSharp.Engine.Extensions
 {
