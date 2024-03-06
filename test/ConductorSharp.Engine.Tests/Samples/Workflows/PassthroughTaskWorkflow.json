@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "passthrough_task_workflow",
   "version": 1,
   "tasks": [
@@ -22,19 +20,11 @@
         "scriptExpression": "return { hostname : $.hostname,additional_template : $.additional_template,base_template : $.base_template,licence : $.licence,oam_domain : $.oam_domain,platform_codename : $.platform_codename,platform_name : $.platform_name,software_version : $.software_version,upstream_switch : $.upstream_switch,upstream_switch_interface_name : $.upstream_switch_interface_name,}"
       },
       "type": "LAMBDA",
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "LAMBDA"
     }
   ],
   "inputParameters": [],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

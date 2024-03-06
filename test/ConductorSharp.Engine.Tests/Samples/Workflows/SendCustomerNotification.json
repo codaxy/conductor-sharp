@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "NOTIFICATION_send_to_customer",
   "version": 3,
   "tasks": [
@@ -11,11 +9,7 @@
         "id": "${workflow.input.id}"
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     },
     {
@@ -26,11 +20,7 @@
         "name": "${get_customer.output.name}"
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     }
   ],
@@ -39,8 +29,5 @@
   ],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

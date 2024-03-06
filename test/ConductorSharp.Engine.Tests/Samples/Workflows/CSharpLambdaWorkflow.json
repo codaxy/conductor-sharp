@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "c_sharp_lambda_workflow",
   "version": 1,
   "tasks": [
@@ -14,11 +12,7 @@
         }
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     },
     {
@@ -41,11 +35,7 @@
               }
             },
             "type": "SIMPLE",
-            "startDelay": 0,
             "optional": false,
-            "rateLimited": false,
-            "asyncComplete": false,
-            "retryCount": 0,
             "workflowTaskType": "SIMPLE"
           }
         ],
@@ -60,20 +50,11 @@
               }
             },
             "type": "SIMPLE",
-            "startDelay": 0,
             "optional": false,
-            "rateLimited": false,
-            "asyncComplete": false,
-            "retryCount": 0,
             "workflowTaskType": "SIMPLE"
           }
         ]
       },
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "DECISION"
     }
   ],
@@ -83,9 +64,6 @@
   ],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
   "ownerEmail": "test@test.com",
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

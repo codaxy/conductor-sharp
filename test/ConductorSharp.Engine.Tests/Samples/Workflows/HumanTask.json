@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "human_task_workflow",
   "version": 1,
   "tasks": [
@@ -9,19 +7,11 @@
       "taskReferenceName": "human_task",
       "inputParameters": {},
       "type": "HUMAN",
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "HUMAN"
     }
   ],
   "inputParameters": [],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

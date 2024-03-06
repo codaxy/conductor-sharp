@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "TEST_optional_task_workflow",
   "version": 1,
   "tasks": [
@@ -11,15 +9,11 @@
         "id": "${workflow.input.customer_id}"
       },
       "type": "SUB_WORKFLOW",
-      "startDelay": 0,
       "subWorkflowParam": {
         "name": "NOTIFICATION_send_to_customer",
         "version": 3
       },
       "optional": true,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SUB_WORKFLOW"
     }
   ],
@@ -28,8 +22,5 @@
   ],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

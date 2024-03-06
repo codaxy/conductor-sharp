@@ -1,7 +1,5 @@
 {
   "ownerApp": "Owner",
-  "createTime": 0,
-  "updateTime": 0,
   "name": "workflow_metadata_workflow",
   "description": "This is description",
   "version": 1,
@@ -13,11 +11,7 @@
         "customer_id": 1
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     }
   ],
@@ -25,9 +19,6 @@
   "outputParameters": {},
   "failureWorkflow": "NOTIFICATION_conditionally_send_to_customer",
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
   "ownerEmail": "test@test.com",
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

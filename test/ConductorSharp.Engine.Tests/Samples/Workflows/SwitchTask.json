@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "switch_task",
   "version": 1,
   "tasks": [
@@ -20,11 +18,7 @@
               "customer_id": 1
             },
             "type": "SIMPLE",
-            "startDelay": 0,
             "optional": false,
-            "rateLimited": false,
-            "asyncComplete": false,
-            "retryCount": 0,
             "workflowTaskType": "SIMPLE"
           }
         ]
@@ -37,19 +31,9 @@
             "terminationStatus": "FAILED"
           },
           "type": "TERMINATE",
-          "startDelay": 0,
-          "optional": false,
-          "rateLimited": false,
-          "asyncComplete": false,
-          "retryCount": 0,
           "workflowTaskType": "TERMINATE"
         }
       ],
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "evaluatorType": "value-param",
       "expression": "switch_case_value",
       "workflowTaskType": "SWITCH"
@@ -58,8 +42,5 @@
   "inputParameters": [],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

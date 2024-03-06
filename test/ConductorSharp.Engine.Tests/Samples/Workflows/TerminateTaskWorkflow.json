@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "terminate_task_worfklow",
   "version": 1,
   "tasks": [
@@ -24,20 +22,10 @@
               "terminationStatus": "COMPLETED"
             },
             "type": "TERMINATE",
-            "startDelay": 0,
-            "optional": false,
-            "rateLimited": false,
-            "asyncComplete": false,
-            "retryCount": 0,
             "workflowTaskType": "TERMINATE"
           }
         ]
       },
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "DECISION"
     },
     {
@@ -59,20 +47,10 @@
               "terminationStatus": "FAILED"
             },
             "type": "TERMINATE",
-            "startDelay": 0,
-            "optional": false,
-            "rateLimited": false,
-            "asyncComplete": false,
-            "retryCount": 0,
             "workflowTaskType": "TERMINATE"
           }
         ]
       },
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "evaluatorType": "value-param",
       "expression": "switch_case_value",
       "workflowTaskType": "SWITCH"
@@ -87,19 +65,11 @@
         }
       },
       "type": "TERMINATE",
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "TERMINATE"
     }
   ],
   "inputParameters": [],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }
