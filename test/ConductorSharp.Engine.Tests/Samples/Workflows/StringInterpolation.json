@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "TEST_StringInterpolation",
   "version": 1,
   "tasks": [
@@ -12,11 +10,7 @@
         "name": "Workflow name: TEST_StringInterpolation"
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     }
   ],
@@ -28,8 +22,5 @@
     "email_body": "${email_prepare.output.email_body}"
   },
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

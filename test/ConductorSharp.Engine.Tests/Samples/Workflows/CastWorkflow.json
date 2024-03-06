@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "cast_workflow",
   "version": 1,
   "tasks": [
@@ -11,11 +9,7 @@
         "customer_id": 1
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     },
     {
@@ -26,19 +20,12 @@
         "address": "${get_customer.output.address}"
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     }
   ],
   "inputParameters": [],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

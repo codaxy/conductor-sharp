@@ -84,7 +84,8 @@ namespace ConductorSharp.Toolkit.Service
             var modelGenerator = new TaskModelGenerator(_config.BaseNamespace + ".Workflows", name, TaskModelGenerator.ModelType.Workflow)
             {
                 OriginalName = workflowDefinition.Name,
-                Version = workflowDefinition.Version
+                Version =
+                    workflowDefinition.Version ?? throw new InvalidOperationException($"Workflow {workflowDefinition.Name} version cannot be null")
             };
 
             foreach (var inputParam in workflowDefinition.InputParameters)

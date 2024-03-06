@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "wait_task_workflow",
   "version": 1,
   "tasks": [
@@ -12,19 +10,11 @@
         "until": "2022-12-31 11:59"
       },
       "type": "WAIT",
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "WAIT"
     }
   ],
   "inputParameters": [],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

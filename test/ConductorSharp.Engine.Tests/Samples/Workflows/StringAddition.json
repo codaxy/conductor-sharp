@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "string_addition",
   "version": 1,
   "tasks": [
@@ -12,11 +10,6 @@
         "scriptExpression": ""
       },
       "type": "LAMBDA",
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "LAMBDA"
     }
   ],
@@ -25,8 +18,5 @@
   ],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

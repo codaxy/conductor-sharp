@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "version_attribute_workflow",
   "version": 1,
   "tasks": [
@@ -9,23 +7,16 @@
       "taskReferenceName": "test_subworkflow",
       "inputParameters": {},
       "type": "SUB_WORKFLOW",
-      "startDelay": 0,
       "subWorkflowParam": {
         "name": "TEST_subworkflow",
         "version": 3
       },
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SUB_WORKFLOW"
     }
   ],
   "inputParameters": [],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

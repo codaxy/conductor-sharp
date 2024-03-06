@@ -149,7 +149,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
-        public void BuilderReturnsCorrectDefinitionCSharpLambdaWorfklow()
+        public void BuilderReturnsCorrectDefinitionCSharpLambdaWorkflow()
         {
             var definition = GetDefinitionFromWorkflow<CSharpLambdaWorkflow>();
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/CSharpLambdaWorkflow.json");

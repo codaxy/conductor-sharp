@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "pattern_tasks",
   "version": 1,
   "tasks": [
@@ -12,11 +10,7 @@
         "workflow_id": "${workflow.input.workflow_id}"
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     },
     {
@@ -26,11 +20,7 @@
         "seconds": "${workflow.input.seconds}"
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     }
   ],
@@ -40,8 +30,5 @@
   ],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

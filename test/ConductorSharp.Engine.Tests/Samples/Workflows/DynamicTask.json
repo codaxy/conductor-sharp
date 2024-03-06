@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "TEST_dynamic_task",
   "version": 1,
   "tasks": [
@@ -14,11 +12,6 @@
       },
       "type": "DYNAMIC",
       "dynamicTaskNameParam": "task_to_execute",
-      "startDelay": 0,
-      "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "DYNAMIC"
     }
   ],
@@ -30,8 +23,5 @@
   ],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }

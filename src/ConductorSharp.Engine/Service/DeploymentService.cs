@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
@@ -50,7 +51,10 @@ namespace ConductorSharp.Engine.Service
                 var oldDefinition = await _metadataService.GetWorkflowAsync(definition.Name, definition.Version);
 
                 if (oldDefinition?.Name != null)
-                    await _metadataService.DeleteWorkflowAsync(definition.Name, definition.Version);
+                    await _metadataService.DeleteWorkflowAsync(
+                        definition.Name,
+                        definition.Version ?? throw new InvalidOperationException($"Workflow {definition.Name} version cannot be null")
+                    );
             }
         }
     }

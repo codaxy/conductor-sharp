@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "evaluate_expression_workflow",
   "version": 1,
   "tasks": [
@@ -11,11 +9,7 @@
         "customer_id": 1
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     },
     {
@@ -25,11 +19,7 @@
         "customer_id": 1
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     },
     {
@@ -39,11 +29,7 @@
         "customer_id": 1
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     },
     {
@@ -53,11 +39,7 @@
         "customer_id": 1
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     },
     {
@@ -67,11 +49,7 @@
         "customer_id": 34
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     },
     {
@@ -82,11 +60,7 @@
         "address": "${workflow.input.username}@test.com"
       },
       "type": "SIMPLE",
-      "startDelay": 0,
       "optional": false,
-      "rateLimited": false,
-      "asyncComplete": false,
-      "retryCount": 0,
       "workflowTaskType": "SIMPLE"
     }
   ],
@@ -95,8 +69,5 @@
   ],
   "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": false,
-  "workflowStatusListenerEnabled": false,
-  "timeoutPolicy": "TIME_OUT_WF",
   "timeoutSeconds": 0
 }
