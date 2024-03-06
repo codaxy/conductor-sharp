@@ -53,7 +53,7 @@ namespace ConductorSharp.Engine.Service
                 if (oldDefinition?.Name != null)
                     await _metadataService.DeleteWorkflowAsync(
                         definition.Name,
-                        definition.Version ?? throw new InvalidOperationException($"Workflow {definition.Name} cannot be null")
+                        definition.Version ?? throw new InvalidOperationException($"Workflow {definition.Name} version cannot be null")
                     );
             }
         }
