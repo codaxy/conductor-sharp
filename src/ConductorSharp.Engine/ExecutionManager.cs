@@ -122,7 +122,7 @@ namespace ConductorSharp.Engine
                 var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, cancellationToken);
 
                 using TextReader textReader = new StreamReader(file.Stream);
-                var json = textReader.ReadToEnd();
+                var json = await textReader.ReadToEndAsync();
 
                 pollResponse.InputData = JsonConvert.DeserializeObject<IDictionary<string, object>>(
                     json,
@@ -134,6 +134,9 @@ namespace ConductorSharp.Engine
             {
                 var inputType = GetInputType(scheduledWorker.TaskType);
                 var inputData = SerializationHelper.DictonaryToObject(inputType, pollResponse.InputData, ConductorConstants.IoJsonSerializerSettings);
+                // Poll response data can be huge (if read from external storage)
+                // We can save memory by not holding reference to pollResponse.InputData after it is parsed
+                pollResponse.InputData = null;
 
                 using var scope = _lifetimeScopeFactory.CreateScope();
 
@@ -167,8 +170,8 @@ namespace ConductorSharp.Engine
             catch (Exception exception)
             {
                 _logger.LogError(
-                    "{error} while executing {task} as part of {workflow} with id {workflowId}",
-                    exception.Message,
+                    "{@Exception} while executing {Task} as part of {Workflow} with id {WorkflowId}",
+                    exception,
                     pollResponse.TaskDefName,
                     pollResponse.WorkflowType,
                     pollResponse.WorkflowInstanceId
