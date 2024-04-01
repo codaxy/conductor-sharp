@@ -100,38 +100,36 @@ namespace ConductorSharp.Engine
 
         private async Task PollAndHandle(TaskToWorker scheduledWorker, CancellationToken cancellationToken)
         {
-            var workerId = Guid.NewGuid().ToString();
-
-            var pollResponse = await _taskManager.PollAsync(scheduledWorker.TaskName, workerId, _configuration.Domain, cancellationToken);
-
-            if (pollResponse == null)
-                return;
-
-            if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStoragePath))
-            {
-                _logger.LogDebug("Fetching storage {location}", pollResponse.ExternalInputPayloadStoragePath);
-                // TODO: Check what the operation and payload type are
-                var externalStorageLocation = await _taskManager.GetExternalStorageLocationAsync(
-                    pollResponse.ExternalInputPayloadStoragePath,
-                    "",
-                    "",
-                    cancellationToken
-                );
-
-                // TODO: iffy
-                var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, cancellationToken);
-
-                using TextReader textReader = new StreamReader(file.Stream);
-                var json = await textReader.ReadToEndAsync();
-
-                pollResponse.InputData = JsonConvert.DeserializeObject<IDictionary<string, object>>(
-                    json,
-                    ConductorConstants.IoJsonSerializerSettings
-                );
-            }
-
+            Client.Generated.Task pollResponse = null;
             try
             {
+                var workerId = Guid.NewGuid().ToString();
+
+                pollResponse = await _taskManager.PollAsync(scheduledWorker.TaskName, workerId, _configuration.Domain, cancellationToken);
+
+                if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStoragePath))
+                {
+                    _logger.LogDebug("Fetching storage {location}", pollResponse.ExternalInputPayloadStoragePath);
+                    // TODO: Check what the operation and payload type are
+                    var externalStorageLocation = await _taskManager.GetExternalStorageLocationAsync(
+                        pollResponse.ExternalInputPayloadStoragePath,
+                        "",
+                        "",
+                        cancellationToken
+                    );
+
+                    // TODO: iffy
+                    var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, cancellationToken);
+
+                    using TextReader textReader = new StreamReader(file.Stream);
+                    var json = await textReader.ReadToEndAsync();
+
+                    pollResponse.InputData = JsonConvert.DeserializeObject<IDictionary<string, object>>(
+                        json,
+                        ConductorConstants.IoJsonSerializerSettings
+                    );
+                }
+
                 var inputType = GetInputType(scheduledWorker.TaskType);
                 var inputData = SerializationHelper.DictonaryToObject(inputType, pollResponse.InputData, ConductorConstants.IoJsonSerializerSettings);
                 // Poll response data can be huge (if read from external storage)
