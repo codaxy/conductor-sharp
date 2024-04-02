@@ -57,6 +57,10 @@ namespace ConductorSharp.Engine.Service
                 await _healthService.SetExecutionManagerRunning(cancellationToken);
                 await _executionManager.StartAsync(cancellationToken);
             }
+            catch (TaskCanceledException)
+            {
+                _logger.LogInformation("Stopping ConductorSharp background service");
+            }
             catch (Exception exception)
             {
                 await _healthService.UnsetExecutionManagerRunning();
