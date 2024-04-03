@@ -22,7 +22,7 @@
         "case_value_param": "${workflow.input.operation}"
       },
       "type": "DECISION",
-      "caseExpression": "case_value_param",
+      "caseValueParam": "case_value_param",
       "decisionCases": {
         "upper": [
           {

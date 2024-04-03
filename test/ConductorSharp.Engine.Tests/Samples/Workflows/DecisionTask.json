@@ -9,7 +9,7 @@
         "case_value_param": "test"
       },
       "type": "DECISION",
-      "caseExpression": "case_value_param",
+      "caseValueParam": "case_value_param",
       "decisionCases": {
         "test": [
           {
