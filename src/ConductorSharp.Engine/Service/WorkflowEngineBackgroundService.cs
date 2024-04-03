@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
@@ -45,6 +46,10 @@ namespace ConductorSharp.Engine.Service
                 await _deploymentService.Deploy(_deployment);
                 await _healthService.SetExecutionManagerRunning(cancellationToken);
                 await _executionManager.StartAsync(cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogInformation("Stopping ConductorSharp background service");
             }
             catch (ApiException exception)
             {
