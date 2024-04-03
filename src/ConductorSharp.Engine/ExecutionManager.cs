@@ -60,10 +60,10 @@ namespace ConductorSharp.Engine
             while (!cancellationToken.IsCancellationRequested)
             {
                 var queuedTasks = (await _taskManager.ListQueuesAsync(cancellationToken))
-                    .Where(a => _registeredWorkers.Any(b => b.TaskName == a.Key) && a.Value > 0)
+                    .Where(a => a.Value > 0)
                     .ToDictionary(a => a.Key, a => a.Value);
 
-                var scheduledWorkers = _registeredWorkers.Where(a => queuedTasks.ContainsKey(a.TaskName)).ToList();
+                var scheduledWorkers = _registeredWorkers.Where(a => queuedTasks.ContainsKey(GetQueueTaskName(a))).ToList();
 
                 currentSleepInterval = _pollTimingStrategy.CalculateDelay(
                     queuedTasks,
@@ -82,6 +82,16 @@ namespace ConductorSharp.Engine
 
                 await Task.Delay(currentSleepInterval, cancellationToken);
             }
+        }
+
+        private string GetQueueTaskName(TaskToWorker taskToWorker)
+        {
+            if (taskToWorker.TaskDomain != null)
+                return $"{taskToWorker.TaskDomain}:{taskToWorker.TaskName}";
+            if (_configuration.Domain != null)
+                return $"{_configuration.Domain}:{taskToWorker.TaskName}";
+
+            return taskToWorker.TaskName;
         }
 
         private static Type GetInputType(Type workerType)
@@ -105,7 +115,12 @@ namespace ConductorSharp.Engine
             {
                 var workerId = Guid.NewGuid().ToString();
 
-                pollResponse = await _taskManager.PollAsync(scheduledWorker.TaskName, workerId, _configuration.Domain, cancellationToken);
+                pollResponse = await _taskManager.PollAsync(
+                    scheduledWorker.TaskName,
+                    workerId,
+                    scheduledWorker.TaskDomain ?? _configuration.Domain,
+                    cancellationToken
+                );
 
                 if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStoragePath))
                 {

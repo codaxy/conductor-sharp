@@ -1,9 +1,11 @@
+using System;
+using System.Reflection;
 using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -13,7 +15,8 @@ namespace ConductorSharp.Engine.Extensions
             this IServiceCollection builder,
             Action<TaskDefinitionOptions> updateOptions = null,
             BuildConfiguration buildConfiguration = null
-        ) where TWorkerTask : IWorker
+        )
+            where TWorkerTask : IWorker
         {
             builder.AddSingleton(ctx => ctx.ResolveTaskDefinitionBuilder(buildConfiguration).Build<TWorkerTask>(updateOptions));
 
@@ -22,7 +25,8 @@ namespace ConductorSharp.Engine.Extensions
                     new TaskToWorker
                     {
                         TaskName = ctx.ResolveTaskDefinitionBuilder(buildConfiguration).Build<TWorkerTask>(updateOptions).Name,
-                        TaskType = typeof(TWorkerTask)
+                        TaskType = typeof(TWorkerTask),
+                        TaskDomain = GetTaskDomain(typeof(TWorkerTask))
                     }
             );
         }
@@ -38,5 +42,7 @@ namespace ConductorSharp.Engine.Extensions
 
             return builder;
         }
+
+        private static string GetTaskDomain(Type workerType) => workerType.GetCustomAttribute<TaskDomainAttribute>()?.Domain;
     }
 }

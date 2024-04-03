@@ -37,6 +37,7 @@ var builder = Host.CreateDefaultBuilder()
                 });
 
             services.RegisterWorkerTask<GetCustomerHandler>();
+            services.RegisterWorkerTask<PrepareEmailHandler>();
         }
     );
 
