@@ -90,7 +90,7 @@ namespace ConductorSharp.Engine.Builders
                     InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                     WorkflowTaskType = WorkflowTaskType.DECISION,
                     Type = WorkflowTaskType.DECISION.ToString(),
-                    CaseExpression = "case_value_param",
+                    CaseValueParam = "case_value_param",
                     DecisionCases = new JObject
                     {
                         _caseDictionary.Select(
