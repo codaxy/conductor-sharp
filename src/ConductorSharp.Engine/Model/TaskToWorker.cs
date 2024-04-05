@@ -6,5 +6,6 @@ namespace ConductorSharp.Engine.Model
     {
         public string TaskName { get; set; }
         public Type TaskType { get; set; }
+        public string TaskDomain { get; set; }
     }
 }
