@@ -1,0 +1,21 @@
+{
+  "name": "event_task_workflow",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "EVENT_event_task",
+      "taskReferenceName": "event_task",
+      "inputParameters": {
+        "payload_param": "param"
+      },
+      "type": "EVENT",
+      "sink": "conductor:event",
+      "workflowTaskType": "EVENT"
+    }
+  ],
+  "inputParameters": [],
+  "outputParameters": {},
+  "schemaVersion": 2,
+  "ownerEmail": "test@test.com",
+  "timeoutSeconds": 0
+}

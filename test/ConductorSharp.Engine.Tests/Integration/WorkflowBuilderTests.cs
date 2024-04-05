@@ -253,6 +253,15 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal(expectedDefinition, definition);
         }
 
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionEventTaskWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<EventTaskWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/EventTaskWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
         private static string GetDefinitionFromWorkflow<TWorkflow>()
             where TWorkflow : IConfigurableWorkflow
         {
