@@ -54,7 +54,7 @@ namespace ConductorSharp.Engine.Service
             catch (ApiException exception)
             {
                 await _healthService.UnsetExecutionManagerRunning(cancellationToken);
-                _logger.LogCritical(exception, "Workflow Engine Background Service encountered an API error");
+                _logger.LogCritical(exception, "Workflow Engine Background Service encountered an API error(s): {apiErrors}", exception.Errors);
                 throw;
             }
             catch (Exception exception)

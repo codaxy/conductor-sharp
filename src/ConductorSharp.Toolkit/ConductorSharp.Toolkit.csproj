@@ -7,7 +7,7 @@
     <Nullable>disable</Nullable>
 	<PackAsTool>true</PackAsTool>
 	<ToolCommandName>dotnet-conductorsharp</ToolCommandName>
-	<Version>3.0.1-beta</Version>
+	<Version>3.0.1-beta2</Version>
   </PropertyGroup>
 
   <ItemGroup>
