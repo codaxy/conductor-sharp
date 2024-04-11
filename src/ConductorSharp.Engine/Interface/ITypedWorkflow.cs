@@ -1,9 +1,9 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Engine.Interface
 {
     public interface ITypedWorkflow : INameable
     {
-        WorkflowDefinition GetDefinition();
+        WorkflowDef GetDefinition();
     }
 }

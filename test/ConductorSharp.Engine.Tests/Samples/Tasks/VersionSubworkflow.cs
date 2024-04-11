@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Engine.Tests.Samples.Tasks
 {

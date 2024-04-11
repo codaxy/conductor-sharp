@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Patterns.Builders;
 using ConductorSharp.Patterns.Model;
@@ -14,6 +15,7 @@ namespace ConductorSharp.Definitions.Workflows
 
     public class CSharpLambdaWorkflowOutput : WorkflowOutput { }
 
+    [WorkflowMetadata(OwnerEmail = "test@test.com")]
     public class CSharpLambdaWorkflow : Workflow<CSharpLambdaWorkflow, CSharpLambdaWorkflowInput, CSharpLambdaWorkflowOutput>
     {
         public class LambdaTaskInput : IRequest<LambdaTaskOutput>
@@ -50,6 +52,7 @@ namespace ConductorSharp.Definitions.Workflows
                 }
             );
 
+#pragma warning disable CS0618 // Type or member is obsolete
             _builder.AddTask(
                 wf => wf.DecisionTask,
                 wf => new DecisionTaskInput() { CaseValueParam = wf.WorkflowInput.Operation },
@@ -79,8 +82,7 @@ namespace ConductorSharp.Definitions.Workflows
                     }
                 }
             );
-
-            _builder.SetOptions(options => options.OwnerEmail = "test@test.com");
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

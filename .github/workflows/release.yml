@@ -2,7 +2,7 @@ name: Deploy packages
 
 on:
   push:
-    tags: ["v2.*"]
+    tags: ["v3.*"]
   workflow_dispatch:
 
 jobs:
@@ -16,7 +16,9 @@ jobs:
     - name: Install .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: |
+             6.x
+             8.x
     - name: Restore dependencies
       run: dotnet restore ConductorSharp.sln
 

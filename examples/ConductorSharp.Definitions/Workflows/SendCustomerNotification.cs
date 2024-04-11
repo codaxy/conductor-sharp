@@ -1,9 +1,8 @@
-﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Definitions.Generated;
+﻿using ConductorSharp.Definitions.Generated;
 using ConductorSharp.Engine.Builders;
+using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
-using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Tasks;
 using MediatR;
 
@@ -27,11 +26,13 @@ namespace ConductorSharp.Definitions.Workflows
     public class ExpectedDynamicOutput : CustomerGetV1Output { }
 
     [OriginalName("NOTIFICATION_send_to_customer")]
+    [WorkflowMetadata(OwnerEmail = "example@example.local", FailureWorkflow = typeof(HandleNotificationFailure))]
     public class SendCustomerNotification : Workflow<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput>
     {
         public SendCustomerNotification(
             WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public EmailPrepareV1 PrepareEmail { get; set; }
         public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput> DynamicHandler { get; set; }
@@ -62,13 +63,6 @@ namespace ConductorSharp.Definitions.Workflows
                         Constant = 500
                     }
             );
-
-            _builder.SetOptions(options =>
-            {
-                options.Version = 1;
-                options.FailureWorkflow = typeof(HandleNotificationFailure);
-                options.OwnerEmail = "example@example.local";
-            });
         }
     }
 }

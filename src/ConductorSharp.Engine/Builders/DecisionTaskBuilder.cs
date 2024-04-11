@@ -1,26 +1,27 @@
-﻿using ConductorSharp.Client;
-using ConductorSharp.Client.Model.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using ConductorSharp.Client;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
     public static class DecisionTaskExtensions
     {
+        [Obsolete("Switch tasks should be used")]
         public static ITaskOptionsBuilder AddTask<TWorkflow>(
             this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, DecisionTaskModel>> taskSelector,
             Expression<Func<TWorkflow, DecisionTaskInput>> expression,
             DecisionCases<TWorkflow> decisionCases
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new DecisionTaskBuilder<TWorkflow>(
                 taskSelector.Body,
@@ -49,32 +50,24 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class DecisionTaskBuilder<TWorkflow> : BaseTaskBuilder<DecisionTaskInput, NoOutput>, ITaskSequenceBuilder<TWorkflow>
+    public class DecisionTaskBuilder<TWorkflow>(
+        Expression taskExpression,
+        Expression inputExpression,
+        BuildConfiguration buildConfiguration,
+        WorkflowBuildItemRegistry buildItemRegistry,
+        IEnumerable<ConfigurationProperty> configurationProperties,
+        BuildContext buildContext
+    ) : BaseTaskBuilder<DecisionTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration), ITaskSequenceBuilder<TWorkflow>
         where TWorkflow : ITypedWorkflow
     {
-        private Dictionary<string, List<ITaskBuilder>> _caseDictionary = new();
+        private readonly Dictionary<string, List<ITaskBuilder>> _caseDictionary = [];
         private List<ITaskBuilder> _defaultCase;
         private string _currentCaseName;
 
-        public BuildContext BuildContext { get; }
-        public BuildConfiguration BuildConfiguration { get; }
-        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; }
-        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; }
-
-        public DecisionTaskBuilder(
-            Expression taskExpression,
-            Expression inputExpression,
-            BuildConfiguration buildConfiguration,
-            WorkflowBuildItemRegistry buildItemRegistry,
-            IEnumerable<ConfigurationProperty> configurationProperties,
-            BuildContext buildContext
-        ) : base(taskExpression, inputExpression, buildConfiguration)
-        {
-            BuildConfiguration = buildConfiguration;
-            BuildContext = buildContext;
-            WorkflowBuildRegistry = buildItemRegistry;
-            ConfigurationProperties = configurationProperties;
-        }
+        public BuildContext BuildContext { get; } = buildContext;
+        public BuildConfiguration BuildConfiguration { get; } = buildConfiguration;
+        public WorkflowBuildItemRegistry WorkflowBuildRegistry { get; } = buildItemRegistry;
+        public IEnumerable<ConfigurationProperty> ConfigurationProperties { get; } = configurationProperties;
 
         internal DecisionTaskBuilder<TWorkflow> AddCase(string caseName)
         {
@@ -83,31 +76,31 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
-        public override WorkflowDefinition.Task[] Build()
+        public override WorkflowTask[] Build()
         {
             var decisionTaskName = $"DECISION_{_taskRefferenceName}";
 
-            return new WorkflowDefinition.Task[]
-            {
-                new WorkflowDefinition.Task
+#pragma warning disable CS0612 // Type or member is obsolete
+            return
+            [
+                new WorkflowTask()
                 {
                     Name = decisionTaskName,
                     TaskReferenceName = _taskRefferenceName,
-                    InputParameters = _inputParameters,
-                    Type = "DECISION",
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
+                    WorkflowTaskType = WorkflowTaskType.DECISION,
+                    Type = WorkflowTaskType.DECISION.ToString(),
                     CaseValueParam = "case_value_param",
                     DecisionCases = new JObject
                     {
                         _caseDictionary.Select(
                             a => new JProperty(a.Key, JArray.FromObject(a.Value.SelectMany(a => a.Build()), ConductorConstants.DefinitionsSerializer))
                         )
-                    },
-                    DefaultCase = _defaultCase
-                        ?.SelectMany(builder => builder.Build())
-                        .Select(task => JObject.FromObject(task, ConductorConstants.DefinitionsSerializer))
-                        .ToList()
+                    }.ToObject<IDictionary<string, ICollection<WorkflowTask>>>(),
+                    DefaultCase = _defaultCase?.SelectMany(builder => builder.Build()).ToArray()
                 }
-            };
+            ];
+#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         public void AddTaskBuilderToSequence(ITaskBuilder builder)
@@ -115,15 +108,17 @@ namespace ConductorSharp.Engine.Builders
             // Handle default case
             if (_currentCaseName == null)
             {
-                if (_defaultCase == null)
-                    _defaultCase = new();
-
+                _defaultCase ??= [];
                 _defaultCase.Add(builder);
+
                 return;
             }
 
             if (!_caseDictionary.ContainsKey(_currentCaseName))
-                _caseDictionary.Add(_currentCaseName, new List<ITaskBuilder>());
+            {
+                _caseDictionary.Add(_currentCaseName, []);
+            }
+
             _caseDictionary[_currentCaseName].Add(builder);
         }
     }

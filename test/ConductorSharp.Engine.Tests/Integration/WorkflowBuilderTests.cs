@@ -1,3 +1,4 @@
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Tests.Samples.Workflows;
@@ -148,7 +149,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
-        public void BuilderReturnsCorrectDefinitionCSharpLambdaWorfklow()
+        public void BuilderReturnsCorrectDefinitionCSharpLambdaWorkflow()
         {
             var definition = GetDefinitionFromWorkflow<CSharpLambdaWorkflow>();
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/CSharpLambdaWorkflow.json");
@@ -243,21 +244,41 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Throws<NonEvaluatableExpressionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
         }
 
-        private string GetDefinitionFromWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionWorkflowMetadataWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<WorkflowMetadataWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/WorkflowMetadataWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionEventTaskWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<EventTaskWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/EventTaskWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        private static string GetDefinitionFromWorkflow<TWorkflow>()
+            where TWorkflow : IConfigurableWorkflow
         {
             var workflow = RegisterWorkflow<TWorkflow>()
-                .GetRequiredService<IEnumerable<WorkflowDefinition>>()
+                .GetRequiredService<IEnumerable<WorkflowDef>>()
                 .First(a => a.Name == NamingUtil.NameOf<TWorkflow>());
 
             return SerializationUtil.SerializeObject(workflow);
         }
 
-        private IServiceProvider RegisterWorkflow<TWorkflow>() where TWorkflow : IConfigurableWorkflow
+        private static IServiceProvider RegisterWorkflow<TWorkflow>()
+            where TWorkflow : IConfigurableWorkflow
         {
             var containerBuilder = new ServiceCollection();
 
             containerBuilder
-                .AddConductorSharp("example.com", "api", false)
+                .AddConductorSharp("example.com/api")
                 .AddExecutionManager(10, 100, 100, null, typeof(WorkflowBuilderTests).Assembly)
                 .AddPipelines(pipelines =>
                 {

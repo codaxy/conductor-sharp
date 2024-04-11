@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Tests.Samples.Workers;
+﻿using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Tests.Samples.Workers;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows;
 
@@ -20,7 +21,8 @@ public class SendCustomerNotification : Workflow<SendCustomerNotification, SendC
 {
     public SendCustomerNotification(
         WorkflowDefinitionBuilder<SendCustomerNotification, SendCustomerNotificationInput, SendCustomerNotificationOutput> builder
-    ) : base(builder) { }
+    )
+        : base(builder) { }
 
     public GetCustomerHandler GetCustomer { get; set; }
     public EmailPrepareV1 PrepareEmail { get; set; }

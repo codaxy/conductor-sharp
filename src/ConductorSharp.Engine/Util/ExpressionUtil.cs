@@ -1,12 +1,12 @@
-﻿using ConductorSharp.Engine.Builders;
-using ConductorSharp.Engine.Interface;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Exceptions;
+using ConductorSharp.Engine.Interface;
+using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Engine.Util
 {
@@ -14,7 +14,7 @@ namespace ConductorSharp.Engine.Util
     {
         public static string ParseToReferenceName(Expression expression)
         {
-            if (!(expression is MemberExpression taskSelectExpression))
+            if (expression is not MemberExpression taskSelectExpression)
                 throw new NotSupportedException($"Only {nameof(MemberExpression)} expression allowed");
 
             return SnakeCaseUtil.ToSnakeCase(taskSelectExpression.Member.Name);
@@ -22,7 +22,7 @@ namespace ConductorSharp.Engine.Util
 
         public static Type ParseToType(Expression expression)
         {
-            if (!(expression is MemberExpression taskSelectExpression))
+            if (expression is not MemberExpression taskSelectExpression)
                 throw new NotSupportedException($"Only {nameof(MemberExpression)} expression allowed");
 
             return ((PropertyInfo)taskSelectExpression.Member).PropertyType;
@@ -99,9 +99,9 @@ namespace ConductorSharp.Engine.Util
         {
             var interpolationArguments = GetInterpolationArguments(methodExpression);
             var expressionStrings = interpolationArguments.Select(CompileInterpolatedStringArgument).ToArray();
-            var formatExpr = methodExpression.Arguments[0] as ConstantExpression;
-            if (formatExpr == null)
-                throw new NotSupportedException("string.Format with non constant format string is not supported");
+            var formatExpr =
+                methodExpression.Arguments[0] as ConstantExpression
+                ?? throw new NotSupportedException("string.Format with non constant format string is not supported");
             var formatString = (string)formatExpr.Value;
             return string.Format(formatString, expressionStrings);
         }
@@ -219,7 +219,7 @@ namespace ConductorSharp.Engine.Util
             {
                 foreach (
                     var member in newExpression.Arguments.Zip(
-                        newExpression.Members ?? (IEnumerable<MemberInfo>)new List<MemberInfo>(),
+                        newExpression.Members ?? (IEnumerable<MemberInfo>)[],
                         (expression, memberInfo) => (expression, memberInfo)
                     )
                 )

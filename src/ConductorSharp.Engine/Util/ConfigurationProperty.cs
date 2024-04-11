@@ -1,14 +1,8 @@
 ﻿namespace ConductorSharp.Engine.Util
 {
-    public class ConfigurationProperty
+    public class ConfigurationProperty(string key, object value)
     {
-        public ConfigurationProperty(string key, object value)
-        {
-            Key = key;
-            Value = value;
-        }
-
-        public string Key { get; }
-        public object Value { get; }
+        public string Key { get; } = key;
+        public object Value { get; } = value;
     }
 }

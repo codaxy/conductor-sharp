@@ -3,7 +3,6 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Patterns.Builders;
 using ConductorSharp.Patterns.Tasks;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Patterns.Extensions
@@ -21,7 +20,7 @@ namespace ConductorSharp.Patterns.Extensions
 
         public static IExecutionManagerBuilder AddCSharpLambdaTasks(
             this IExecutionManagerBuilder executionManagerBuilder,
-            string csharpLambdaTaskNamePrefix = null
+            string? csharpLambdaTaskNamePrefix = null
         )
         {
             executionManagerBuilder.Builder.RegisterWorkerTask<CSharpLambdaTask>(options =>

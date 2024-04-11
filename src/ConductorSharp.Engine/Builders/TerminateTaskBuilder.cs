@@ -1,12 +1,10 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -16,7 +14,8 @@ namespace ConductorSharp.Engine.Builders
             this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, TerminateTaskModel>> reference,
             Expression<Func<TWorkflow, TerminateTaskInput>> input
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new TerminateTaskBuilder(reference.Body, input.Body, builder.BuildConfiguration);
             builder.AddTaskBuilderToSequence(taskBuilder);
@@ -24,21 +23,19 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    internal class TerminateTaskBuilder : BaseTaskBuilder<TerminateTaskInput, NoOutput>
+    internal class TerminateTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<TerminateTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration)
     {
-        public TerminateTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration) { }
-
-        public override WorkflowDefinition.Task[] Build() =>
-            new[]
-            {
-                new WorkflowDefinition.Task
+        public override WorkflowTask[] Build() =>
+            [
+                new()
                 {
                     Name = $"TERMINATE_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
-                    Type = "TERMINATE",
-                    InputParameters = _inputParameters,
+                    WorkflowTaskType = WorkflowTaskType.TERMINATE,
+                    Type = WorkflowTaskType.TERMINATE.ToString(),
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                 }
-            };
+            ];
     }
 }

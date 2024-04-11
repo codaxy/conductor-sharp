@@ -7,7 +7,7 @@
     <Nullable>disable</Nullable>
 	<PackAsTool>true</PackAsTool>
 	<ToolCommandName>dotnet-conductorsharp</ToolCommandName>
-	<Version>3.0.0-alpha1</Version>
+	<Version>3.0.1-beta3</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,10 +26,10 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="7.0.0" />
-    <PackageReference Include="YamlDotNet" Version="13.7.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,11 +1,8 @@
 {
   "ownerApp": "undefined",
-  "createTime": 0,
-  "updateTime": 0,
   "createdBy": "UNDEFINED",
   "updatedBy": "UNDEFINED",
   "name": "CUSTOMER_get",
-  "description": null,
   "retryCount": 0,
   "timeoutSeconds": 60,
   "inputKeys": [
@@ -20,11 +17,10 @@
   "retryDelaySeconds": 0,
   "responseTimeoutSeconds": 60,
   "concurrentExecLimit": 0,
-  "inputTemplate": null,
+  "inputTemplate": {},
   "rateLimitPerFrequency": 0,
   "rateLimitFrequencyInSeconds": 1,
-  "isolationGroupId": null,
-  "executionNameSpace": null,
   "ownerEmail": "undefined@undefined.local",
-  "pollTimeoutSeconds": 0
+  "pollTimeoutSeconds": 0,
+  "backoffScaleFactor": 1
 }

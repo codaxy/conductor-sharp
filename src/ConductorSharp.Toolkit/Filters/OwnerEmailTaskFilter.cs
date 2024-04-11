@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Toolkit.Filters
 {
@@ -8,7 +8,7 @@ namespace ConductorSharp.Toolkit.Filters
 
         public OwnerEmailTaskFilter(IEnumerable<string> ownerEmails) => _ownerEmails = ownerEmails.ToArray();
 
-        public bool Test(TaskDefinition taskDefinition) =>
+        public bool Test(TaskDef taskDefinition) =>
             taskDefinition.OwnerEmail != null && _ownerEmails.Any(email => email == taskDefinition.OwnerEmail);
     }
 }

@@ -1,7 +1,7 @@
-﻿using ConductorSharp.Engine.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ConductorSharp.Engine.Model;
 
 namespace ConductorSharp.Engine.Polling
 {
@@ -14,7 +14,7 @@ namespace ConductorSharp.Engine.Polling
         private DateTimeOffset _lastRecoveryTime = DateTimeOffset.UtcNow;
 
         public int CalculateDelay(
-            IDictionary<string, int> taskQueue,
+            IDictionary<string, long> taskQueue,
             List<TaskToWorker> taskToWorkerList,
             int baseSleepInterval,
             int currentSleepInterval

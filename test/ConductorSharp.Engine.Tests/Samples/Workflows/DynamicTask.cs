@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
@@ -30,7 +31,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     [OriginalName("TEST_dynamic_task")]
     public class DynamicTask : Workflow<DynamicTask, DynamicTaskInput, DynamicTaskOutput>
     {
-        public DynamicTask(WorkflowDefinitionBuilder<DynamicTask, DynamicTaskInput, DynamicTaskOutput> builder) : base(builder) { }
+        public DynamicTask(WorkflowDefinitionBuilder<DynamicTask, DynamicTaskInput, DynamicTaskOutput> builder)
+            : base(builder) { }
 
         public DynamicTaskModel<MandatoryDynamicInput, ExpectedDynamicOutput> DynamicHandler { get; set; }
 

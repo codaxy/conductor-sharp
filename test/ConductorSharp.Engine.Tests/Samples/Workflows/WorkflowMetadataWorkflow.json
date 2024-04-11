@@ -1,0 +1,24 @@
+{
+  "ownerApp": "Owner",
+  "name": "workflow_metadata_workflow",
+  "description": "This is description",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "CUSTOMER_get",
+      "taskReferenceName": "get_customer",
+      "inputParameters": {
+        "customer_id": 1
+      },
+      "type": "SIMPLE",
+      "optional": false,
+      "workflowTaskType": "SIMPLE"
+    }
+  ],
+  "inputParameters": [],
+  "outputParameters": {},
+  "failureWorkflow": "NOTIFICATION_conditionally_send_to_customer",
+  "schemaVersion": 2,
+  "ownerEmail": "test@test.com",
+  "timeoutSeconds": 0
+}

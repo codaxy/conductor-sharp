@@ -2,7 +2,6 @@
 using ConductorSharp.ApiEnabled.Services;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
-using MediatR;
 
 namespace ConductorSharp.ApiEnabled.Extensions;
 
@@ -11,11 +10,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ConfigureApiEnabled(this IServiceCollection hostBuilder, ConfigurationManager configuration)
     {
         hostBuilder
-            .AddConductorSharp(
-                baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"),
-                apiPath: configuration.GetValue<string>("Conductor:ApiUrl"),
-                preventErrorOnBadRequest: configuration.GetValue<bool>("Conductor:PreventErrorOnBadRequest")
-            )
+            .AddConductorSharp(baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"))
             .AddExecutionManager(
                 maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                 sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),

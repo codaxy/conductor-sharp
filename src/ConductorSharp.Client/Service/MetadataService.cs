@@ -1,72 +1,46 @@
-﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Client.Model.Response;
-using ConductorSharp.Client.Util;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Client.Service
 {
-    public class MetadataService : IMetadataService
+    public class MetadataService(ConductorClient client) : IMetadataService
     {
-        private readonly IConductorClient _conductorClient;
+        public async Task<ICollection<WorkflowDef>> ListWorkflowsAsync(CancellationToken cancellationToken = default) =>
+            await client.GetAllAsync(cancellationToken);
 
-        public MetadataService(IConductorClient client) => _conductorClient = client;
+        public async Task<BulkResponse> UpdateWorkflowsAsync(IEnumerable<WorkflowDef> workflows, CancellationToken cancellationToken = default) =>
+            await client.UpdateAsync(workflows, cancellationToken);
 
-        public async Task<TaskDefinition[]> GetAllTaskDefinitions() =>
-            (await _conductorClient.ExecuteRequestAsync<TaskDefinition[]>(ApiUrls.GetAllTaskDefinitions(), HttpMethod.Get));
+        public async Task AddWorkflowAsync(WorkflowDef workflowDef, CancellationToken cancellationToken = default) =>
+            await client.CreateAsync(workflowDef, cancellationToken);
 
-        public async Task CreateTaskDefinitions(List<TaskDefinition> definitions) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.CreateTaskDefinitions(), HttpMethod.Post, definitions);
+        public async Task<ICollection<TaskDef>> ListTasksAsync(CancellationToken cancellationToken = default) =>
+            await client.GetTaskDefsAsync(cancellationToken);
 
-        public async Task<TaskDefinition> GetTaskDefinition(string name) =>
-            await _conductorClient.ExecuteRequestAsync<TaskDefinition>(ApiUrls.GetTaskDefinition(name), HttpMethod.Get);
+        public async Task AddTaskAsync(TaskDef taskDef, CancellationToken cancellationToken = default) =>
+            await client.RegisterTaskDefAsync(taskDef, cancellationToken);
 
-        public async Task DeleteTaskDefinition(string name) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.DeleteTaskDefinition(name), HttpMethod.Delete);
+        public async Task AddTasksAsync(IEnumerable<TaskDef> taskDefs, CancellationToken cancellationToken = default) =>
+            await client.RegisterTaskDef_1Async(taskDefs, cancellationToken);
 
-        public async Task UpdateTaskDefinition(TaskDefinition definition) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.UpdateTaskDefinition(), HttpMethod.Put, definition);
+        public async Task ValidateWorkflowAsync(WorkflowDef workflowDef, CancellationToken cancellationToken = default) =>
+            await client.ValidateAsync(workflowDef, cancellationToken);
 
-        public async Task<WorkflowDefinition> GetWorkflowDefinition(string name, int version) =>
-            await _conductorClient.ExecuteRequestAsync<WorkflowDefinition>(ApiUrls.GetWorkflowDefinition(name, version), HttpMethod.Get);
+        public async Task<WorkflowDef> GetWorkflowAsync(string name, int? version = null, CancellationToken cancellationToken = default) =>
+            await client.GetAsync(name, version, cancellationToken);
 
-        public async Task UpdateWorkflowDefinitions(List<WorkflowDefinition> definitions) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.UpdateWorkflowDefinitions(), HttpMethod.Put, definitions);
+        public async Task<IDictionary<string, object>> GetWorkflowNamesAndVersionsAsync(CancellationToken cancellationToken = default) =>
+            await client.GetWorkflowNamesAndVersionsAsync(cancellationToken);
 
-        public async Task DeleteWorkflowDefinition(string name, int version) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.DeleteWorkflowDefinition(name, version), HttpMethod.Delete);
+        public async Task<ICollection<WorkflowDef>> GetAllWorkflowsWithLatestVersionsAsync(CancellationToken cancellationToken = default) =>
+            await client.GetAllWorkflowsWithLatestVersionsAsync(cancellationToken);
 
-        public async Task ValidateWorkflowDefinition(WorkflowDefinition workflowDefinition) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.ValidateWorkflowDefinition(), HttpMethod.Post, workflowDefinition);
+        public async Task<TaskDef> GetTaskAsync(string taskType, CancellationToken cancellationToken = default) =>
+            await client.GetTaskDefAsync(taskType, cancellationToken);
 
-        public async Task CreateWorkflowDefinitions(List<WorkflowDefinition> workflowDefinition) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.CreateWorkflowDefinitions(), HttpMethod.Put, workflowDefinition);
+        public async Task DeleteTaskAsync(string taskType, CancellationToken cancellationToken = default) =>
+            await client.UnregisterTaskDefAsync(taskType, cancellationToken);
 
-        public async Task<WorkflowDefinition[]> GetAllWorkflowDefinitions() =>
-            (await _conductorClient.ExecuteRequestAsync<WorkflowDefinition[]>(ApiUrls.GetAlleWorkflowDefinitions(), HttpMethod.Get));
-
-        public async Task<Dictionary<string, List<NameAndVersion>>> GetAllWorkflowNamesAndVersions() =>
-            (
-                await _conductorClient.ExecuteRequestAsync<Dictionary<string, List<NameAndVersion>>>(
-                    ApiUrls.GetAllWorkflowNamesAndVersions(),
-                    HttpMethod.Get
-                )
-            );
-
-        public async Task<EventHandlerDefinition[]> GetAllEventHandlerDefinitions() =>
-            await _conductorClient.ExecuteRequestAsync<EventHandlerDefinition[]>(ApiUrls.GetAllEventDefinitions(), HttpMethod.Get);
-
-        public async Task UpdateEventHandlerDefinition(EventHandlerDefinition definition) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.UpdateEventHandlerDefinition(), HttpMethod.Put, definition);
-
-        public async Task DeleteEventHandlerDefinition(string name) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.DeleteEventHandlerDefinition(name), HttpMethod.Delete);
-
-        public async Task CreateEventHandlerDefinition(EventHandlerDefinition definition) =>
-            await _conductorClient.ExecuteRequestAsync(ApiUrls.CreateEventHandlerDefinition(), HttpMethod.Post, definition);
-
-        public async Task<EventHandlerDefinition> GetEventHandlerDefinition(string name) =>
-            await _conductorClient.ExecuteRequestAsync<EventHandlerDefinition>(ApiUrls.GetEventHandlerDefinition(name), HttpMethod.Get);
+        public async Task DeleteWorkflowAsync(string name, int version, CancellationToken cancellationToken = default) =>
+            await client.UnregisterWorkflowDefAsync(name, version, cancellationToken);
     }
 }

@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Text;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Text;
 
 namespace ConductorSharp.Toolkit.Util
 {
@@ -50,7 +50,7 @@ namespace ConductorSharp.Toolkit.Util
             _compilationUnit = _compilationUnit.AddUsings(
                 CreateUsings(
                     "ConductorSharp.Engine.Model",
-                    "ConductorSharp.Engine.Util",
+                    "ConductorSharp.Engine.Builders.Metadata",
                     "MediatR",
                     "Newtonsoft.Json",
                     "ConductorSharp.Engine.Builders"

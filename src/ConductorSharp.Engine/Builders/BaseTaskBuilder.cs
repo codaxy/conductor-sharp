@@ -1,22 +1,21 @@
-﻿using ConductorSharp.Client;
-using ConductorSharp.Client.Model.Common;
+﻿using System.Linq.Expressions;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using MediatR;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public abstract class BaseTaskBuilder<A, B> : ITaskOptionsBuilder, ITaskBuilder where A : IRequest<B>
+    public abstract class BaseTaskBuilder<A, B> : ITaskOptionsBuilder, ITaskBuilder
+        where A : IRequest<B>
     {
         protected readonly JObject _inputParameters;
         protected readonly string _taskRefferenceName;
         protected readonly string _taskName;
-        private readonly BuildConfiguration _buildConfiguration;
+        protected readonly BuildConfiguration _buildConfiguration;
         protected AdditionalTaskParameters _additionalParameters = new();
 
         public BaseTaskBuilder(Expression taskExpression, Expression memberExpression, BuildConfiguration buildConfiguration)
@@ -34,6 +33,6 @@ namespace ConductorSharp.Engine.Builders
             return this;
         }
 
-        public abstract WorkflowDefinition.Task[] Build();
+        public abstract WorkflowTask[] Build();
     }
 }

@@ -1,28 +1,15 @@
 {
-  "ownerApp": null,
-  "createTime": 0,
-  "updateTime": 0,
-  "createdBy": null,
-  "updatedBy": null,
   "name": "TEST_decision_in_decision",
-  "description": null,
   "version": 1,
   "tasks": [
     {
-      "queryExpression": null,
       "name": "DECISION_send_notification_decision",
       "taskReferenceName": "send_notification_decision",
-      "description": null,
       "inputParameters": {
         "case_value_param": "${workflow.input.should_send_notification}"
       },
       "type": "DECISION",
-      "dynamicTaskNameParam": null,
       "caseValueParam": "case_value_param",
-      "caseExpression": null,
-      "expression": null,
-      "evaluatorType": null,
-      "scriptExpression": null,
       "decisionCases": {
         "YES": [
           {
@@ -42,53 +29,27 @@
                     "id": "${workflow.input.customer_id}"
                   },
                   "type": "SUB_WORKFLOW",
-                  "startDelay": 0,
                   "subWorkflowParam": {
                     "name": "NOTIFICATION_send_to_customer",
                     "version": 3
                   },
                   "optional": false,
-                  "rateLimited": false,
-                  "asyncComplete": false
+                  "workflowTaskType": "SUB_WORKFLOW"
                 }
               ]
             },
-            "startDelay": 0,
-            "optional": false,
-            "rateLimited": false,
-            "asyncComplete": false
+            "workflowTaskType": "DECISION"
           }
         ]
       },
-      "dynamicForkJoinTasksParam": null,
-      "dynamicForkTasksParam": null,
-      "dynamicForkTasksInputParamName": null,
-      "defaultCase": null,
-      "forkTasks": null,
-      "startDelay": 0,
-      "subWorkflowParam": null,
-      "joinOn": null,
-      "sink": null,
-      "optional": false,
-      "taskDefinition": null,
-      "rateLimited": false,
-      "defaultExclusiveJoinTask": null,
-      "asyncComplete": false,
-      "loopCondition": null,
-      "loopOver": null
+      "workflowTaskType": "DECISION"
     }
   ],
   "inputParameters": [
     "should_send_notification",
     "customer_id"
   ],
-  "outputParameters": null,
-  "failureWorkflow": null,
+  "outputParameters": {},
   "schemaVersion": 2,
-  "restartable": true,
-  "workflowStatusListenerEnabled": true,
-  "ownerEmail": null,
-  "timeoutPolicy": null,
-  "timeoutSeconds": 0,
-  "variables": null
+  "timeoutSeconds": 0
 }

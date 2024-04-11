@@ -1,10 +1,10 @@
-﻿using ConductorSharp.Client.Model.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Linq.Expressions;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -14,7 +14,8 @@ namespace ConductorSharp.Engine.Builders
             this ITaskSequenceBuilder<TWorkflow> builder,
             Expression<Func<TWorkflow, HumanTaskModel>> reference,
             Expression<Func<TWorkflow, HumanTaskInput>> input
-        ) where TWorkflow : ITypedWorkflow
+        )
+            where TWorkflow : ITypedWorkflow
         {
             var taskBuilder = new HumanTaskBuilder(reference.Body, input.Body, builder.BuildConfiguration);
             builder.AddTaskBuilderToSequence(taskBuilder);
@@ -22,21 +23,19 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    internal class HumanTaskBuilder : BaseTaskBuilder<HumanTaskInput, NoOutput>
+    internal class HumanTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<HumanTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration)
     {
-        public HumanTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-            : base(taskExpression, inputExpression, buildConfiguration) { }
-
-        public override WorkflowDefinition.Task[] Build() =>
-            new[]
-            {
-                new WorkflowDefinition.Task
+        public override WorkflowTask[] Build() =>
+            [
+                new()
                 {
                     Name = $"HUMAN_{_taskRefferenceName}",
                     TaskReferenceName = _taskRefferenceName,
-                    Type = "HUMAN",
-                    InputParameters = _inputParameters,
+                    WorkflowTaskType = WorkflowTaskType.HUMAN,
+                    Type = WorkflowTaskType.HUMAN.ToString(),
+                    InputParameters = _inputParameters.ToObject<IDictionary<string, object>>(),
                 }
-            };
+            ];
     }
 }

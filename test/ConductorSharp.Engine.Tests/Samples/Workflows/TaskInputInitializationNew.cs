@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
@@ -18,7 +19,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     {
         public TaskInputInitializationNew(
             WorkflowDefinitionBuilder<TaskInputInitializationNew, TaskInputInitializationNewInput, TaskInputInitializationNewOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public CustomerGetV1 GetCustomer { get; set; }
 

@@ -1,14 +1,13 @@
-﻿using ConductorSharp.Client.Model.Common;
-using ConductorSharp.Engine.Interface;
-using ConductorSharp.Engine.Util;
-using ConductorSharp.Engine.Util.Builders;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using ConductorSharp.Client.Generated;
+using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
+using ConductorSharp.Engine.Util.Builders;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -21,14 +20,6 @@ namespace ConductorSharp.Engine.Builders
         {
             builder.BuildContext.Outputs = ExpressionUtil.ParseToParameters(input.Body);
         }
-
-        public static void SetOptions<FWorkflow, F, G>(this WorkflowDefinitionBuilder<FWorkflow, F, G> builder, Action<WorkflowOptions> adjustOptions)
-            where FWorkflow : Workflow<FWorkflow, F, G>
-            where F : WorkflowInput<G>
-            where G : WorkflowOutput
-        {
-            adjustOptions?.Invoke(builder.BuildContext.WorkflowOptions);
-        }
     }
 
     public class WorkflowDefinitionBuilder<TWorkflow, TInput, TOutput> : ITaskSequenceBuilder<TWorkflow>
@@ -37,7 +28,7 @@ namespace ConductorSharp.Engine.Builders
         where TOutput : WorkflowOutput
     {
         private readonly Type _workflowType = typeof(TWorkflow);
-        private readonly List<ITaskBuilder> _taskBuilders = new();
+        private readonly List<ITaskBuilder> _taskBuilders = [];
 
         public BuildContext BuildContext { get; } = new();
         public BuildConfiguration BuildConfiguration { get; set; }
@@ -58,20 +49,25 @@ namespace ConductorSharp.Engine.Builders
 
         private void GenerateWorkflowName() => BuildContext.WorkflowName = NamingUtil.DetermineRegistrationName(_workflowType);
 
-        public WorkflowDefinition Build()
+        public WorkflowDef Build()
         {
+            var metadataAttribute = _workflowType.GetCustomAttribute<WorkflowMetadataAttribute>();
+            var ownerApp = metadataAttribute?.OwnerApp;
+            var ownerEmail = metadataAttribute?.OwnerEmail;
+            var description = metadataAttribute?.Description;
+            var failureWorkflow = metadataAttribute?.FailureWorkflow;
+
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerApp))
             {
-                BuildContext.WorkflowOptions.OwnerApp = BuildConfiguration.DefaultOwnerApp;
+                ownerApp = BuildConfiguration.DefaultOwnerApp;
             }
 
             if (!string.IsNullOrEmpty(BuildConfiguration?.DefaultOwnerEmail))
             {
-                BuildContext.WorkflowOptions.OwnerEmail = BuildConfiguration.DefaultOwnerEmail;
+                ownerEmail = BuildConfiguration.DefaultOwnerEmail;
             }
 
-            BuildContext.WorkflowOptions.Version =
-                _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? BuildContext.WorkflowOptions.Version;
+            var version = _workflowType.GetCustomAttribute<VersionAttribute>()?.Version ?? 1;
             BuildContext.Inputs = new();
 
             var input = _workflowType.BaseType.GenericTypeArguments[1];
@@ -83,20 +79,18 @@ namespace ConductorSharp.Engine.Builders
                 BuildContext.Inputs.Add(propertyName);
             }
 
-            return new WorkflowDefinition
+            return new WorkflowDef
             {
                 Name = BuildContext.WorkflowName,
                 Tasks = _taskBuilders.SelectMany(a => a.Build()).ToList(),
-                FailureWorkflow =
-                    BuildContext.WorkflowOptions.FailureWorkflow != null
-                        ? NamingUtil.DetermineRegistrationName(BuildContext.WorkflowOptions.FailureWorkflow)
-                        : null,
-                Description = BuildContext.WorkflowOptions.Description,
+                FailureWorkflow = failureWorkflow != null ? NamingUtil.DetermineRegistrationName(failureWorkflow) : null,
+                Description = description,
                 InputParameters = BuildContext.Inputs.ToArray(),
-                OutputParameters = BuildContext.Outputs,
-                OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
-                OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
-                Version = BuildContext.WorkflowOptions.Version
+                OutputParameters = (BuildContext.Outputs ?? []).ToObject<IDictionary<string, object>>(),
+                OwnerApp = ownerApp,
+                OwnerEmail = ownerEmail,
+                Version = version,
+                SchemaVersion = 2
             };
         }
 

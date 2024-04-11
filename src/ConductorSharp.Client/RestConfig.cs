@@ -2,8 +2,6 @@
 {
     public class RestConfig
     {
-        public string BaseUrl { get; set; }
-        public string ApiPath { get; set; }
-        public bool IgnoreValidationErrors { get; set; }
+        public string? BaseUrl { get; set; }
     }
 }
