@@ -24,7 +24,7 @@ namespace ConductorSharp.Client
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                     MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
                     TypeNameHandling = TypeNameHandling.Auto,
-                    Converters = new List<JsonConverter>() { new JsonNodeConverter() }
+                    Converters = new List<JsonConverter>() { new JsonNodeConverter(), new JsonElementConverter() }
                 };
             }
         }
