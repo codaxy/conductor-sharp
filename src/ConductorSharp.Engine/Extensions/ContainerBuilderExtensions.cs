@@ -6,6 +6,8 @@ using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util.Builders;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Http;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -14,9 +16,7 @@ namespace ConductorSharp.Engine.Extensions
         public static IConductorSharpBuilder AddConductorSharp(this IServiceCollection builder, string baseUrl)
         {
             builder.AddTransient<HttpClient>();
-
-            builder.AddSingleton((ctx) => new ConductorClient(new HttpClient { BaseAddress = new Uri(baseUrl) }));
-
+            builder.AddHttpClient<ConductorClient>().ConfigureHttpClient(client => client.BaseAddress = new Uri(baseUrl));
             builder.AddTransient<IAdminService, AdminService>();
             builder.AddTransient<IEventService, EventService>();
             builder.AddTransient<IExternalPayloadService, ExternalPayloadService>();

@@ -14,7 +14,7 @@ public class WorkflowBulkService(ConductorClient client) : IWorkflowBulkService
         IEnumerable<string> worklowIds,
         string? reason = null,
         CancellationToken cancellationToken = default
-    ) => await client.TerminateAsync(worklowIds, reason, cancellationToken);
+    ) => await client.TerminateAsync(reason, worklowIds, cancellationToken);
 
     public async Task<BulkResponse> RetryAsync(IEnumerable<string> workflowIds, CancellationToken cancellationToken = default) =>
         await client.Retry_1Async(workflowIds, cancellationToken);
@@ -23,5 +23,5 @@ public class WorkflowBulkService(ConductorClient client) : IWorkflowBulkService
         IEnumerable<string> workflowIds,
         bool? useLatestDefinition = null,
         CancellationToken cancellationToken = default
-    ) => await client.Restart_1Async(workflowIds, useLatestDefinition, cancellationToken);
+    ) => await client.Restart_1Async(useLatestDefinition, workflowIds, cancellationToken);
 }

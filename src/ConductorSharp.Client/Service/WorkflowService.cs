@@ -80,7 +80,7 @@ namespace ConductorSharp.Client.Service
             bool? includeClosed = false,
             bool? includeTasks = false,
             CancellationToken cancellationToken = default
-        ) => await _client.GetWorkflowsAsync(name, correlationIds, includeClosed, includeTasks, cancellationToken);
+        ) => await _client.GetWorkflowsAsync(name, includeClosed, includeTasks, correlationIds, cancellationToken);
 
         /// <summary>
         /// Test workflow execution using mock data
