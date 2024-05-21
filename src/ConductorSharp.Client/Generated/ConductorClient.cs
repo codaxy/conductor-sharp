@@ -37,7 +37,6 @@ namespace ConductorSharp.Client.Generated
         public ConductorClient(System.Net.Http.HttpClient httpClient)
     #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
-            BaseUrl = "http://dev.cxo.lab:8081";
             _httpClient = httpClient;
         }
 
