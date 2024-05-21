@@ -176,5 +176,20 @@ namespace ConductorSharp.Client.Service
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<string> UpdateAsync(TaskResult updateRequest, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Update a task
+        /// </summary>
+        /// <param name="updateRequest"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<string> UpdateTaskByRefnameAsync(
+            string workflowId,
+            string taskRefName,
+            Status status,
+            string? workerid,
+            IDictionary<string, object> body,
+            CancellationToken cancellationToken = default
+        );
     }
 }

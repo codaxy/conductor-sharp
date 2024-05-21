@@ -7,7 +7,7 @@ public class QueueAdminService(ConductorClient client) : IQueueAdminService
     public async Task MarkWaitTaskCompletedAsync(
         string workflowId,
         string taskRefName,
-        Status status,
+        Status2 status,
         IDictionary<string, object> output,
         CancellationToken cancellationToken = default
     ) => await client.Update_1Async(workflowId, taskRefName, status, output, cancellationToken);
@@ -15,7 +15,7 @@ public class QueueAdminService(ConductorClient client) : IQueueAdminService
     public async Task MarkWaitTaskCompletedAsync(
         string workflowId,
         string taskId,
-        Status2 status,
+        Generated.TaskStatus status,
         IDictionary<string, object> output,
         CancellationToken cancellationToken = default
     ) => await client.UpdateByTaskIdAsync(workflowId, taskId, status, output, cancellationToken);

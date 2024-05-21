@@ -23,7 +23,7 @@ namespace ConductorSharp.Client.Service
         Task MarkWaitTaskCompletedAsync(
             string workflowId,
             string taskRefName,
-            Status status,
+            Status2 status,
             IDictionary<string, object> output,
             CancellationToken cancellationToken = default
         );
@@ -34,7 +34,7 @@ namespace ConductorSharp.Client.Service
         Task MarkWaitTaskCompletedAsync(
             string workflowId,
             string taskId,
-            Status2 status,
+            Generated.TaskStatus status,
             IDictionary<string, object> output,
             CancellationToken cancellationToken = default
         );

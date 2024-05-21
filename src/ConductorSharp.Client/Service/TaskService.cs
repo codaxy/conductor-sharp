@@ -82,5 +82,14 @@ namespace ConductorSharp.Client.Service
             string payloadType,
             CancellationToken cancellationToken = default
         ) => await _client.GetExternalStorageLocation_1Async(path, operation, payloadType, cancellationToken);
+
+        public async Task<string> UpdateTaskByRefnameAsync(
+            string workflowId,
+            string taskRefName,
+            Status status,
+            string? workerid,
+            IDictionary<string, object> body,
+            CancellationToken cancellationToken = default
+        ) => await _client.UpdateTask_1Async(workflowId, taskRefName, status, workerid, body, cancellationToken);
     }
 }
