@@ -10,21 +10,21 @@ namespace ConductorSharp.Engine.Builders
 {
     public static class HumanTaskExtensions
     {
-        public static ITaskOptionsBuilder AddTask<TWorkflow>(
+        public static ITaskOptionsBuilder AddTask<TWorkflow, TOutput>(
             this ITaskSequenceBuilder<TWorkflow> builder,
-            Expression<Func<TWorkflow, HumanTaskModel>> reference,
-            Expression<Func<TWorkflow, HumanTaskInput>> input
+            Expression<Func<TWorkflow, HumanTaskModel<TOutput>>> reference,
+            Expression<Func<TWorkflow, HumanTaskInput<TOutput>>> input
         )
             where TWorkflow : ITypedWorkflow
         {
-            var taskBuilder = new HumanTaskBuilder(reference.Body, input.Body, builder.BuildConfiguration);
+            var taskBuilder = new HumanTaskBuilder<TOutput>(reference.Body, input.Body, builder.BuildConfiguration);
             builder.AddTaskBuilderToSequence(taskBuilder);
             return taskBuilder;
         }
     }
 
-    internal class HumanTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-        : BaseTaskBuilder<HumanTaskInput, NoOutput>(taskExpression, inputExpression, buildConfiguration)
+    internal class HumanTaskBuilder<TOutput>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<HumanTaskInput<TOutput>, TOutput>(taskExpression, inputExpression, buildConfiguration)
     {
         public override WorkflowTask[] Build() =>
             [

@@ -19,7 +19,7 @@
     <None Remove="Samples\Workflows\DynamicTask.json" />
     <None Remove="Samples\Workflows\EvaluateExpressionWorkflow.json" />
     <None Remove="Samples\Workflows\EventTaskWorkflow.json" />
-    <None Remove="Samples\Workflows\HumanTask.json" />
+    <None Remove="Samples\Workflows\HumanTaskWorkflow.json" />
     <None Remove="Samples\Workflows\IndexerWorkflow.json" />
     <None Remove="Samples\Workflows\ListInitializationWorkflow.json" />
     <None Remove="Samples\Workflows\NestedObjects.json" />
@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Samples\Workflows\HumanTask.json" />
+    <EmbeddedResource Include="Samples\Workflows\HumanTaskWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\ListInitializationWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\EvaluateExpressionWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\TaskPropertiesWorkflow.json" />
