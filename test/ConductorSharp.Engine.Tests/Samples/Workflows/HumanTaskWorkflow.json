@@ -8,6 +8,16 @@
       "inputParameters": {},
       "type": "HUMAN",
       "workflowTaskType": "HUMAN"
+    },
+    {
+      "name": "CUSTOMER_get",
+      "taskReferenceName": "get_customer",
+      "inputParameters": {
+        "customer_id": "${human_task.output.customer_id}"
+      },
+      "type": "SIMPLE",
+      "optional": false,
+      "workflowTaskType": "SIMPLE"
     }
   ],
   "inputParameters": [],

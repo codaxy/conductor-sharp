@@ -12,7 +12,13 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
     public class HumanTaskWorkflow : Workflow<HumanTaskWorkflow, HumanTaskWorkflowInput, HumanTaskWorkflowOutput>
     {
-        public HumanTaskModel HumanTask { get; set; }
+        public class HumanTaskOutput
+        {
+            public string CustomerId { get; set; }
+        }
+
+        public HumanTaskModel<HumanTaskOutput> HumanTask { get; set; }
+        public CustomerGetV1 GetCustomer { get; set; }
 
         public HumanTaskWorkflow(WorkflowDefinitionBuilder<HumanTaskWorkflow, HumanTaskWorkflowInput, HumanTaskWorkflowOutput> builder)
             : base(builder) { }
@@ -22,6 +28,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
             base.BuildDefinition();
 
             _builder.AddTask(wf => wf.HumanTask, wf => new() { });
+            _builder.AddTask(wf => wf.GetCustomer, wf => new() { CustomerId = wf.HumanTask.Output.CustomerId });
         }
     }
 }

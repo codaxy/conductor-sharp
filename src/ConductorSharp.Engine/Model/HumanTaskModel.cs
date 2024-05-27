@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace ConductorSharp.Engine.Model
 {
-    public class HumanTaskInput : IRequest<NoOutput> { }
+    public class HumanTaskInput<TOutput> : IRequest<TOutput> { }
 
-    public class HumanTaskModel : TaskModel<HumanTaskInput, NoOutput> { }
+    public class HumanTaskModel<TOutput> : TaskModel<HumanTaskInput<TOutput>, TOutput> { }
 }

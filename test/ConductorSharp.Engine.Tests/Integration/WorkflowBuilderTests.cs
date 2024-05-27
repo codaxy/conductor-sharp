@@ -188,7 +188,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         public void BuilderReturnsCorrectDefinitionHumanWorkflow()
         {
             var definition = GetDefinitionFromWorkflow<HumanTaskWorkflow>();
-            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/HumanTask.json");
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/HumanTaskWorkflow.json");
 
             Assert.Equal(expectedDefinition, definition);
         }
