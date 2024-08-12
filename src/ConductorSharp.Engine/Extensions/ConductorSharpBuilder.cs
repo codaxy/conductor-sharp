@@ -70,6 +70,12 @@ namespace ConductorSharp.Engine.Extensions
             return this;
         }
 
+        public IExecutionManagerBuilder UseConstantPollTimingStrategy()
+        {
+            Builder.AddTransient<IPollTimingStrategy, ConstantInterval>();
+            return this;
+        }
+
         public IConductorSharpBuilder SetBuildConfiguration(BuildConfiguration buildConfiguration)
         {
             if (buildConfiguration is null)

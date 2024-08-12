@@ -180,6 +180,12 @@ namespace ConductorSharp.Engine
                     cancellationToken
                 );
             }
+            catch (ApiException exception) when (exception.StatusCode == 204)
+            {
+                // This handles the case when PollAsync throws exception in case there are no tasks in queue
+                // Even though Conductor reports 1 task in queue for particular task type this endpoint won't return scheduled task immmediately
+                // This causes NullReferenceException in logging code below hence why we ignore the exception
+            }
             catch (Exception exception)
             {
                 _logger.LogError(

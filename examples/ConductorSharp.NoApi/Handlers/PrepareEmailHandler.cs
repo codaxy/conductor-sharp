@@ -23,7 +23,6 @@ namespace ConductorSharp.NoApi.Handlers
     }
 
     [OriginalName("EMAIL_prepare")]
-    [TaskDomain("my_domain")]
     public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
     {
         private readonly ConductorSharpExecutionContext _context;

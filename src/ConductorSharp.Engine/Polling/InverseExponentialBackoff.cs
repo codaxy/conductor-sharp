@@ -5,10 +5,10 @@ using ConductorSharp.Engine.Model;
 
 namespace ConductorSharp.Engine.Polling
 {
-    public class InverseExponentialBackoff : IPollTimingStrategy
+    internal class InverseExponentialBackoff : IPollTimingStrategy
     {
         private const int _backoffRatio = 2;
-        private const int _recoveryValue = 50;
+        private const int _recoveryValue = 250;
         private readonly TimeSpan _recoveryInterval = TimeSpan.FromMilliseconds(5000);
 
         private DateTimeOffset _lastRecoveryTime = DateTimeOffset.UtcNow;
@@ -20,6 +20,9 @@ namespace ConductorSharp.Engine.Polling
             int currentSleepInterval
         )
         {
+            if (baseSleepInterval < _recoveryValue)
+                throw new ArgumentException($"Sleep interval must be greater than or equal than {_recoveryValue}ms");
+
             if (taskToWorkerList.Count > 0)
             {
                 currentSleepInterval /= _backoffRatio;

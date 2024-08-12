@@ -2,6 +2,7 @@
 using ConductorSharp.Engine.Health;
 using ConductorSharp.NoApi.Behaviors;
 using ConductorSharp.NoApi.Handlers;
+using ConductorSharp.Patterns.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,7 +37,8 @@ var builder = Host.CreateDefaultBuilder()
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
                     pipelines.AddCustomBehavior<PrepareEmailBehavior, PrepareEmailRequest, PrepareEmailResponse>();
-                });
+                })
+                .AddConductorSharpPatterns();
 
             services.RegisterWorkerTask<GetCustomerHandler>();
             services.RegisterWorkerTask<PrepareEmailHandler>();
