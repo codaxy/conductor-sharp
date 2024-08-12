@@ -1,10 +1,10 @@
-﻿using ConductorSharp.Engine.Interface;
-using System;
+﻿using System;
 using System.Reflection;
-using ConductorSharp.Client;
-using Newtonsoft.Json;
 using System.Text.Json.Serialization;
+using ConductorSharp.Client;
 using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Interface;
+using Newtonsoft.Json;
 
 namespace ConductorSharp.Engine.Util
 {
@@ -21,7 +21,8 @@ namespace ConductorSharp.Engine.Util
             return name;
         }
 
-        public static string NameOf<TNameable>() where TNameable : INameable => DetermineRegistrationName(typeof(TNameable));
+        public static string NameOf<TNameable>()
+            where TNameable : INameable => DetermineRegistrationName(typeof(TNameable));
 
         internal static string GetParameterName(PropertyInfo propInfo) =>
             propInfo.GetCustomAttribute<JsonPropertyAttribute>(true)?.PropertyName

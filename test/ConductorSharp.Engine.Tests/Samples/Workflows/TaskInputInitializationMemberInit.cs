@@ -24,7 +24,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 TaskInputInitializationMemberInitInput,
                 TaskInputInitializationMemberInitOutput
             > builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public CustomerGetV1 GetCustomer { get; set; }
 

@@ -31,7 +31,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     [OriginalName("TEST_dynamic_task")]
     public class DynamicTask : Workflow<DynamicTask, DynamicTaskInput, DynamicTaskOutput>
     {
-        public DynamicTask(WorkflowDefinitionBuilder<DynamicTask, DynamicTaskInput, DynamicTaskOutput> builder) : base(builder) { }
+        public DynamicTask(WorkflowDefinitionBuilder<DynamicTask, DynamicTaskInput, DynamicTaskOutput> builder)
+            : base(builder) { }
 
         public DynamicTaskModel<MandatoryDynamicInput, ExpectedDynamicOutput> DynamicHandler { get; set; }
 

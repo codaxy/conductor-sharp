@@ -19,7 +19,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     {
         public TaskInputInitializationNew(
             WorkflowDefinitionBuilder<TaskInputInitializationNew, TaskInputInitializationNewInput, TaskInputInitializationNewOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public CustomerGetV1 GetCustomer { get; set; }
 

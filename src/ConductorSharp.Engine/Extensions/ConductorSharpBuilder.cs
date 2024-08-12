@@ -13,7 +13,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace ConductorSharp.Engine.Extensions
 {
-    public class ConductorSharpBuilder(IServiceCollection builder) : IConductorSharpBuilder, IExecutionManagerBuilder, IPipelineBuilder
+    public class ConductorSharpBuilder(IServiceCollection builder) : IConductorSharpBuilder, IExecutionManagerBuilder
     {
         public IServiceCollection Builder { get; set; } = builder;
 
@@ -58,17 +58,10 @@ namespace ConductorSharp.Engine.Extensions
 
         public IExecutionManagerBuilder AddPipelines(Action<IPipelineBuilder> behaviorBuilder)
         {
-            behaviorBuilder(this);
+            var pipelineBuilder = new PipelineBuilder(Builder);
+            behaviorBuilder(pipelineBuilder);
             return this;
         }
-
-        public void AddRequestResponseLogging() => Builder.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestResponseLoggingBehavior<,>));
-
-        public void AddValidation() => Builder.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-
-        public void AddContextLogging() => Builder.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextLoggingBehavior<,>));
-
-        public void AddExecutionTaskTracking() => Builder.AddTransient(typeof(IPipelineBehavior<,>), typeof(TaskExecutionTrackingBehavior<,>));
 
         public IExecutionManagerBuilder SetHealthCheckService<T>()
             where T : IConductorSharpHealthService
