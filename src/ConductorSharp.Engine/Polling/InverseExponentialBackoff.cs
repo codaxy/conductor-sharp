@@ -8,7 +8,7 @@ namespace ConductorSharp.Engine.Polling
     internal class InverseExponentialBackoff : IPollTimingStrategy
     {
         private const int _backoffRatio = 2;
-        private const int _recoveryValue = 50;
+        private const int _recoveryValue = 250;
         private readonly TimeSpan _recoveryInterval = TimeSpan.FromMilliseconds(5000);
 
         private DateTimeOffset _lastRecoveryTime = DateTimeOffset.UtcNow;
