@@ -17,7 +17,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     [OriginalName("string_addition")]
     public class StringAddition : Workflow<StringAddition, StringAdditionInput, StringAdditionOutput>
     {
-        public StringAddition(WorkflowDefinitionBuilder<StringAddition, StringAdditionInput, StringAdditionOutput> builder) : base(builder) { }
+        public StringAddition(WorkflowDefinitionBuilder<StringAddition, StringAdditionInput, StringAdditionOutput> builder)
+            : base(builder) { }
 
         public class StringTaskOutput { }
 
