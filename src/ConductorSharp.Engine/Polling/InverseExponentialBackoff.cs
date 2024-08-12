@@ -20,6 +20,9 @@ namespace ConductorSharp.Engine.Polling
             int currentSleepInterval
         )
         {
+            if (baseSleepInterval < _recoveryValue)
+                throw new ArgumentException($"Sleep interval must be greater than or equal than {_recoveryValue}ms");
+
             if (taskToWorkerList.Count > 0)
             {
                 currentSleepInterval /= _backoffRatio;
