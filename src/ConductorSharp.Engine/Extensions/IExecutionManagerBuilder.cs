@@ -1,6 +1,7 @@
-﻿using ConductorSharp.Engine.Health;
+﻿using System;
+using ConductorSharp.Engine.Health;
+using ConductorSharp.Engine.Polling;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -8,6 +9,8 @@ namespace ConductorSharp.Engine.Extensions
     {
         IServiceCollection Builder { get; set; }
         IExecutionManagerBuilder AddPipelines(Action<IPipelineBuilder> pipelines);
-        IExecutionManagerBuilder SetHealthCheckService<T>() where T : IConductorSharpHealthService;
+        IExecutionManagerBuilder SetHealthCheckService<T>()
+            where T : IConductorSharpHealthService;
+        IExecutionManagerBuilder UseConstantPollTimingStrategy();
     }
 }

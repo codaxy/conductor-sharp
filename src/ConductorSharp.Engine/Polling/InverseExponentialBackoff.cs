@@ -5,7 +5,7 @@ using ConductorSharp.Engine.Model;
 
 namespace ConductorSharp.Engine.Polling
 {
-    public class InverseExponentialBackoff : IPollTimingStrategy
+    internal class InverseExponentialBackoff : IPollTimingStrategy
     {
         private const int _backoffRatio = 2;
         private const int _recoveryValue = 50;
