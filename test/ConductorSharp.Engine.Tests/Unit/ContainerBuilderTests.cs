@@ -117,25 +117,15 @@ namespace ConductorSharp.Engine.Tests.Unit
             var metadataService = container.GetService<IMetadataService>();
             var workflowService = container.GetService<IWorkflowService>();
 
-            Assert.NotNull(adminService);
-            Assert.NotNull(eventService);
-            Assert.NotNull(externalPayloadService);
-            Assert.NotNull(queueAdminService);
-            Assert.NotNull(workflowBulkService);
-            Assert.NotNull(taskService);
-            Assert.NotNull(healthService);
-            Assert.NotNull(metadataService);
-            Assert.NotNull(workflowService);
-
-            adminService = container.GetKeyedService<IAdminService>(alternateClient);
-            eventService = container.GetKeyedService<IEventService>(alternateClient);
-            externalPayloadService = container.GetKeyedService<IExternalPayloadService>(alternateClient);
-            queueAdminService = container.GetKeyedService<IQueueAdminService>(alternateClient);
-            workflowBulkService = container.GetKeyedService<IWorkflowBulkService>(alternateClient);
-            taskService = container.GetKeyedService<ITaskService>(alternateClient);
-            healthService = container.GetKeyedService<IHealthService>(alternateClient);
-            metadataService = container.GetKeyedService<IMetadataService>(alternateClient);
-            workflowService = container.GetKeyedService<IWorkflowService>(alternateClient);
+            var alternateAdminService = container.GetKeyedService<IAdminService>(alternateClient);
+            var alternateEventService = container.GetKeyedService<IEventService>(alternateClient);
+            var alternateExternalPayloadService = container.GetKeyedService<IExternalPayloadService>(alternateClient);
+            var alternateQueueAdminService = container.GetKeyedService<IQueueAdminService>(alternateClient);
+            var alternateWorkflowBulkService = container.GetKeyedService<IWorkflowBulkService>(alternateClient);
+            var alternateTaskService = container.GetKeyedService<ITaskService>(alternateClient);
+            var alternateHealthService = container.GetKeyedService<IHealthService>(alternateClient);
+            var alternateMetadataService = container.GetKeyedService<IMetadataService>(alternateClient);
+            var alternateWorkflowService = container.GetKeyedService<IWorkflowService>(alternateClient);
 
             Assert.NotNull(adminService);
             Assert.NotNull(eventService);
@@ -146,6 +136,26 @@ namespace ConductorSharp.Engine.Tests.Unit
             Assert.NotNull(healthService);
             Assert.NotNull(metadataService);
             Assert.NotNull(workflowService);
+
+            Assert.NotNull(alternateAdminService);
+            Assert.NotNull(alternateEventService);
+            Assert.NotNull(alternateExternalPayloadService);
+            Assert.NotNull(alternateQueueAdminService);
+            Assert.NotNull(alternateWorkflowBulkService);
+            Assert.NotNull(alternateTaskService);
+            Assert.NotNull(alternateHealthService);
+            Assert.NotNull(alternateMetadataService);
+            Assert.NotNull(alternateWorkflowService);
+
+            Assert.NotEqual(adminService, alternateAdminService);
+            Assert.NotEqual(eventService, alternateEventService);
+            Assert.NotEqual(externalPayloadService, alternateExternalPayloadService);
+            Assert.NotEqual(queueAdminService, alternateQueueAdminService);
+            Assert.NotEqual(workflowBulkService, alternateWorkflowBulkService);
+            Assert.NotEqual(taskService, alternateTaskService);
+            Assert.NotEqual(healthService, alternateHealthService);
+            Assert.NotEqual(metadataService, alternateMetadataService);
+            Assert.NotEqual(workflowService, alternateWorkflowService);
         }
     }
 }
