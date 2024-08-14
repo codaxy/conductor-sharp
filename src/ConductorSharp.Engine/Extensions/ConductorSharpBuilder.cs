@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Net.Http;
 using System.Reflection;
+using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Behaviors;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
@@ -84,6 +86,32 @@ namespace ConductorSharp.Engine.Extensions
             }
 
             Builder.AddSingleton(buildConfiguration);
+            return this;
+        }
+
+        public IConductorSharpBuilder AddAlternateClient(string baseUrl, string key, string apiPath = "api", bool ignoreInvalidCertificate = false)
+        {
+            var clientBuilder = builder
+                .AddHttpClient(key, client => client.BaseAddress = new(baseUrl))
+                .AddHttpMessageHandler(() => new ApiPathOverrideHttpHandler(apiPath));
+
+            if (ignoreInvalidCertificate)
+            {
+                clientBuilder.ConfigurePrimaryHttpMessageHandler(
+                    () => new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true }
+                );
+            }
+
+            builder.AddKeyedTransient<IAdminService, AdminService>(key, ((sp, _) => new(sp.GetService<IHttpClientFactory>(), key)));
+            builder.AddKeyedTransient<IEventService, EventService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
+            builder.AddKeyedTransient<IExternalPayloadService, ExternalPayloadService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
+            builder.AddKeyedTransient<IQueueAdminService, QueueAdminService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
+            builder.AddKeyedTransient<IWorkflowBulkService, WorkflowBulkService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
+            builder.AddKeyedTransient<ITaskService, TaskService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
+            builder.AddKeyedTransient<IHealthService, HealthService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
+            builder.AddKeyedTransient<IMetadataService, MetadataService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
+            builder.AddKeyedTransient<IWorkflowService, WorkflowService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
+
             return this;
         }
     }

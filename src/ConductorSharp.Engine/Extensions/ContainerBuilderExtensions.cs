@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Net.Http;
+using System.Reflection;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -13,19 +15,35 @@ namespace ConductorSharp.Engine.Extensions
 {
     public static class ContainerBuilderExtensions
     {
-        public static IConductorSharpBuilder AddConductorSharp(this IServiceCollection builder, string baseUrl)
+        private const string DefaultClientName = "ConductorSharp.Client.DefaultHttpClient";
+
+        public static IConductorSharpBuilder AddConductorSharp(
+            this IServiceCollection builder,
+            string baseUrl,
+            string apiPath = "api",
+            bool ignoreInvalidCertificate = false
+        )
         {
-            builder.AddTransient<HttpClient>();
-            builder.AddHttpClient<ConductorClient>().ConfigureHttpClient(client => client.BaseAddress = new Uri(baseUrl));
-            builder.AddTransient<IAdminService, AdminService>();
-            builder.AddTransient<IEventService, EventService>();
-            builder.AddTransient<IExternalPayloadService, ExternalPayloadService>();
-            builder.AddTransient<IQueueAdminService, QueueAdminService>();
-            builder.AddTransient<IWorkflowBulkService, WorkflowBulkService>();
-            builder.AddTransient<ITaskService, TaskService>();
-            builder.AddTransient<IHealthService, HealthService>();
-            builder.AddTransient<IMetadataService, MetadataService>();
-            builder.AddTransient<IWorkflowService, WorkflowService>();
+            var clientBuilder = builder
+                .AddHttpClient(DefaultClientName, client => client.BaseAddress = new(baseUrl))
+                .AddHttpMessageHandler(() => new ApiPathOverrideHttpHandler(apiPath));
+
+            if (ignoreInvalidCertificate)
+            {
+                clientBuilder.ConfigurePrimaryHttpMessageHandler(
+                    () => new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true }
+                );
+            }
+
+            builder.AddTransient<IAdminService, AdminService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
+            builder.AddTransient<IEventService, EventService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
+            builder.AddTransient<IExternalPayloadService, ExternalPayloadService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
+            builder.AddTransient<IQueueAdminService, QueueAdminService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
+            builder.AddTransient<IWorkflowBulkService, WorkflowBulkService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
+            builder.AddTransient<ITaskService, TaskService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
+            builder.AddTransient<IHealthService, HealthService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
+            builder.AddTransient<IMetadataService, MetadataService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
+            builder.AddTransient<IWorkflowService, WorkflowService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
 
             builder.AddSingleton(new BuildConfiguration());
             builder.AddSingleton<WorkflowBuildItemRegistry>();

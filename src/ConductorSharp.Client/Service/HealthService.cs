@@ -1,12 +1,13 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System.Net.Http;
+using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Client.Service
 {
-    public class HealthService(ConductorClient client) : IHealthService
+    public class HealthService(IHttpClientFactory httpClientFactory, string clientName) : IHealthService
     {
-        private readonly ConductorClient _conductorClient = client;
+        private readonly ConductorClient _client = new(httpClientFactory.CreateClient(clientName));
 
         public async Task<HealthCheckStatus> CheckHealthAsync(CancellationToken cancellationToken = default) =>
-            await _conductorClient.DoCheckAsync(cancellationToken);
+            await _client.DoCheckAsync(cancellationToken);
     }
 }
