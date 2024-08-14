@@ -1,10 +1,11 @@
-﻿using ConductorSharp.Client.Generated;
+﻿using System.Net.Http;
+using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Client.Service
 {
-    public class WorkflowService(ConductorClient client) : IWorkflowService
+    public class WorkflowService(IHttpClientFactory httpClientFactory, string clientName) : IWorkflowService
     {
-        private readonly ConductorClient _client = client;
+        private readonly ConductorClient _client = new(httpClientFactory.CreateClient(clientName));
 
         /// <summary>
         /// Skips a given task from a current running workflow

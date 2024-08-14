@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
     {
         hostBuilder
             .AddConductorSharp(baseUrl: configuration.GetValue<string>("Conductor:BaseUrl"))
+            .AddAlternateClient(baseUrl: configuration.GetValue<string>("Conductor:AlternateUrl"), "Alternate", "api/workflow", true)
             .AddExecutionManager(
                 maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                 sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),

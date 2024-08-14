@@ -2,26 +2,28 @@
 
 namespace ConductorSharp.Client.Service;
 
-public class WorkflowBulkService(ConductorClient client) : IWorkflowBulkService
+public class WorkflowBulkService(IHttpClientFactory httpClientFactory, string clientName) : IWorkflowBulkService
 {
+    private readonly ConductorClient _client = new(httpClientFactory.CreateClient(clientName));
+
     public async Task<BulkResponse> ResumeAsync(IEnumerable<string> workflowIds, CancellationToken cancellationToken = default) =>
-        await client.ResumeWorkflow_1Async(workflowIds, cancellationToken);
+        await _client.ResumeWorkflow_1Async(workflowIds, cancellationToken);
 
     public async Task<BulkResponse> PauseAsync(IEnumerable<string> workflowIds, CancellationToken cancellationToken = default) =>
-        await client.PauseWorkflow_1Async(workflowIds, cancellationToken);
+        await _client.PauseWorkflow_1Async(workflowIds, cancellationToken);
 
     public async Task<BulkResponse> TerminateAsync(
         IEnumerable<string> worklowIds,
         string? reason = null,
         CancellationToken cancellationToken = default
-    ) => await client.TerminateAsync(reason, worklowIds, cancellationToken);
+    ) => await _client.TerminateAsync(reason, worklowIds, cancellationToken);
 
     public async Task<BulkResponse> RetryAsync(IEnumerable<string> workflowIds, CancellationToken cancellationToken = default) =>
-        await client.Retry_1Async(workflowIds, cancellationToken);
+        await _client.Retry_1Async(workflowIds, cancellationToken);
 
     public async Task<BulkResponse> RestartAsync(
         IEnumerable<string> workflowIds,
         bool? useLatestDefinition = null,
         CancellationToken cancellationToken = default
-    ) => await client.Restart_1Async(useLatestDefinition, workflowIds, cancellationToken);
+    ) => await _client.Restart_1Async(useLatestDefinition, workflowIds, cancellationToken);
 }

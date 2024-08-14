@@ -1,8 +1,8 @@
-﻿using ConductorSharp.Engine.Util.Builders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using ConductorSharp.Engine.Util.Builders;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -16,5 +16,6 @@ namespace ConductorSharp.Engine.Extensions
             params Assembly[] handlerAssemblies
         );
         IConductorSharpBuilder SetBuildConfiguration(BuildConfiguration buildConfiguration);
+        IConductorSharpBuilder AddAlternateClient(string baseUrl, string key, string apiPath = "api", bool ignoreInvalidCertificate = false);
     }
 }

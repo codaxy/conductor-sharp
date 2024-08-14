@@ -12,13 +12,20 @@ public class WorkflowController : ControllerBase
     private readonly IMetadataService _metadataService;
     private readonly IWorkflowService _workflowService;
     private readonly ITaskService _taskService;
+    private readonly IMetadataService _alternateMetadataService;
     private const string NotificationWorfklowName = "NOTIFICATION_send_to_customer";
 
-    public WorkflowController(IMetadataService metadataService, IWorkflowService workflowService, ITaskService taskService)
+    public WorkflowController(
+        IMetadataService metadataService,
+        IWorkflowService workflowService,
+        ITaskService taskService,
+        [FromKeyedServices("Alternate")] IMetadataService alternateMetadataService
+    )
     {
         _metadataService = metadataService;
         _workflowService = workflowService;
         _taskService = taskService;
+        _alternateMetadataService = alternateMetadataService;
     }
 
     [HttpGet("get-workflows")]
@@ -45,4 +52,12 @@ public class WorkflowController : ControllerBase
                 Input = new Dictionary<string, object> { { "task_to_execute", "CUSTOMER_get" }, { "customer_id", request.CustomerId } }
             }
         );
+
+    [HttpGet("get-workflows/{discriminator}")]
+    public async Task<ICollection<WorkflowDef>> GetRegisteredWorkflows(string discriminator) =>
+        discriminator switch
+        {
+            "alternate" => await _alternateMetadataService.ListWorkflowsAsync(),
+            _ => await _metadataService.ListWorkflowsAsync()
+        };
 }
