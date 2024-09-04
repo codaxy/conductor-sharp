@@ -16,6 +16,7 @@
     <None Remove="Samples\Workflows\CSharpLambdaWorkflow.json" />
     <None Remove="Samples\Workflows\DecisionInDecision.json" />
     <None Remove="Samples\Workflows\DecisionTask.json" />
+    <None Remove="Samples\Workflows\DictionaryInitializationWorkflow.json" />
     <None Remove="Samples\Workflows\DynamicTask.json" />
     <None Remove="Samples\Workflows\EvaluateExpressionWorkflow.json" />
     <None Remove="Samples\Workflows\EventTaskWorkflow.json" />
@@ -39,6 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Samples\Workflows\DictionaryInitializationWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\HumanTaskWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\ListInitializationWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\EvaluateExpressionWorkflow.json" />
