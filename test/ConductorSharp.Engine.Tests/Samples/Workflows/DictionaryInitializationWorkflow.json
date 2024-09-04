@@ -1,0 +1,25 @@
+{
+  "name": "dictionary_initialization_workflow",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "dictionary_input_task",
+      "taskReferenceName": "dictionary_task",
+      "inputParameters": {
+        "input": {
+          "test1": "value",
+          "test2": {
+            "my_prop": "test"
+          }
+        }
+      },
+      "type": "SIMPLE",
+      "optional": false,
+      "workflowTaskType": "SIMPLE"
+    }
+  ],
+  "inputParameters": [],
+  "outputParameters": {},
+  "schemaVersion": 2,
+  "timeoutSeconds": 0
+}

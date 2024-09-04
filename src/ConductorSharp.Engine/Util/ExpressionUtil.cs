@@ -51,8 +51,11 @@ namespace ConductorSharp.Engine.Util
             if (expression is NewArrayExpression newArrayExpression)
                 return ParseArrayInitalization(newArrayExpression);
 
-            if (expression is ListInitExpression listInitExpression)
-                return ParseListInit(listInitExpression);
+            if (IsListInitExpression(expression))
+                return ParseListInit((ListInitExpression)expression);
+
+            if (IsDictionaryInitialization(expression))
+                return ParseDictionaryInitialization((ListInitExpression)expression);
 
             if (ShouldCompileToJsonPathExpression(expression))
                 return CreateExpressionString(expression);
@@ -175,20 +178,32 @@ namespace ConductorSharp.Engine.Util
             return new JArray(newArrayExpression.Expressions.Select(ParseExpression));
         }
 
+        private static bool IsListInitExpression(Expression expr) =>
+            expr is ListInitExpression listExpr && listExpr.Initializers.All(i => i.Arguments.Count == 1);
+
         private static JArray ParseListInit(ListInitExpression listInitExpression)
         {
             var array = new JArray();
-            foreach (ElementInit init in listInitExpression.Initializers)
+            foreach (var init in listInitExpression.Initializers)
             {
-                // Assuming all initializers have one argument
-                if (init.Arguments.Count != 1)
-                {
-                    throw new NotSupportedException("Only single argument initializers are supported");
-                }
-
                 array.Add(ParseExpression(init.Arguments.Single()));
             }
             return array;
+        }
+
+        private static bool IsDictionaryInitialization(Expression expr) =>
+            expr is ListInitExpression listExpr && listExpr.NewExpression.Type.IsAssignableTo(typeof(IDictionary<string, object>));
+
+        private static JObject ParseDictionaryInitialization(ListInitExpression listExpression)
+        {
+            var obj = new JObject();
+
+            foreach (var init in listExpression.Initializers)
+            {
+                obj.Add((((ConstantExpression)init.Arguments[0]).Value as string)!, JToken.FromObject(ParseExpression(init.Arguments[1])));
+            }
+
+            return obj;
         }
 
         private static JObject ParseObjectInitialization(Expression expression)
