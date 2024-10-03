@@ -1,17 +1,18 @@
-﻿using ConductorSharp.Engine.Util;
-using MediatR;
-using Microsoft.Extensions.Logging;
-using Serilog.Context;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ConductorSharp.Engine.Util;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Serilog.Context;
 
 namespace ConductorSharp.Engine.Behaviors
 {
-    public class RequestResponseLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
+    public class RequestResponseLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
     {
         private readonly ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> _logger;
 
@@ -22,8 +23,18 @@ namespace ConductorSharp.Engine.Behaviors
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
+            var requestId = Guid.NewGuid();
+            var requestName = typeof(TRequest).Name;
+
             var stopwatch = new Stopwatch();
-            _logger.LogInformation($"Submitting request {{@{typeof(TRequest).Name}}}", request);
+
+            _logger.LogInformation(
+                $"Submitting {{@Test}} request {{Request}} with payload {{@{requestName}}} and with id {{RequestId}}",
+                new { Test = 2 },
+                requestName,
+                request,
+                requestId
+            );
             stopwatch.Start();
 
             try
@@ -33,8 +44,10 @@ namespace ConductorSharp.Engine.Behaviors
                 stopwatch.Stop();
 
                 _logger.LogInformation(
-                    $"Received response {{@{typeof(TResponse).Name}}} for request {typeof(TRequest).Name} (exec time = {{@ElapsedMilliseconds}})",
+                    $"Received response {{@Response}} for request {{Request}} with id {{RequestId}} (exec time = {{ElapsedMilliseconds}})",
                     response,
+                    requestName,
+                    requestId,
                     stopwatch.ElapsedMilliseconds
                 );
 
@@ -44,8 +57,10 @@ namespace ConductorSharp.Engine.Behaviors
             {
                 stopwatch.Stop();
                 _logger.LogError(
-                    $"Exception occured {{@Exception}} for request {typeof(TRequest).Name} (exec time = {{@ElapsedMilliseconds}})",
+                    $"Exception occured {{@Exception}} for request {{Request}} with id {{RequestId}} (exec time = {{ElapsedMilliseconds}})",
                     exc,
+                    requestName,
+                    requestId,
                     stopwatch.ElapsedMilliseconds
                 );
                 throw;
