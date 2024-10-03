@@ -29,8 +29,7 @@ namespace ConductorSharp.Engine.Behaviors
             var stopwatch = new Stopwatch();
 
             _logger.LogInformation(
-                $"Submitting {{@Test}} request {{Request}} with payload {{@{requestName}}} and with id {{RequestId}}",
-                new { Test = 2 },
+                $"Submitting request {{Request}} with payload {{@{requestName}}} and with id {{RequestId}}",
                 requestName,
                 request,
                 requestId
