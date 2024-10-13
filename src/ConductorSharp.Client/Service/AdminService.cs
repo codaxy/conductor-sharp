@@ -2,9 +2,9 @@
 
 namespace ConductorSharp.Client.Service
 {
-    public class AdminService(IHttpClientFactory httpClientFactory, string clientName) : IAdminService
+    public class AdminService(HttpClient client) : IAdminService
     {
-        private readonly ConductorClient _client = new(httpClientFactory.CreateClient(clientName));
+        private readonly ConductorClient _client = new(client);
 
         public async Task<string> QueueRunningWorkflowsForSweepAsync(string workflowId, CancellationToken cancellationToken = default) =>
             await _client.RequeueSweepAsync(workflowId, cancellationToken);

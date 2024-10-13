@@ -3,9 +3,9 @@ using ConductorSharp.Client.Generated;
 
 namespace ConductorSharp.Client.Service;
 
-public class QueueAdminService(IHttpClientFactory httpClientFactory, string clientName) : IQueueAdminService
+public class QueueAdminService(HttpClient client) : IQueueAdminService
 {
-    private readonly ConductorClient _client = new(httpClientFactory.CreateClient(clientName));
+    private readonly ConductorClient _client = new(client);
 
     public async Task MarkWaitTaskCompletedAsync(
         string workflowId,

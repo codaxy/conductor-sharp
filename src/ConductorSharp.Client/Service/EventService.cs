@@ -3,9 +3,9 @@ using EventHandler = ConductorSharp.Client.Generated.EventHandler;
 
 namespace ConductorSharp.Client.Service
 {
-    public class EventService(IHttpClientFactory httpClientFactory, string clientName) : IEventService
+    public class EventService(HttpClient client) : IEventService
     {
-        private readonly ConductorClient _client = new(httpClientFactory.CreateClient(clientName));
+        private readonly ConductorClient _client = new(client);
 
         public async Task<ICollection<EventHandler>> ListAsync(CancellationToken cancellationToken = default) =>
             await _client.GetEventHandlersAsync(cancellationToken);

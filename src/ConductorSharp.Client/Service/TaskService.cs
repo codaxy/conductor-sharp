@@ -2,9 +2,9 @@
 
 namespace ConductorSharp.Client.Service
 {
-    public class TaskService(IHttpClientFactory httpClientFactory, string clientName) : ITaskService
+    public class TaskService(HttpClient client) : ITaskService
     {
-        private readonly ConductorClient _client = new(httpClientFactory.CreateClient(clientName));
+        private readonly ConductorClient _client = new(client);
 
         public async Task<string> UpdateAsync(TaskResult updateRequest, CancellationToken cancellationToken = default) =>
             await _client.UpdateTaskAsync(updateRequest, cancellationToken);

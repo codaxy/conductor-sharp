@@ -2,9 +2,9 @@
 
 namespace ConductorSharp.Client.Service;
 
-public class WorkflowBulkService(IHttpClientFactory httpClientFactory, string clientName) : IWorkflowBulkService
+public class WorkflowBulkService(HttpClient client) : IWorkflowBulkService
 {
-    private readonly ConductorClient _client = new(httpClientFactory.CreateClient(clientName));
+    private readonly ConductorClient _client = new(client);
 
     public async Task<BulkResponse> ResumeAsync(IEnumerable<string> workflowIds, CancellationToken cancellationToken = default) =>
         await _client.ResumeWorkflow_1Async(workflowIds, cancellationToken);

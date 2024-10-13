@@ -2,9 +2,9 @@
 
 namespace ConductorSharp.Client.Service
 {
-    public class MetadataService(IHttpClientFactory httpClientFactory, string clientName) : IMetadataService
+    public class MetadataService(HttpClient client) : IMetadataService
     {
-        private readonly ConductorClient _client = new(httpClientFactory.CreateClient(clientName));
+        private readonly ConductorClient _client = new(client);
 
         public async Task<ICollection<WorkflowDef>> ListWorkflowsAsync(CancellationToken cancellationToken = default) =>
             await _client.GetAllAsync(cancellationToken);

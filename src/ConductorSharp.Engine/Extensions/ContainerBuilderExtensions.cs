@@ -35,15 +35,21 @@ namespace ConductorSharp.Engine.Extensions
                 );
             }
 
-            builder.AddTransient<IAdminService, AdminService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
-            builder.AddTransient<IEventService, EventService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
-            builder.AddTransient<IExternalPayloadService, ExternalPayloadService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
-            builder.AddTransient<IQueueAdminService, QueueAdminService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
-            builder.AddTransient<IWorkflowBulkService, WorkflowBulkService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
-            builder.AddTransient<ITaskService, TaskService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
-            builder.AddTransient<IHealthService, HealthService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
-            builder.AddTransient<IMetadataService, MetadataService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
-            builder.AddTransient<IWorkflowService, WorkflowService>(sp => new(sp.GetService<IHttpClientFactory>(), DefaultClientName));
+            builder.AddTransient<IAdminService, AdminService>(sp => new(sp.GetService<IHttpClientFactory>().CreateClient(DefaultClientName)));
+            builder.AddTransient<IEventService, EventService>(sp => new(sp.GetService<IHttpClientFactory>().CreateClient(DefaultClientName)));
+            builder.AddTransient<IExternalPayloadService, ExternalPayloadService>(
+                sp => new(sp.GetService<IHttpClientFactory>().CreateClient(DefaultClientName))
+            );
+            builder.AddTransient<IQueueAdminService, QueueAdminService>(
+                sp => new(sp.GetService<IHttpClientFactory>().CreateClient(DefaultClientName))
+            );
+            builder.AddTransient<IWorkflowBulkService, WorkflowBulkService>(
+                sp => new(sp.GetService<IHttpClientFactory>().CreateClient(DefaultClientName))
+            );
+            builder.AddTransient<ITaskService, TaskService>(sp => new(sp.GetService<IHttpClientFactory>().CreateClient(DefaultClientName)));
+            builder.AddTransient<IHealthService, HealthService>(sp => new(sp.GetService<IHttpClientFactory>().CreateClient(DefaultClientName)));
+            builder.AddTransient<IMetadataService, MetadataService>(sp => new(sp.GetService<IHttpClientFactory>().CreateClient(DefaultClientName)));
+            builder.AddTransient<IWorkflowService, WorkflowService>(sp => new(sp.GetService<IHttpClientFactory>().CreateClient(DefaultClientName)));
 
             builder.AddSingleton(new BuildConfiguration());
             builder.AddSingleton<WorkflowBuildItemRegistry>();

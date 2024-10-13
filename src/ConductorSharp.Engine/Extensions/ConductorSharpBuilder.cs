@@ -102,15 +102,24 @@ namespace ConductorSharp.Engine.Extensions
                 );
             }
 
-            builder.AddKeyedTransient<IAdminService, AdminService>(key, ((sp, _) => new(sp.GetService<IHttpClientFactory>(), key)));
-            builder.AddKeyedTransient<IEventService, EventService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
-            builder.AddKeyedTransient<IExternalPayloadService, ExternalPayloadService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
-            builder.AddKeyedTransient<IQueueAdminService, QueueAdminService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
-            builder.AddKeyedTransient<IWorkflowBulkService, WorkflowBulkService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
-            builder.AddKeyedTransient<ITaskService, TaskService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
-            builder.AddKeyedTransient<IHealthService, HealthService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
-            builder.AddKeyedTransient<IMetadataService, MetadataService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
-            builder.AddKeyedTransient<IWorkflowService, WorkflowService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>(), key));
+            builder.AddKeyedTransient<IAdminService, AdminService>(key, ((sp, _) => new(sp.GetService<IHttpClientFactory>().CreateClient(key))));
+            builder.AddKeyedTransient<IEventService, EventService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>().CreateClient(key)));
+            builder.AddKeyedTransient<IExternalPayloadService, ExternalPayloadService>(
+                key,
+                (sp, _) => new(sp.GetService<IHttpClientFactory>().CreateClient(key))
+            );
+            builder.AddKeyedTransient<IQueueAdminService, QueueAdminService>(
+                key,
+                (sp, _) => new(sp.GetService<IHttpClientFactory>().CreateClient(key))
+            );
+            builder.AddKeyedTransient<IWorkflowBulkService, WorkflowBulkService>(
+                key,
+                (sp, _) => new(sp.GetService<IHttpClientFactory>().CreateClient(key))
+            );
+            builder.AddKeyedTransient<ITaskService, TaskService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>().CreateClient(key)));
+            builder.AddKeyedTransient<IHealthService, HealthService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>().CreateClient(key)));
+            builder.AddKeyedTransient<IMetadataService, MetadataService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>().CreateClient(key)));
+            builder.AddKeyedTransient<IWorkflowService, WorkflowService>(key, (sp, _) => new(sp.GetService<IHttpClientFactory>().CreateClient(key)));
 
             return this;
         }
