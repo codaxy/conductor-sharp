@@ -41,6 +41,7 @@ var builder = Host.CreateDefaultBuilder()
             services.RegisterWorkflow<SendCustomerNotification>();
             services.RegisterWorkflow<HandleNotificationFailure>();
             services.RegisterWorkflow<CSharpLambdaWorkflow>();
+            services.RegisterWorkflow<EnumWorkflow>();
         }
     );
 

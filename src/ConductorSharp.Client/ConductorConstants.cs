@@ -1,5 +1,6 @@
 ﻿using ConductorSharp.Client.Util;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace ConductorSharp.Client
@@ -24,7 +25,7 @@ namespace ConductorSharp.Client
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                     MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
                     TypeNameHandling = TypeNameHandling.Auto,
-                    Converters = new List<JsonConverter>() { new JsonNodeConverter(), new JsonElementConverter() }
+                    Converters = new List<JsonConverter>() { new JsonNodeConverter(), new JsonElementConverter(), new StringEnumConverter() }
                 };
             }
         }

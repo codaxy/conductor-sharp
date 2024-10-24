@@ -2,6 +2,7 @@
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using MediatR;
+using Newtonsoft.Json;
 
 namespace ConductorSharp.Definitions.Generated
 {
@@ -59,4 +60,37 @@ namespace ConductorSharp.Definitions.Generated
     ///
     [OriginalName("CUSTOMER_get")]
     public partial class CustomerGetV1 : SimpleTaskModel<CustomerGetV1Input, CustomerGetV1Output> { }
+
+    public partial class EnumTaskInput : IRequest<EnumTaskOutput>
+    {
+        /// <originalName>
+        /// status
+        /// </originalName>
+        [JsonProperty("status")]
+        public object Status { get; set; }
+    }
+
+    public partial class EnumTaskOutput
+    {
+        /// <originalName>
+        /// status
+        /// </originalName>
+        [JsonProperty("status")]
+        public object Status { get; set; }
+    }
+
+    /// <originalName>
+    /// ENUM_task
+    /// </originalName>
+    /// <ownerEmail>
+    /// undefined@undefined.local
+    /// </ownerEmail>
+    /// <node>
+    ///
+    /// </node>
+    /// <summary>
+    ///
+    /// </summary>
+    [OriginalName("ENUM_task")]
+    public partial class EnumTask : SimpleTaskModel<EnumTaskInput, EnumTaskOutput> { }
 }
