@@ -192,7 +192,15 @@ namespace ConductorSharp.Engine.Util
         }
 
         private static bool IsDictionaryInitialization(Expression expr) =>
-            expr is ListInitExpression listExpr && listExpr.NewExpression.Type.IsAssignableTo(typeof(IDictionary<string, object>));
+            expr is ListInitExpression listExpr
+            && listExpr
+                .NewExpression.Type.GetInterfaces()
+                .Any(
+                    iface =>
+                        iface.IsGenericType
+                        && iface.GetGenericTypeDefinition() == typeof(IDictionary<,>)
+                        && iface.GenericTypeArguments[0] == typeof(string)
+                );
 
         private static JObject ParseDictionaryInitialization(ListInitExpression listExpression)
         {

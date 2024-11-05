@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows
@@ -31,7 +32,9 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 wf =>
                     new()
                     {
-                        Input = new Dictionary<string, object>() { { "test1", "value" }, { "test2", new { MyProp = "test" } } }
+                        Object = new Dictionary<string, object>() { { "test1", "value" }, { "test2", new { MyProp = "test" } } },
+                        StringObject = new Dictionary<string, string>() { { "test", "test" } },
+                        IntObject = new Dictionary<string, int>() { { "test", 1 } }
                     }
             );
         }
