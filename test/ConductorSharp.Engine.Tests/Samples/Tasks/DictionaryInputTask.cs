@@ -2,7 +2,9 @@
 
 public class DictionaryInputTaskInput : IRequest<DictionaryInputTaskOutput>
 {
-    public IDictionary<string, object> Input { get; set; }
+    public IDictionary<string, object> Object { get; set; }
+    public IDictionary<string, string> StringObject { get; set; }
+    public IDictionary<string, int> IntObject { get; set; }
 }
 
 public class DictionaryInputTaskOutput;

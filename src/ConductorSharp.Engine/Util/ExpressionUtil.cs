@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -7,6 +8,7 @@ using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Interface;
 using Newtonsoft.Json.Linq;
+using ListInitExpression = System.Linq.Expressions.ListInitExpression;
 
 namespace ConductorSharp.Engine.Util
 {
@@ -192,7 +194,15 @@ namespace ConductorSharp.Engine.Util
         }
 
         private static bool IsDictionaryInitialization(Expression expr) =>
-            expr is ListInitExpression listExpr && listExpr.NewExpression.Type.IsAssignableTo(typeof(IDictionary<string, object>));
+            expr is ListInitExpression listExpr
+            && listExpr
+                .NewExpression.Type.GetInterfaces()
+                .Any(
+                    iface =>
+                        iface.IsGenericType
+                        && iface.GetGenericTypeDefinition() == typeof(IDictionary<,>)
+                        && iface.GenericTypeArguments[0] == typeof(string)
+                );
 
         private static JObject ParseDictionaryInitialization(ListInitExpression listExpression)
         {

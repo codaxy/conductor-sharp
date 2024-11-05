@@ -6,11 +6,17 @@
       "name": "dictionary_input_task",
       "taskReferenceName": "dictionary_task",
       "inputParameters": {
-        "input": {
+        "object": {
           "test1": "value",
           "test2": {
             "my_prop": "test"
           }
+        },
+        "string_object": {
+          "test": "test"
+        },
+        "int_object": {
+          "test": 1
         }
       },
       "type": "SIMPLE",
