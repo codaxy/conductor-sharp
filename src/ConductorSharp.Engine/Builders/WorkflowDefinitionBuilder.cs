@@ -135,7 +135,9 @@ namespace ConductorSharp.Engine.Builders
                 OutputParameters = BuildContext.Outputs,
                 OwnerApp = BuildContext.WorkflowOptions.OwnerApp,
                 OwnerEmail = BuildContext.WorkflowOptions.OwnerEmail,
-                Version = BuildContext.WorkflowOptions.Version
+                Version = BuildContext.WorkflowOptions.Version,
+                CreateTime = 0,
+                UpdateTime = 0
             };
         }
 

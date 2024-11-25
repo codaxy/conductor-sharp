@@ -10,10 +10,10 @@ namespace ConductorSharp.Client.Model.Common
         public string OwnerApp { get; set; } = "test@test.local";
 
         [JsonProperty("createTime")]
-        public long CreateTime { get; set; }
+        public long? CreateTime { get; set; }
 
         [JsonProperty("updateTime")]
-        public long UpdateTime { get; set; }
+        public long? UpdateTime { get; set; }
 
         [JsonProperty("createdBy")]
         public string CreatedBy { get; set; }

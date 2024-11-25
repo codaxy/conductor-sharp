@@ -69,6 +69,8 @@ namespace ConductorSharp.Engine.Builders
                 UpdatedBy = options.UpdatedBy,
                 InputTemplate = options.InputTemplate,
                 ExecutionNameSpace = options.ExecutionNameSpace,
+                CreateTime = 0,
+                UpdateTime = 0
             };
         }
 
