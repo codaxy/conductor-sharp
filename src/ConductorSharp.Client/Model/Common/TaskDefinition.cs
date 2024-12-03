@@ -74,7 +74,7 @@ namespace ConductorSharp.Client.Model.Common
         /// <summary>Number of tasks that can be executed at any given time.</summary>
         /// <remarks>Optional</remarks>
         [JsonProperty("concurrentExecLimit")]
-        public int ConcurrentExecLimit { get; set; }
+        public int? ConcurrentExecLimit { get; set; }
 
         /// <summary>Allows to define default values, which can be overridden by values provided in Workflow.</summary>
         [JsonProperty("inputTemplate")]
