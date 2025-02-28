@@ -207,16 +207,16 @@ namespace ConductorSharp.Engine
                         _taskManager.UpdateAsync(
                             new TaskResult
                             {
-                                TaskId = pollResponse.TaskId,
+                                TaskId = pollResponse?.TaskId,
                                 Status = TaskResultStatus.FAILED,
                                 ReasonForIncompletion = exception.Message,
                                 OutputData = SerializationHelper.ObjectToDictionary(errorMessage, ConductorConstants.IoJsonSerializerSettings),
-                                WorkflowInstanceId = pollResponse.WorkflowInstanceId
+                                WorkflowInstanceId = pollResponse?.WorkflowInstanceId
                             },
                             cancellationToken
                         ),
-                        _taskManager.LogAsync(pollResponse.TaskId, exception.Message, cancellationToken),
-                        _taskManager.LogAsync(pollResponse.TaskId, exception.StackTrace, cancellationToken)
+                        _taskManager.LogAsync(pollResponse?.TaskId, exception.Message, cancellationToken),
+                        _taskManager.LogAsync(pollResponse?.TaskId, exception.StackTrace, cancellationToken)
                     ]
                 );
             }
