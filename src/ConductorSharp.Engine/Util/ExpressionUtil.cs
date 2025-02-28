@@ -75,12 +75,16 @@ namespace ConductorSharp.Engine.Util
                 ? Expression.Lambda(evaluatableExpression).Compile().DynamicInvoke()
                 : throw new NonEvaluatableExpressionException(expr);
 
-        private static Expression GetEvaluatableExpression(Expression expr)
+        private static Expression GetEvaluatableExpression(Expression expr, Expression parentExpr = null)
         {
             switch (expr)
             {
                 case MemberExpression memExpr:
-                    if (ShouldCompileToJsonPathExpression(expr))
+                    bool shouldCompileToJsonPath = ShouldCompileToJsonPathExpression(expr);
+                    if (shouldCompileToJsonPath && parentExpr is MethodCallExpression methodCallExpression && methodCallExpression.Object == expr)
+                        return null;
+
+                    if (shouldCompileToJsonPath)
                         return Expression.Constant(CreateExpressionString(expr), typeof(string));
 
                     if (
@@ -96,23 +100,30 @@ namespace ConductorSharp.Engine.Util
                     if (memExpr.Member is PropertyInfo propertyInfo && propertyInfo.DeclaringType == typeof(Type))
                         return memExpr;
 
-                    return GetEvaluatableExpression(memExpr.Expression);
+                    var subExpr = GetEvaluatableExpression(memExpr.Expression, parentExpr);
+                    return memExpr.Expression is null || subExpr is not null ? memExpr.Update(subExpr) : null;
                 case MethodCallExpression methodExpr:
-                    var arguments = methodExpr.Arguments.Select(GetEvaluatableExpression).ToArray();
-                    return GetEvaluatableExpression(methodExpr.Object) is { } objectExpression && arguments.Length == methodExpr.Arguments.Count
-                        ? methodExpr.Update(objectExpression, arguments)
+                    var argumentExpressions = methodExpr
+                        .Arguments.Select(arg => GetEvaluatableExpression(arg, methodExpr))
+                        .Where(argExpr => argExpr is not null)
+                        .ToArray();
+                    var objectExpression = GetEvaluatableExpression(methodExpr.Object, methodExpr);
+                    return (methodExpr.Object is null || objectExpression is not null) && argumentExpressions.Length == methodExpr.Arguments.Count
+                        ? methodExpr.Update(objectExpression, argumentExpressions)
                         : null;
                 case BinaryExpression binaryExpr:
-                    return GetEvaluatableExpression(binaryExpr.Left) is { } left && GetEvaluatableExpression(binaryExpr.Right) is { } right
+                    return
+                        GetEvaluatableExpression(binaryExpr.Left, binaryExpr) is { } left
+                        && GetEvaluatableExpression(binaryExpr.Right, binaryExpr) is { } right
                         ? binaryExpr.Update(left, binaryExpr.Conversion, right)
                         : null;
                 case UnaryExpression unaryExpr:
-                    return GetEvaluatableExpression(unaryExpr.Operand);
+                    return unaryExpr.Update(GetEvaluatableExpression(unaryExpr.Operand, unaryExpr));
                 case ConditionalExpression condExpr:
                     return
-                        GetEvaluatableExpression(condExpr.Test) is { } test
-                        && GetEvaluatableExpression(condExpr.IfTrue) is { } ifTrue
-                        && GetEvaluatableExpression(condExpr.IfFalse) is { } ifFalse
+                        GetEvaluatableExpression(condExpr.Test, condExpr) is { } test
+                        && GetEvaluatableExpression(condExpr.IfTrue, condExpr) is { } ifTrue
+                        && GetEvaluatableExpression(condExpr.IfFalse, condExpr) is { } ifFalse
                         ? condExpr.Update(test, ifTrue, ifFalse)
                         : null;
                 default:

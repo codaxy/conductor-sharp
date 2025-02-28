@@ -20,13 +20,14 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public NonEvaluatableWorkflow(
             WorkflowDefinitionBuilder<NonEvaluatableWorkflow, NonEvaluatableWorkflowInput, NonEvaluatableWorkflowOutput> builder
-        ) : base(builder) { }
+        )
+            : base(builder) { }
 
         public override void BuildDefinition()
         {
             _builder.AddTask(wf => wf.GetCustomer, wf => new() { CustomerId = wf.WorkflowInput.Input });
 
-            _builder.AddTask(wf => wf.PrepareEmail, wf => new() { Address = $"{wf.GetCustomer.Output.Address}".ToUpperInvariant(), });
+            _builder.AddTask(wf => wf.PrepareEmail, wf => new() { Address = wf.GetCustomer.Output.Address.ToString().ToUpperInvariant(), });
         }
     }
 }
