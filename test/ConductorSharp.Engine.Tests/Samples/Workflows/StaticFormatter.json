@@ -1,0 +1,26 @@
+{
+  "name": "static_formatter",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "EMAIL_prepare",
+      "taskReferenceName": "email_prepare",
+      "inputParameters": {
+        "address": "${workflow.input.first_name}.${workflow.input.last_name}@example.com",
+        "name": "Workflow name: TEST_StringInterpolation"
+      },
+      "type": "SIMPLE",
+      "optional": false,
+      "workflowTaskType": "SIMPLE"
+    }
+  ],
+  "inputParameters": [
+    "first_name",
+    "last_name"
+  ],
+  "outputParameters": {
+    "email_body": "${email_prepare.output.email_body}"
+  },
+  "schemaVersion": 2,
+  "timeoutSeconds": 0
+}

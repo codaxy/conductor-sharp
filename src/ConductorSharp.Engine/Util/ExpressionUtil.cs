@@ -71,30 +71,63 @@ namespace ConductorSharp.Engine.Util
             && methodExpression.Method.DeclaringType == typeof(string);
 
         private static object EvaluateExpression(Expression expr) =>
-            IsEvaluatable(expr) ? Expression.Lambda(expr).Compile().DynamicInvoke() : throw new NonEvaluatableExpressionException(expr);
+            GetEvaluatableExpression(expr) is { } evaluatableExpression
+                ? Expression.Lambda(evaluatableExpression).Compile().DynamicInvoke()
+                : throw new NonEvaluatableExpressionException(expr);
 
-        private static bool IsEvaluatable(Expression expr)
+        private static Expression GetEvaluatableExpression(Expression expr, Expression parentExpr = null)
         {
             switch (expr)
             {
                 case MemberExpression memExpr:
+                    bool shouldCompileToJsonPath = ShouldCompileToJsonPathExpression(expr);
+                    if (shouldCompileToJsonPath && parentExpr is MethodCallExpression methodCallExpression && methodCallExpression.Object == expr)
+                        return null;
+
+                    if (shouldCompileToJsonPath)
+                        return Expression.Constant(CreateExpressionString(expr), typeof(string));
+
                     if (
                         typeof(ITaskModel).IsAssignableFrom(memExpr.Type)
                         || typeof(WorkflowId).IsAssignableFrom(memExpr.Type)
                         || typeof(IWorkflowInput).IsAssignableFrom(memExpr.Type)
                     )
-                        return false;
-                    return IsEvaluatable(memExpr.Expression);
+                        return null;
+
+                    if (memExpr.Member is PropertyInfo { GetMethod.IsStatic: true })
+                        return memExpr;
+
+                    if (memExpr.Member is PropertyInfo propertyInfo && propertyInfo.DeclaringType == typeof(Type))
+                        return memExpr;
+
+                    var subExpr = GetEvaluatableExpression(memExpr.Expression, parentExpr);
+                    return memExpr.Expression is null || subExpr is not null ? memExpr.Update(subExpr) : null;
                 case MethodCallExpression methodExpr:
-                    return IsEvaluatable(methodExpr.Object) && methodExpr.Arguments.All(IsEvaluatable);
+                    var argumentExpressions = methodExpr
+                        .Arguments.Select(arg => GetEvaluatableExpression(arg, methodExpr))
+                        .Where(argExpr => argExpr is not null)
+                        .ToArray();
+                    var objectExpression = GetEvaluatableExpression(methodExpr.Object, methodExpr);
+                    return (methodExpr.Object is null || objectExpression is not null) && argumentExpressions.Length == methodExpr.Arguments.Count
+                        ? methodExpr.Update(objectExpression, argumentExpressions)
+                        : null;
                 case BinaryExpression binaryExpr:
-                    return IsEvaluatable(binaryExpr.Left) && IsEvaluatable(binaryExpr.Right);
+                    return
+                        GetEvaluatableExpression(binaryExpr.Left, binaryExpr) is { } left
+                        && GetEvaluatableExpression(binaryExpr.Right, binaryExpr) is { } right
+                        ? binaryExpr.Update(left, binaryExpr.Conversion, right)
+                        : null;
                 case UnaryExpression unaryExpr:
-                    return IsEvaluatable(unaryExpr.Operand);
+                    return unaryExpr.Update(GetEvaluatableExpression(unaryExpr.Operand, unaryExpr));
                 case ConditionalExpression condExpr:
-                    return IsEvaluatable(condExpr.Test) && IsEvaluatable(condExpr.IfTrue) && IsEvaluatable(condExpr.IfFalse);
+                    return
+                        GetEvaluatableExpression(condExpr.Test, condExpr) is { } test
+                        && GetEvaluatableExpression(condExpr.IfTrue, condExpr) is { } ifTrue
+                        && GetEvaluatableExpression(condExpr.IfFalse, condExpr) is { } ifFalse
+                        ? condExpr.Update(test, ifTrue, ifFalse)
+                        : null;
                 default:
-                    return true;
+                    return expr;
             }
         }
 
