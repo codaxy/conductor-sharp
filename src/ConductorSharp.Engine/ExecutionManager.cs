@@ -191,9 +191,9 @@ namespace ConductorSharp.Engine
                 _logger.LogError(
                     "{@Exception} while executing {Task} as part of {Workflow} with id {WorkflowId}",
                     exception,
-                    pollResponse.TaskDefName,
-                    pollResponse.WorkflowType,
-                    pollResponse.WorkflowInstanceId
+                    pollResponse?.TaskDefName,
+                    pollResponse?.WorkflowType,
+                    pollResponse?.WorkflowInstanceId
                 );
 
                 var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
