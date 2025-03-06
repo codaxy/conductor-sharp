@@ -1,0 +1,24 @@
+﻿{
+  "name": "formatter_workflow",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "EMAIL_prepare",
+      "taskReferenceName": "email_prepare",
+      "inputParameters": {
+        "address": "${workflow.input.first_name}.${workflow.input.last_name}@example.com",
+        "name": "Mr ${workflow.input.first_name} ${workflow.input.last_name}"
+      },
+      "type": "SIMPLE",
+      "optional": false,
+      "workflowTaskType": "SIMPLE"
+    }
+  ],
+  "inputParameters": [
+    "first_name",
+    "last_name"
+  ],
+  "outputParameters": {},
+  "schemaVersion": 2,
+  "timeoutSeconds": 0
+}
