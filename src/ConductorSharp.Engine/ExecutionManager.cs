@@ -110,18 +110,44 @@ namespace ConductorSharp.Engine
 
         private async Task PollAndHandle(TaskToWorker scheduledWorker, CancellationToken cancellationToken)
         {
-            Client.Generated.Task pollResponse = null;
+            Client.Generated.Task pollResponse;
+
+            // TODO: Maybe this should be configurable
+            var workerId = Guid.NewGuid().ToString();
             try
             {
-                var workerId = Guid.NewGuid().ToString();
-
                 pollResponse = await _taskManager.PollAsync(
                     scheduledWorker.TaskName,
                     workerId,
                     scheduledWorker.TaskDomain ?? _configuration.Domain,
                     cancellationToken
                 );
+            }
+            catch (ApiException exception) when (exception.StatusCode == 204)
+            {
+                // This handles the case when PollAsync throws exception in case there are no tasks in queue
+                // Even though Conductor reports 1 task in queue for particular task type this endpoint won't return scheduled task immmediately
+                // We skip the furthe handling as task will be handled in next call to this method
+                return;
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Exception during the polling");
+                return;
+            }
 
+            await ProcessPolledTask(pollResponse, workerId, scheduledWorker, cancellationToken);
+        }
+
+        private async Task ProcessPolledTask(
+            Client.Generated.Task pollResponse,
+            string workerId,
+            TaskToWorker scheduledWorker,
+            CancellationToken cancellationToken
+        )
+        {
+            try
+            {
                 if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStoragePath))
                 {
                     _logger.LogDebug("Fetching storage {location}", pollResponse.ExternalInputPayloadStoragePath);
@@ -180,20 +206,14 @@ namespace ConductorSharp.Engine
                     cancellationToken
                 );
             }
-            catch (ApiException exception) when (exception.StatusCode == 204)
-            {
-                // This handles the case when PollAsync throws exception in case there are no tasks in queue
-                // Even though Conductor reports 1 task in queue for particular task type this endpoint won't return scheduled task immmediately
-                // This causes NullReferenceException in logging code below hence why we ignore the exception
-            }
             catch (Exception exception)
             {
                 _logger.LogError(
                     "{@Exception} while executing {Task} as part of {Workflow} with id {WorkflowId}",
                     exception,
-                    pollResponse?.TaskDefName,
-                    pollResponse?.WorkflowType,
-                    pollResponse?.WorkflowInstanceId
+                    pollResponse.TaskDefName,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
                 );
 
                 var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
@@ -207,7 +227,7 @@ namespace ConductorSharp.Engine
                         _taskManager.UpdateAsync(
                             new TaskResult
                             {
-                                TaskId = pollResponse?.TaskId,
+                                TaskId = pollResponse.TaskId,
                                 Status = TaskResultStatus.FAILED,
                                 ReasonForIncompletion = exception.Message,
                                 OutputData = SerializationHelper.ObjectToDictionary(errorMessage, ConductorConstants.IoJsonSerializerSettings),
@@ -215,8 +235,8 @@ namespace ConductorSharp.Engine
                             },
                             cancellationToken
                         ),
-                        _taskManager.LogAsync(pollResponse?.TaskId, exception.Message, cancellationToken),
-                        _taskManager.LogAsync(pollResponse?.TaskId, exception.StackTrace, cancellationToken)
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.Message, cancellationToken),
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.StackTrace, cancellationToken)
                     ]
                 );
             }
