@@ -1,6 +1,8 @@
-﻿using ConductorSharp.Engine.Interface;
+﻿using System.Diagnostics;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.KafkaCancellationNotifier.Model;
+using Microsoft.Extensions.Logging;
 using TaskStatus = ConductorSharp.Client.Generated.TaskStatus;
 
 namespace ConductorSharp.KafkaCancellationNotifier.Service
@@ -26,10 +28,12 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
         private readonly HashSet<string> _tasks;
         private readonly object _lock = new();
+        private readonly ILogger<KafkaCancellationNotifier> _logger;
         private readonly Dictionary<string, CancellationTokenSource> _taskIdToCtsMap = new();
 
-        public KafkaCancellationNotifier(IEnumerable<TaskToWorker> tasks)
+        public KafkaCancellationNotifier(IEnumerable<TaskToWorker> tasks, ILogger<KafkaCancellationNotifier> logger)
         {
+            _logger = logger;
             _tasks = tasks.Select(t => t.TaskName).ToHashSet();
         }
 
@@ -54,10 +58,11 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
         private CancellationTokenSource CreateCtsIfDoesNotExists(string taskId, CancellationToken engineCancellationToken = default)
         {
+            CancellationTokenSource cts;
+            var stopwatch = Stopwatch.StartNew();
+
             lock (_lock)
             {
-                CancellationTokenSource cts;
-
                 if (!_taskIdToCtsMap.ContainsKey(taskId))
                 {
                     cts = CancellationTokenSource.CreateLinkedTokenSource(engineCancellationToken);
@@ -65,17 +70,20 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
                 }
                 else
                     cts = _taskIdToCtsMap[taskId];
-
-                return cts;
             }
+            _logger.LogDebug("CancellationTokenSource creation time {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+
+            return cts;
         }
 
         private void ClearTaskCts(string taskId)
         {
+            var stopwatch = Stopwatch.StartNew();
             lock (_lock)
             {
                 _taskIdToCtsMap.Remove(taskId);
             }
+            _logger.LogDebug("CancellationTokenSource removal time {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
         }
     }
 }
