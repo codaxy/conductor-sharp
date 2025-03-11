@@ -34,6 +34,7 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
         private readonly IOptions<KafkaOptions> _kafkaOptions;
         private readonly KafkaCancellationNotifier _notifier;
         private readonly ILogger<KafkaConsumerBackgroundService> _logger;
+        private const int KafkaRetryPeriodSeconds = 5;
 
         public KafkaConsumerBackgroundService(
             IOptions<KafkaOptions> kafkaOptions,
@@ -59,24 +60,29 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
             consumer.Subscribe(_kafkaOptions.Value.TopicName);
 
-            try
-            {
-                await Task.Run(
-                    () =>
+            await Task.Run(
+                async () =>
+                {
+                    try
                     {
                         while (true)
                         {
                             var result = consumer.Consume(stoppingToken);
                             _notifier.HandleKafkaEvent(result.Message.Value);
                         }
-                    },
-                    stoppingToken
-                );
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Exception during message consumption from kafka");
-            }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(
+                            e,
+                            "Exception during message consumption from kafka, will retry to consume after {Period} seconds",
+                            KafkaRetryPeriodSeconds
+                        );
+                        await Task.Delay(TimeSpan.FromSeconds(KafkaRetryPeriodSeconds), stoppingToken);
+                    }
+                },
+                stoppingToken
+            );
         }
 
         private void LogHandler(IConsumer<string, TaskStatusModel> consumer, LogMessage msg) =>
