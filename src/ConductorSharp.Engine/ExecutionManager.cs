@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using ConductorSharp.Client;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
@@ -30,6 +31,7 @@ namespace ConductorSharp.Engine
         private readonly IServiceScopeFactory _lifetimeScopeFactory;
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
+        private readonly ICancellationNotifier _cancellationNotifier;
 
         public ExecutionManager(
             WorkerSetConfig options,
@@ -39,7 +41,8 @@ namespace ConductorSharp.Engine
             IExternalPayloadService externalPayloadService,
             IServiceScopeFactory lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
-            IPollOrderStrategy pollOrderStrategy
+            IPollOrderStrategy pollOrderStrategy,
+            ICancellationNotifier cancellationNotifier
         )
         {
             _configuration = options;
@@ -50,6 +53,7 @@ namespace ConductorSharp.Engine
             _lifetimeScopeFactory = lifetimeScope;
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
+            _cancellationNotifier = cancellationNotifier;
             _externalPayloadService = externalPayloadService;
         }
 
@@ -127,16 +131,30 @@ namespace ConductorSharp.Engine
             {
                 // This handles the case when PollAsync throws exception in case there are no tasks in queue
                 // Even though Conductor reports 1 task in queue for particular task type this endpoint won't return scheduled task immmediately
-                // We skip the furthe handling as task will be handled in next call to this method
+                // We skip the further handling as task will be handled in next call to this method
                 return;
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Exception during the polling");
+                _logger.LogError(exception, "Exception during the task polling");
                 return;
             }
 
-            await ProcessPolledTask(pollResponse, workerId, scheduledWorker, cancellationToken);
+            try
+            {
+                using var tokenHolder = _cancellationNotifier.GetCancellationToken(pollResponse.TaskId, cancellationToken);
+                await ProcessPolledTask(pollResponse, workerId, scheduledWorker, tokenHolder.CancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogWarning(
+                    "Polled task {Task}(id={TaskId}) of workflow {Workflow}(id={WorkflowId}) is cancelled",
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
+                );
+            }
         }
 
         private async Task ProcessPolledTask(
@@ -205,6 +223,11 @@ namespace ConductorSharp.Engine
                     },
                     cancellationToken
                 );
+            }
+            catch (TaskCanceledException)
+            {
+                // Propagate this exception to outer handler
+                throw;
             }
             catch (Exception exception)
             {

@@ -1,5 +1,6 @@
 ﻿using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
+using ConductorSharp.KafkaCancellationNotifier.Extensions;
 using ConductorSharp.NoApi.Behaviors;
 using ConductorSharp.NoApi.Handlers;
 using ConductorSharp.Patterns.Extensions;
@@ -38,7 +39,12 @@ var builder = Host.CreateDefaultBuilder()
                     pipelines.AddValidation();
                     pipelines.AddCustomBehavior<PrepareEmailBehavior, PrepareEmailRequest, PrepareEmailResponse>();
                 })
-                .AddConductorSharpPatterns();
+                .AddConductorSharpPatterns()
+                //.AddKafkaCancellationNotifier(
+                //    kafkaBootstrapServers: configuration.GetValue<string>(
+                //        "Conductor:KafkaCancellationNotifier:BootstrapServers"),
+                //    topicName: configuration.GetValue<string>("Conductor:KafkaCancellationNotifier:TopicName"),
+                //    groupId: configuration.GetValue<string>("Conductor:KafkaCancellationNotifier:GroupId"));
 
             services.RegisterWorkerTask<GetCustomerHandler>();
             services.RegisterWorkerTask<PrepareEmailHandler>();
