@@ -39,7 +39,7 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
         public ICancellationNotifier.ICancellationTokenHolder GetCancellationToken(string taskId, CancellationToken engineCancellationToken)
         {
-            var cts = CreateCtsIfDoesNotExists(taskId, engineCancellationToken);
+            var cts = CreateCts(taskId, engineCancellationToken);
             return new CancellationTokenSourceHolder(cts.Token, taskId, this);
         }
 
@@ -52,26 +52,40 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
             )
                 return;
 
-            var cts = CreateCtsIfDoesNotExists(taskStatusModel.TaskId);
+            var cts = GetCts(taskStatusModel.TaskId);
+            if (cts is null)
+            {
+                _logger.LogWarning("No CancellationTokenSource found for task {TaskId}", taskStatusModel.TaskId);
+                return;
+            }
+
             cts.Cancel();
         }
 
-        private CancellationTokenSource CreateCtsIfDoesNotExists(string taskId, CancellationToken engineCancellationToken = default)
+        private CancellationTokenSource CreateCts(string taskId, CancellationToken engineCancellationToken = default)
         {
             CancellationTokenSource cts;
             var stopwatch = Stopwatch.StartNew();
 
             lock (_lock)
             {
-                if (!_taskIdToCtsMap.ContainsKey(taskId))
-                {
-                    cts = CancellationTokenSource.CreateLinkedTokenSource(engineCancellationToken);
-                    _taskIdToCtsMap[taskId] = cts;
-                }
-                else
-                    cts = _taskIdToCtsMap[taskId];
+                cts = _taskIdToCtsMap[taskId] = CancellationTokenSource.CreateLinkedTokenSource(engineCancellationToken);
             }
             _logger.LogDebug("CancellationTokenSource creation time {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+
+            return cts;
+        }
+
+        private CancellationTokenSource? GetCts(string taskId)
+        {
+            CancellationTokenSource? cts;
+            var stopwatch = Stopwatch.StartNew();
+
+            lock (_lock)
+            {
+                cts = _taskIdToCtsMap.GetValueOrDefault(taskId);
+            }
+            _logger.LogDebug("CancellationTokenSource get time {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
 
             return cts;
         }
