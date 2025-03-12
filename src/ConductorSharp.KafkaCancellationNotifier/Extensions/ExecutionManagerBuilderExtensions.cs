@@ -14,8 +14,12 @@ namespace ConductorSharp.KafkaCancellationNotifier.Extensions
             string groupId
         )
         {
+            ArgumentNullException.ThrowIfNull(kafkaBootstrapServers);
+            ArgumentNullException.ThrowIfNull(topicName);
+            ArgumentNullException.ThrowIfNull(groupId);
+
             builder
-                .Builder.AddOptionsWithValidateOnStart<KafkaOptions>()
+                .Builder.AddOptions<KafkaOptions>()
                 .Configure(opts =>
                 {
                     opts.BootstrapServers = kafkaBootstrapServers;
