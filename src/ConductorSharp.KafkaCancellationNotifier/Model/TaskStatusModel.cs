@@ -5,7 +5,7 @@ namespace ConductorSharp.KafkaCancellationNotifier.Model;
 
 internal class TaskStatusModel
 {
-    public WorkflowTask WorkflowTask { get; set; }
+    public WorkflowTask WorkflowTask { get; set; } = null!;
     public TaskStatus Status { get; set; }
-    public string TaskId { get; set; }
+    public string TaskId { get; set; } = null!;
 }

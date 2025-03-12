@@ -5,13 +5,8 @@ namespace ConductorSharp.KafkaCancellationNotifier
 {
     internal class KafkaOptions
     {
-        [Required]
-        public string BootstrapServers { get; set; }
-
-        [Required]
-        public string TopicName { get; set; }
-
-        [Required]
-        public string GroupId { get; set; }
+        public string BootstrapServers { get; set; } = null!;
+        public string TopicName { get; set; } = null!;
+        public string GroupId { get; set; } = null!;
     }
 }
