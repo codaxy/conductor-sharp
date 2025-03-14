@@ -71,6 +71,10 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
                             _notifier.HandleKafkaEvent(result.Message.Value);
                         }
                     }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogInformation("Stopping KafkaCancellationNotifier background service");
+                    }
                     catch (Exception e)
                     {
                         _logger.LogError(

@@ -55,7 +55,11 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
             var cts = GetCts(taskStatusModel.TaskId);
             if (cts is null)
             {
-                _logger.LogWarning("No CancellationTokenSource found for task {TaskId}", taskStatusModel.TaskId);
+                _logger.LogWarning(
+                    "Unable to cancel task {TaskId} of workflow {WorkflowId}",
+                    taskStatusModel.TaskId,
+                    taskStatusModel.WorkflowInstanceId
+                );
                 return;
             }
 
