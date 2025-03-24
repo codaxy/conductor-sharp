@@ -52,6 +52,16 @@ namespace ConductorSharp.Engine.Behaviors
 
                 return response;
             }
+            catch (TaskCanceledException)
+            {
+                _logger.LogWarning(
+                    $"Request {{Request}} cancelled with payload {{@{requestName}}} and with id {{RequestId}}",
+                    requestName,
+                    request,
+                    requestId
+                );
+                throw;
+            }
             catch (Exception exc)
             {
                 stopwatch.Stop();
