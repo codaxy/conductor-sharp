@@ -44,6 +44,7 @@
     <EmbeddedResource Include="Samples\Workflows\HumanTaskWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\ListInitializationWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\EvaluateExpressionWorkflow.json" />
+    <EmbeddedResource Include="Samples\Workflows\StaticFormatter.json" />
     <EmbeddedResource Include="Samples\Workflows\TaskPropertiesWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\WaitTask.json" />
     <EmbeddedResource Include="Samples\Workflows\CSharpLambdaWorkflow.json">

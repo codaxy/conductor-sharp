@@ -13,3 +13,4 @@ dist
 .env
 *.xmldocs.xml
 **/CONDUCTORSHARP_HEALTH.json
+.idea
