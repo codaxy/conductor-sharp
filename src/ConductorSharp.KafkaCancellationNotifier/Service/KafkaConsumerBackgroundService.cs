@@ -2,6 +2,7 @@
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.KafkaCancellationNotifier.Model;
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -49,6 +50,8 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            await CreateTopicIfDoesNotExists();
+
             using var consumer = new ConsumerBuilder<string, TaskStatusModel>(
                 new ConsumerConfig
                 {
@@ -87,6 +90,22 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
                 },
                 stoppingToken
             );
+        }
+
+        private async Task CreateTopicIfDoesNotExists()
+        {
+            using var admin = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _kafkaOptions.Value.BootstrapServers }).Build();
+
+            try
+            {
+                await admin.CreateTopicsAsync(new[] { new TopicSpecification { Name = _kafkaOptions.Value.TopicName } });
+
+                _logger.LogInformation($"Created topic {_kafkaOptions.Value.TopicName}");
+            }
+            catch (CreateTopicsException ex) when (ex.Results.Any(r => r.Error.Code == ErrorCode.TopicAlreadyExists))
+            {
+                _logger.LogInformation($"Topic {_kafkaOptions.Value.TopicName} already exists");
+            }
         }
 
         private void LogHandler(IConsumer<string, TaskStatusModel> consumer, LogMessage msg) =>
