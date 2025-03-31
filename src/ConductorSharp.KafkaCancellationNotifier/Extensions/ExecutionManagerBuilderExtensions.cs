@@ -11,7 +11,8 @@ namespace ConductorSharp.KafkaCancellationNotifier.Extensions
             this IExecutionManagerBuilder builder,
             string kafkaBootstrapServers,
             string topicName,
-            string groupId
+            string groupId,
+            bool createTopicOnStartup = false
         )
         {
             ArgumentNullException.ThrowIfNull(kafkaBootstrapServers);
@@ -25,6 +26,7 @@ namespace ConductorSharp.KafkaCancellationNotifier.Extensions
                     opts.BootstrapServers = kafkaBootstrapServers;
                     opts.GroupId = groupId;
                     opts.TopicName = topicName;
+                    opts.CreateTopicOnStartup = createTopicOnStartup;
                 });
 
             builder.Builder.AddSingleton<ICancellationNotifier, Service.KafkaCancellationNotifier>();

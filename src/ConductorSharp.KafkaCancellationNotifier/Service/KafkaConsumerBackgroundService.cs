@@ -50,7 +50,8 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await CreateTopicIfDoesNotExists();
+            if (_kafkaOptions.Value.CreateTopicOnStartup)
+                await CreateTopicIfDoesNotExists();
 
             using var consumer = new ConsumerBuilder<string, TaskStatusModel>(
                 new ConsumerConfig
