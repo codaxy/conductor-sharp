@@ -16,6 +16,8 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
             public CancellationToken CancellationToken { get; }
 
+            public bool IsCancellationRequestedByNotifier => _notifier.IsCancellationRequested(_taskId);
+
             public CancellationTokenSourceHolder(CancellationToken cancellationToken, string taskId, KafkaCancellationNotifier notifier)
             {
                 CancellationToken = cancellationToken;
@@ -26,10 +28,21 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
             public void Dispose() => _notifier.ClearTaskCts(_taskId);
         }
 
+        private class TaskCancellationInfo
+        {
+            public TaskCancellationInfo(CancellationTokenSource cancellationTokenSource)
+            {
+                CancellationTokenSource = cancellationTokenSource;
+            }
+
+            public CancellationTokenSource CancellationTokenSource { get; }
+            public bool IsCancellationRequested { get; set; }
+        }
+
         private readonly HashSet<string> _tasks;
         private readonly object _lock = new();
         private readonly ILogger<KafkaCancellationNotifier> _logger;
-        private readonly Dictionary<string, CancellationTokenSource> _taskIdToCtsMap = new();
+        private readonly Dictionary<string, TaskCancellationInfo> _taskIdToInfoMap = new();
 
         public KafkaCancellationNotifier(IEnumerable<TaskToWorker> tasks, ILogger<KafkaCancellationNotifier> logger)
         {
@@ -39,8 +52,8 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
         public ICancellationNotifier.ICancellationTokenHolder GetCancellationToken(string taskId, CancellationToken engineCancellationToken)
         {
-            var cts = CreateCts(taskId, engineCancellationToken);
-            return new CancellationTokenSourceHolder(cts.Token, taskId, this);
+            var token = CreateTaskCancellationInfoAndGetToken(taskId, engineCancellationToken);
+            return new CancellationTokenSourceHolder(token, taskId, this);
         }
 
         public void HandleKafkaEvent(TaskStatusModel taskStatusModel)
@@ -52,8 +65,34 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
             )
                 return;
 
-            var cts = GetCts(taskStatusModel.TaskId);
-            if (cts is null)
+            TryToCancelTask(taskStatusModel);
+        }
+
+        private CancellationToken CreateTaskCancellationInfoAndGetToken(string taskId, CancellationToken engineCancellationToken = default)
+        {
+            CancellationToken token;
+
+            lock (_lock)
+            {
+                var info = _taskIdToInfoMap[taskId] = new TaskCancellationInfo(
+                    CancellationTokenSource.CreateLinkedTokenSource(engineCancellationToken)
+                );
+                token = info.CancellationTokenSource.Token;
+            }
+
+            return token;
+        }
+
+        private void TryToCancelTask(TaskStatusModel taskStatusModel)
+        {
+            TaskCancellationInfo? info;
+
+            lock (_lock)
+            {
+                info = _taskIdToInfoMap.GetValueOrDefault(taskStatusModel.TaskId);
+            }
+
+            if (info is null)
             {
                 _logger.LogWarning(
                     "Unable to cancel task {TaskId} of workflow {WorkflowId}",
@@ -63,45 +102,28 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
                 return;
             }
 
-            cts.Cancel();
-        }
-
-        private CancellationTokenSource CreateCts(string taskId, CancellationToken engineCancellationToken = default)
-        {
-            CancellationTokenSource cts;
-            var stopwatch = Stopwatch.StartNew();
-
             lock (_lock)
             {
-                cts = _taskIdToCtsMap[taskId] = CancellationTokenSource.CreateLinkedTokenSource(engineCancellationToken);
+                info.IsCancellationRequested = true;
+                info.CancellationTokenSource.Cancel();
             }
-            _logger.LogDebug("CancellationTokenSource creation time {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
-
-            return cts;
-        }
-
-        private CancellationTokenSource? GetCts(string taskId)
-        {
-            CancellationTokenSource? cts;
-            var stopwatch = Stopwatch.StartNew();
-
-            lock (_lock)
-            {
-                cts = _taskIdToCtsMap.GetValueOrDefault(taskId);
-            }
-            _logger.LogDebug("CancellationTokenSource get time {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
-
-            return cts;
         }
 
         private void ClearTaskCts(string taskId)
         {
-            var stopwatch = Stopwatch.StartNew();
             lock (_lock)
             {
-                _taskIdToCtsMap.Remove(taskId);
+                _taskIdToInfoMap[taskId].CancellationTokenSource.Dispose();
+                _taskIdToInfoMap.Remove(taskId);
             }
-            _logger.LogDebug("CancellationTokenSource removal time {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+        }
+
+        private bool IsCancellationRequested(string taskId)
+        {
+            lock (_lock)
+            {
+                return _taskIdToInfoMap[taskId].IsCancellationRequested;
+            }
         }
     }
 }

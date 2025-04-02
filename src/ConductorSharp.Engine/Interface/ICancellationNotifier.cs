@@ -8,6 +8,7 @@ namespace ConductorSharp.Engine.Interface
         public interface ICancellationTokenHolder : IDisposable
         {
             CancellationToken CancellationToken { get; }
+            bool IsCancellationRequestedByNotifier { get; }
         }
 
         ICancellationTokenHolder GetCancellationToken(string taskId, CancellationToken engineCancellationToken);

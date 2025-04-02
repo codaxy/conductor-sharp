@@ -11,14 +11,20 @@ using Serilog.Context;
 
 namespace ConductorSharp.Engine.Behaviors
 {
+    // TODO: Consider removing this
     public class RequestResponseLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
         private readonly ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> _logger;
+        private readonly ConductorSharpExecutionContext _context;
 
-        public RequestResponseLoggingBehavior(ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> logger)
+        public RequestResponseLoggingBehavior(
+            ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> logger,
+            ConductorSharpExecutionContext context
+        )
         {
             _logger = logger;
+            _context = context;
         }
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -52,14 +58,9 @@ namespace ConductorSharp.Engine.Behaviors
 
                 return response;
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException) when (_context.TaskId != null)
             {
-                _logger.LogWarning(
-                    $"Request {{Request}} cancelled with payload {{@{requestName}}} and with id {{RequestId}}",
-                    requestName,
-                    request,
-                    requestId
-                );
+                // Simply rethrow and do not log in order for cancellation notifier to work
                 throw;
             }
             catch (Exception exc)
