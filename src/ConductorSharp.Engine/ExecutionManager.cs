@@ -222,6 +222,16 @@ namespace ConductorSharp.Engine
                     pollResponse.WorkflowInstanceId
                 );
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) // This is fine since we know cancellationToken comes from background service
+            {
+                _logger.LogWarning(
+                    "Cancelling task {Task}(id={TaskId}) of workflow {Workflow}(id={WorkflowId}) due to background service shutdown",
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
+                );
+            }
             catch (Exception exception)
             {
                 _logger.LogError(
