@@ -10,6 +10,8 @@ internal class NoOpCancellationNotifier : ICancellationNotifier
     {
         public CancellationToken CancellationToken { get; } = cancellationToken;
 
+        public bool IsCancellationRequestedByNotifier => false;
+
         public void Dispose() { }
     }
 

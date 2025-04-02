@@ -140,21 +140,7 @@ namespace ConductorSharp.Engine
                 return;
             }
 
-            try
-            {
-                using var tokenHolder = _cancellationNotifier.GetCancellationToken(pollResponse.TaskId, cancellationToken);
-                await ProcessPolledTask(pollResponse, workerId, scheduledWorker, tokenHolder.CancellationToken);
-            }
-            catch (TaskCanceledException)
-            {
-                _logger.LogWarning(
-                    "Polled task {Task}(id={TaskId}) of workflow {Workflow}(id={WorkflowId}) is cancelled",
-                    pollResponse.TaskDefName,
-                    pollResponse.TaskId,
-                    pollResponse.WorkflowType,
-                    pollResponse.WorkflowInstanceId
-                );
-            }
+            await ProcessPolledTask(pollResponse, workerId, scheduledWorker, cancellationToken);
         }
 
         private async Task ProcessPolledTask(
@@ -164,6 +150,8 @@ namespace ConductorSharp.Engine
             CancellationToken cancellationToken
         )
         {
+            using var tokenHolder = _cancellationNotifier.GetCancellationToken(pollResponse.TaskId, cancellationToken);
+
             try
             {
                 if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStoragePath))
@@ -178,7 +166,7 @@ namespace ConductorSharp.Engine
                     );
 
                     // TODO: iffy
-                    var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, cancellationToken);
+                    var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, tokenHolder.CancellationToken);
 
                     using TextReader textReader = new StreamReader(file.Stream);
                     var json = await textReader.ReadToEndAsync();
@@ -211,7 +199,7 @@ namespace ConductorSharp.Engine
                     context.WorkerId = workerId;
                 }
 
-                var response = await mediator.Send(inputData, cancellationToken);
+                var response = await mediator.Send(inputData, tokenHolder.CancellationToken);
 
                 await _taskManager.UpdateAsync(
                     new TaskResult
@@ -221,13 +209,28 @@ namespace ConductorSharp.Engine
                         OutputData = SerializationHelper.ObjectToDictionary(response, ConductorConstants.IoJsonSerializerSettings),
                         WorkflowInstanceId = pollResponse.WorkflowInstanceId
                     },
-                    cancellationToken
+                    tokenHolder.CancellationToken
                 );
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException) when (tokenHolder.IsCancellationRequestedByNotifier)
             {
-                // Propagate this exception to outer handler
-                throw;
+                _logger.LogWarning(
+                    "Polled task {Task}(id={TaskId}) of workflow {Workflow}(id={WorkflowId}) is cancelled",
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
+                );
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) // This is fine since we know cancellationToken comes from background service
+            {
+                _logger.LogWarning(
+                    "Cancelling task {Task}(id={TaskId}) of workflow {Workflow}(id={WorkflowId}) due to background service shutdown",
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
+                );
             }
             catch (Exception exception)
             {
@@ -256,10 +259,10 @@ namespace ConductorSharp.Engine
                                 OutputData = SerializationHelper.ObjectToDictionary(errorMessage, ConductorConstants.IoJsonSerializerSettings),
                                 WorkflowInstanceId = pollResponse?.WorkflowInstanceId
                             },
-                            cancellationToken
+                            tokenHolder.CancellationToken
                         ),
-                        _taskManager.LogAsync(pollResponse.TaskId, exception.Message, cancellationToken),
-                        _taskManager.LogAsync(pollResponse.TaskId, exception.StackTrace, cancellationToken)
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.Message, tokenHolder.CancellationToken),
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.StackTrace, tokenHolder.CancellationToken)
                     ]
                 );
             }
