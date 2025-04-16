@@ -76,7 +76,7 @@ namespace ConductorSharp.Engine.Util
         private static string CompileConductorExpressionFormatString(MethodCallExpression methodExpr)
         {
             if (methodExpr.Method.ReturnType != typeof(string))
-                throw new InvalidOperationException($"Format method {methodExpr.Method.Name} must return string");
+                throw new InvalidOperationException($"Format method \"{methodExpr.Method.Name}\" must return string");
 
             var args = new List<object>();
 
