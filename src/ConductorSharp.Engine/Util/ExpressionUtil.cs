@@ -319,6 +319,9 @@ namespace ConductorSharp.Engine.Util
                 return ParseConstantExpression(cex);
             if (expr is UnaryExpression { NodeType: ExpressionType.Convert } uex)
                 return CompileInterpolatedStringArgument(uex.Operand);
+            if (IsConductorExpressionFormatString(expr))
+                return CompileConductorExpressionFormatString((MethodCallExpression)expr);
+
             return EvaluateExpression(expr);
         }
 
