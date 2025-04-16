@@ -239,9 +239,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
-        public void BuilderReturnsCorrectDefinitionNonEvaluatableWorkflow()
+        public void BuilderThrowsNonEvaluatableWorkflowExcepion()
         {
             Assert.Throws<NonEvaluatableExpressionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
+        }
+
+        [Fact]
+        public void BuilderThrowsInvalidOperationExceptionForInvalidFormatterArgument()
+        {
+            Assert.Throws<InvalidOperationException>(GetDefinitionFromWorkflow<InvalidFormatterArgumentWorkflow>);
         }
 
         [Fact]
@@ -267,6 +273,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         {
             var definition = GetDefinitionFromWorkflow<DictionaryInitializationWorkflow>();
             var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/DictionaryInitializationWorkflow.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderReturnsCorrectDefinitionFormatterWorkflow()
+        {
+            var definition = GetDefinitionFromWorkflow<FormatterWorkflow>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/FormatterWorkflow.json");
 
             Assert.Equal(expectedDefinition, definition);
         }

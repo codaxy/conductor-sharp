@@ -63,7 +63,55 @@ namespace ConductorSharp.Engine.Util
             if (IsNameOfExpression(expression))
                 return CompileNameOfExpression((MethodCallExpression)expression);
 
+            if (IsConductorExpressionFormatString(expression))
+                return CompileConductorExpressionFormatString((MethodCallExpression)expression);
+
             return EvaluateExpression(expression);
+        }
+
+        private static bool IsConductorExpressionFormatString(Expression expression) =>
+            expression is MethodCallExpression methodExpr
+            && methodExpr.Method.GetCustomAttribute<ConductorExpressionFormatterAttribute>() is not null;
+
+        private static string CompileConductorExpressionFormatString(MethodCallExpression methodExpr)
+        {
+            if (methodExpr.Method.ReturnType != typeof(string))
+                throw new InvalidOperationException($"Format method \"{methodExpr.Method.Name}\" must return string");
+
+            var args = new List<object>();
+
+            foreach (var (argExpr, paramInfo) in methodExpr.Arguments.Zip(methodExpr.Method.GetParameters(), (expr, paramInfo) => (expr, paramInfo)))
+            {
+                if (paramInfo.GetCustomAttribute<FormatterParameterAttribute>() is not null)
+                {
+                    if (argExpr.Type != typeof(string))
+                        throw new InvalidOperationException(
+                            $"Parameter \"{paramInfo.Name}\" marked with {nameof(FormatterParameterAttribute)} of format method \"{methodExpr.Method.Name}\" is not a string"
+                        );
+
+                    if (!ShouldCompileToJsonPathExpression(argExpr))
+                        throw new InvalidOperationException(
+                            $"Argument {argExpr} corresponding to parameter \"{paramInfo.Name}\" marked with {nameof(FormatterParameterAttribute)} of format method \"{methodExpr.Method.Name}\" can not be compiled to expression string"
+                        );
+
+                    args.Add(CreateExpressionString(argExpr));
+                }
+                else if (!IsEvaluatable(argExpr))
+                {
+                    throw new InvalidOperationException(
+                        $"Argument {argExpr} corresponding to parameter \"{paramInfo.Name}\" of format method \"{methodExpr.Method.Name}\" can not be evaluated"
+                    );
+                }
+                else
+                    args.Add(EvaluateExpression(argExpr));
+            }
+
+            if (methodExpr.Object is not null && !IsEvaluatable(methodExpr.Object))
+                throw new InvalidOperationException(
+                    $"Format method \"{methodExpr.Method.Name}\" is being called on non evaluatable expression {methodExpr.Object}"
+                );
+
+            return (string)methodExpr.Method.Invoke(methodExpr.Object is not null ? EvaluateExpression(methodExpr.Object) : null, args.ToArray());
         }
 
         private static bool IsStringInterpolation(Expression expression) =>
@@ -271,6 +319,9 @@ namespace ConductorSharp.Engine.Util
                 return ParseConstantExpression(cex);
             if (expr is UnaryExpression { NodeType: ExpressionType.Convert } uex)
                 return CompileInterpolatedStringArgument(uex.Operand);
+            if (IsConductorExpressionFormatString(expr))
+                return CompileConductorExpressionFormatString((MethodCallExpression)expr);
+
             return EvaluateExpression(expr);
         }
 
