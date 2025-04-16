@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Authors>Codaxy</Authors>
     <Company>Codaxy</Company>
-    <Version>3.4.1</Version>
+    <Version>3.5.0</Version>
   </PropertyGroup>
 
 	<ItemGroup>
