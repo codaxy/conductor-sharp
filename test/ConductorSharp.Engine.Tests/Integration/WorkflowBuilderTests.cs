@@ -239,9 +239,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
-        public void BuilderReturnsCorrectDefinitionNonEvaluatableWorkflow()
+        public void BuilderThrowsNonEvaluatableWorkflowExcepion()
         {
             Assert.Throws<NonEvaluatableExpressionException>(GetDefinitionFromWorkflow<NonEvaluatableWorkflow>);
+        }
+
+        [Fact]
+        public void BuilderThrowsInvalidOperationExceptionForInvalidFormatterArgument()
+        {
+            Assert.Throws<InvalidOperationException>(GetDefinitionFromWorkflow<InvalidFormatterArgumentWorkflow>);
         }
 
         [Fact]

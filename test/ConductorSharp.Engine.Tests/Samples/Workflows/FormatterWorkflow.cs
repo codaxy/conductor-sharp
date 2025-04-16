@@ -30,8 +30,6 @@ public class FormatterWorkflow : Workflow<FormatterWorkflow, FormatterWorkflowIn
 
     public override void BuildDefinition()
     {
-        base.BuildDefinition();
-
         _builder.AddTask(
             wf => wf.EmailPrepare,
             wf =>
