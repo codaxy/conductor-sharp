@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using ConductorSharp.Client;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
@@ -30,6 +31,7 @@ namespace ConductorSharp.Engine
         private readonly IServiceScopeFactory _lifetimeScopeFactory;
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
+        private readonly ICancellationNotifier _cancellationNotifier;
 
         public ExecutionManager(
             WorkerSetConfig options,
@@ -39,7 +41,8 @@ namespace ConductorSharp.Engine
             IExternalPayloadService externalPayloadService,
             IServiceScopeFactory lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
-            IPollOrderStrategy pollOrderStrategy
+            IPollOrderStrategy pollOrderStrategy,
+            ICancellationNotifier cancellationNotifier
         )
         {
             _configuration = options;
@@ -50,6 +53,7 @@ namespace ConductorSharp.Engine
             _lifetimeScopeFactory = lifetimeScope;
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
+            _cancellationNotifier = cancellationNotifier;
             _externalPayloadService = externalPayloadService;
         }
 
@@ -110,18 +114,46 @@ namespace ConductorSharp.Engine
 
         private async Task PollAndHandle(TaskToWorker scheduledWorker, CancellationToken cancellationToken)
         {
-            Client.Generated.Task pollResponse = null;
+            Client.Generated.Task pollResponse;
+
+            // TODO: Maybe this should be configurable
+            var workerId = Guid.NewGuid().ToString();
             try
             {
-                var workerId = Guid.NewGuid().ToString();
-
                 pollResponse = await _taskManager.PollAsync(
                     scheduledWorker.TaskName,
                     workerId,
                     scheduledWorker.TaskDomain ?? _configuration.Domain,
                     cancellationToken
                 );
+            }
+            catch (ApiException exception) when (exception.StatusCode == 204)
+            {
+                // This handles the case when PollAsync throws exception in case there are no tasks in queue
+                // Even though Conductor reports 1 task in queue for particular task type this endpoint won't return scheduled task immmediately
+                // We skip the further handling as task will be handled in next call to this method
+                return;
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Exception during the task polling");
+                return;
+            }
 
+            await ProcessPolledTask(pollResponse, workerId, scheduledWorker, cancellationToken);
+        }
+
+        private async Task ProcessPolledTask(
+            Client.Generated.Task pollResponse,
+            string workerId,
+            TaskToWorker scheduledWorker,
+            CancellationToken cancellationToken
+        )
+        {
+            using var tokenHolder = _cancellationNotifier.GetCancellationToken(pollResponse.TaskId, cancellationToken);
+
+            try
+            {
                 if (!string.IsNullOrEmpty(pollResponse.ExternalInputPayloadStoragePath))
                 {
                     _logger.LogDebug("Fetching storage {location}", pollResponse.ExternalInputPayloadStoragePath);
@@ -134,7 +166,7 @@ namespace ConductorSharp.Engine
                     );
 
                     // TODO: iffy
-                    var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, cancellationToken);
+                    var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, tokenHolder.CancellationToken);
 
                     using TextReader textReader = new StreamReader(file.Stream);
                     var json = await textReader.ReadToEndAsync();
@@ -167,7 +199,7 @@ namespace ConductorSharp.Engine
                     context.WorkerId = workerId;
                 }
 
-                var response = await mediator.Send(inputData, cancellationToken);
+                var response = await mediator.Send(inputData, tokenHolder.CancellationToken);
 
                 await _taskManager.UpdateAsync(
                     new TaskResult
@@ -177,23 +209,37 @@ namespace ConductorSharp.Engine
                         OutputData = SerializationHelper.ObjectToDictionary(response, ConductorConstants.IoJsonSerializerSettings),
                         WorkflowInstanceId = pollResponse.WorkflowInstanceId
                     },
-                    cancellationToken
+                    tokenHolder.CancellationToken
                 );
             }
-            catch (ApiException exception) when (exception.StatusCode == 204)
+            catch (OperationCanceledException) when (tokenHolder.IsCancellationRequestedByNotifier)
             {
-                // This handles the case when PollAsync throws exception in case there are no tasks in queue
-                // Even though Conductor reports 1 task in queue for particular task type this endpoint won't return scheduled task immmediately
-                // This causes NullReferenceException in logging code below hence why we ignore the exception
+                _logger.LogWarning(
+                    "Polled task {Task}(id={TaskId}) of workflow {Workflow}(id={WorkflowId}) is cancelled",
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
+                );
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) // This is fine since we know cancellationToken comes from background service
+            {
+                _logger.LogWarning(
+                    "Cancelling task {Task}(id={TaskId}) of workflow {Workflow}(id={WorkflowId}) due to background service shutdown",
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
+                );
             }
             catch (Exception exception)
             {
                 _logger.LogError(
                     "{@Exception} while executing {Task} as part of {Workflow} with id {WorkflowId}",
                     exception,
-                    pollResponse?.TaskDefName,
-                    pollResponse?.WorkflowType,
-                    pollResponse?.WorkflowInstanceId
+                    pollResponse.TaskDefName,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
                 );
 
                 var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
@@ -207,16 +253,16 @@ namespace ConductorSharp.Engine
                         _taskManager.UpdateAsync(
                             new TaskResult
                             {
-                                TaskId = pollResponse?.TaskId,
+                                TaskId = pollResponse.TaskId,
                                 Status = TaskResultStatus.FAILED,
                                 ReasonForIncompletion = exception.Message,
                                 OutputData = SerializationHelper.ObjectToDictionary(errorMessage, ConductorConstants.IoJsonSerializerSettings),
                                 WorkflowInstanceId = pollResponse?.WorkflowInstanceId
                             },
-                            cancellationToken
+                            tokenHolder.CancellationToken
                         ),
-                        _taskManager.LogAsync(pollResponse?.TaskId, exception.Message, cancellationToken),
-                        _taskManager.LogAsync(pollResponse?.TaskId, exception.StackTrace, cancellationToken)
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.Message, tokenHolder.CancellationToken),
+                        _taskManager.LogAsync(pollResponse.TaskId, exception.StackTrace, tokenHolder.CancellationToken)
                     ]
                 );
             }
