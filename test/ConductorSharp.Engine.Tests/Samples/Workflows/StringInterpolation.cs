@@ -30,6 +30,9 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
 
         public EmailPrepareV1 EmailPrepare { get; set; }
 
+        [ConductorExpressionFormatter]
+        public static string Format([FormatterParameter] string input) => $"Formatted:{input}";
+
         public override void BuildDefinition()
         {
             _builder.AddTask(
@@ -37,7 +40,8 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
                 wf =>
                     new()
                     {
-                        Address = $"{wf.WorkflowInput.FirstInput},{wf.WorkflowInput.SecondInput},{ConstantStr},{ConstantPrimitive}",
+                        Address =
+                            $"{wf.WorkflowInput.FirstInput},{wf.WorkflowInput.SecondInput},{ConstantStr},{ConstantPrimitive},{Format(wf.WorkflowInput.FirstInput)}",
                         Name = $"Workflow name: {NamingUtil.NameOf<StringInterpolation>()}"
                     }
             );
