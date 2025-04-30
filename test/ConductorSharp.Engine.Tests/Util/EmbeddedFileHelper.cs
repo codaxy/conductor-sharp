@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ConductorSharp.Engine.Tests.Util
 {
@@ -43,7 +43,7 @@ namespace ConductorSharp.Engine.Tests.Util
 
             var contents = ReadAssemblyFile(typeof(EmbeddedFileHelper).Assembly, fileName);
 
-            return contents;
+            return contents.Replace("\r\n", "\n");
         }
 
         public static Task<T> GetObjectFromEmbeddedFileAsync<T>(string fileName, params (string Key, object Value)[] templateParams) =>

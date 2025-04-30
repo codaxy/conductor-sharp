@@ -1,0 +1,30 @@
+{
+  "name": "do_while_task",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "do_while",
+      "taskReferenceName": "do_while",
+      "inputParameters": {},
+      "type": "DO_WHILE",
+      "loopCondition": "$.do_while.iteration < 3",
+      "loopOver": [
+        {
+          "name": "CUSTOMER_get",
+          "taskReferenceName": "get_customer",
+          "inputParameters": {
+            "customer_id": "CUSTOMER-1"
+          },
+          "type": "SIMPLE",
+          "optional": false,
+          "workflowTaskType": "SIMPLE"
+        }
+      ],
+      "workflowTaskType": "DO_WHILE"
+    }
+  ],
+  "inputParameters": [],
+  "outputParameters": {},
+  "schemaVersion": 2,
+  "timeoutSeconds": 0
+}
