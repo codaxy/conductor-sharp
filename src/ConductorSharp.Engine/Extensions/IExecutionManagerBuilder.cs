@@ -12,5 +12,6 @@ namespace ConductorSharp.Engine.Extensions
         IExecutionManagerBuilder SetHealthCheckService<T>()
             where T : IConductorSharpHealthService;
         IExecutionManagerBuilder UseConstantPollTimingStrategy();
+        IExecutionManagerBuilder UseBetaExecutionManager();
     }
 }
