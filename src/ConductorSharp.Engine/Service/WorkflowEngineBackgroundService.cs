@@ -14,13 +14,13 @@ namespace ConductorSharp.Engine.Service
         IConductorSharpHealthService healthService,
         ILogger<WorkflowEngineBackgroundService> logger,
         IDeploymentService deploymentService,
-        ExecutionManager executionManager,
+        IExecutionManager executionManager,
         ModuleDeployment deployment
     ) : IHostedService, IDisposable
     {
         private readonly ILogger<WorkflowEngineBackgroundService> _logger = logger;
         private readonly IDeploymentService _deploymentService = deploymentService;
-        private readonly ExecutionManager _executionManager = executionManager;
+        private readonly IExecutionManager _executionManager = executionManager;
         private readonly ModuleDeployment _deployment = deployment;
         private readonly IConductorSharpHealthService _healthService = healthService;
         private Task _executingTask;

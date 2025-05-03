@@ -43,7 +43,7 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.AddTransient<ModuleDeployment>();
 
-            Builder.AddSingleton<ExecutionManager>();
+            Builder.AddSingleton<IExecutionManager,ExecutionManager>();
 
             Builder.AddScoped<ConductorSharpExecutionContext>();
 
@@ -60,6 +60,12 @@ namespace ConductorSharp.Engine.Extensions
             return this;
         }
 
+        public IExecutionManagerBuilder UseBetaExecutionManager()
+        {
+            Builder.AddSingleton<IExecutionManager,TypePollSpreadingExecutionManager>();
+            return this;
+        }
+        
         public IExecutionManagerBuilder AddPipelines(Action<IPipelineBuilder> behaviorBuilder)
         {
             var pipelineBuilder = new PipelineBuilder(Builder);
