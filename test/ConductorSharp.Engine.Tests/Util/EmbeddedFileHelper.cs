@@ -43,7 +43,7 @@ namespace ConductorSharp.Engine.Tests.Util
 
             var contents = ReadAssemblyFile(typeof(EmbeddedFileHelper).Assembly, fileName);
 
-            return contents.Replace("\r\n", "\n");
+            return contents;
         }
 
         public static Task<T> GetObjectFromEmbeddedFileAsync<T>(string fileName, params (string Key, object Value)[] templateParams) =>

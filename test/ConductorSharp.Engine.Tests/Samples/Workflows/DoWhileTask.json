@@ -5,9 +5,11 @@
     {
       "name": "do_while",
       "taskReferenceName": "do_while",
-      "inputParameters": {},
+      "inputParameters": {
+        "value": "${workflow.input.loops}"
+      },
       "type": "DO_WHILE",
-      "loopCondition": "$.do_while.iteration < 3",
+      "loopCondition": "$.do_while.iteration < $.value",
       "loopOver": [
         {
           "name": "CUSTOMER_get",
@@ -23,7 +25,9 @@
       "workflowTaskType": "DO_WHILE"
     }
   ],
-  "inputParameters": [],
+  "inputParameters": [
+    "loops"
+  ],
   "outputParameters": {},
   "schemaVersion": 2,
   "timeoutSeconds": 0
