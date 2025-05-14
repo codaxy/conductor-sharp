@@ -42,6 +42,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Samples\Workflows\DictionaryInitializationWorkflow.json" />
+    <EmbeddedResource Include="Samples\Workflows\DoWhileTask.json" />
     <EmbeddedResource Include="Samples\Workflows\FormatterWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\HumanTaskWorkflow.json" />
     <EmbeddedResource Include="Samples\Workflows\ListInitializationWorkflow.json" />

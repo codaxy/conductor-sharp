@@ -167,6 +167,15 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
+        public void BuilderReturnsCorrectDefinitionDoWhileTask()
+        {
+            var definition = GetDefinitionFromWorkflow<DoWhileTask>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/DoWhileTask.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
         public void BuilderReturnsCorrectDefinitionSwitchTask()
         {
             var definition = GetDefinitionFromWorkflow<SwitchTask>();
