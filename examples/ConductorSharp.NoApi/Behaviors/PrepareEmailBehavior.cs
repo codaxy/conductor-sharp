@@ -1,10 +1,11 @@
-﻿using ConductorSharp.NoApi.Handlers;
+﻿using ConductorSharp.Engine.Interface;
+using ConductorSharp.NoApi.Handlers;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace ConductorSharp.NoApi.Behaviors
 {
-    internal class PrepareEmailBehavior : IPipelineBehavior<PrepareEmailRequest, PrepareEmailResponse>
+    internal class PrepareEmailBehavior : INgWorkerMiddleware<PrepareEmailRequest, PrepareEmailResponse>
     {
         private readonly ILogger<PrepareEmailBehavior> _logger;
 
@@ -15,12 +16,12 @@ namespace ConductorSharp.NoApi.Behaviors
 
         public async Task<PrepareEmailResponse> Handle(
             PrepareEmailRequest request,
-            RequestHandlerDelegate<PrepareEmailResponse> next,
+            Func<PrepareEmailRequest, CancellationToken, Task<PrepareEmailResponse>> next,
             CancellationToken cancellationToken
         )
         {
             _logger.LogInformation($"Executed only before {nameof(PrepareEmailHandler)}");
-            var response = await next();
+            var response = await next(request, cancellationToken);
             _logger.LogInformation($"Executed only after {nameof(PrepareEmailHandler)}");
             return response;
         }

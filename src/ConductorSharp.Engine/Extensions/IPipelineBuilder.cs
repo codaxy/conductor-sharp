@@ -1,5 +1,5 @@
 ﻿using System;
-using MediatR;
+using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.Engine.Extensions
 {
@@ -10,7 +10,9 @@ namespace ConductorSharp.Engine.Extensions
         void AddContextLogging();
         void AddExecutionTaskTracking();
         void AddCustomBehavior(Type behaviorType);
-        void AddCustomBehavior<TBehavior, TRequest, TResponse>()
-            where TBehavior : class, IPipelineBehavior<TRequest, TResponse>;
+        void AddCustomBehavior<TWorkerMiddleware, TRequest, TResponse>()
+            where TWorkerMiddleware : class, INgWorkerMiddleware<TRequest, TResponse>
+            where TRequest : class, new()
+            where TResponse : class, new();
     }
 }

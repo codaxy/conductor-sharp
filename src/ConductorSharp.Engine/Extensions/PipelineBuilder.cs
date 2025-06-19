@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Reflection;
 using ConductorSharp.Engine.Behaviors;
-using MediatR;
+using ConductorSharp.Engine.Interface;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Engine.Extensions;
@@ -9,19 +8,22 @@ namespace ConductorSharp.Engine.Extensions;
 internal class PipelineBuilder(IServiceCollection serviceCollection) : IPipelineBuilder
 {
     public void AddRequestResponseLogging() =>
-        serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestResponseLoggingBehavior<,>));
+        serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(RequestResponseLoggingBehavior<,>));
 
-    public void AddValidation() => serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+    public void AddValidation() => serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(ValidationWorkerMiddleware<,>));
 
-    public void AddContextLogging() => serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextLoggingBehavior<,>));
+    public void AddContextLogging() => serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(ContextLoggingBehavior<,>));
 
-    public void AddExecutionTaskTracking() => serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(TaskExecutionTrackingBehavior<,>));
+    public void AddExecutionTaskTracking() =>
+        serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(TaskExecutionTrackingBehavior<,>));
 
-    public void AddCustomBehavior(Type behaviorType) => serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), behaviorType);
+    public void AddCustomBehavior(Type behaviorType) => serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), behaviorType);
 
-    public void AddCustomBehavior<TBehavior, TRequest, TResponse>()
-        where TBehavior : class, IPipelineBehavior<TRequest, TResponse>
+    public void AddCustomBehavior<TWorkerMiddleware, TRequest, TResponse>()
+        where TWorkerMiddleware : class, INgWorkerMiddleware<TRequest, TResponse>
+        where TRequest : class, new()
+        where TResponse : class, new()
     {
-        serviceCollection.AddTransient<IPipelineBehavior<TRequest, TResponse>, TBehavior>();
+        serviceCollection.AddTransient<INgWorkerMiddleware<TRequest, TResponse>, TWorkerMiddleware>();
     }
 }
