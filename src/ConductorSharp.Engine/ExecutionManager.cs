@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using ConductorSharp.Client;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
@@ -11,8 +10,8 @@ using ConductorSharp.Client.Util;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Polling;
+using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -32,6 +31,7 @@ namespace ConductorSharp.Engine
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
         private readonly ICancellationNotifier _cancellationNotifier;
+        private readonly WorkerInvokerService _workerInvokerService;
 
         public ExecutionManager(
             WorkerSetConfig options,
@@ -42,7 +42,8 @@ namespace ConductorSharp.Engine
             IServiceScopeFactory lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy,
-            ICancellationNotifier cancellationNotifier
+            ICancellationNotifier cancellationNotifier,
+            WorkerInvokerService workerInvokerService
         )
         {
             _configuration = options;
@@ -54,6 +55,7 @@ namespace ConductorSharp.Engine
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
             _cancellationNotifier = cancellationNotifier;
+            _workerInvokerService = workerInvokerService;
             _externalPayloadService = externalPayloadService;
         }
 
@@ -186,7 +188,6 @@ namespace ConductorSharp.Engine
                 using var scope = _lifetimeScopeFactory.CreateScope();
 
                 var context = scope.ServiceProvider.GetService<ConductorSharpExecutionContext>();
-                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
                 if (context != null)
                 {

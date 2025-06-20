@@ -2,14 +2,12 @@
 using System.Net.Http;
 using System.Reflection;
 using ConductorSharp.Client.Service;
-using ConductorSharp.Engine.Behaviors;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Polling;
 using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -43,7 +41,7 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.AddTransient<ModuleDeployment>();
 
-            Builder.AddSingleton<IExecutionManager,ExecutionManager>();
+            Builder.AddSingleton<IExecutionManager, ExecutionManager>();
 
             Builder.AddScoped<ConductorSharpExecutionContext>();
 
@@ -55,17 +53,17 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.AddSingleton<ICancellationNotifier, NoOpCancellationNotifier>();
 
-            Builder.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(handlerAssemblies));
+            Builder.AddTransient<WorkerInvokerService>();
 
             return this;
         }
 
         public IExecutionManagerBuilder UseBetaExecutionManager()
         {
-            Builder.AddSingleton<IExecutionManager,TypePollSpreadingExecutionManager>();
+            Builder.AddSingleton<IExecutionManager, TypePollSpreadingExecutionManager>();
             return this;
         }
-        
+
         public IExecutionManagerBuilder AddPipelines(Action<IPipelineBuilder> behaviorBuilder)
         {
             var pipelineBuilder = new PipelineBuilder(Builder);

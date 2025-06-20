@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -40,7 +42,14 @@ namespace ConductorSharp.Engine.Service
 
         private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-        public async Task<object> Invoke(Type workerType, object request, CancellationToken cancellationToken)
+        public async Task<IDictionary<string, object>> Invoke(
+            Type workerType,
+            IDictionary<string, object> request,
+            CancellationToken cancellationToken
+        ) { }
+
+        // TODO: MR Removal: Make private
+        public async Task<object> InternalInvoke(Type workerType, object request, CancellationToken cancellationToken)
         {
             var workerTypeInfo = new WorkerTypeInfo(workerType);
             var middlewares = _serviceProvider.GetServices(workerTypeInfo.MiddlewareType).ToArray();
