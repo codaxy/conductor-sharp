@@ -1,9 +1,10 @@
-﻿using MediatR;
+﻿using ConductorSharp.Engine.Interface;
 using Microsoft.Extensions.Logging;
 
 namespace ConductorSharp.Definitions.Behaviors
 {
-    internal class CustomBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    internal class CustomBehavior<TRequest, TResponse> : INgWorkerMiddleware<TRequest, TResponse>
+        where TRequest : class, ITaskInput<TResponse>, new()
     {
         private readonly ILogger<CustomBehavior<TRequest, TResponse>> _logger;
 
@@ -12,10 +13,14 @@ namespace ConductorSharp.Definitions.Behaviors
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(
+            TRequest request,
+            Func<TRequest, CancellationToken, Task<TResponse>> next,
+            CancellationToken cancellationToken
+        )
         {
             _logger.LogInformation("Executed before all behaviors");
-            var response = await next();
+            var response = await next(request, cancellationToken);
             _logger.LogInformation("Executed after all behaviors");
             return response;
         }

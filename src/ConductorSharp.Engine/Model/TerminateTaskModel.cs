@@ -1,6 +1,5 @@
 ﻿using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
-using MediatR;
 using Newtonsoft.Json;
 
 namespace ConductorSharp.Engine.Model

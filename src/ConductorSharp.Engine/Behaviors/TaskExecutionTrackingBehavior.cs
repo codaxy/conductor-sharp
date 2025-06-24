@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
-using MediatR;
 
 namespace ConductorSharp.Engine.Behaviors
 {

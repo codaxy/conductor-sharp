@@ -1,5 +1,4 @@
 ﻿using ConductorSharp.Engine.Interface;
-using MediatR;
 
 namespace ConductorSharp.Engine.Model
 {

@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ConductorSharp.Engine.Exceptions;
 using ConductorSharp.Engine.Interface;
-using MediatR;
 
 namespace ConductorSharp.Engine.Behaviors
 {

@@ -8,7 +8,6 @@ using ConductorSharp.Engine;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
-using MediatR;
 using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Patterns.Tasks

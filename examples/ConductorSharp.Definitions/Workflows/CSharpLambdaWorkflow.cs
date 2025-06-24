@@ -4,7 +4,6 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Patterns.Builders;
 using ConductorSharp.Patterns.Model;
-using MediatR;
 
 namespace ConductorSharp.Definitions.Workflows
 {

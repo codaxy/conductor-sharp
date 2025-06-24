@@ -1,6 +1,5 @@
 ﻿using ConductorSharp.Engine.Interface;
 using ConductorSharp.NoApi.Handlers;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace ConductorSharp.NoApi.Behaviors
