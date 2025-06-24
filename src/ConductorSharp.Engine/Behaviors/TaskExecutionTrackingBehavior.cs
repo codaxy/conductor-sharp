@@ -1,15 +1,16 @@
-﻿using ConductorSharp.Engine.Interface;
-using ConductorSharp.Engine.Util;
-using MediatR;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
+using MediatR;
 
 namespace ConductorSharp.Engine.Behaviors
 {
-    public class TaskExecutionTrackingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
+    public class TaskExecutionTrackingBehavior<TRequest, TResponse> : INgWorkerMiddleware<TRequest, TResponse>
+        where TRequest : class, ITaskInput<TResponse>, new()
     {
         private readonly ConductorSharpExecutionContext _executionContext;
         private readonly IEnumerable<ITaskExecutionService> _taskExecutionServices;
@@ -23,7 +24,11 @@ namespace ConductorSharp.Engine.Behaviors
             _taskExecutionServices = taskExecutionServices;
         }
 
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(
+            TRequest request,
+            Func<TRequest, CancellationToken, Task<TResponse>> next,
+            CancellationToken cancellationToken
+        )
         {
             var trackedTask = new RunningTask
             {
@@ -39,7 +44,7 @@ namespace ConductorSharp.Engine.Behaviors
 
             try
             {
-                var response = await next();
+                var response = await next(request, cancellationToken);
 
                 foreach (var taskExecutionService in _taskExecutionServices)
                 {

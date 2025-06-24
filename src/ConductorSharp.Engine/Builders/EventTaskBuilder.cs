@@ -18,7 +18,7 @@ namespace ConductorSharp.Engine.Builders
             string sink
         )
             where TWorkflow : ITypedWorkflow
-            where TInput : IRequest<EventTaskModelOutput>
+            where TInput : ITaskInput<EventTaskModelOutput>
         {
             var taskBuilder = new EventTaskBuilder(reference.Body, input.Body, builder.BuildConfiguration, sink);
             builder.AddTaskBuilderToSequence(taskBuilder);

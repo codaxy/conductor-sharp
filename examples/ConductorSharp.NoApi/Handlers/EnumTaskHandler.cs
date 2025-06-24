@@ -1,11 +1,10 @@
 ﻿using ConductorSharp.Client.Generated;
-using ConductorSharp.Engine;
 using ConductorSharp.Engine.Builders.Metadata;
-using MediatR;
+using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.NoApi.Handlers
 {
-    public class EnumTaskInput : IRequest<EnumTaskOutput>
+    public class EnumTaskInput : ITaskInput<EnumTaskOutput>
     {
         public WorkflowStatus Status { get; set; }
     }
@@ -16,9 +15,9 @@ namespace ConductorSharp.NoApi.Handlers
     }
 
     [OriginalName("ENUM_task")]
-    public class EnumTaskHandler : TaskRequestHandler<EnumTaskInput, EnumTaskOutput>
+    public class EnumTaskHandler : INgWorker<EnumTaskInput, EnumTaskOutput>
     {
-        public override Task<EnumTaskOutput> Handle(EnumTaskInput request, CancellationToken cancellationToken)
+        public Task<EnumTaskOutput> Handle(EnumTaskInput request, CancellationToken cancellationToken)
         {
             Console.WriteLine(request.Status);
             return System.Threading.Tasks.Task.FromResult(new EnumTaskOutput() { Status = request.Status });

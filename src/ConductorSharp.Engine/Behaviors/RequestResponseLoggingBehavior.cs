@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
-using MediatR;
 using Microsoft.Extensions.Logging;
-using Serilog.Context;
 
 namespace ConductorSharp.Engine.Behaviors
 {
     // TODO: Consider removing this
-    public class RequestResponseLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+    public class RequestResponseLoggingBehavior<TRequest, TResponse> : INgWorkerMiddleware<TRequest, TResponse>
+        where TRequest : class, ITaskInput<TResponse>, new()
     {
         private readonly ILogger<RequestResponseLoggingBehavior<TRequest, TResponse>> _logger;
         private readonly ConductorSharpExecutionContext _context;
@@ -27,7 +24,11 @@ namespace ConductorSharp.Engine.Behaviors
             _context = context;
         }
 
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(
+            TRequest request,
+            Func<TRequest, CancellationToken, Task<TResponse>> next,
+            CancellationToken cancellationToken
+        )
         {
             var requestId = Guid.NewGuid();
             var requestName = typeof(TRequest).Name;
@@ -44,7 +45,7 @@ namespace ConductorSharp.Engine.Behaviors
 
             try
             {
-                var response = await next();
+                var response = await next(request, cancellationToken);
 
                 stopwatch.Stop();
 

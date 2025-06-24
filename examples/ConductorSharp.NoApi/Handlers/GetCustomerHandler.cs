@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
-using ConductorSharp.Engine.Util;
-using MediatR;
 
 namespace ConductorSharp.NoApi.Handlers;
 
-public class GetCustomerRequest : IRequest<GetCustomerResponse>
+public class GetCustomerRequest : ITaskInput<GetCustomerResponse>
 {
     [Required]
     public int CustomerId { get; set; }
@@ -26,7 +24,7 @@ public class Customer
 }
 
 [OriginalName("CUSTOMER_get")]
-public class GetCustomerHandler : ITaskRequestHandler<GetCustomerRequest, GetCustomerResponse>
+public class GetCustomerHandler : INgWorker<GetCustomerRequest, GetCustomerResponse>
 {
     private static Customer[] customers = new Customer[]
     {

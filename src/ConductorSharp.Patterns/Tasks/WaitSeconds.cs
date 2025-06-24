@@ -1,16 +1,14 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using ConductorSharp.Engine;
 using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
-using ConductorSharp.Engine.Util;
-using MediatR;
 
 namespace ConductorSharp.Patterns.Tasks
 {
-    public class WaitSecondsRequest : IRequest<NoOutput>
+    public class WaitSecondsRequest : ITaskInput<NoOutput>
     {
         /// <summary>
         /// Time to wait in seconds
@@ -24,7 +22,7 @@ namespace ConductorSharp.Patterns.Tasks
     /// Executes `await Task.Delay(input.Seconds * 1000)` to wait for a given amount of seconds
     /// </summary>
     [OriginalName(Constants.TaskNamePrefix + "_wait_seconds")]
-    public class WaitSeconds : TaskRequestHandler<WaitSecondsRequest, NoOutput>
+    public class WaitSeconds : NgWorker<WaitSecondsRequest, NoOutput>
     {
         public override async Task<NoOutput> Handle(WaitSecondsRequest input, CancellationToken cancellationToken)
         {

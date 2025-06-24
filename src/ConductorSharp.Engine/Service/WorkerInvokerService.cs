@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using ConductorSharp.Client;
 using ConductorSharp.Client.Util;
 using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Engine.Service
@@ -23,12 +24,12 @@ namespace ConductorSharp.Engine.Service
             public WorkerTypeInfo(Type workerType)
             {
                 WorkerType = workerType;
-                (RequestType, ResponseType) = GetRequestResponseTypes(workerType);
+                (RequestType, ResponseType) = WorkerUtil.GetRequestResponseTypes(workerType);
                 MiddlewareType = typeof(INgWorkerMiddleware<,>).MakeGenericType(RequestType, ResponseType);
                 WorkerHandleMethod = typeof(INgWorker<,>)
                     .MakeGenericType(RequestType, ResponseType)
-                    .GetMethod(nameof(INgWorker<object, object>.Handle));
-                MiddlewareHandleMethod = MiddlewareType.GetMethod(nameof(INgWorkerMiddleware<object, object>.Handle));
+                    .GetMethod(nameof(INgWorker<ObjectRequest, object>.Handle));
+                MiddlewareHandleMethod = MiddlewareType.GetMethod(nameof(INgWorkerMiddleware<ObjectRequest, object>.Handle));
                 NextFuncType = MiddlewareHandleMethod!.GetParameters().FirstOrDefault(p => p.Name == "next")!.ParameterType;
                 TaskResultProperty = typeof(Task<>).MakeGenericType(ResponseType).GetProperty(nameof(Task<object>.Result));
             }
@@ -41,12 +42,6 @@ namespace ConductorSharp.Engine.Service
             public MethodInfo MiddlewareHandleMethod { get; }
             public Type NextFuncType { get; }
             public PropertyInfo TaskResultProperty { get; }
-
-            private static (Type RequestType, Type ResponseType) GetRequestResponseTypes(Type workerType)
-            {
-                var types = workerType.GetInterface(typeof(INgWorker<,>).Name)!.GetGenericArguments();
-                return (types[0], types[1]);
-            }
         }
 
         private readonly IServiceProvider _serviceProvider = serviceProvider;

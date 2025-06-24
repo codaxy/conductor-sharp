@@ -7,8 +7,7 @@ using ConductorSharp.Engine.Util;
 namespace ConductorSharp.Engine.Behaviors
 {
     public class ValidationWorkerMiddleware<TRequest, TResponse> : INgWorkerMiddleware<TRequest, TResponse>
-        where TRequest : class, new()
-        where TResponse : class, new()
+        where TRequest : class, ITaskInput<TResponse>, new()
     {
         public async Task<TResponse> Handle(
             TRequest request,

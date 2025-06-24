@@ -19,7 +19,7 @@ namespace ConductorSharp.Engine.Builders
             string script
         )
             where TWorkflow : ITypedWorkflow
-            where TInput : IRequest<TOutput>
+            where TInput : ITaskInput<TOutput>
         {
             var taskBuilder = new LambdaTaskBuilder<TInput, TOutput>(script, referrence.Body, input.Body, builder.BuildConfiguration);
 
@@ -28,9 +28,13 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class LambdaTaskBuilder<A, B>(string script, Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-        : BaseTaskBuilder<A, B>(taskExpression, inputExpression, buildConfiguration)
-        where A : IRequest<B>
+    public class LambdaTaskBuilder<TInput, TOutput>(
+        string script,
+        Expression taskExpression,
+        Expression inputExpression,
+        BuildConfiguration buildConfiguration
+    ) : BaseTaskBuilder<TInput, TOutput>(taskExpression, inputExpression, buildConfiguration)
+        where TInput : ITaskInput<TOutput>
     {
         private readonly string _script = script;
 

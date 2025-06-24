@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ConductorSharp.Client.Service;
 using ConductorSharp.Engine;
 using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using MediatR;
 using Newtonsoft.Json.Linq;
@@ -13,7 +14,7 @@ using Newtonsoft.Json.Linq;
 namespace ConductorSharp.Patterns.Tasks
 {
     #region models
-    public class ReadWorkflowTasksRequest : IRequest<ReadWorkflowTasksResponse>
+    public class ReadWorkflowTasksRequest : ITaskInput<ReadWorkflowTasksResponse>
     {
         /// <summary>
         /// Comma separated list of task reference names to be read from specified workflow
@@ -35,7 +36,7 @@ namespace ConductorSharp.Patterns.Tasks
     /// Uses the Conductor API to read the input/output and status of the specified tasks for the specified workflow.
     /// </summary>
     [OriginalName(Constants.TaskNamePrefix + "_read_tasks")]
-    public class ReadWorkflowTasks(IWorkflowService workflowService) : TaskRequestHandler<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
+    public class ReadWorkflowTasks(IWorkflowService workflowService) : NgWorker<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
     {
         private readonly IWorkflowService _workflowService = workflowService;
 

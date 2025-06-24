@@ -10,13 +10,12 @@ using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Patterns.Exceptions;
-using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Patterns.Tasks
 {
-    internal class CSharpLambdaTaskInput : IRequest<object>
+    internal class CSharpLambdaTaskInput : ITaskInput<object>
     {
         public const string LambdaIdenfitierParamName = "lambda_identifier";
         public const string TaskInputParamName = "task_input";
@@ -31,7 +30,7 @@ namespace ConductorSharp.Patterns.Tasks
     }
 
     [OriginalName(TaskName)]
-    internal class CSharpLambdaTask(WorkflowBuildItemRegistry itemRegistry) : ITaskRequestHandler<CSharpLambdaTaskInput, object>
+    internal class CSharpLambdaTask(WorkflowBuildItemRegistry itemRegistry) : INgWorker<CSharpLambdaTaskInput, object>
     {
         public const string TaskName = "CSHRP_inln_lmbd";
         public const string LambdaTaskNameConfigurationProperty = nameof(LambdaTaskNameConfigurationProperty);

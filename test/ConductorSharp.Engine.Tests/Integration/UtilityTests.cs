@@ -20,7 +20,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             Assert.Equal("CUSTOMER_get", NamingUtil.NameOf<CustomerGetV1>());
         }
 
-        public class Request
+        public class Request : ITaskInput<Request.Response>
         {
             public class Response { }
 
@@ -46,8 +46,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         public class GenericMiddleware<TRequest, TResponse> : INgWorkerMiddleware<TRequest, TResponse>
-            where TResponse : class, new()
-            where TRequest : class, new()
+            where TRequest : class, ITaskInput<TResponse>, new()
         {
             public async Task<TResponse> Handle(
                 TRequest request,

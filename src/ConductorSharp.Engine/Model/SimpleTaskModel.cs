@@ -3,5 +3,6 @@ using MediatR;
 
 namespace ConductorSharp.Engine.Model
 {
-    public abstract class SimpleTaskModel<I, O> : TaskModel<I, O>, INameable where I : IRequest<O> { }
+    public abstract class SimpleTaskModel<TInput, TOutput> : TaskModel<TInput, TOutput>, INameable
+        where TInput : ITaskInput<TOutput>;
 }

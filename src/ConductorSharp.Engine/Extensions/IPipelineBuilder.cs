@@ -10,9 +10,9 @@ namespace ConductorSharp.Engine.Extensions
         void AddContextLogging();
         void AddExecutionTaskTracking();
         void AddCustomBehavior(Type behaviorType);
+
         void AddCustomBehavior<TWorkerMiddleware, TRequest, TResponse>()
             where TWorkerMiddleware : class, INgWorkerMiddleware<TRequest, TResponse>
-            where TRequest : class, new()
-            where TResponse : class, new();
+            where TRequest : class, ITaskInput<TResponse>, new();
     }
 }

@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace ConductorSharp.NoApi.Handlers
 {
-    public class PrepareEmailRequest : IRequest<PrepareEmailResponse>
+    public class PrepareEmailRequest : ITaskInput<PrepareEmailResponse>
     {
         public string CustomerName { get; set; }
         public string Address { get; set; }
@@ -23,7 +18,7 @@ namespace ConductorSharp.NoApi.Handlers
     }
 
     [OriginalName("EMAIL_prepare")]
-    public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
+    public class PrepareEmailHandler : INgWorker<PrepareEmailRequest, PrepareEmailResponse>
     {
         private readonly ConductorSharpExecutionContext _context;
         private readonly ILogger<PrepareEmailHandler> _logger;

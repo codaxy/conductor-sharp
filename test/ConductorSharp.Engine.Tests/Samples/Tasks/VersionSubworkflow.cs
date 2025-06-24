@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ConductorSharp.Engine.Builders.Metadata;
+﻿using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Engine.Tests.Samples.Tasks
 {
-    public class VersionSubworkflowInput : IRequest<VersionSubworkflowOutput> { }
+    public class VersionSubworkflowInput : ITaskInput<VersionSubworkflowOutput> { }
 
-    public class VersionSubworkflowOutput { }
+    public class VersionSubworkflowOutput;
 
     [OriginalName("TEST_subworkflow")]
     [Version(3)]
-    public class VersionSubworkflow : SubWorkflowTaskModel<VersionSubworkflowInput, VersionSubworkflowOutput> { }
+    public class VersionSubworkflow : SubWorkflowTaskModel<VersionSubworkflowInput, VersionSubworkflowOutput>;
 }

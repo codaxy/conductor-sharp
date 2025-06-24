@@ -1,18 +1,25 @@
-﻿using ConductorSharp.Engine.Exceptions;
-using MediatR;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ConductorSharp.Engine.Exceptions;
+using ConductorSharp.Engine.Interface;
+using MediatR;
 
 namespace ConductorSharp.Engine.Behaviors
 {
-    public class ErrorHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
+    // TODO: Consider removing
+    public class ErrorHandlingBehavior<TRequest, TResponse> : INgWorkerMiddleware<TRequest, TResponse>
+        where TRequest : class, ITaskInput<TResponse>, new()
     {
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(
+            TRequest request,
+            Func<TRequest, CancellationToken, Task<TResponse>> next,
+            CancellationToken cancellationToken
+        )
         {
             try
             {
-                return await next();
+                return await next(request, cancellationToken);
             }
             catch (Exception ex)
             {

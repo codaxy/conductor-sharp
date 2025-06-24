@@ -2,11 +2,10 @@
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
-using MediatR;
 
 namespace ConductorSharp.ApiEnabled.Handlers;
 
-public class PrepareEmailRequest : IRequest<PrepareEmailResponse>
+public class PrepareEmailRequest : ITaskInput<PrepareEmailResponse>
 {
     public string CustomerName { get; set; }
     public string Address { get; set; }
@@ -18,7 +17,7 @@ public class PrepareEmailResponse
 }
 
 [OriginalName("EMAIL_prepare")]
-public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
+public class PrepareEmailHandler : INgWorker<PrepareEmailRequest, PrepareEmailResponse>
 {
     private readonly ConductorSharpExecutionContext _context;
     private readonly ILogger<PrepareEmailHandler> _logger;

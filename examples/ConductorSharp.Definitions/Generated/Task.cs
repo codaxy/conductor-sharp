@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using MediatR;
@@ -6,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace ConductorSharp.Definitions.Generated
 {
-    public partial class EmailPrepareV1Input : IRequest<EmailPrepareV1Output>
+    public partial class EmailPrepareV1Input : ITaskInput<EmailPrepareV1Output>
     {
         /// <originalName>
         /// address
@@ -33,7 +34,7 @@ namespace ConductorSharp.Definitions.Generated
     [OriginalName("EMAIL_prepare")]
     public partial class EmailPrepareV1 : SimpleTaskModel<EmailPrepareV1Input, EmailPrepareV1Output> { }
 
-    public partial class CustomerGetV1Input : IRequest<CustomerGetV1Output>
+    public partial class CustomerGetV1Input : ITaskInput<CustomerGetV1Output>
     {
         /// <originalName>
         /// customer_id
@@ -61,7 +62,7 @@ namespace ConductorSharp.Definitions.Generated
     [OriginalName("CUSTOMER_get")]
     public partial class CustomerGetV1 : SimpleTaskModel<CustomerGetV1Input, CustomerGetV1Output> { }
 
-    public partial class EnumTaskInput : IRequest<EnumTaskOutput>
+    public partial class EnumTaskInput : ITaskInput<EnumTaskOutput>
     {
         /// <originalName>
         /// status

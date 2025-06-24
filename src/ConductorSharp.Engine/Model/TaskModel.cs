@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace ConductorSharp.Engine.Model
 {
-    public abstract class TaskModel<I, O> : ITaskModel where I : IRequest<O>
+    public abstract class TaskModel<I, O> : ITaskModel
     {
         public I Input { get; }
 

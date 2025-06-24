@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ConductorSharp.Engine.Builders.Metadata;
+﻿using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Engine.Tests.Samples.Tasks
 {
-    public class TaskNestedObjectsInput : IRequest<TaskNestedObjectsOutput>
+    public class TaskNestedObjectsInput : ITaskInput<TaskNestedObjectsOutput>
     {
         public object NestedObjects { get; set; }
     }

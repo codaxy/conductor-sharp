@@ -3,7 +3,7 @@ using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workers;
 
-public class GetCustomerRequest : IRequest<GetCustomerResponse>
+public class GetCustomerRequest : ITaskInput<GetCustomerResponse>
 {
     [Required]
     [JsonProperty("id")]
@@ -24,7 +24,7 @@ public class Customer
 }
 
 [OriginalName("CUSTOMER_get")]
-public class GetCustomerHandler : TaskRequestHandler<GetCustomerRequest, GetCustomerResponse>
+public class GetCustomerHandler : NgWorker<GetCustomerRequest, GetCustomerResponse>
 {
     public override Task<GetCustomerResponse> Handle(GetCustomerRequest request, CancellationToken cancellationToken) =>
         throw new NotImplementedException();

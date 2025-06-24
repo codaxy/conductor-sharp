@@ -1,10 +1,9 @@
 ﻿using ConductorSharp.Definitions.Generated;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
-using ConductorSharp.Engine.Util;
 using ConductorSharp.Patterns.Tasks;
-using MediatR;
 
 namespace ConductorSharp.Definitions.Workflows
 {
@@ -21,7 +20,7 @@ namespace ConductorSharp.Definitions.Workflows
         public object Constant { get; set; }
     }
 
-    public class ExpectedDynamicInput : CustomerGetV1Input, IRequest<ExpectedDynamicOutput> { }
+    public class ExpectedDynamicInput : CustomerGetV1Input, ITaskInput<ExpectedDynamicOutput> { }
 
     public class ExpectedDynamicOutput : CustomerGetV1Output { }
 

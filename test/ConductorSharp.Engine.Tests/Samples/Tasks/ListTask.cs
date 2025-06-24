@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConductorSharp.Engine.Tests.Samples.Tasks
 {
-    public class ListTaskInput : IRequest<ListTaskOutput>
+    public class ListTaskInput : ITaskInput<ListTaskOutput>
     {
         public List<object> List { get; set; }
     }

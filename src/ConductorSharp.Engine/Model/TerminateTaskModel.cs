@@ -1,4 +1,5 @@
-﻿using ConductorSharp.Engine.Util;
+﻿using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
 using MediatR;
 using Newtonsoft.Json;
 
@@ -13,7 +14,7 @@ namespace ConductorSharp.Engine.Model
         Failed
     };
 
-    public class TerminateTaskInput : IRequest<NoOutput>
+    public class TerminateTaskInput : ITaskInput<NoOutput>
     {
         [JsonProperty("workflowOutput")]
         public object WorkflowOutput { get; set; }
@@ -22,5 +23,5 @@ namespace ConductorSharp.Engine.Model
         public TerminationStatus TerminationStatus { get; set; }
     }
 
-    public class TerminateTaskModel : TaskModel<TerminateTaskInput, NoOutput> { }
+    public class TerminateTaskModel : TaskModel<TerminateTaskInput, NoOutput>;
 }
