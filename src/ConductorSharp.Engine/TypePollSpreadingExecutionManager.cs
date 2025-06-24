@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using ConductorSharp.Client;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
@@ -11,8 +10,8 @@ using ConductorSharp.Client.Util;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Polling;
+using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -32,6 +31,7 @@ namespace ConductorSharp.Engine
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
         private readonly ICancellationNotifier _cancellationNotifier;
+        private readonly WorkerInvokerService _workerInvokerService;
 
         public TypePollSpreadingExecutionManager(
             WorkerSetConfig options,
@@ -42,7 +42,8 @@ namespace ConductorSharp.Engine
             IServiceScopeFactory lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy,
-            ICancellationNotifier cancellationNotifier
+            ICancellationNotifier cancellationNotifier,
+            WorkerInvokerService workerInvokerService
         )
         {
             _configuration = options;
@@ -54,6 +55,7 @@ namespace ConductorSharp.Engine
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
             _cancellationNotifier = cancellationNotifier;
+            _workerInvokerService = workerInvokerService;
             _externalPayloadService = externalPayloadService;
         }
 
@@ -67,8 +69,7 @@ namespace ConductorSharp.Engine
                     .Where(a => a.Value > 0)
                     .ToDictionary(a => a.Key, a => a.Value);
 
-                var scheduledWorkers = _registeredWorkers.Where(a => queuedTasks.ContainsKey(GetQueueTaskName(a)))
-                    .ToList();
+                var scheduledWorkers = _registeredWorkers.Where(a => queuedTasks.ContainsKey(GetQueueTaskName(a))).ToList();
 
                 currentSleepInterval = _pollTimingStrategy.CalculateDelay(
                     queuedTasks,
@@ -77,8 +78,7 @@ namespace ConductorSharp.Engine
                     currentSleepInterval
                 );
 
-                scheduledWorkers =
-                    _pollOrderStrategy.CalculateOrder(queuedTasks, scheduledWorkers, _semaphore.CurrentCount);
+                scheduledWorkers = _pollOrderStrategy.CalculateOrder(queuedTasks, scheduledWorkers, _semaphore.CurrentCount);
 
                 foreach (var scheduledWorker in scheduledWorkers)
                 {
@@ -107,20 +107,6 @@ namespace ConductorSharp.Engine
                 return $"{_configuration.Domain}:{taskToWorker.TaskName}";
 
             return taskToWorker.TaskName;
-        }
-
-        private static Type GetInputType(Type workerType)
-        {
-            var interfaces = workerType
-                .GetInterfaces()
-                .Where(a => a.IsGenericType && a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
-                .First();
-            var genericArguments = interfaces.GetGenericArguments();
-
-            var inputType = genericArguments[0];
-            var outputType = genericArguments[1];
-
-            return inputType;
         }
 
         private async Task PollAndHandle(TaskToWorker scheduledWorker, CancellationToken cancellationToken)
@@ -177,8 +163,7 @@ namespace ConductorSharp.Engine
                     );
 
                     // TODO: iffy
-                    var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path,
-                        tokenHolder.CancellationToken);
+                    var file = await _externalPayloadService.GetExternalStorageDataAsync(externalStorageLocation.Path, tokenHolder.CancellationToken);
 
                     using TextReader textReader = new StreamReader(file.Stream);
                     var json = await textReader.ReadToEndAsync();
@@ -189,17 +174,9 @@ namespace ConductorSharp.Engine
                     );
                 }
 
-                var inputType = GetInputType(scheduledWorker.TaskType);
-                var inputData = SerializationHelper.DictonaryToObject(inputType, pollResponse.InputData,
-                    ConductorConstants.IoJsonSerializerSettings);
-                // Poll response data can be huge (if read from external storage)
-                // We can save memory by not holding reference to pollResponse.InputData after it is parsed
-                pollResponse.InputData = null;
-
                 using var scope = _lifetimeScopeFactory.CreateScope();
 
                 var context = scope.ServiceProvider.GetService<ConductorSharpExecutionContext>();
-                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
                 if (context != null)
                 {
@@ -212,16 +189,14 @@ namespace ConductorSharp.Engine
                     context.WorkerId = workerId;
                 }
 
-                var response = await mediator.Send(inputData, tokenHolder.CancellationToken);
+                var response = await _workerInvokerService.Invoke(scheduledWorker.TaskType, pollResponse.InputData, tokenHolder.CancellationToken);
 
                 await _taskManager.UpdateAsync(
                     new TaskResult
                     {
                         TaskId = pollResponse.TaskId,
                         Status = TaskResultStatus.COMPLETED,
-                        OutputData =
-                            SerializationHelper.ObjectToDictionary(response,
-                                ConductorConstants.IoJsonSerializerSettings),
+                        OutputData = response,
                         WorkflowInstanceId = pollResponse.WorkflowInstanceId
                     },
                     tokenHolder.CancellationToken
@@ -237,9 +212,7 @@ namespace ConductorSharp.Engine
                     pollResponse.WorkflowInstanceId
                 );
             }
-            catch (OperationCanceledException) when
-                (cancellationToken
-                    .IsCancellationRequested) // This is fine since we know cancellationToken comes from background service
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) // This is fine since we know cancellationToken comes from background service
             {
                 _logger.LogWarning(
                     "Cancelling task {Task}(id={TaskId}) of workflow {Workflow}(id={WorkflowId}) due to background service shutdown",
@@ -273,8 +246,7 @@ namespace ConductorSharp.Engine
                                 TaskId = pollResponse.TaskId,
                                 Status = TaskResultStatus.FAILED,
                                 ReasonForIncompletion = exception.Message,
-                                OutputData = SerializationHelper.ObjectToDictionary(errorMessage,
-                                    ConductorConstants.IoJsonSerializerSettings),
+                                OutputData = SerializationHelper.ObjectToDictionary(errorMessage, ConductorConstants.IoJsonSerializerSettings),
                                 WorkflowInstanceId = pollResponse?.WorkflowInstanceId
                             },
                             tokenHolder.CancellationToken

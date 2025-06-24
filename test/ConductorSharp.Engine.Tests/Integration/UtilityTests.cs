@@ -22,15 +22,12 @@ namespace ConductorSharp.Engine.Tests.Integration
 
         public class Request
         {
-            public int Counter = 0;
-
             public class Response { }
 
             public class Handler : INgWorker<Request, Response>
             {
                 public Task<Response> Handle(Request request, CancellationToken cancellationToken)
                 {
-                    request.Counter++;
                     return Task.FromResult(new Response());
                 }
             }
@@ -44,7 +41,6 @@ namespace ConductorSharp.Engine.Tests.Integration
                 CancellationToken cancellationToken
             )
             {
-                request.Counter++;
                 return await next(request, cancellationToken);
             }
         }
@@ -59,9 +55,6 @@ namespace ConductorSharp.Engine.Tests.Integration
                 CancellationToken cancellationToken
             )
             {
-                var obj = (object)request;
-                var req = (Request)obj;
-                req.Counter++;
                 return await next(request, cancellationToken);
             }
         }
@@ -77,11 +70,12 @@ namespace ConductorSharp.Engine.Tests.Integration
             var provider = collection.BuildServiceProvider();
             var invoker = new WorkerInvokerService(provider);
 
-            var sw = Stopwatch.StartNew();
-            var @ref = new Request();
-            var result = await invoker.Invoke(typeof(Request.Handler), @ref, default);
-            var response = (Request.Response)result;
-            var t = sw.ElapsedMilliseconds;
+            for (int i = 0; i < 5; i++)
+            {
+                var sw = Stopwatch.StartNew();
+                var result = await invoker.Invoke(typeof(Request.Handler), new Dictionary<string, object>(), default);
+                var t = sw.ElapsedMilliseconds;
+            }
         }
     }
 }

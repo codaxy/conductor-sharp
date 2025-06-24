@@ -6,8 +6,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
+using ConductorSharp.Client;
+using ConductorSharp.Client.Util;
 using ConductorSharp.Engine.Interface;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,6 +41,12 @@ namespace ConductorSharp.Engine.Service
             public MethodInfo MiddlewareHandleMethod { get; }
             public Type NextFuncType { get; }
             public PropertyInfo TaskResultProperty { get; }
+
+            private static (Type RequestType, Type ResponseType) GetRequestResponseTypes(Type workerType)
+            {
+                var types = workerType.GetInterface(typeof(INgWorker<,>).Name)!.GetGenericArguments();
+                return (types[0], types[1]);
+            }
         }
 
         private readonly IServiceProvider _serviceProvider = serviceProvider;
@@ -46,35 +55,26 @@ namespace ConductorSharp.Engine.Service
             Type workerType,
             IDictionary<string, object> request,
             CancellationToken cancellationToken
-        ) { }
-
-        // TODO: MR Removal: Make private
-        public async Task<object> InternalInvoke(Type workerType, object request, CancellationToken cancellationToken)
+        )
         {
             var workerTypeInfo = new WorkerTypeInfo(workerType);
+            var objRequest = SerializationHelper.DictonaryToObject(workerTypeInfo.RequestType, request, ConductorConstants.IoJsonSerializerSettings);
+            var sw = Stopwatch.StartNew();
+            var objResponse = await InternalInvoke(workerTypeInfo, objRequest, cancellationToken);
+            var t = sw.ElapsedMilliseconds;
+            var response = SerializationHelper.ObjectToDictionary(objResponse, ConductorConstants.IoJsonSerializerSettings);
+
+            return response;
+        }
+
+        private async Task<object> InternalInvoke(WorkerTypeInfo workerTypeInfo, object request, CancellationToken cancellationToken)
+        {
             var middlewares = _serviceProvider.GetServices(workerTypeInfo.MiddlewareType).ToArray();
-            var worker = _serviceProvider.GetRequiredService(workerType);
+            var worker = _serviceProvider.GetRequiredService(workerTypeInfo.WorkerType);
             var resultTask = InvokeMiddlewarePipeline(middlewares, worker, workerTypeInfo, request, cancellationToken);
             await resultTask;
             var result = workerTypeInfo.TaskResultProperty.GetValue(resultTask);
             return result;
-        }
-
-        private static (Type RequestType, Type ResponseType) GetRequestResponseTypes(Type workerType)
-        {
-            var types = workerType.GetInterface(typeof(INgWorker<,>).Name)!.GetGenericArguments();
-            return (types[0], types[1]);
-        }
-
-        private static async Task<object> InvokeHandler(object worker, object request, CancellationToken cancellationToken)
-        {
-            var resultTask = (Task)worker.GetType().GetMethod(nameof(INgWorker<object, object>.Handle))!.Invoke(worker, [request, cancellationToken]);
-            await resultTask!;
-
-            var propInfo = resultTask.GetType().GetProperty(nameof(Task<object>.Result));
-            var result = propInfo!.GetValue(resultTask);
-
-            return Task.FromResult(result);
         }
 
         private static Task InvokeMiddlewarePipeline(
@@ -89,10 +89,10 @@ namespace ConductorSharp.Engine.Service
             if (middlewares.Length == 0)
                 result = workerTypeInfo.WorkerHandleMethod.Invoke(worker, [request, cancellationToken]);
             else
-                result = workerTypeInfo.MiddlewareHandleMethod.Invoke(
-                    middlewares[0],
-                    [request, GenerateCallToMiddleware(middlewares, worker, 1, workerTypeInfo).Compile(), cancellationToken]
-                );
+            {
+                var next = GenerateCallToMiddleware(middlewares, worker, 1, workerTypeInfo).Compile();
+                result = workerTypeInfo.MiddlewareHandleMethod.Invoke(middlewares[0], [request, next, cancellationToken]);
+            }
 
             return (Task)result;
         }

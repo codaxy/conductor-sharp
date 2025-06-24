@@ -100,20 +100,6 @@ namespace ConductorSharp.Engine
             return taskToWorker.TaskName;
         }
 
-        private static Type GetInputType(Type workerType)
-        {
-            var interfaces = workerType
-                .GetInterfaces()
-                .Where(a => a.IsGenericType && a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
-                .First();
-            var genericArguments = interfaces.GetGenericArguments();
-
-            var inputType = genericArguments[0];
-            var outputType = genericArguments[1];
-
-            return inputType;
-        }
-
         private async Task PollAndHandle(TaskToWorker scheduledWorker, CancellationToken cancellationToken)
         {
             Client.Generated.Task pollResponse;
@@ -179,12 +165,6 @@ namespace ConductorSharp.Engine
                     );
                 }
 
-                var inputType = GetInputType(scheduledWorker.TaskType);
-                var inputData = SerializationHelper.DictonaryToObject(inputType, pollResponse.InputData, ConductorConstants.IoJsonSerializerSettings);
-                // Poll response data can be huge (if read from external storage)
-                // We can save memory by not holding reference to pollResponse.InputData after it is parsed
-                pollResponse.InputData = null;
-
                 using var scope = _lifetimeScopeFactory.CreateScope();
 
                 var context = scope.ServiceProvider.GetService<ConductorSharpExecutionContext>();
@@ -200,7 +180,7 @@ namespace ConductorSharp.Engine
                     context.WorkerId = workerId;
                 }
 
-                var response = await mediator.Send(inputData, tokenHolder.CancellationToken);
+                var response = await _workerInvokerService.Invoke(scheduledWorker.TaskType, pollResponse.InputData, tokenHolder.CancellationToken);
 
                 await _taskManager.UpdateAsync(
                     new TaskResult
