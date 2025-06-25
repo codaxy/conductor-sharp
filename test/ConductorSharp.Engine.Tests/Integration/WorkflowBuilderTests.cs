@@ -313,7 +313,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             containerBuilder
                 .AddConductorSharp("example.com/api")
                 .SetBuildConfiguration(new() { DefaultOwnerEmail = null })
-                .AddExecutionManager(10, 100, 100, null, typeof(WorkflowBuilderTests).Assembly)
+                .AddExecutionManager(10, 100, 100, null)
                 .AddPipelines(pipelines =>
                 {
                     pipelines.AddContextLogging();

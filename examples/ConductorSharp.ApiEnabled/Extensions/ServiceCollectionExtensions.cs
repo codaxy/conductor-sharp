@@ -16,8 +16,7 @@ public static class ServiceCollectionExtensions
                 maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                 sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                 longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
-                domain: configuration.GetValue<string>("Conductor:WorkerDomain"),
-                typeof(ServiceCollectionExtensions).Assembly
+                domain: configuration.GetValue<string>("Conductor:WorkerDomain")
             )
             .SetHealthCheckService<FileHealthService>()
             .AddPipelines(pipelines =>

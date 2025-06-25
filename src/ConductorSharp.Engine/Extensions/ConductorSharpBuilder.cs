@@ -17,13 +17,7 @@ namespace ConductorSharp.Engine.Extensions
     {
         public IServiceCollection Builder { get; set; } = builder;
 
-        public IExecutionManagerBuilder AddExecutionManager(
-            int maxConcurrentWorkers,
-            int sleepInterval,
-            int longPollInterval,
-            string domain = null,
-            params Assembly[] handlerAssemblies
-        )
+        public IExecutionManagerBuilder AddExecutionManager(int maxConcurrentWorkers, int sleepInterval, int longPollInterval, string domain = null)
         {
             var workerConfig = new WorkerSetConfig
             {
