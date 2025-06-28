@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Definitions.Behaviors;
+﻿using ConductorSharp.Definitions.Middlewares;
 using ConductorSharp.Definitions.Workflows;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
@@ -31,7 +31,7 @@ var builder = Host.CreateDefaultBuilder()
                 .SetHealthCheckService<FileHealthService>()
                 .AddPipelines(pipelines =>
                 {
-                    pipelines.AddCustomBehavior(typeof(CustomBehavior<,>));
+                    pipelines.AddCustomMiddleware(typeof(CustomMiddleware<,>));
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
                 })

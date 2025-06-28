@@ -1,8 +1,8 @@
 ﻿using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
 using ConductorSharp.KafkaCancellationNotifier.Extensions;
-using ConductorSharp.NoApi.Behaviors;
 using ConductorSharp.NoApi.Handlers;
+using ConductorSharp.NoApi.MIddlewares;
 using ConductorSharp.Patterns.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +36,7 @@ var builder = Host.CreateDefaultBuilder()
                     pipelines.AddContextLogging();
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
-                    pipelines.AddCustomBehavior<PrepareEmailBehavior, PrepareEmailRequest, PrepareEmailResponse>();
+                    pipelines.AddCustomMiddleware<PrepareEmailMiddleware, PrepareEmailRequest, PrepareEmailResponse>();
                 })
                 .AddConductorSharpPatterns();
             //.AddKafkaCancellationNotifier(

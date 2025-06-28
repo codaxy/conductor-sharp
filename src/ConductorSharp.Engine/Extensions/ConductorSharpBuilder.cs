@@ -58,10 +58,10 @@ namespace ConductorSharp.Engine.Extensions
             return this;
         }
 
-        public IExecutionManagerBuilder AddPipelines(Action<IPipelineBuilder> behaviorBuilder)
+        public IExecutionManagerBuilder AddPipelines(Action<IPipelineBuilder> middlewareBuilder)
         {
             var pipelineBuilder = new PipelineBuilder(Builder);
-            behaviorBuilder(pipelineBuilder);
+            middlewareBuilder(pipelineBuilder);
             return this;
         }
 
