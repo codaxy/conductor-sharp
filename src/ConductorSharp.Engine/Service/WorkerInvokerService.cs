@@ -54,9 +54,7 @@ namespace ConductorSharp.Engine.Service
         {
             var workerTypeInfo = new WorkerTypeInfo(workerType);
             var objRequest = SerializationHelper.DictonaryToObject(workerTypeInfo.RequestType, request, ConductorConstants.IoJsonSerializerSettings);
-            var sw = Stopwatch.StartNew();
             var objResponse = await InternalInvoke(workerTypeInfo, objRequest, cancellationToken);
-            var t = sw.ElapsedMilliseconds;
             var response = SerializationHelper.ObjectToDictionary(objResponse, ConductorConstants.IoJsonSerializerSettings);
 
             return response;
