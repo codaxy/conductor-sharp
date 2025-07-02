@@ -23,7 +23,6 @@ public static class ServiceCollectionExtensions
             {
                 pipelines.AddExecutionTaskTracking();
                 pipelines.AddContextLogging();
-                pipelines.AddRequestResponseLogging();
                 pipelines.AddValidation();
             });
 

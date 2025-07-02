@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -189,7 +190,25 @@ namespace ConductorSharp.Engine
                     context.WorkerId = workerId;
                 }
 
+                _logger.LogInformation(
+                    "Executing worker {Worker} for task {Task}(id={TaskId}) as part of workflow {Workflow}(id={WorkflowId})",
+                    scheduledWorker.TaskType.Name,
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
+                );
+                var stopwatch = Stopwatch.StartNew();
                 var response = await _workerInvokerService.Invoke(scheduledWorker.TaskType, pollResponse.InputData, tokenHolder.CancellationToken);
+                _logger.LogInformation(
+                    "Worker {Worker} executed for task {Task}(id={TaskId}) as part of workflow {Workflow}(id={WorkflowId}), exec time = {WorkerPipelineExecutionTime}ms",
+                    scheduledWorker.TaskType.Name,
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId,
+                    stopwatch.ElapsedMilliseconds
+                );
 
                 await _taskManager.UpdateAsync(
                     new TaskResult
@@ -225,9 +244,10 @@ namespace ConductorSharp.Engine
             catch (Exception exception)
             {
                 _logger.LogError(
-                    "{@Exception} while executing {Task} as part of {Workflow} with id {WorkflowId}",
                     exception,
+                    "Exception while processing polled task {Task}(id={TaskId}) as part of workflow {Workflow}(id={WorkflowId})",
                     pollResponse.TaskDefName,
+                    pollResponse.TaskId,
                     pollResponse.WorkflowType,
                     pollResponse.WorkflowInstanceId
                 );

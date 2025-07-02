@@ -21,7 +21,6 @@ namespace ConductorSharp.Engine.Tests.Unit
                 .AddPipelines(pipelines =>
                 {
                     pipelines.AddContextLogging();
-                    pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
                 });
 

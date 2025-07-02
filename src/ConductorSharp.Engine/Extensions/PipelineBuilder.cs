@@ -7,9 +7,6 @@ namespace ConductorSharp.Engine.Extensions;
 
 internal class PipelineBuilder(IServiceCollection serviceCollection) : IPipelineBuilder
 {
-    public void AddRequestResponseLogging() =>
-        serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(RequestResponseLoggingMiddleware<,>));
-
     public void AddValidation() => serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(ValidationWorkerMiddleware<,>));
 
     public void AddContextLogging() => serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(ContextLoggingMiddleware<,>));

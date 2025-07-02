@@ -32,7 +32,6 @@ var builder = Host.CreateDefaultBuilder()
                 .AddPipelines(pipelines =>
                 {
                     pipelines.AddCustomMiddleware(typeof(CustomMiddleware<,>));
-                    pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
                 })
                 .AddCSharpLambdaTasks();
