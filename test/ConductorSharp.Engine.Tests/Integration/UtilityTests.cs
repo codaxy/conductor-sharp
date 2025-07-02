@@ -26,7 +26,7 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             public class Handler : INgWorker<Request, Response>
             {
-                public Task<Response> Handle(Request request, CancellationToken cancellationToken)
+                public Task<Response> Handle(Request request, WorkerExecutionContext context, CancellationToken cancellationToken)
                 {
                     return Task.FromResult(new Response());
                 }
@@ -37,6 +37,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         {
             public async Task<Request.Response> Handle(
                 Request request,
+                WorkerExecutionContext context,
                 Func<Request, CancellationToken, Task<Request.Response>> next,
                 CancellationToken cancellationToken
             )
@@ -50,6 +51,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         {
             public async Task<TResponse> Handle(
                 TRequest request,
+                WorkerExecutionContext context,
                 Func<TRequest, CancellationToken, Task<TResponse>> next,
                 CancellationToken cancellationToken
             )
@@ -72,7 +74,12 @@ namespace ConductorSharp.Engine.Tests.Integration
             for (int i = 0; i < 5; i++)
             {
                 var sw = Stopwatch.StartNew();
-                var result = await invoker.Invoke(typeof(Request.Handler), new Dictionary<string, object>(), default);
+                var result = await invoker.Invoke(
+                    typeof(Request.Handler),
+                    new Dictionary<string, object>(),
+                    new WorkerExecutionContext(WorkflowName: "test", WorkflowId: null, "", "", "", "", ""),
+                    default
+                );
                 var t = sw.ElapsedMilliseconds;
             }
         }

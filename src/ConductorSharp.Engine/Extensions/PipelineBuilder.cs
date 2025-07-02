@@ -9,8 +9,6 @@ internal class PipelineBuilder(IServiceCollection serviceCollection) : IPipeline
 {
     public void AddValidation() => serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(ValidationWorkerMiddleware<,>));
 
-    public void AddContextLogging() => serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(ContextLoggingMiddleware<,>));
-
     public void AddExecutionTaskTracking() =>
         serviceCollection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(TaskExecutionTrackingMiddleware<,>));
 

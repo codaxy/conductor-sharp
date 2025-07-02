@@ -316,7 +316,6 @@ namespace ConductorSharp.Engine.Tests.Integration
                 .AddExecutionManager(10, 100, 100, null)
                 .AddPipelines(pipelines =>
                 {
-                    pipelines.AddContextLogging();
                     pipelines.AddValidation();
                 })
                 .AddCSharpLambdaTasks("TEST");

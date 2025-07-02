@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
 using ConductorSharp.NoApi.Handlers;
 using Microsoft.Extensions.Logging;
 
@@ -15,6 +16,7 @@ internal class PrepareEmailMiddleware : INgWorkerMiddleware<PrepareEmailRequest,
 
     public async Task<PrepareEmailResponse> Handle(
         PrepareEmailRequest request,
+        WorkerExecutionContext context,
         Func<PrepareEmailRequest, CancellationToken, Task<PrepareEmailResponse>> next,
         CancellationToken cancellationToken
     )

@@ -22,7 +22,6 @@ public static class ServiceCollectionExtensions
             .AddPipelines(pipelines =>
             {
                 pipelines.AddExecutionTaskTracking();
-                pipelines.AddContextLogging();
                 pipelines.AddValidation();
             });
 

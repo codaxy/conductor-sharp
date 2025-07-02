@@ -175,20 +175,15 @@ namespace ConductorSharp.Engine
                     );
                 }
 
-                using var scope = _lifetimeScopeFactory.CreateScope();
-
-                var context = scope.ServiceProvider.GetService<ConductorSharpExecutionContext>();
-
-                if (context != null)
-                {
-                    context.WorkflowName = pollResponse.WorkflowType;
-                    context.TaskName = pollResponse.TaskDefName;
-                    context.TaskReferenceName = pollResponse.ReferenceTaskName;
-                    context.WorkflowId = pollResponse.WorkflowInstanceId;
-                    context.CorrelationId = pollResponse.CorrelationId;
-                    context.TaskId = pollResponse.TaskId;
-                    context.WorkerId = workerId;
-                }
+                var context = new WorkerExecutionContext(
+                    WorkflowName: pollResponse.WorkflowType,
+                    WorkflowId: pollResponse.WorkflowInstanceId,
+                    TaskName: pollResponse.TaskDefName,
+                    TaskId: pollResponse.TaskId,
+                    TaskReferenceName: pollResponse.ReferenceTaskName,
+                    CorrelationId: pollResponse.CorrelationId,
+                    WorkerId: workerId
+                );
 
                 _logger.LogInformation(
                     "Executing worker {Worker} for task {Task}(id={TaskId}) as part of workflow {Workflow}(id={WorkflowId})",
@@ -199,7 +194,12 @@ namespace ConductorSharp.Engine
                     pollResponse.WorkflowInstanceId
                 );
                 var stopwatch = Stopwatch.StartNew();
-                var response = await _workerInvokerService.Invoke(scheduledWorker.TaskType, pollResponse.InputData, tokenHolder.CancellationToken);
+                var response = await _workerInvokerService.Invoke(
+                    scheduledWorker.TaskType,
+                    pollResponse.InputData,
+                    context,
+                    tokenHolder.CancellationToken
+                );
                 _logger.LogInformation(
                     "Worker {Worker} executed for task {Task}(id={TaskId}) as part of workflow {Workflow}(id={WorkflowId}), exec time = {WorkerPipelineExecutionTime}ms",
                     scheduledWorker.TaskType.Name,

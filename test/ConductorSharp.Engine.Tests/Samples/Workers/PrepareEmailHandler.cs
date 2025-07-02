@@ -16,6 +16,9 @@ public class PrepareEmailResponse
 [OriginalName("EMAIL_prepare")]
 public class PrepareEmailHandler : NgWorker<PrepareEmailRequest, PrepareEmailResponse>
 {
-    public override Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public override Task<PrepareEmailResponse> Handle(
+        PrepareEmailRequest request,
+        WorkerExecutionContext context,
+        CancellationToken cancellationToken
+    ) => throw new NotImplementedException();
 }

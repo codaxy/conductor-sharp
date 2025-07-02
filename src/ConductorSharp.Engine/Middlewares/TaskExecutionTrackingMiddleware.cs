@@ -10,10 +10,10 @@ namespace ConductorSharp.Engine.Middlewares;
 public class TaskExecutionTrackingMiddleware<TRequest, TResponse> : INgWorkerMiddleware<TRequest, TResponse>
     where TRequest : class, ITaskInput<TResponse>, new()
 {
-    private readonly ConductorSharpExecutionContext _executionContext;
+    private readonly WorkerExecutionContext _executionContext;
     private readonly IEnumerable<ITaskExecutionService> _taskExecutionServices;
 
-    public TaskExecutionTrackingMiddleware(ConductorSharpExecutionContext executionContext, IEnumerable<ITaskExecutionService> taskExecutionServices)
+    public TaskExecutionTrackingMiddleware(WorkerExecutionContext executionContext, IEnumerable<ITaskExecutionService> taskExecutionServices)
     {
         _executionContext = executionContext;
         _taskExecutionServices = taskExecutionServices;
@@ -21,6 +21,7 @@ public class TaskExecutionTrackingMiddleware<TRequest, TResponse> : INgWorkerMid
 
     public async Task<TResponse> Handle(
         TRequest request,
+        WorkerExecutionContext context,
         Func<TRequest, CancellationToken, Task<TResponse>> next,
         CancellationToken cancellationToken
     )

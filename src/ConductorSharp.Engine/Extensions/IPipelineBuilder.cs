@@ -6,7 +6,6 @@ namespace ConductorSharp.Engine.Extensions
     public interface IPipelineBuilder
     {
         void AddValidation();
-        void AddContextLogging();
         void AddExecutionTaskTracking();
         void AddCustomMiddleware(Type middlewareType);
 

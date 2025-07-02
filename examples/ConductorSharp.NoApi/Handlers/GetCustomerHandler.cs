@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
 
 namespace ConductorSharp.NoApi.Handlers;
 
@@ -36,7 +37,7 @@ public class GetCustomerHandler : INgWorker<GetCustomerRequest, GetCustomerRespo
         }
     };
 
-    public Task<GetCustomerResponse> Handle(GetCustomerRequest request, CancellationToken cancellationToken)
+    public Task<GetCustomerResponse> Handle(GetCustomerRequest request, WorkerExecutionContext context, CancellationToken cancellationToken)
     {
         var customer = customers.First(a => a.Id == request.CustomerId);
 

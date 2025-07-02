@@ -26,6 +26,9 @@ public class Customer
 [OriginalName("CUSTOMER_get")]
 public class GetCustomerHandler : NgWorker<GetCustomerRequest, GetCustomerResponse>
 {
-    public override Task<GetCustomerResponse> Handle(GetCustomerRequest request, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public override Task<GetCustomerResponse> Handle(
+        GetCustomerRequest request,
+        WorkerExecutionContext context,
+        CancellationToken cancellationToken
+    ) => throw new NotImplementedException();
 }

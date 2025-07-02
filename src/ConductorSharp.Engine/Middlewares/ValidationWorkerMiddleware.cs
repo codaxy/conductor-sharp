@@ -11,6 +11,7 @@ public class ValidationWorkerMiddleware<TRequest, TResponse> : INgWorkerMiddlewa
 {
     public async Task<TResponse> Handle(
         TRequest request,
+        WorkerExecutionContext context,
         Func<TRequest, CancellationToken, Task<TResponse>> next,
         CancellationToken cancellationToken
     )

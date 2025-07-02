@@ -39,7 +39,11 @@ namespace ConductorSharp.Patterns.Tasks
     {
         private readonly IWorkflowService _workflowService = workflowService;
 
-        public override async Task<ReadWorkflowTasksResponse> Handle(ReadWorkflowTasksRequest input, CancellationToken cancellationToken)
+        public override async Task<ReadWorkflowTasksResponse> Handle(
+            ReadWorkflowTasksRequest input,
+            WorkerExecutionContext context,
+            CancellationToken cancellationToken
+        )
         {
             if (string.IsNullOrEmpty(input.TaskNames))
             {

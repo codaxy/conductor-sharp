@@ -33,7 +33,6 @@ var builder = Host.CreateDefaultBuilder()
                 .SetHealthCheckService<FileHealthService>()
                 .AddPipelines(pipelines =>
                 {
-                    pipelines.AddContextLogging();
                     pipelines.AddValidation();
                     pipelines.AddCustomMiddleware<PrepareEmailMiddleware, PrepareEmailRequest, PrepareEmailResponse>();
                 })

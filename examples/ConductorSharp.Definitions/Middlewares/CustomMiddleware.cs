@@ -1,4 +1,5 @@
 ﻿using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
 using Microsoft.Extensions.Logging;
 
 namespace ConductorSharp.Definitions.Middlewares;
@@ -15,6 +16,7 @@ internal class CustomMiddleware<TRequest, TResponse> : INgWorkerMiddleware<TRequ
 
     public async Task<TResponse> Handle(
         TRequest request,
+        WorkerExecutionContext context,
         Func<TRequest, CancellationToken, Task<TResponse>> next,
         CancellationToken cancellationToken
     )

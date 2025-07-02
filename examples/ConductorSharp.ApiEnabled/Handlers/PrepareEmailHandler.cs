@@ -19,16 +19,16 @@ public class PrepareEmailResponse
 [OriginalName("EMAIL_prepare")]
 public class PrepareEmailHandler : INgWorker<PrepareEmailRequest, PrepareEmailResponse>
 {
-    private readonly ConductorSharpExecutionContext _context;
+    private readonly WorkerExecutionContext _context;
     private readonly ILogger<PrepareEmailHandler> _logger;
 
-    public PrepareEmailHandler(ConductorSharpExecutionContext context, ILogger<PrepareEmailHandler> logger)
+    public PrepareEmailHandler(WorkerExecutionContext context, ILogger<PrepareEmailHandler> logger)
     {
         _context = context;
         _logger = logger;
     }
 
-    public async Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
+    public async Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, WorkerExecutionContext context, CancellationToken cancellationToken)
     {
         var emailBodyBuilder = new StringBuilder();
 

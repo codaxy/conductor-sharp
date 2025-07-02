@@ -37,7 +37,7 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.AddSingleton<IExecutionManager, ExecutionManager>();
 
-            Builder.AddScoped<ConductorSharpExecutionContext>();
+            Builder.AddScoped<WorkerExecutionContext>();
 
             Builder.AddSingleton<IConductorSharpHealthService, InMemoryHealthService>();
 

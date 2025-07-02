@@ -1,6 +1,7 @@
 ﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Util;
 
 namespace ConductorSharp.NoApi.Handlers
 {
@@ -17,7 +18,7 @@ namespace ConductorSharp.NoApi.Handlers
     [OriginalName("ENUM_task")]
     public class EnumTaskHandler : INgWorker<EnumTaskInput, EnumTaskOutput>
     {
-        public Task<EnumTaskOutput> Handle(EnumTaskInput request, CancellationToken cancellationToken)
+        public Task<EnumTaskOutput> Handle(EnumTaskInput request, WorkerExecutionContext context, CancellationToken cancellationToken)
         {
             Console.WriteLine(request.Status);
             return System.Threading.Tasks.Task.FromResult(new EnumTaskOutput() { Status = request.Status });

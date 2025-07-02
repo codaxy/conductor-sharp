@@ -37,7 +37,7 @@ namespace ConductorSharp.Patterns.Tasks
 
         private readonly WorkflowBuildItemRegistry _itemRegistry = itemRegistry;
 
-        public Task<object> Handle(CSharpLambdaTaskInput request, CancellationToken cancellationToken)
+        public Task<object> Handle(CSharpLambdaTaskInput request, WorkerExecutionContext context, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(request.LambdaIdentifier))
             {

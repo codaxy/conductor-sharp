@@ -5,6 +5,7 @@ using ConductorSharp.Engine;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
+using ConductorSharp.Engine.Util;
 
 namespace ConductorSharp.Patterns.Tasks
 {
@@ -24,7 +25,7 @@ namespace ConductorSharp.Patterns.Tasks
     [OriginalName(Constants.TaskNamePrefix + "_wait_seconds")]
     public class WaitSeconds : NgWorker<WaitSecondsRequest, NoOutput>
     {
-        public override async Task<NoOutput> Handle(WaitSecondsRequest input, CancellationToken cancellationToken)
+        public override async Task<NoOutput> Handle(WaitSecondsRequest input, WorkerExecutionContext context, CancellationToken cancellationToken)
         {
             await Task.Delay(input.Seconds * 1000, cancellationToken);
             return new NoOutput();

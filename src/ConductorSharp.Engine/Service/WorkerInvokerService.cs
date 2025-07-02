@@ -49,22 +49,28 @@ namespace ConductorSharp.Engine.Service
         public async Task<IDictionary<string, object>> Invoke(
             Type workerType,
             IDictionary<string, object> request,
+            WorkerExecutionContext workerExecutionContext,
             CancellationToken cancellationToken
         )
         {
             var workerTypeInfo = new WorkerTypeInfo(workerType);
             var objRequest = SerializationHelper.DictonaryToObject(workerTypeInfo.RequestType, request, ConductorConstants.IoJsonSerializerSettings);
-            var objResponse = await InternalInvoke(workerTypeInfo, objRequest, cancellationToken);
+            var objResponse = await InternalInvoke(workerTypeInfo, objRequest, workerExecutionContext, cancellationToken);
             var response = SerializationHelper.ObjectToDictionary(objResponse, ConductorConstants.IoJsonSerializerSettings);
 
             return response;
         }
 
-        private async Task<object> InternalInvoke(WorkerTypeInfo workerTypeInfo, object request, CancellationToken cancellationToken)
+        private async Task<object> InternalInvoke(
+            WorkerTypeInfo workerTypeInfo,
+            object request,
+            WorkerExecutionContext context,
+            CancellationToken cancellationToken
+        )
         {
             var middlewares = _serviceProvider.GetServices(workerTypeInfo.MiddlewareType).ToArray();
             var worker = _serviceProvider.GetRequiredService(workerTypeInfo.WorkerType);
-            var resultTask = InvokeMiddlewarePipeline(middlewares, worker, workerTypeInfo, request, cancellationToken);
+            var resultTask = InvokeMiddlewarePipeline(middlewares, worker, workerTypeInfo, request, context, cancellationToken);
             await resultTask;
             var result = workerTypeInfo.TaskResultProperty.GetValue(resultTask);
             return result;
@@ -75,44 +81,60 @@ namespace ConductorSharp.Engine.Service
             object worker,
             WorkerTypeInfo workerTypeInfo,
             object request,
+            WorkerExecutionContext context,
             CancellationToken cancellationToken
         )
         {
             object result;
             if (middlewares.Length == 0)
-                result = workerTypeInfo.WorkerHandleMethod.Invoke(worker, [request, cancellationToken]);
+                result = workerTypeInfo.WorkerHandleMethod.Invoke(worker, [request, context, cancellationToken]);
             else
             {
-                var next = GenerateCallToMiddleware(middlewares, worker, 1, workerTypeInfo).Compile();
-                result = workerTypeInfo.MiddlewareHandleMethod.Invoke(middlewares[0], [request, next, cancellationToken]);
+                var next = GenerateCallToMiddleware(middlewares, worker, 1, workerTypeInfo, context).Compile();
+                result = workerTypeInfo.MiddlewareHandleMethod.Invoke(middlewares[0], [request, context, next, cancellationToken]);
             }
 
             return (Task)result;
         }
 
-        private static LambdaExpression GenerateCallToHandler(object worker, WorkerTypeInfo workerInfo)
+        private static LambdaExpression GenerateCallToHandler(object worker, WorkerTypeInfo workerInfo, WorkerExecutionContext context)
         {
             var requestParam = Expression.Parameter(workerInfo.RequestType);
             var cancellationTokenParam = Expression.Parameter(typeof(CancellationToken));
+            var contextParam = Expression.Constant(context);
 
-            var lambdaBody = Expression.Call(Expression.Constant(worker), workerInfo.WorkerHandleMethod, requestParam, cancellationTokenParam);
+            var lambdaBody = Expression.Call(
+                Expression.Constant(worker),
+                workerInfo.WorkerHandleMethod,
+                requestParam,
+                contextParam,
+                cancellationTokenParam
+            );
             var lambda = Expression.Lambda(workerInfo.NextFuncType, lambdaBody, requestParam, cancellationTokenParam);
             return lambda;
         }
 
-        private static LambdaExpression GenerateCallToMiddleware(object[] middlewares, object worker, int middlewareIndex, WorkerTypeInfo workerInfo)
+        private static LambdaExpression GenerateCallToMiddleware(
+            object[] middlewares,
+            object worker,
+            int middlewareIndex,
+            WorkerTypeInfo workerInfo,
+            WorkerExecutionContext context
+        )
         {
             if (middlewares.Length == middlewareIndex)
-                return GenerateCallToHandler(worker, workerInfo);
+                return GenerateCallToHandler(worker, workerInfo, context);
 
             var requestParam = Expression.Parameter(workerInfo.RequestType);
             var cancellationTokenParam = Expression.Parameter(typeof(CancellationToken));
+            var contextParam = Expression.Constant(context);
 
-            var nextLambda = GenerateCallToMiddleware(middlewares, worker, middlewareIndex + 1, workerInfo);
+            var nextLambda = GenerateCallToMiddleware(middlewares, worker, middlewareIndex + 1, workerInfo, context);
             var lambdaBody = Expression.Call(
                 Expression.Constant(middlewares[middlewareIndex]),
                 workerInfo.MiddlewareHandleMethod,
                 requestParam,
+                contextParam,
                 nextLambda,
                 cancellationTokenParam
             );
