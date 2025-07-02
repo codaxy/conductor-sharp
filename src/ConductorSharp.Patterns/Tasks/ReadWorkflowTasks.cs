@@ -35,7 +35,7 @@ namespace ConductorSharp.Patterns.Tasks
     /// Uses the Conductor API to read the input/output and status of the specified tasks for the specified workflow.
     /// </summary>
     [OriginalName(Constants.TaskNamePrefix + "_read_tasks")]
-    public class ReadWorkflowTasks(IWorkflowService workflowService) : NgWorker<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
+    public class ReadWorkflowTasks(IWorkflowService workflowService) : Worker<ReadWorkflowTasksRequest, ReadWorkflowTasksResponse>
     {
         private readonly IWorkflowService _workflowService = workflowService;
 

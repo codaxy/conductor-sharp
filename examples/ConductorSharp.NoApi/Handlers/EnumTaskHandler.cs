@@ -16,7 +16,7 @@ namespace ConductorSharp.NoApi.Handlers
     }
 
     [OriginalName("ENUM_task")]
-    public class EnumTaskHandler : INgWorker<EnumTaskInput, EnumTaskOutput>
+    public class EnumTaskHandler : IWorker<EnumTaskInput, EnumTaskOutput>
     {
         public Task<EnumTaskOutput> Handle(EnumTaskInput request, WorkerExecutionContext context, CancellationToken cancellationToken)
         {

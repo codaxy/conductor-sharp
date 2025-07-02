@@ -10,7 +10,7 @@ namespace ConductorSharp.Engine.Extensions
         void AddCustomMiddleware(Type middlewareType);
 
         void AddCustomMiddleware<TWorkerMiddleware, TRequest, TResponse>()
-            where TWorkerMiddleware : class, INgWorkerMiddleware<TRequest, TResponse>
+            where TWorkerMiddleware : class, IWorkerMiddleware<TRequest, TResponse>
             where TRequest : class, ITaskInput<TResponse>, new();
     }
 }

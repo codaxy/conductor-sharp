@@ -6,7 +6,7 @@ using ConductorSharp.Engine.Util;
 
 namespace ConductorSharp.Engine.Middlewares;
 
-public class ValidationWorkerMiddleware<TRequest, TResponse> : INgWorkerMiddleware<TRequest, TResponse>
+public class ValidationWorkerMiddleware<TRequest, TResponse> : IWorkerMiddleware<TRequest, TResponse>
     where TRequest : class, ITaskInput<TResponse>, new()
 {
     public async Task<TResponse> Handle(

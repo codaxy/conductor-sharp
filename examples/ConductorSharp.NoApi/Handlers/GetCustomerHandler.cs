@@ -25,7 +25,7 @@ public class Customer
 }
 
 [OriginalName("CUSTOMER_get")]
-public class GetCustomerHandler : INgWorker<GetCustomerRequest, GetCustomerResponse>
+public class GetCustomerHandler : IWorker<GetCustomerRequest, GetCustomerResponse>
 {
     private static Customer[] customers = new Customer[]
     {

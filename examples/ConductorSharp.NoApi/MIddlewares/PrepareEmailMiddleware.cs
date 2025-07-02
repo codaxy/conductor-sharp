@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ConductorSharp.NoApi.MIddlewares;
 
-internal class PrepareEmailMiddleware : INgWorkerMiddleware<PrepareEmailRequest, PrepareEmailResponse>
+internal class PrepareEmailMiddleware : IWorkerMiddleware<PrepareEmailRequest, PrepareEmailResponse>
 {
     private readonly ILogger<PrepareEmailMiddleware> _logger;
 

@@ -25,11 +25,11 @@ namespace ConductorSharp.Engine.Service
             {
                 WorkerType = workerType;
                 (RequestType, ResponseType) = WorkerUtil.GetRequestResponseTypes(workerType);
-                MiddlewareType = typeof(INgWorkerMiddleware<,>).MakeGenericType(RequestType, ResponseType);
-                WorkerHandleMethod = typeof(INgWorker<,>)
+                MiddlewareType = typeof(IWorkerMiddleware<,>).MakeGenericType(RequestType, ResponseType);
+                WorkerHandleMethod = typeof(IWorker<,>)
                     .MakeGenericType(RequestType, ResponseType)
-                    .GetMethod(nameof(INgWorker<ObjectRequest, object>.Handle));
-                MiddlewareHandleMethod = MiddlewareType.GetMethod(nameof(INgWorkerMiddleware<ObjectRequest, object>.Handle));
+                    .GetMethod(nameof(IWorker<ObjectRequest, object>.Handle));
+                MiddlewareHandleMethod = MiddlewareType.GetMethod(nameof(IWorkerMiddleware<ObjectRequest, object>.Handle));
                 NextFuncType = MiddlewareHandleMethod!.GetParameters().FirstOrDefault(p => p.Name == "next")!.ParameterType;
                 TaskResultProperty = typeof(Task<>).MakeGenericType(ResponseType).GetProperty(nameof(Task<object>.Result));
             }

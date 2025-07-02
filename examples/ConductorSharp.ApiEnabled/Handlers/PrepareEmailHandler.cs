@@ -17,7 +17,7 @@ public class PrepareEmailResponse
 }
 
 [OriginalName("EMAIL_prepare")]
-public class PrepareEmailHandler : INgWorker<PrepareEmailRequest, PrepareEmailResponse>
+public class PrepareEmailHandler : IWorker<PrepareEmailRequest, PrepareEmailResponse>
 {
     private readonly WorkerExecutionContext _context;
     private readonly ILogger<PrepareEmailHandler> _logger;

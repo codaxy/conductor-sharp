@@ -23,7 +23,7 @@ namespace ConductorSharp.Patterns.Tasks
     /// Executes `await Task.Delay(input.Seconds * 1000)` to wait for a given amount of seconds
     /// </summary>
     [OriginalName(Constants.TaskNamePrefix + "_wait_seconds")]
-    public class WaitSeconds : NgWorker<WaitSecondsRequest, NoOutput>
+    public class WaitSeconds : Worker<WaitSecondsRequest, NoOutput>
     {
         public override async Task<NoOutput> Handle(WaitSecondsRequest input, WorkerExecutionContext context, CancellationToken cancellationToken)
         {

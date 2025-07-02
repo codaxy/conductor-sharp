@@ -26,7 +26,7 @@ namespace ConductorSharp.Engine.Tests.Integration
 
             public class Response { }
 
-            public class Handler : INgWorker<Request, Response>
+            public class Handler : IWorker<Request, Response>
             {
                 public Task<Response> Handle(Request request, WorkerExecutionContext context, CancellationToken cancellationToken)
                 {
@@ -35,7 +35,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             }
         }
 
-        public class Middleware : INgWorkerMiddleware<Request, Request.Response>
+        public class Middleware : IWorkerMiddleware<Request, Request.Response>
         {
             public async Task<Request.Response> Handle(
                 Request request,
@@ -48,7 +48,7 @@ namespace ConductorSharp.Engine.Tests.Integration
             }
         }
 
-        public class GenericMiddleware<TRequest, TResponse> : INgWorkerMiddleware<TRequest, TResponse>
+        public class GenericMiddleware<TRequest, TResponse> : IWorkerMiddleware<TRequest, TResponse>
             where TRequest : class, ITaskInput<TResponse>, new()
         {
             public async Task<TResponse> Handle(
@@ -67,8 +67,8 @@ namespace ConductorSharp.Engine.Tests.Integration
         {
             var collection = new ServiceCollection();
             collection.RegisterWorkerTask<Request.Handler>();
-            collection.AddTransient<INgWorkerMiddleware<Request, Request.Response>, Middleware>();
-            collection.AddTransient(typeof(INgWorkerMiddleware<,>), typeof(GenericMiddleware<,>));
+            collection.AddTransient<IWorkerMiddleware<Request, Request.Response>, Middleware>();
+            collection.AddTransient(typeof(IWorkerMiddleware<,>), typeof(GenericMiddleware<,>));
 
             var provider = collection.BuildServiceProvider();
             var invoker = new WorkerInvokerService(provider);

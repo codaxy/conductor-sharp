@@ -24,7 +24,7 @@ public class Customer
 }
 
 [OriginalName("CUSTOMER_get")]
-public class GetCustomerHandler : NgWorker<GetCustomerRequest, GetCustomerResponse>
+public class GetCustomerHandler : Worker<GetCustomerRequest, GetCustomerResponse>
 {
     public override Task<GetCustomerResponse> Handle(
         GetCustomerRequest request,

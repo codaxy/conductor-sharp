@@ -7,7 +7,7 @@ namespace ConductorSharp.Engine.Util
     {
         public static (Type RequestType, Type ResponseType) GetRequestResponseTypes(Type workerType)
         {
-            var types = workerType.GetInterface(typeof(INgWorker<,>).Name)!.GetGenericArguments();
+            var types = workerType.GetInterface(typeof(IWorker<,>).Name)!.GetGenericArguments();
             return (types[0], types[1]);
         }
     }

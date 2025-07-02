@@ -14,7 +14,7 @@ public class PrepareEmailResponse
 }
 
 [OriginalName("EMAIL_prepare")]
-public class PrepareEmailHandler : NgWorker<PrepareEmailRequest, PrepareEmailResponse>
+public class PrepareEmailHandler : Worker<PrepareEmailRequest, PrepareEmailResponse>
 {
     public override Task<PrepareEmailResponse> Handle(
         PrepareEmailRequest request,
