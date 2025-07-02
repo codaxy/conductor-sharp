@@ -187,7 +187,7 @@ namespace ConductorSharp.Engine
                     {
                         TaskId = pollResponse.TaskId,
                         Status = TaskResultStatus.COMPLETED,
-                        OutputData = SerializationHelper.ObjectToDictionary(response, ConductorConstants.IoJsonSerializerSettings),
+                        OutputData = response,
                         WorkflowInstanceId = pollResponse.WorkflowInstanceId
                     },
                     tokenHolder.CancellationToken
