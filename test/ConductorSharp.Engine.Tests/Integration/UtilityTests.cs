@@ -22,6 +22,8 @@ namespace ConductorSharp.Engine.Tests.Integration
 
         public class Request : ITaskInput<Request.Response>
         {
+            public string Baba { get; set; } = "Baba";
+
             public class Response { }
 
             public class Handler : INgWorker<Request, Response>
@@ -38,11 +40,11 @@ namespace ConductorSharp.Engine.Tests.Integration
             public async Task<Request.Response> Handle(
                 Request request,
                 WorkerExecutionContext context,
-                Func<Request, CancellationToken, Task<Request.Response>> next,
+                Func<Task<Request.Response>> next,
                 CancellationToken cancellationToken
             )
             {
-                return await next(request, cancellationToken);
+                return await next();
             }
         }
 
@@ -52,11 +54,11 @@ namespace ConductorSharp.Engine.Tests.Integration
             public async Task<TResponse> Handle(
                 TRequest request,
                 WorkerExecutionContext context,
-                Func<TRequest, CancellationToken, Task<TResponse>> next,
+                Func<Task<TResponse>> next,
                 CancellationToken cancellationToken
             )
             {
-                return await next(request, cancellationToken);
+                return await next();
             }
         }
 
@@ -78,7 +80,7 @@ namespace ConductorSharp.Engine.Tests.Integration
                     typeof(Request.Handler),
                     new Dictionary<string, object>(),
                     new WorkerExecutionContext(WorkflowName: "test", WorkflowId: null, "", "", "", "", ""),
-                    default
+                    new CancellationToken(true)
                 );
                 var t = sw.ElapsedMilliseconds;
             }

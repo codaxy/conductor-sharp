@@ -17,12 +17,12 @@ internal class CustomMiddleware<TRequest, TResponse> : INgWorkerMiddleware<TRequ
     public async Task<TResponse> Handle(
         TRequest request,
         WorkerExecutionContext context,
-        Func<TRequest, CancellationToken, Task<TResponse>> next,
+        Func<Task<TResponse>> next,
         CancellationToken cancellationToken
     )
     {
         _logger.LogInformation("Executed before all middlewares");
-        var response = await next(request, cancellationToken);
+        var response = await next();
         _logger.LogInformation("Executed after all middlewares");
         return response;
     }

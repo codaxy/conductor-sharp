@@ -90,55 +90,63 @@ namespace ConductorSharp.Engine.Service
                 result = workerTypeInfo.WorkerHandleMethod.Invoke(worker, [request, context, cancellationToken]);
             else
             {
-                var next = GenerateCallToMiddleware(middlewares, worker, 1, workerTypeInfo, context).Compile();
+                var next = GenerateCallToMiddleware(middlewares, worker, request, 1, workerTypeInfo, context, cancellationToken).Compile();
                 result = workerTypeInfo.MiddlewareHandleMethod.Invoke(middlewares[0], [request, context, next, cancellationToken]);
             }
 
             return (Task)result;
         }
 
-        private static LambdaExpression GenerateCallToHandler(object worker, WorkerTypeInfo workerInfo, WorkerExecutionContext context)
+        private static LambdaExpression GenerateCallToHandler(
+            object worker,
+            object request,
+            WorkerTypeInfo workerInfo,
+            WorkerExecutionContext context,
+            CancellationToken cancellationToken
+        )
         {
-            var requestParam = Expression.Parameter(workerInfo.RequestType);
-            var cancellationTokenParam = Expression.Parameter(typeof(CancellationToken));
-            var contextParam = Expression.Constant(context);
+            var requestArgument = Expression.Constant(request);
+            var cancellationTokenArgument = Expression.Constant(cancellationToken);
+            var contextArgument = Expression.Constant(context);
 
             var lambdaBody = Expression.Call(
                 Expression.Constant(worker),
                 workerInfo.WorkerHandleMethod,
-                requestParam,
-                contextParam,
-                cancellationTokenParam
+                requestArgument,
+                contextArgument,
+                cancellationTokenArgument
             );
-            var lambda = Expression.Lambda(workerInfo.NextFuncType, lambdaBody, requestParam, cancellationTokenParam);
+            var lambda = Expression.Lambda(workerInfo.NextFuncType, lambdaBody);
             return lambda;
         }
 
         private static LambdaExpression GenerateCallToMiddleware(
             object[] middlewares,
             object worker,
+            object request,
             int middlewareIndex,
             WorkerTypeInfo workerInfo,
-            WorkerExecutionContext context
+            WorkerExecutionContext context,
+            CancellationToken cancellationToken
         )
         {
             if (middlewares.Length == middlewareIndex)
-                return GenerateCallToHandler(worker, workerInfo, context);
+                return GenerateCallToHandler(worker, request, workerInfo, context, cancellationToken);
 
-            var requestParam = Expression.Parameter(workerInfo.RequestType);
-            var cancellationTokenParam = Expression.Parameter(typeof(CancellationToken));
-            var contextParam = Expression.Constant(context);
+            var requestArgument = Expression.Constant(request);
+            var cancellationTokenArgument = Expression.Constant(cancellationToken);
+            var contextArgument = Expression.Constant(context);
 
-            var nextLambda = GenerateCallToMiddleware(middlewares, worker, middlewareIndex + 1, workerInfo, context);
+            var nextLambda = GenerateCallToMiddleware(middlewares, worker, request, middlewareIndex + 1, workerInfo, context, cancellationToken);
             var lambdaBody = Expression.Call(
                 Expression.Constant(middlewares[middlewareIndex]),
                 workerInfo.MiddlewareHandleMethod,
-                requestParam,
-                contextParam,
+                requestArgument,
+                contextArgument,
                 nextLambda,
-                cancellationTokenParam
+                cancellationTokenArgument
             );
-            var lambda = Expression.Lambda(workerInfo.NextFuncType, lambdaBody, requestParam, cancellationTokenParam);
+            var lambda = Expression.Lambda(workerInfo.NextFuncType, lambdaBody);
             return lambda;
         }
     }

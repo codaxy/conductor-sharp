@@ -12,12 +12,12 @@ public class ValidationWorkerMiddleware<TRequest, TResponse> : INgWorkerMiddlewa
     public async Task<TResponse> Handle(
         TRequest request,
         WorkerExecutionContext context,
-        Func<TRequest, CancellationToken, Task<TResponse>> next,
+        Func<Task<TResponse>> next,
         CancellationToken cancellationToken
     )
     {
         ObjectValidator.Validate(request);
-        var response = await next(request, cancellationToken);
+        var response = await next();
         return response;
     }
 }

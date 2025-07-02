@@ -17,12 +17,12 @@ internal class PrepareEmailMiddleware : INgWorkerMiddleware<PrepareEmailRequest,
     public async Task<PrepareEmailResponse> Handle(
         PrepareEmailRequest request,
         WorkerExecutionContext context,
-        Func<PrepareEmailRequest, CancellationToken, Task<PrepareEmailResponse>> next,
+        Func<Task<PrepareEmailResponse>> next,
         CancellationToken cancellationToken
     )
     {
         _logger.LogInformation($"Executed only before {nameof(PrepareEmailHandler)}");
-        var response = await next(request, cancellationToken);
+        var response = await next();
         _logger.LogInformation($"Executed only after {nameof(PrepareEmailHandler)}");
         return response;
     }
