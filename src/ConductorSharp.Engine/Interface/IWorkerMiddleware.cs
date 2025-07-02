@@ -6,7 +6,7 @@ using ConductorSharp.Engine.Util;
 namespace ConductorSharp.Engine.Interface;
 
 public interface IWorkerMiddleware<TRequest, TResponse>
-    where TRequest : class, ITaskInput<TResponse>, new()
+    where TRequest : ITaskInput<TResponse>, new()
 {
     Task<TResponse> Handle(TRequest request, WorkerExecutionContext context, Func<Task<TResponse>> next, CancellationToken cancellationToken);
 }

@@ -16,6 +16,5 @@ internal class PipelineBuilder(IServiceCollection serviceCollection) : IPipeline
 
     public void AddCustomMiddleware<TWorkerMiddleware, TRequest, TResponse>()
         where TWorkerMiddleware : class, IWorkerMiddleware<TRequest, TResponse>
-        where TRequest : class, ITaskInput<TResponse>, new() =>
-        serviceCollection.AddTransient<IWorkerMiddleware<TRequest, TResponse>, TWorkerMiddleware>();
+        where TRequest : ITaskInput<TResponse>, new() => serviceCollection.AddTransient<IWorkerMiddleware<TRequest, TResponse>, TWorkerMiddleware>();
 }

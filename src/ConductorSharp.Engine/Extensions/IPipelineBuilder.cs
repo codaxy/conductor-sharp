@@ -11,6 +11,6 @@ namespace ConductorSharp.Engine.Extensions
 
         void AddCustomMiddleware<TWorkerMiddleware, TRequest, TResponse>()
             where TWorkerMiddleware : class, IWorkerMiddleware<TRequest, TResponse>
-            where TRequest : class, ITaskInput<TResponse>, new();
+            where TRequest : ITaskInput<TResponse>, new();
     }
 }

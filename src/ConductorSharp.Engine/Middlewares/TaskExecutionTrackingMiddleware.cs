@@ -8,7 +8,7 @@ using ConductorSharp.Engine.Util;
 namespace ConductorSharp.Engine.Middlewares;
 
 public class TaskExecutionTrackingMiddleware<TRequest, TResponse> : IWorkerMiddleware<TRequest, TResponse>
-    where TRequest : class, ITaskInput<TResponse>, new()
+    where TRequest : ITaskInput<TResponse>, new()
 {
     private readonly WorkerExecutionContext _executionContext;
     private readonly IEnumerable<ITaskExecutionService> _taskExecutionServices;

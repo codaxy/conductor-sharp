@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace ConductorSharp.Definitions.Middlewares;
 
 internal class CustomMiddleware<TRequest, TResponse> : IWorkerMiddleware<TRequest, TResponse>
-    where TRequest : class, ITaskInput<TResponse>, new()
+    where TRequest : ITaskInput<TResponse>, new()
 {
     private readonly ILogger<CustomMiddleware<TRequest, TResponse>> _logger;
 

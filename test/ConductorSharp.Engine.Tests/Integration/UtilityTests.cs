@@ -49,7 +49,7 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         public class GenericMiddleware<TRequest, TResponse> : IWorkerMiddleware<TRequest, TResponse>
-            where TRequest : class, ITaskInput<TResponse>, new()
+            where TRequest : ITaskInput<TResponse>, new()
         {
             public async Task<TResponse> Handle(
                 TRequest request,
