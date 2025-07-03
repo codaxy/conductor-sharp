@@ -2,7 +2,7 @@
 using ConductorSharp.Engine.Health;
 using ConductorSharp.KafkaCancellationNotifier.Extensions;
 using ConductorSharp.NoApi.Handlers;
-using ConductorSharp.NoApi.MIddlewares;
+using ConductorSharp.NoApi.Middlewares;
 using ConductorSharp.Patterns.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

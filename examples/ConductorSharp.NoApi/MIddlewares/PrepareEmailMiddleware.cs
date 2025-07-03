@@ -3,7 +3,7 @@ using ConductorSharp.Engine.Util;
 using ConductorSharp.NoApi.Handlers;
 using Microsoft.Extensions.Logging;
 
-namespace ConductorSharp.NoApi.MIddlewares;
+namespace ConductorSharp.NoApi.Middlewares;
 
 internal class PrepareEmailMiddleware : IWorkerMiddleware<PrepareEmailRequest, PrepareEmailResponse>
 {
