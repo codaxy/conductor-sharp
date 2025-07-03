@@ -18,7 +18,7 @@ namespace ConductorSharp.Engine.IntegrationTests
         }
 
         [Fact]
-        public async Task StartWorkflowAsync()
+        public async Task HostShouldExecuteWorkflowTasksSuccesfully()
         {
             var workflowService = _factory.Services.GetRequiredService<IWorkflowService>();
             var workflowId = await workflowService.StartAsync(new() { Name = NamingUtil.NameOf<TestWorkflow.Workflow>(), Version = 1 });
