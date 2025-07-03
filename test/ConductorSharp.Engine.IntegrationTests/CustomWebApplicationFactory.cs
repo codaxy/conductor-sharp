@@ -40,7 +40,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
             .WithPortBinding(8080, true)
             .WithWaitStrategy(
                 Wait.ForUnixContainer()
-                    .UntilMessageIsLogged("SystemTaskWorkerCoordinator initialized with 5 async tasks", w => w.WithInterval(TimeSpan.FromSeconds(5)))
+                    .UntilHttpRequestIsSucceeded(
+                        w => w.ForPath("/health").ForPort(8080).ForStatusCode(HttpStatusCode.OK),
+                        w => w.WithInterval(TimeSpan.FromSeconds(5))
+                    )
             )
             .WithNetwork(network)
             .Build();
