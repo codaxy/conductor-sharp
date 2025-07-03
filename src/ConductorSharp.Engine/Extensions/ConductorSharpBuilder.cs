@@ -37,8 +37,6 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.AddSingleton<IExecutionManager, ExecutionManager>();
 
-            Builder.AddScoped<WorkerExecutionContext>();
-
             Builder.AddSingleton<IConductorSharpHealthService, InMemoryHealthService>();
 
             Builder.AddTransient<IPollTimingStrategy, InverseExponentialBackoff>();

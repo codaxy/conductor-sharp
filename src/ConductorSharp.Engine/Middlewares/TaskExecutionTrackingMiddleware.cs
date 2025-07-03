@@ -10,12 +10,10 @@ namespace ConductorSharp.Engine.Middlewares;
 public class TaskExecutionTrackingMiddleware<TRequest, TResponse> : IWorkerMiddleware<TRequest, TResponse>
     where TRequest : ITaskInput<TResponse>, new()
 {
-    private readonly WorkerExecutionContext _executionContext;
     private readonly IEnumerable<ITaskExecutionService> _taskExecutionServices;
 
-    public TaskExecutionTrackingMiddleware(WorkerExecutionContext executionContext, IEnumerable<ITaskExecutionService> taskExecutionServices)
+    public TaskExecutionTrackingMiddleware(IEnumerable<ITaskExecutionService> taskExecutionServices)
     {
-        _executionContext = executionContext;
         _taskExecutionServices = taskExecutionServices;
     }
 
@@ -28,8 +26,8 @@ public class TaskExecutionTrackingMiddleware<TRequest, TResponse> : IWorkerMiddl
     {
         var trackedTask = new RunningTask
         {
-            TaskId = _executionContext.TaskId,
-            TaskName = _executionContext.TaskName,
+            TaskId = context.TaskId,
+            TaskName = context.TaskName,
             StartedAt = DateTimeOffset.UtcNow
         };
 
