@@ -20,12 +20,10 @@ namespace ConductorSharp.NoApi.Handlers
     [OriginalName("EMAIL_prepare")]
     public class PrepareEmailHandler : IWorker<PrepareEmailRequest, PrepareEmailResponse>
     {
-        private readonly WorkerExecutionContext _context;
         private readonly ILogger<PrepareEmailHandler> _logger;
 
-        public PrepareEmailHandler(WorkerExecutionContext context, ILogger<PrepareEmailHandler> logger)
+        public PrepareEmailHandler(ILogger<PrepareEmailHandler> logger)
         {
-            _context = context;
             _logger = logger;
         }
 
@@ -43,8 +41,8 @@ namespace ConductorSharp.NoApi.Handlers
             emailBodyBuilder.AppendLine($"Customer: {request.CustomerName}");
             emailBodyBuilder.AppendLine($"Address: {request.Address}");
             emailBodyBuilder.AppendLine("------------------");
-            emailBodyBuilder.AppendLine($"WorkflowId : {_context.WorkflowId}");
-            emailBodyBuilder.AppendLine($"WorkflowName: {_context.WorkflowName}");
+            emailBodyBuilder.AppendLine($"WorkflowId : {context.WorkflowId}");
+            emailBodyBuilder.AppendLine($"WorkflowName: {context.WorkflowName}");
 
             _logger.LogInformation("Prepared email");
 
