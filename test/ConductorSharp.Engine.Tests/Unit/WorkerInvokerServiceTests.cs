@@ -90,6 +90,7 @@ public class WorkerInvokerServiceTests
             WorkerId: "WorkerId"
         );
 
+        var expectedContext = context with { };
         var result = await invoker.Invoke(
             typeof(Request.Handler),
             new Dictionary<string, object>() { { "input", "Input" } },
@@ -98,8 +99,11 @@ public class WorkerInvokerServiceTests
         );
 
         Assert.Equal("InputWorkerGenericMiddlewareMiddleware", result["output"]);
-        Assert.Equal(context, ((JObject)result["handler_context"]).ToObject<WorkerExecutionContext>(ConductorConstants.IoJsonSerializer));
-        Assert.Equal(context, ((JObject)result["middleware_context"]).ToObject<WorkerExecutionContext>(ConductorConstants.IoJsonSerializer));
-        Assert.Equal(context, ((JObject)result["generic_middleware_context"]).ToObject<WorkerExecutionContext>(ConductorConstants.IoJsonSerializer));
+        Assert.Equal(expectedContext, ((JObject)result["handler_context"]).ToObject<WorkerExecutionContext>(ConductorConstants.IoJsonSerializer));
+        Assert.Equal(expectedContext, ((JObject)result["middleware_context"]).ToObject<WorkerExecutionContext>(ConductorConstants.IoJsonSerializer));
+        Assert.Equal(
+            expectedContext,
+            ((JObject)result["generic_middleware_context"]).ToObject<WorkerExecutionContext>(ConductorConstants.IoJsonSerializer)
+        );
     }
 }
