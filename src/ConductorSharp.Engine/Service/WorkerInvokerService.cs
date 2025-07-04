@@ -17,7 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Engine.Service
 {
-    public class WorkerInvokerService(IServiceProvider serviceProvider)
+    internal class WorkerInvokerService(IServiceProvider serviceProvider)
     {
         private record WorkerTypeInfo
         {
