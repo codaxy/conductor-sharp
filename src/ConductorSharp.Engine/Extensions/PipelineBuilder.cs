@@ -12,7 +12,13 @@ internal class PipelineBuilder(IServiceCollection serviceCollection) : IPipeline
     public void AddExecutionTaskTracking() =>
         serviceCollection.AddTransient(typeof(IWorkerMiddleware<,>), typeof(TaskExecutionTrackingMiddleware<,>));
 
-    public void AddCustomMiddleware(Type middlewareType) => serviceCollection.AddTransient(typeof(IWorkerMiddleware<,>), middlewareType);
+    public void AddCustomMiddleware(Type middlewareType)
+    {
+        if (middlewareType.GetInterface(typeof(IWorkerMiddleware<,>).Name) is null)
+            throw new ArgumentException($"Generic middleware must implement interface {typeof(IWorkerMiddleware<,>).Name}", nameof(middlewareType));
+
+        serviceCollection.AddTransient(typeof(IWorkerMiddleware<,>), middlewareType);
+    }
 
     public void AddCustomMiddleware<TWorkerMiddleware, TRequest, TResponse>()
         where TWorkerMiddleware : class, IWorkerMiddleware<TRequest, TResponse>
