@@ -2,9 +2,9 @@
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 
-namespace ConductorSharp.ApiEnabled.Handlers
+namespace ConductorSharp.ApiEnabled.Workers
 {
-    public class SecondTestWorker : ITaskInput<SecondTestWorker.Response>
+    public class FirstTestWorker : ITaskInput<FirstTestWorker.Response>
     {
         public string Input { get; set; }
 
@@ -13,7 +13,7 @@ namespace ConductorSharp.ApiEnabled.Handlers
             public string Output { get; set; }
         }
 
-        public class Worker : Worker<SecondTestWorker, Response>
+        public class Worker : Worker<FirstTestWorker, Response>
         {
             private readonly ILogger<Worker> _logger;
 
@@ -22,9 +22,10 @@ namespace ConductorSharp.ApiEnabled.Handlers
                 _logger = logger;
             }
 
-            public override Task<Response> Handle(SecondTestWorker test, WorkerExecutionContext context, CancellationToken cancellationToken)
+            public override Task<Response> Handle(FirstTestWorker test, WorkerExecutionContext context, CancellationToken cancellationToken)
             {
-                _logger.LogInformation("Second test worker");
+                _logger.LogInformation("First test worker");
+
                 return Task.FromResult<Response>(new() { Output = test.Input });
             }
         }

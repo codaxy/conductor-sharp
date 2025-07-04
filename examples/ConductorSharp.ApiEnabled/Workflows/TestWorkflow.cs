@@ -1,4 +1,5 @@
-﻿using ConductorSharp.ApiEnabled.Handlers;
+﻿using ConductorSharp.ApiEnabled.Workers;
+using ConductorSharp.ApiEnabled.Workers;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Builders.Metadata;
 

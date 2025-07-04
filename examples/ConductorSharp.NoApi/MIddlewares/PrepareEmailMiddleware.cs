@@ -1,6 +1,6 @@
 ﻿using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
-using ConductorSharp.NoApi.Handlers;
+using ConductorSharp.NoApi.Workers;
 using Microsoft.Extensions.Logging;
 
 namespace ConductorSharp.NoApi.Middlewares;
@@ -21,9 +21,9 @@ internal class PrepareEmailMiddleware : IWorkerMiddleware<PrepareEmailRequest, P
         CancellationToken cancellationToken
     )
     {
-        _logger.LogInformation($"Executed only before {nameof(PrepareEmailHandler)}");
+        _logger.LogInformation($"Executed only before {nameof(PrepareEmailWorker)}");
         var response = await next();
-        _logger.LogInformation($"Executed only after {nameof(PrepareEmailHandler)}");
+        _logger.LogInformation($"Executed only after {nameof(PrepareEmailWorker)}");
         return response;
     }
 }

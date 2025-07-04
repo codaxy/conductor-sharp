@@ -3,7 +3,7 @@ using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 
-namespace ConductorSharp.ApiEnabled.Handlers;
+namespace ConductorSharp.ApiEnabled.Workers;
 
 public class PrepareEmailRequest : ITaskInput<PrepareEmailResponse>
 {
@@ -17,11 +17,11 @@ public class PrepareEmailResponse
 }
 
 [OriginalName("EMAIL_prepare")]
-public class PrepareEmailHandler : IWorker<PrepareEmailRequest, PrepareEmailResponse>
+public class PrepareEmailWorker : IWorker<PrepareEmailRequest, PrepareEmailResponse>
 {
-    private readonly ILogger<PrepareEmailHandler> _logger;
+    private readonly ILogger<PrepareEmailWorker> _logger;
 
-    public PrepareEmailHandler(ILogger<PrepareEmailHandler> logger)
+    public PrepareEmailWorker(ILogger<PrepareEmailWorker> logger)
     {
         _logger = logger;
     }

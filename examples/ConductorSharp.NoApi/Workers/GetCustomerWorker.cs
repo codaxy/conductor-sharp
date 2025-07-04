@@ -3,7 +3,7 @@ using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 
-namespace ConductorSharp.NoApi.Handlers;
+namespace ConductorSharp.NoApi.Workers;
 
 public class GetCustomerRequest : ITaskInput<GetCustomerResponse>
 {
@@ -25,7 +25,7 @@ public class Customer
 }
 
 [OriginalName("CUSTOMER_get")]
-public class GetCustomerHandler : IWorker<GetCustomerRequest, GetCustomerResponse>
+public class GetCustomerWorker : IWorker<GetCustomerRequest, GetCustomerResponse>
 {
     private static Customer[] customers = new Customer[]
     {

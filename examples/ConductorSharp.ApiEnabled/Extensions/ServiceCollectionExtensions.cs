@@ -1,5 +1,6 @@
-﻿using ConductorSharp.ApiEnabled.Handlers;
-using ConductorSharp.ApiEnabled.Services;
+﻿using ConductorSharp.ApiEnabled.Services;
+using ConductorSharp.ApiEnabled.Workers;
+using ConductorSharp.ApiEnabled.Workers;
 using ConductorSharp.ApiEnabled.Workflows;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
@@ -27,7 +28,7 @@ public static class ServiceCollectionExtensions
             });
 
         hostBuilder.AddSingleton<ITaskExecutionCounterService, TaskExecutionCounterService>();
-        hostBuilder.RegisterWorkerTask<PrepareEmailHandler>(options =>
+        hostBuilder.RegisterWorkerTask<PrepareEmailWorker>(options =>
         {
             options.OwnerEmail = "owneremail@gmail.com";
         });

@@ -4,7 +4,7 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
 using Microsoft.Extensions.Logging;
 
-namespace ConductorSharp.NoApi.Handlers
+namespace ConductorSharp.NoApi.Workers
 {
     public class PrepareEmailRequest : ITaskInput<PrepareEmailResponse>
     {
@@ -18,11 +18,11 @@ namespace ConductorSharp.NoApi.Handlers
     }
 
     [OriginalName("EMAIL_prepare")]
-    public class PrepareEmailHandler : IWorker<PrepareEmailRequest, PrepareEmailResponse>
+    public class PrepareEmailWorker : IWorker<PrepareEmailRequest, PrepareEmailResponse>
     {
-        private readonly ILogger<PrepareEmailHandler> _logger;
+        private readonly ILogger<PrepareEmailWorker> _logger;
 
-        public PrepareEmailHandler(ILogger<PrepareEmailHandler> logger)
+        public PrepareEmailWorker(ILogger<PrepareEmailWorker> logger)
         {
             _logger = logger;
         }
