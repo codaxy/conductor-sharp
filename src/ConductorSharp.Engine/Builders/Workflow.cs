@@ -1,11 +1,10 @@
 ﻿using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
-using MediatR;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public class WorkflowInput<T> : IWorkflowInput, IRequest<T>
+    public class WorkflowInput<T> : IWorkflowInput, ITaskInput<T>
         where T : WorkflowOutput { }
 
     public class WorkflowOutput { }

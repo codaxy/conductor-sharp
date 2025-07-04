@@ -1,8 +1,7 @@
 ﻿using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
-using ConductorSharp.KafkaCancellationNotifier.Extensions;
-using ConductorSharp.NoApi.Behaviors;
-using ConductorSharp.NoApi.Handlers;
+using ConductorSharp.NoApi.Middlewares;
+using ConductorSharp.NoApi.Workers;
 using ConductorSharp.Patterns.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,16 +27,13 @@ var builder = Host.CreateDefaultBuilder()
                     maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
-                    domain: configuration.GetValue<string>("Conductor:WorkerDomain"),
-                    handlerAssemblies: typeof(Program).Assembly
+                    domain: configuration.GetValue<string>("Conductor:WorkerDomain")
                 )
                 .SetHealthCheckService<FileHealthService>()
                 .AddPipelines(pipelines =>
                 {
-                    pipelines.AddContextLogging();
-                    pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
-                    pipelines.AddCustomBehavior<PrepareEmailBehavior, PrepareEmailRequest, PrepareEmailResponse>();
+                    pipelines.AddCustomMiddleware<PrepareEmailMiddleware, PrepareEmailRequest, PrepareEmailResponse>();
                 })
                 .AddConductorSharpPatterns();
             //.AddKafkaCancellationNotifier(
@@ -46,9 +42,9 @@ var builder = Host.CreateDefaultBuilder()
             //    topicName: configuration.GetValue<string>("Conductor:KafkaCancellationNotifier:TopicName"),
             //    groupId: configuration.GetValue<string>("Conductor:KafkaCancellationNotifier:GroupId"));
 
-            services.RegisterWorkerTask<GetCustomerHandler>();
-            services.RegisterWorkerTask<PrepareEmailHandler>();
-            services.RegisterWorkerTask<EnumTaskHandler>();
+            services.RegisterWorkerTask<GetCustomerWorker>();
+            services.RegisterWorkerTask<PrepareEmailWorker>();
+            services.RegisterWorkerTask<EnumTaskWorker>();
         }
     );
 

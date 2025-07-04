@@ -1,5 +1,7 @@
-﻿using ConductorSharp.ApiEnabled.Handlers;
-using ConductorSharp.ApiEnabled.Services;
+﻿using ConductorSharp.ApiEnabled.Services;
+using ConductorSharp.ApiEnabled.Workers;
+using ConductorSharp.ApiEnabled.Workers;
+using ConductorSharp.ApiEnabled.Workflows;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
 
@@ -16,23 +18,23 @@ public static class ServiceCollectionExtensions
                 maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                 sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                 longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
-                domain: configuration.GetValue<string>("Conductor:WorkerDomain"),
-                typeof(ServiceCollectionExtensions).Assembly
+                domain: configuration.GetValue<string>("Conductor:WorkerDomain")
             )
             .SetHealthCheckService<FileHealthService>()
             .AddPipelines(pipelines =>
             {
                 pipelines.AddExecutionTaskTracking();
-                pipelines.AddContextLogging();
-                pipelines.AddRequestResponseLogging();
                 pipelines.AddValidation();
             });
 
         hostBuilder.AddSingleton<ITaskExecutionCounterService, TaskExecutionCounterService>();
-        hostBuilder.RegisterWorkerTask<PrepareEmailHandler>(options =>
+        hostBuilder.RegisterWorkerTask<PrepareEmailWorker>(options =>
         {
             options.OwnerEmail = "owneremail@gmail.com";
         });
+        hostBuilder.RegisterWorkerTask<FirstTestWorker.Worker>();
+        hostBuilder.RegisterWorkerTask<SecondTestWorker.Worker>();
+        hostBuilder.RegisterWorkflow<TestWorkflow.Workflow>();
 
         return hostBuilder;
     }

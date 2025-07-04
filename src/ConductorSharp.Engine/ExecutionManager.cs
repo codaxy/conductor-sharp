@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using ConductorSharp.Client;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
@@ -11,8 +11,8 @@ using ConductorSharp.Client.Util;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Polling;
+using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -32,6 +32,7 @@ namespace ConductorSharp.Engine
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
         private readonly ICancellationNotifier _cancellationNotifier;
+        private readonly WorkerInvokerService _workerInvokerService;
 
         public ExecutionManager(
             WorkerSetConfig options,
@@ -42,7 +43,8 @@ namespace ConductorSharp.Engine
             IServiceScopeFactory lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy,
-            ICancellationNotifier cancellationNotifier
+            ICancellationNotifier cancellationNotifier,
+            WorkerInvokerService workerInvokerService
         )
         {
             _configuration = options;
@@ -54,6 +56,7 @@ namespace ConductorSharp.Engine
             _pollTimingStrategy = pollTimingStrategy;
             _pollOrderStrategy = pollOrderStrategy;
             _cancellationNotifier = cancellationNotifier;
+            _workerInvokerService = workerInvokerService;
             _externalPayloadService = externalPayloadService;
         }
 
@@ -96,20 +99,6 @@ namespace ConductorSharp.Engine
                 return $"{_configuration.Domain}:{taskToWorker.TaskName}";
 
             return taskToWorker.TaskName;
-        }
-
-        private static Type GetInputType(Type workerType)
-        {
-            var interfaces = workerType
-                .GetInterfaces()
-                .Where(a => a.IsGenericType && a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
-                .First();
-            var genericArguments = interfaces.GetGenericArguments();
-
-            var inputType = genericArguments[0];
-            var outputType = genericArguments[1];
-
-            return inputType;
         }
 
         private async Task PollAndHandle(TaskToWorker scheduledWorker, CancellationToken cancellationToken)
@@ -177,36 +166,47 @@ namespace ConductorSharp.Engine
                     );
                 }
 
-                var inputType = GetInputType(scheduledWorker.TaskType);
-                var inputData = SerializationHelper.DictonaryToObject(inputType, pollResponse.InputData, ConductorConstants.IoJsonSerializerSettings);
-                // Poll response data can be huge (if read from external storage)
-                // We can save memory by not holding reference to pollResponse.InputData after it is parsed
-                pollResponse.InputData = null;
+                var context = new WorkerExecutionContext(
+                    WorkflowName: pollResponse.WorkflowType,
+                    WorkflowId: pollResponse.WorkflowInstanceId,
+                    TaskName: pollResponse.TaskDefName,
+                    TaskId: pollResponse.TaskId,
+                    TaskReferenceName: pollResponse.ReferenceTaskName,
+                    CorrelationId: pollResponse.CorrelationId,
+                    WorkerId: workerId
+                );
 
-                using var scope = _lifetimeScopeFactory.CreateScope();
-
-                var context = scope.ServiceProvider.GetService<ConductorSharpExecutionContext>();
-                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-
-                if (context != null)
-                {
-                    context.WorkflowName = pollResponse.WorkflowType;
-                    context.TaskName = pollResponse.TaskDefName;
-                    context.TaskReferenceName = pollResponse.ReferenceTaskName;
-                    context.WorkflowId = pollResponse.WorkflowInstanceId;
-                    context.CorrelationId = pollResponse.CorrelationId;
-                    context.TaskId = pollResponse.TaskId;
-                    context.WorkerId = workerId;
-                }
-
-                var response = await mediator.Send(inputData, tokenHolder.CancellationToken);
+                _logger.LogInformation(
+                    "Executing worker {Worker} for task {Task}(id={TaskId}) as part of workflow {Workflow}(id={WorkflowId})",
+                    scheduledWorker.TaskType.Name,
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId
+                );
+                var stopwatch = Stopwatch.StartNew();
+                var response = await _workerInvokerService.Invoke(
+                    scheduledWorker.TaskType,
+                    pollResponse.InputData,
+                    context,
+                    tokenHolder.CancellationToken
+                );
+                _logger.LogInformation(
+                    "Worker {Worker} executed for task {Task}(id={TaskId}) as part of workflow {Workflow}(id={WorkflowId}), exec time = {WorkerPipelineExecutionTime}ms",
+                    scheduledWorker.TaskType.Name,
+                    pollResponse.TaskDefName,
+                    pollResponse.TaskId,
+                    pollResponse.WorkflowType,
+                    pollResponse.WorkflowInstanceId,
+                    stopwatch.ElapsedMilliseconds
+                );
 
                 await _taskManager.UpdateAsync(
                     new TaskResult
                     {
                         TaskId = pollResponse.TaskId,
                         Status = TaskResultStatus.COMPLETED,
-                        OutputData = SerializationHelper.ObjectToDictionary(response, ConductorConstants.IoJsonSerializerSettings),
+                        OutputData = response,
                         WorkflowInstanceId = pollResponse.WorkflowInstanceId
                     },
                     tokenHolder.CancellationToken
@@ -235,9 +235,10 @@ namespace ConductorSharp.Engine
             catch (Exception exception)
             {
                 _logger.LogError(
-                    "{@Exception} while executing {Task} as part of {Workflow} with id {WorkflowId}",
                     exception,
+                    "Exception while processing polled task {Task}(id={TaskId}) as part of workflow {Workflow}(id={WorkflowId})",
                     pollResponse.TaskDefName,
+                    pollResponse.TaskId,
                     pollResponse.WorkflowType,
                     pollResponse.WorkflowInstanceId
                 );

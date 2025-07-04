@@ -1,12 +1,12 @@
 ﻿using ConductorSharp.Engine.Builders;
-using MediatR;
+using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.Engine.Model
 {
     /// <summary>
     /// Input for configuration of the DO_WHILE task.
     /// </summary>
-    public class DoWhileInput : IRequest<NoOutput>, IWorkflowInput
+    public class DoWhileInput : ITaskInput<NoOutput>, IWorkflowInput
     {
         public object Value { get; set; } = null;
     }
@@ -14,5 +14,5 @@ namespace ConductorSharp.Engine.Model
     /// <summary>
     /// Task Model to reference the do while task in the workflow builders
     /// </summary>
-    public class DoWhileTaskModel : TaskModel<DoWhileInput, NoOutput> { }
+    public class DoWhileTaskModel : TaskModel<DoWhileInput, NoOutput>;
 }

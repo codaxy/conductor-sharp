@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Definitions.Behaviors;
+﻿using ConductorSharp.Definitions.Middlewares;
 using ConductorSharp.Definitions.Workflows;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
@@ -25,15 +25,13 @@ var builder = Host.CreateDefaultBuilder()
                     maxConcurrentWorkers: configuration.GetValue<int>("Conductor:MaxConcurrentWorkers"),
                     sleepInterval: configuration.GetValue<int>("Conductor:SleepInterval"),
                     longPollInterval: configuration.GetValue<int>("Conductor:LongPollInterval"),
-                    domain: configuration.GetValue<string>("Conductor:WorkerDomain"),
-                    typeof(Program).Assembly
+                    domain: configuration.GetValue<string>("Conductor:WorkerDomain")
                 )
                 .AddConductorSharpPatterns()
                 .SetHealthCheckService<FileHealthService>()
                 .AddPipelines(pipelines =>
                 {
-                    pipelines.AddCustomBehavior(typeof(CustomBehavior<,>));
-                    pipelines.AddRequestResponseLogging();
+                    pipelines.AddCustomMiddleware(typeof(CustomMiddleware<,>));
                     pipelines.AddValidation();
                 })
                 .AddCSharpLambdaTasks();

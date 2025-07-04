@@ -30,6 +30,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConductorSharp.Patterns", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConductorSharp.KafkaCancellationNotifier", "src\ConductorSharp.KafkaCancellationNotifier\ConductorSharp.KafkaCancellationNotifier.csproj", "{A94EE48D-17F3-432A-A47D-BCB9B1EF2670}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConductorSharp.Engine.IntegrationTests", "test\ConductorSharp.Engine.IntegrationTests\ConductorSharp.Engine.IntegrationTests.csproj", "{30EACB1C-FB15-4294-AF46-3AF7ABEB2121}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{A94EE48D-17F3-432A-A47D-BCB9B1EF2670}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A94EE48D-17F3-432A-A47D-BCB9B1EF2670}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A94EE48D-17F3-432A-A47D-BCB9B1EF2670}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30EACB1C-FB15-4294-AF46-3AF7ABEB2121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30EACB1C-FB15-4294-AF46-3AF7ABEB2121}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30EACB1C-FB15-4294-AF46-3AF7ABEB2121}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30EACB1C-FB15-4294-AF46-3AF7ABEB2121}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

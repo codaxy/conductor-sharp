@@ -1,6 +1,6 @@
 ﻿namespace ConductorSharp.Engine.Tests.Samples.Tasks
 {
-    public class TaskPropertiesTaskInput : IRequest<TaskPropertiesTaskOutput>
+    public class TaskPropertiesTaskInput : ITaskInput<TaskPropertiesTaskOutput>
     {
         public string Status { get; set; }
         public string TaskType { get; set; }
@@ -13,7 +13,7 @@
         public string CorrelationId { get; set; }
     }
 
-    public class TaskPropertiesTaskOutput { }
+    public class TaskPropertiesTaskOutput;
 
-    public class TaskPropertiesTask : SimpleTaskModel<TaskPropertiesTaskInput, TaskPropertiesTaskOutput> { }
+    public class TaskPropertiesTask : SimpleTaskModel<TaskPropertiesTaskInput, TaskPropertiesTaskOutput>;
 }

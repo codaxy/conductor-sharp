@@ -51,7 +51,7 @@ namespace ConductorSharp.Toolkit.Util
                 CreateUsings(
                     "ConductorSharp.Engine.Model",
                     "ConductorSharp.Engine.Builders.Metadata",
-                    "MediatR",
+                    "ConductorSharp.Engine.Interface",
                     "Newtonsoft.Json",
                     "ConductorSharp.Engine.Builders"
                 )
@@ -146,7 +146,7 @@ namespace ConductorSharp.Toolkit.Util
             var typeArgumentList = SyntaxFactory.TypeArgumentList(
                 SyntaxFactory.SingletonSeparatedList(SyntaxFactory.ParseTypeName($"{ClassName}Output"))
             );
-            var baseType = SyntaxFactory.SimpleBaseType(SyntaxFactory.GenericName("IRequest").WithTypeArgumentList(typeArgumentList));
+            var baseType = SyntaxFactory.SimpleBaseType(SyntaxFactory.GenericName("ITaskInput").WithTypeArgumentList(typeArgumentList));
             var baseList = SyntaxFactory.BaseList(SyntaxFactory.SingletonSeparatedList<BaseTypeSyntax>(baseType));
             var classDeclaration = SyntaxFactory
                 .ClassDeclaration($"{ClassName}Input")

@@ -2,7 +2,7 @@
 
 namespace ConductorSharp.Engine.Tests.Samples.Tasks;
 
-public partial class EmailPrepareV1Input : IRequest<EmailPrepareV1Output>
+public partial class EmailPrepareV1Input : ITaskInput<EmailPrepareV1Output>
 {
     /// <originalName>
     /// address

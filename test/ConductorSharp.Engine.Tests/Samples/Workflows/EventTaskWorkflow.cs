@@ -9,7 +9,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     [WorkflowMetadata(OwnerEmail = "test@test.com")]
     public class EventTaskWorkflow : Workflow<EventTaskWorkflow, EventTaskWorkflowInput, EventTaskWorkflowOutput>
     {
-        public class EventTaskPayload : IRequest<EventTaskModelOutput>
+        public class EventTaskPayload : ITaskInput<EventTaskModelOutput>
         {
             public string PayloadParam { get; set; }
         }

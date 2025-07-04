@@ -1,9 +1,8 @@
-﻿using MediatR;
-using Newtonsoft.Json;
+﻿using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.Engine.Model
 {
-    public class HumanTaskInput<TOutput> : IRequest<TOutput> { }
+    public class HumanTaskInput<TOutput> : ITaskInput<TOutput>;
 
-    public class HumanTaskModel<TOutput> : TaskModel<HumanTaskInput<TOutput>, TOutput> { }
+    public class HumanTaskModel<TOutput> : TaskModel<HumanTaskInput<TOutput>, TOutput>;
 }
