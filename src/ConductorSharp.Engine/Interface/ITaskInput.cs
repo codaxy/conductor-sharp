@@ -1,3 +1,3 @@
 ﻿namespace ConductorSharp.Engine.Interface;
 
-public interface ITaskInput<TResponse> { }
+public interface ITaskInput<TResponse>;
