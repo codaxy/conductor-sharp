@@ -160,8 +160,8 @@ namespace ConductorSharp.Engine
                     // TODO: Check what the operation and payload type are
                     var externalStorageLocation = await _taskManager.GetExternalStorageLocationAsync(
                         pollResponse.ExternalInputPayloadStoragePath,
-                        "",
-                        "",
+                        "READ",
+                        "TASK_INPUT",
                         cancellationToken
                     );
 
