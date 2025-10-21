@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using ConductorSharp.Engine.Interface;
 using Newtonsoft.Json;
 
 namespace ConductorSharp.Engine.Model;
@@ -28,4 +28,4 @@ public class EventTaskModelOutput
 }
 
 public class EventTaskModel<TInput> : TaskModel<TInput, EventTaskModelOutput>
-    where TInput : IRequest<EventTaskModelOutput> { }
+    where TInput : ITaskInput<EventTaskModelOutput>;

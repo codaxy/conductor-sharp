@@ -1,4 +1,4 @@
-﻿baseUrl: http://localhost:8080
+﻿baseUrl: http://localhost:8127
 apiPath: api
 namespace: ConductorSharp.Toolkit
 destination: ./ConductorSharp.Toolkit/Generated

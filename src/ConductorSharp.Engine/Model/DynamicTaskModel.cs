@@ -1,15 +1,12 @@
-﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.Engine.Model
 {
-    public class DynamicTaskInput<I, O> : IRequest<O>
+    public class DynamicTaskInput<TInput, TOutput> : ITaskInput<TOutput>
     {
-        public I TaskInput { get; set; }
+        public TInput TaskInput { get; set; }
         public string TaskToExecute { get; set; }
     }
 
-    public class DynamicTaskModel<I, O> : TaskModel<DynamicTaskInput<I, O>, O> { }
+    public class DynamicTaskModel<TInput, TOutput> : TaskModel<DynamicTaskInput<TInput, TOutput>, TOutput>;
 }

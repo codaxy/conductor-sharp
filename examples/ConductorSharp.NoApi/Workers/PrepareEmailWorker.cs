@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace ConductorSharp.NoApi.Handlers
+namespace ConductorSharp.NoApi.Workers
 {
-    public class PrepareEmailRequest : IRequest<PrepareEmailResponse>
+    public class PrepareEmailRequest : ITaskInput<PrepareEmailResponse>
     {
         public string CustomerName { get; set; }
         public string Address { get; set; }
@@ -23,18 +18,20 @@ namespace ConductorSharp.NoApi.Handlers
     }
 
     [OriginalName("EMAIL_prepare")]
-    public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
+    public class PrepareEmailWorker : IWorker<PrepareEmailRequest, PrepareEmailResponse>
     {
-        private readonly ConductorSharpExecutionContext _context;
-        private readonly ILogger<PrepareEmailHandler> _logger;
+        private readonly ILogger<PrepareEmailWorker> _logger;
 
-        public PrepareEmailHandler(ConductorSharpExecutionContext context, ILogger<PrepareEmailHandler> logger)
+        public PrepareEmailWorker(ILogger<PrepareEmailWorker> logger)
         {
-            _context = context;
             _logger = logger;
         }
 
-        public async Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
+        public async Task<PrepareEmailResponse> Handle(
+            PrepareEmailRequest request,
+            WorkerExecutionContext context,
+            CancellationToken cancellationToken
+        )
         {
             var emailBodyBuilder = new StringBuilder();
 
@@ -44,8 +41,8 @@ namespace ConductorSharp.NoApi.Handlers
             emailBodyBuilder.AppendLine($"Customer: {request.CustomerName}");
             emailBodyBuilder.AppendLine($"Address: {request.Address}");
             emailBodyBuilder.AppendLine("------------------");
-            emailBodyBuilder.AppendLine($"WorkflowId : {_context.WorkflowId}");
-            emailBodyBuilder.AppendLine($"WorkflowName: {_context.WorkflowName}");
+            emailBodyBuilder.AppendLine($"WorkflowId : {context.WorkflowId}");
+            emailBodyBuilder.AppendLine($"WorkflowName: {context.WorkflowName}");
 
             _logger.LogInformation("Prepared email");
 

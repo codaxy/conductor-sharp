@@ -5,7 +5,6 @@ using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -17,7 +16,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, TInput>> input
         )
             where TWorkflow : ITypedWorkflow
-            where TInput : IRequest<TOutput>
+            where TInput : ITaskInput<TOutput>
         {
             var taskBuilder = new JsonJqTransformTaskBuilder<TInput, TOutput>(refference.Body, input.Body, builder.BuildConfiguration);
             builder.AddTaskBuilderToSequence(taskBuilder);
@@ -25,8 +24,8 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class JsonJqTransformTaskBuilder<A, B> : BaseTaskBuilder<A, B>
-        where A : IRequest<B>
+    public class JsonJqTransformTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput>
+        where TInput : ITaskInput<TOutput>
     {
         public JsonJqTransformTaskBuilder(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
             : base(taskExpression, inputExpression, buildConfiguration)

@@ -2,7 +2,7 @@
 
 namespace ConductorSharp.Engine.Tests.Samples.Tasks;
 
-public partial class CustomerGetV1Input : IRequest<CustomerGetV1Output>
+public partial class CustomerGetV1Input : ITaskInput<CustomerGetV1Output>
 {
     /// <originalName>
     /// customer_id

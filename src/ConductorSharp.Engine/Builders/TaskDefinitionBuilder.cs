@@ -22,15 +22,7 @@ namespace ConductorSharp.Engine.Builders
 
             updateOptions?.Invoke(options);
 
-            var interfaces = taskType
-                .GetInterfaces()
-                .Where(a => a.IsGenericType && a.GetGenericTypeDefinition() == typeof(ITaskRequestHandler<,>))
-                .First();
-
-            var genericArguments = interfaces.GetGenericArguments();
-
-            var inputType = genericArguments[0];
-            var outputType = genericArguments[1];
+            var (inputType, outputType) = WorkerUtil.GetRequestResponseTypes(taskType);
 
             var originalName = _taskNameBuilder.Build(taskType);
 

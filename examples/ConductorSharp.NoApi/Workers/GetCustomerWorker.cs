@@ -2,11 +2,10 @@
 using ConductorSharp.Engine.Builders.Metadata;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
-using MediatR;
 
-namespace ConductorSharp.NoApi.Handlers;
+namespace ConductorSharp.NoApi.Workers;
 
-public class GetCustomerRequest : IRequest<GetCustomerResponse>
+public class GetCustomerRequest : ITaskInput<GetCustomerResponse>
 {
     [Required]
     public int CustomerId { get; set; }
@@ -26,7 +25,7 @@ public class Customer
 }
 
 [OriginalName("CUSTOMER_get")]
-public class GetCustomerHandler : ITaskRequestHandler<GetCustomerRequest, GetCustomerResponse>
+public class GetCustomerWorker : IWorker<GetCustomerRequest, GetCustomerResponse>
 {
     private static Customer[] customers = new Customer[]
     {
@@ -38,7 +37,7 @@ public class GetCustomerHandler : ITaskRequestHandler<GetCustomerRequest, GetCus
         }
     };
 
-    public Task<GetCustomerResponse> Handle(GetCustomerRequest request, CancellationToken cancellationToken)
+    public Task<GetCustomerResponse> Handle(GetCustomerRequest request, WorkerExecutionContext context, CancellationToken cancellationToken)
     {
         var customer = customers.First(a => a.Id == request.CustomerId);
 

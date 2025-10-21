@@ -1,9 +1,9 @@
 ﻿using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Builders.Metadata;
+using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Patterns.Builders;
 using ConductorSharp.Patterns.Model;
-using MediatR;
 
 namespace ConductorSharp.Definitions.Workflows
 {
@@ -18,7 +18,7 @@ namespace ConductorSharp.Definitions.Workflows
     [WorkflowMetadata(OwnerEmail = "test@test.com")]
     public class CSharpLambdaWorkflow : Workflow<CSharpLambdaWorkflow, CSharpLambdaWorkflowInput, CSharpLambdaWorkflowOutput>
     {
-        public class LambdaTaskInput : IRequest<LambdaTaskOutput>
+        public class LambdaTaskInput : ITaskInput<LambdaTaskOutput>
         {
             public string LambdaInput { get; set; }
         }

@@ -18,13 +18,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             builder
                 .AddConductorSharp(baseUrl: "http://empty/empty")
                 .SetBuildConfiguration(new BuildConfiguration { DefaultOwnerApp = "testApp", DefaultOwnerEmail = "owner@test.app" })
-                .AddExecutionManager(
-                    maxConcurrentWorkers: 1,
-                    sleepInterval: 1,
-                    longPollInterval: 1,
-                    domain: null,
-                    handlerAssemblies: typeof(ContainerBuilderTests).Assembly
-                );
+                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1, domain: null);
 
             builder.RegisterWorkflow<StringInterpolation>();
             var container = builder.BuildServiceProvider();
@@ -42,13 +36,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             builder
                 .AddConductorSharp(baseUrl: "http://empty/empty")
                 .SetBuildConfiguration(new BuildConfiguration { DefaultOwnerApp = "testApp", DefaultOwnerEmail = "owner@test.app", })
-                .AddExecutionManager(
-                    maxConcurrentWorkers: 1,
-                    sleepInterval: 1,
-                    longPollInterval: 1,
-                    null,
-                    handlerAssemblies: typeof(ContainerBuilderTests).Assembly
-                );
+                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1, null);
 
             builder.RegisterWorkflow<StringInterpolation>(new BuildConfiguration { DefaultOwnerApp = overrideValue });
             var container = builder.BuildServiceProvider();
@@ -64,13 +52,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             var builder = new ServiceCollection();
             builder
                 .AddConductorSharp(baseUrl: "http://empty/empty")
-                .AddExecutionManager(
-                    maxConcurrentWorkers: 1,
-                    sleepInterval: 1,
-                    longPollInterval: 1,
-                    null,
-                    handlerAssemblies: typeof(ContainerBuilderTests).Assembly
-                );
+                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1, null);
 
             builder.AddTransient<IConfigurationService, ConfigurationService>();
             builder.RegisterWorkflow<WorkflowWithDependencies>();
@@ -85,13 +67,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             var builder = new ServiceCollection();
             builder
                 .AddConductorSharp(baseUrl: "http://empty/empty")
-                .AddExecutionManager(
-                    maxConcurrentWorkers: 1,
-                    sleepInterval: 1,
-                    longPollInterval: 1,
-                    null,
-                    handlerAssemblies: typeof(ContainerBuilderTests).Assembly
-                );
+                .AddExecutionManager(maxConcurrentWorkers: 1, sleepInterval: 1, longPollInterval: 1, null);
 
             builder.RegisterWorkflow<WorkflowWithDependencies>();
             var container = builder.BuildServiceProvider();

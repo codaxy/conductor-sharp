@@ -5,7 +5,6 @@ using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -17,7 +16,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, Tinput>> input
         )
             where TWorkflow : ITypedWorkflow
-            where Tinput : IRequest<TOutput>
+            where Tinput : ITaskInput<TOutput>
         {
             var taskBuilder = new SimpleTaskBuilder<Tinput, TOutput>(refference.Body, input.Body, builder.BuildConfiguration);
             builder.AddTaskBuilderToSequence(taskBuilder);
@@ -25,9 +24,9 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class SimpleTaskBuilder<A, B>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-        : BaseTaskBuilder<A, B>(taskExpression, inputExpression, buildConfiguration)
-        where A : IRequest<B>
+    public class SimpleTaskBuilder<TInput, TOutput>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<TInput, TOutput>(taskExpression, inputExpression, buildConfiguration)
+        where TInput : ITaskInput<TOutput>
     {
         public override WorkflowTask[] Build() =>
             [

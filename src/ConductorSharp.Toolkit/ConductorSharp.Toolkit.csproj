@@ -11,20 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Templates\TaskCollectionTemplate.default" />
-    <None Remove="Templates\WorkerTemplate.default" />
-    <None Remove="Templates\WorkflowCollectionTemplate.default" />
-    <None Remove="Templates\WorkflowTemplate.default" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Templates\TaskCollectionTemplate.default" />
-    <EmbeddedResource Include="Templates\WorkerTemplate.default" />
-    <EmbeddedResource Include="Templates\WorkflowCollectionTemplate.default" />
-    <EmbeddedResource Include="Templates\WorkflowTemplate.default" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />

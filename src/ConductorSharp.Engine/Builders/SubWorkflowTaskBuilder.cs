@@ -8,7 +8,6 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 
 namespace ConductorSharp.Engine.Builders
 {
@@ -20,7 +19,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, TInput>> input
         )
             where TWorkflow : ITypedWorkflow
-            where TInput : IRequest<TOutput>
+            where TInput : ITaskInput<TOutput>
         {
             var taskBuilder = new SubWorkflowTaskBuilder<TInput, TOutput>(referrence.Body, input.Body, builder.BuildConfiguration);
             builder.AddTaskBuilderToSequence(taskBuilder);
@@ -30,7 +29,7 @@ namespace ConductorSharp.Engine.Builders
 
     public class SubWorkflowTaskBuilder<TInput, TOutput>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
         : BaseTaskBuilder<TInput, TOutput>(taskExpression, inputExpression, buildConfiguration)
-        where TInput : IRequest<TOutput>
+        where TInput : ITaskInput<TOutput>
     {
         private readonly int _version = GetVersion(taskExpression);
 
