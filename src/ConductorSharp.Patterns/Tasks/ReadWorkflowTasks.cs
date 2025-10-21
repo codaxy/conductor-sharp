@@ -58,7 +58,7 @@ namespace ConductorSharp.Patterns.Tasks
             var tasknames = input.TaskNames.Split(",").Where(a => !string.IsNullOrEmpty(a)).ToList();
 
             var starterWorkflow =
-                await _workflowService.GetExecutionStatusAsync(input.WorkflowId, cancellationToken: cancellationToken)
+                await _workflowService.GetExecutionStatusAsync(input.WorkflowId, includeTasks: true, cancellationToken: cancellationToken)
                 ?? throw new Exception($"Could not find starter workflow by id {input.WorkflowId}");
 
             var output = new ReadWorkflowTasksResponse([], new WorkflowDetails(JObject.FromObject(starterWorkflow.Input)));
