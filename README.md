@@ -16,6 +16,7 @@ A comprehensive .NET client library for [Conductor](https://github.com/conductor
   - [Workflow Definition](#workflow-definition)
   - [Task Handlers](#task-handlers)
   - [Input/Output Models](#inputoutput-models)
+  - [Task Input Specification](#task-input-specification)
 - [Task Types](#task-types)
 - [Configuration](#configuration)
 - [Pipeline Behaviors](#pipeline-behaviors)
@@ -191,31 +192,6 @@ public class MyWorkflow : Workflow<MyWorkflow, MyWorkflowInput, MyWorkflowOutput
 
 ### Task Handlers
 
-Two approaches for implementing task handlers:
-
-#### Interface-based (Recommended)
-
-```csharp
-[OriginalName("MY_TASK_name")]
-public class MyTaskHandler : ITaskRequestHandler<MyTaskRequest, MyTaskResponse>
-{
-    private readonly ConductorSharpExecutionContext _context;
-    
-    public MyTaskHandler(ConductorSharpExecutionContext context)
-    {
-        _context = context; // Access workflow/task metadata
-    }
-
-    public async Task<MyTaskResponse> Handle(MyTaskRequest request, CancellationToken cancellationToken)
-    {
-        // Implementation
-        return new MyTaskResponse { /* ... */ };
-    }
-}
-```
-
-#### Abstract class-based
-
 ```csharp
 [OriginalName("MY_TASK_name")]
 public class MyTaskHandler : TaskRequestHandler<MyTaskRequest, MyTaskResponse>
@@ -253,6 +229,217 @@ public class MyTaskResponse
     public string OutputValue { get; set; }
 }
 ```
+
+### Task Input Specification
+
+In Conductor, task inputs in workflows are specified using Conductor expressions with the format: `${SOURCE.input/output.JSONPath}`. The `SOURCE` can be `workflow` or a task reference name in the workflow definition. `input/output` refers to the input of the workflow or output of the task. JSONPath is used to traverse the input/output object.
+
+ConductorSharp generates these expressions automatically when writing workflows. Here's an example:
+
+```csharp
+_builder.AddTask(
+    wf => wf.PrepareEmail,
+    wf => new PrepareEmailRequest
+    {
+        CustomerName = $"{wf.GetCustomer.Output.FirstName} {wf.GetCustomer.Output.LastName}",
+        Address = wf.WorkflowInput.Address
+    }
+);
+```
+
+This is converted to the following Conductor input parameters specification:
+
+```json
+"inputParameters": {
+    "customer_name": "${get_customer.output.first_name} ${get_customer.output.last_name}",
+    "address": "${workflow.input.address}"
+}
+```
+
+#### Casting
+
+When input/output parameters are of different types, casting can be used:
+
+```csharp
+wf => new PrepareEmailRequest
+{
+    CustomerName = ((FullName)wf.GetCustomer.Output.Name).FirstName,
+    Address = (string)wf.GetCustomer.Output.Address
+}
+```
+
+This translates to:
+
+```json
+"inputParameters": {
+    "customer_name": "${get_customer.output.name.first_name}",
+    "address": "${get_customer.output.address}"
+}
+```
+
+#### Array Initialization
+
+Array initialization is supported. Arrays can be typed or dynamic:
+
+```csharp
+wf => new()
+{
+    Integers = new[] { 1, 2, 3 },
+    TestModelList = new List<ArrayTaskInput.TestModel>
+    {
+        new ArrayTaskInput.TestModel { String = wf.Input.TestValue },
+        new ArrayTaskInput.TestModel { String = "List2" }
+    },
+    Models = new[]
+    {
+        new ArrayTaskInput.TestModel { String = "Test1" },
+        new ArrayTaskInput.TestModel { String = "Test2" }
+    },
+    Objects = new dynamic[] { new { AnonymousObjProp = "Prop" }, new { Test = "Prop" } }
+}
+```
+
+This translates to:
+
+```json
+"inputParameters": {
+    "integers": [1, 2, 3],
+    "test_model_list": [
+        {
+            "string": "${workflow.input.test_value}"
+        },
+        {
+            "string": "List2"
+        }
+    ],
+    "models": [
+        {
+            "string": "Test1"
+        },
+        {
+            "string": "Test2"
+        }
+    ],
+    "objects": [
+        {
+            "anonymous_obj_prop": "Prop"
+        },
+        {
+            "test": "Prop"
+        }
+    ]
+}
+```
+
+#### Object Initialization
+
+Object initialization is supported, including anonymous objects when initializing sub-properties:
+
+```csharp
+wf => new()
+{
+    NestedObjects = new TestModel
+    {
+        Integer = 1,
+        String = "test",
+        Object = new TestModel
+        {
+            Integer = 1,
+            String = "string",
+            Object = new { NestedInput = "1" }
+        }
+    }
+}
+```
+
+This translates to:
+
+```json
+"inputParameters": {
+    "nested_objects": {
+        "integer": 1,
+        "string": "test",
+        "object": {
+            "integer": 1,
+            "string": "string",
+            "object": {
+                "nested_input": "1"
+            }
+        }
+    }
+}
+```
+
+#### Indexing
+
+Dictionary indexing is supported. Indexing using an indexer on arbitrary types is currently not supported:
+
+```csharp
+wf => new()
+{
+    CustomerName = wf.WorkflowInput.Dictionary["test"].CustomerName,
+    Address = wf.WorkflowInput.DoubleDictionary["test"]["address"]
+}
+```
+
+This translates to:
+
+```json
+"inputParameters": {
+    "customer_name": "${workflow.input.dictionary['test'].customer_name}",
+    "address": "${workflow.input.double_dictionary['test']['address']}"
+}
+```
+
+#### Workflow Name
+
+You can embed the name of any workflow in task input specification using `NamingUtil.NameOf<T>()`:
+
+```csharp
+wf => new()
+{
+    Name = $"Workflow name: {NamingUtil.NameOf<StringInterpolation>()}",
+    WfName = NamingUtil.NameOf<StringInterpolation>()
+}
+```
+
+This translates to:
+
+```json
+"inputParameters": {
+    "name": "Workflow name: TEST_StringInterpolation",
+    "wf_name": "TEST_StringInterpolation"
+}
+```
+
+Note: `StringInterpolation` has an attribute `[OriginalName("TEST_StringInterpolation")]` applied.
+
+#### String Concatenation
+
+String concatenation is supported. You can concatenate strings with numbers, input/output parameters, and interpolation strings:
+
+```csharp
+wf => new()
+{
+    Input = 1
+        + "Str_"
+        + "2Str_"
+        + wf.WorkflowInput.Input
+        + $"My input: {wf.WorkflowInput.Input}"
+        + NamingUtil.NameOf<StringAddition>()
+        + 1
+}
+```
+
+This translates to:
+
+```json
+"inputParameters": {
+    "input": "1Str_2Str_${workflow.input.input}My input: ${workflow.input.input}string_addition1"
+}
+```
+
+Note: `StringAddition` has an attribute `[OriginalName("string_addition")]` applied.
 
 ### Metadata Attributes
 
