@@ -5,8 +5,6 @@ A comprehensive .NET client library for [Conductor](https://github.com/conductor
 [![NuGet](https://img.shields.io/nuget/v/ConductorSharp.Client.svg)](https://www.nuget.org/packages/ConductorSharp.Client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[📖 More info on wiki](https://github.com/codaxy/conductor-sharp/wiki)
-
 ## Table of Contents
 
 - [Installation](#installation)
