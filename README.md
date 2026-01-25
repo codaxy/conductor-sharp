@@ -729,7 +729,7 @@ builder.Services.AddHealthChecks()
 Access workflow/task metadata in handlers:
 
 ```csharp
-public class MyHandler : ITaskRequestHandler<MyRequest, MyResponse>
+public class MyHandler : TaskRequestHandler<MyRequest, MyResponse>
 {
     private readonly ConductorSharpExecutionContext _context;
 

@@ -69,7 +69,7 @@ using ConductorSharp.Engine.Util;
 using MediatR;
 
 [OriginalName("MY_TASK_name")]
-public class MyTaskHandler : ITaskRequestHandler<MyTaskRequest, MyTaskResponse>
+public class MyTaskHandler : TaskRequestHandler<MyTaskRequest, MyTaskResponse>
 {
     private readonly ConductorSharpExecutionContext _context;
     
@@ -633,7 +633,7 @@ dotnet-conductorsharp --dry-run
 Access workflow/task metadata in handlers:
 
 ```csharp
-public class MyHandler : ITaskRequestHandler<MyRequest, MyResponse>
+public class MyHandler : TaskRequestHandler<MyRequest, MyResponse>
 {
     private readonly ConductorSharpExecutionContext _context;
 
@@ -656,7 +656,7 @@ public class MyHandler : ITaskRequestHandler<MyRequest, MyResponse>
 
 ```csharp
 [TaskDomain("my-domain")]
-public class MyTaskHandler : ITaskRequestHandler<...> { }
+public class MyTaskHandler : TaskRequestHandler<...> { }
 ```
 
 ## Common Patterns
@@ -701,10 +701,9 @@ public class MyWorkflow : Workflow<...> { }
 ## Best Practices
 
 1. **Use `[OriginalName]` attribute** for custom task/workflow names in Conductor
-2. **Use interface-based handlers** (`ITaskRequestHandler`) for better testability and context access
-3. **Register workflows** with `services.RegisterWorkflow<MyWorkflow>()`
-4. **Use strongly-typed models** for inputs/outputs instead of dictionaries
-5. **Add validation** using DataAnnotations and `.AddValidation()` pipeline
-6. **Use patterns package** for common tasks (WaitSeconds, ReadWorkflowTasks, C# Lambda)
-7. **Configure health checks** for production deployments
-8. **Use scaffolding tool** to generate models from existing Conductor definitions
+2. **Register workflows** with `services.RegisterWorkflow<MyWorkflow>()`
+3. **Use strongly-typed models** for inputs/outputs instead of dictionaries
+4. **Add validation** using DataAnnotations and `.AddValidation()` pipeline
+5. **Use patterns package** for common tasks (WaitSeconds, ReadWorkflowTasks, C# Lambda)
+6. **Configure health checks** for production deployments
+7. **Use scaffolding tool** to generate models from existing Conductor definitions
