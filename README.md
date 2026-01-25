@@ -5,6 +5,9 @@ A comprehensive .NET client library for [Conductor](https://github.com/conductor
 [![NuGet](https://img.shields.io/nuget/v/ConductorSharp.Client.svg)](https://www.nuget.org/packages/ConductorSharp.Client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+
+**Note: This documentation been AI generated and human reviewed.**
+
 ## Table of Contents
 
 - [Installation](#installation)
@@ -54,27 +57,28 @@ dotnet tool install --global ConductorSharp.Toolkit --version 3.0.1-beta3
 
 ```csharp
 using ConductorSharp.Engine.Extensions;
+using Microsoft.Extensions.Hosting;
 
-var builder = Host.CreateDefaultBuilder()
-    .ConfigureServices((_, services) =>
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services
+    .AddConductorSharp(baseUrl: "http://localhost:8080")
+    .AddExecutionManager(
+        maxConcurrentWorkers: 10,
+        sleepInterval: 500,
+        longPollInterval: 100,
+        domain: null,
+        typeof(Program).Assembly
+    )
+    .AddPipelines(pipelines =>
     {
-        services
-            .AddConductorSharp(baseUrl: "http://localhost:8080")
-            .AddExecutionManager(
-                maxConcurrentWorkers: 10,
-                sleepInterval: 500,
-                longPollInterval: 100,
-                domain: null,
-                typeof(Program).Assembly
-            )
-            .AddPipelines(pipelines =>
-            {
-                pipelines.AddRequestResponseLogging();
-                pipelines.AddValidation();
-            });
-
-        services.RegisterWorkflow<MyWorkflow>();
+        pipelines.AddRequestResponseLogging();
+        pipelines.AddValidation();
     });
+
+builder.Services.RegisterWorkflow<MyWorkflow>();
+
+var host = builder.Build();
+await host.RunAsync();
 ```
 
 ### 2. Define a Task Handler
@@ -96,7 +100,7 @@ public class PrepareEmailResponse
 }
 
 [OriginalName("EMAIL_prepare")]
-public class PrepareEmailHandler : ITaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
+public class PrepareEmailHandler : TaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
 {
     public async Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
     {
