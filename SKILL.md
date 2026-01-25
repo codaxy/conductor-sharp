@@ -60,13 +60,11 @@ await host.RunAsync();
 
 ## Writing Task Handlers
 
-### Interface-Based (Recommended)
 
 ```csharp
 using ConductorSharp.Engine.Builders.Metadata;
-using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine;
 using ConductorSharp.Engine.Util;
-using MediatR;
 
 [OriginalName("MY_TASK_name")]
 public class MyTaskHandler : TaskRequestHandler<MyTaskRequest, MyTaskResponse>
@@ -78,22 +76,9 @@ public class MyTaskHandler : TaskRequestHandler<MyTaskRequest, MyTaskResponse>
         _context = context; // Access workflow/task metadata
     }
 
-    public async Task<MyTaskResponse> Handle(MyTaskRequest request, CancellationToken cancellationToken)
-    {
-        // Access context: _context.WorkflowId, _context.TaskId, _context.CorrelationId
-        return new MyTaskResponse { /* ... */ };
-    }
-}
-```
-
-### Abstract Class-Based
-
-```csharp
-[OriginalName("MY_TASK_name")]
-public class MyTaskHandler : TaskRequestHandler<MyTaskRequest, MyTaskResponse>
-{
     public override async Task<MyTaskResponse> Handle(MyTaskRequest request, CancellationToken cancellationToken)
     {
+        // Access context: _context.WorkflowId, _context.TaskId, _context.CorrelationId
         return new MyTaskResponse { /* ... */ };
     }
 }
@@ -642,7 +627,7 @@ public class MyHandler : TaskRequestHandler<MyRequest, MyResponse>
         _context = context;
     }
 
-    public async Task<MyResponse> Handle(MyRequest request, CancellationToken cancellationToken)
+    public override async Task<MyResponse> Handle(MyRequest request, CancellationToken cancellationToken)
     {
         var workflowId = _context.WorkflowId;
         var taskId = _context.TaskId;

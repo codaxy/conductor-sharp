@@ -86,8 +86,7 @@ await host.RunAsync();
 
 ```csharp
 using ConductorSharp.Engine.Builders.Metadata;
-using ConductorSharp.Engine.Interface;
-using MediatR;
+using ConductorSharp.Engine;
 
 public class PrepareEmailRequest : IRequest<PrepareEmailResponse>
 {
@@ -103,7 +102,7 @@ public class PrepareEmailResponse
 [OriginalName("EMAIL_prepare")]
 public class PrepareEmailHandler : TaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
 {
-    public async Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
+    public override async Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken)
     {
         var body = $"Hello {request.CustomerName} at {request.Address}!";
         return new PrepareEmailResponse { EmailBody = body };
@@ -135,8 +134,8 @@ public class SendNotificationWorkflow : Workflow<SendNotificationWorkflow, SendN
         WorkflowDefinitionBuilder<SendNotificationWorkflow, SendNotificationInput, SendNotificationOutput> builder
     ) : base(builder) { }
 
-    public CustomerGetV1 GetCustomer { get; set; }
-    public EmailPrepareV1 PrepareEmail { get; set; }
+    public GetCustomerHandler GetCustomer { get; set; }
+    public PrepareEmailHandler PrepareEmail { get; set; }
 
     public override void BuildDefinition()
     {
@@ -175,8 +174,8 @@ public class MyWorkflow : Workflow<MyWorkflow, MyWorkflowInput, MyWorkflowOutput
         : base(builder) { }
 
     // Task properties - these become task references in the workflow
-    public SomeTaskV1 FirstTask { get; set; }
-    public AnotherTaskV1 SecondTask { get; set; }
+    public SomeTaskHandler FirstTask { get; set; }
+    public AnotherTaskHandler SecondTask { get; set; }
 
     public override void BuildDefinition()
     {
@@ -738,7 +737,7 @@ public class MyHandler : TaskRequestHandler<MyRequest, MyResponse>
         _context = context;
     }
 
-    public async Task<MyResponse> Handle(MyRequest request, CancellationToken cancellationToken)
+    public override async Task<MyResponse> Handle(MyRequest request, CancellationToken cancellationToken)
     {
         var workflowId = _context.WorkflowId;
         var taskId = _context.TaskId;
