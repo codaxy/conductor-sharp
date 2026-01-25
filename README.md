@@ -6,7 +6,7 @@ A comprehensive .NET client library for [Conductor](https://github.com/conductor
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
-**Note: This documentation been AI generated and human reviewed.**
+**Note: This documentation has been AI generated and human reviewed.**
 
 ## Table of Contents
 
