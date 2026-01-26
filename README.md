@@ -51,7 +51,7 @@ dotnet add package ConductorSharp.Patterns
 dotnet add package ConductorSharp.KafkaCancellationNotifier
 
 # CLI tool for scaffolding task/workflow definitions
-dotnet tool install --global ConductorSharp.Toolki
+dotnet tool install --global ConductorSharp.Toolkit
 ```
 
 ## Quick Start
