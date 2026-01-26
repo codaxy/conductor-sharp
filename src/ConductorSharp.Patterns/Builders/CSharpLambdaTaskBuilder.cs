@@ -10,7 +10,6 @@ using ConductorSharp.Engine.Util.Builders;
 using ConductorSharp.Patterns.Exceptions;
 using ConductorSharp.Patterns.Model;
 using ConductorSharp.Patterns.Tasks;
-using MediatR;
 using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Patterns.Builders
@@ -24,7 +23,7 @@ namespace ConductorSharp.Patterns.Builders
             Func<TInput, TOutput> lambda
         )
             where TWorkflow : ITypedWorkflow
-            where TInput : IRequest<TOutput>
+            where TInput : ITaskInput<TOutput>
         {
             var configurationProp =
                 builder.ConfigurationProperties.FirstOrDefault(prop => prop.Key == CSharpLambdaTask.LambdaTaskNameConfigurationProperty)
@@ -50,7 +49,7 @@ namespace ConductorSharp.Patterns.Builders
     }
 
     internal class CSharpLambdaTaskBuilder<TInput, TOutput> : BaseTaskBuilder<TInput, TOutput>
-        where TInput : IRequest<TOutput>
+        where TInput : ITaskInput<TOutput>
     {
         public const string LambdaIdStorageKey = "ConductorSharp.Engine.CSharpLambdaTaskBuilder.LambdaId";
 

@@ -5,7 +5,6 @@ using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -19,7 +18,7 @@ namespace ConductorSharp.Engine.Builders
             Expression<Func<TWorkflow, DynamicTaskInput<TInput, TOutput>>> input
         )
             where TWorkflow : ITypedWorkflow
-            where TInput : IRequest<TOutput>
+            where TInput : ITaskInput<TOutput>
         {
             var taskBuilder = new DynamicTaskBuilder<TInput, TOutput>(reference.Body, input.Body, builder.BuildConfiguration);
             builder.AddTaskBuilderToSequence(taskBuilder);
@@ -27,8 +26,8 @@ namespace ConductorSharp.Engine.Builders
         }
     }
 
-    public class DynamicTaskBuilder<I, O>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
-        : BaseTaskBuilder<DynamicTaskInput<I, O>, O>(taskExpression, inputExpression, buildConfiguration)
+    public class DynamicTaskBuilder<TInput, TOutput>(Expression taskExpression, Expression inputExpression, BuildConfiguration buildConfiguration)
+        : BaseTaskBuilder<DynamicTaskInput<TInput, TOutput>, TOutput>(taskExpression, inputExpression, buildConfiguration)
     {
         private const string DynamicTasknameParam = "task_to_execute";
 

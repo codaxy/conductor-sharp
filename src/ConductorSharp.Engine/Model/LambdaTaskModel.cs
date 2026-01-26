@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.Engine.Model
 {
@@ -7,9 +7,10 @@ namespace ConductorSharp.Engine.Model
         public O Result { get; set; }
     }
 
-    public abstract class LambdaTaskModel<I, O> where I : IRequest<O>
+    public abstract class LambdaTaskModel<TInput, TOutput>
+        where TInput : ITaskInput<TOutput>
     {
-        public I Input { get; set; }
-        public LambdaOutputModel<O> Output { get; set; }
+        public TInput Input { get; set; }
+        public LambdaOutputModel<TOutput> Output { get; set; }
     }
 }

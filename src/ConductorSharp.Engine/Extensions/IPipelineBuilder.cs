@@ -1,16 +1,16 @@
 ﻿using System;
-using MediatR;
+using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.Engine.Extensions
 {
     public interface IPipelineBuilder
     {
-        void AddRequestResponseLogging();
         void AddValidation();
-        void AddContextLogging();
         void AddExecutionTaskTracking();
-        void AddCustomBehavior(Type behaviorType);
-        void AddCustomBehavior<TBehavior, TRequest, TResponse>()
-            where TBehavior : class, IPipelineBehavior<TRequest, TResponse>;
+        void AddCustomMiddleware(Type middlewareType);
+
+        void AddCustomMiddleware<TWorkerMiddleware, TRequest, TResponse>()
+            where TWorkerMiddleware : class, IWorkerMiddleware<TRequest, TResponse>
+            where TRequest : ITaskInput<TResponse>, new();
     }
 }

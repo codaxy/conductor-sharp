@@ -1,6 +1,6 @@
 ﻿namespace ConductorSharp.Engine.Tests.Samples.Tasks;
 
-public class DictionaryInputTaskInput : IRequest<DictionaryInputTaskOutput>
+public class DictionaryInputTaskInput : ITaskInput<DictionaryInputTaskOutput>
 {
     public IDictionary<string, object> Object { get; set; }
     public IDictionary<string, string> StringObject { get; set; }

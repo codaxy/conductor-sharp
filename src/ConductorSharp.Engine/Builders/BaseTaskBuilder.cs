@@ -4,13 +4,12 @@ using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Util;
 using ConductorSharp.Engine.Util.Builders;
-using MediatR;
 using Newtonsoft.Json.Linq;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public abstract class BaseTaskBuilder<A, B> : ITaskOptionsBuilder, ITaskBuilder
-        where A : IRequest<B>
+    public abstract class BaseTaskBuilder<TInput, TOutput> : ITaskOptionsBuilder, ITaskBuilder
+        where TInput : ITaskInput<TOutput>
     {
         protected readonly JObject _inputParameters;
         protected readonly string _taskRefferenceName;

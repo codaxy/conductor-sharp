@@ -15,7 +15,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
     [WorkflowMetadata(OwnerEmail = "test@test.com")]
     public class CSharpLambdaWorkflow : Workflow<CSharpLambdaWorkflow, CSharpLambdaWorkflowInput, CSharpLambdaWorkflowOutput>
     {
-        public class LambdaTaskInput : IRequest<LambdaTaskOutput>
+        public class LambdaTaskInput : ITaskInput<LambdaTaskOutput>
         {
             public string LambdaInput { get; set; }
         }

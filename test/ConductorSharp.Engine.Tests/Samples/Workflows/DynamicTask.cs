@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ConductorSharp.Engine.Builders.Metadata;
+﻿using ConductorSharp.Engine.Builders.Metadata;
 
 namespace ConductorSharp.Engine.Tests.Samples.Workflows
 {
@@ -22,7 +17,7 @@ namespace ConductorSharp.Engine.Tests.Samples.Workflows
         public string Name { get; set; }
     }
 
-    public class MandatoryDynamicInput : IRequest<ExpectedDynamicOutput>
+    public class MandatoryDynamicInput : ITaskInput<ExpectedDynamicOutput>
     {
         public int Count { get; set; }
         public bool ShouldUseNext { get; set; }

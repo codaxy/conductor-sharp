@@ -2,7 +2,6 @@ using System;
 using System.Reflection;
 using ConductorSharp.Engine.Builders;
 using ConductorSharp.Engine.Builders.Metadata;
-using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +10,9 @@ namespace ConductorSharp.Engine.Extensions
     public static class TaskRegistrationExtensions
     {
         public static void RegisterWorkerTask<TWorkerTask>(this IServiceCollection builder, Action<TaskDefinitionOptions> updateOptions = null)
-            where TWorkerTask : IWorker
+            where TWorkerTask : class
+        // TODO: MR Removal
+        //where TWorkerTask : IWorker
         {
             builder.AddSingleton(ctx => ctx.GetRequiredService<TaskDefinitionBuilder>().Build<TWorkerTask>(updateOptions));
 
@@ -24,6 +25,8 @@ namespace ConductorSharp.Engine.Extensions
                         TaskDomain = GetTaskDomain(typeof(TWorkerTask))
                     }
             );
+
+            builder.AddTransient<TWorkerTask>();
         }
 
         private static string GetTaskDomain(Type workerType) => workerType.GetCustomAttribute<TaskDomainAttribute>()?.Domain;

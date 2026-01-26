@@ -1,27 +1,26 @@
 ﻿using System;
-using System.Reflection;
-using ConductorSharp.Engine.Behaviors;
-using MediatR;
+using ConductorSharp.Engine.Interface;
+using ConductorSharp.Engine.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ConductorSharp.Engine.Extensions;
 
 internal class PipelineBuilder(IServiceCollection serviceCollection) : IPipelineBuilder
 {
-    public void AddRequestResponseLogging() =>
-        serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestResponseLoggingBehavior<,>));
+    public void AddValidation() => serviceCollection.AddTransient(typeof(IWorkerMiddleware<,>), typeof(ValidationWorkerMiddleware<,>));
 
-    public void AddValidation() => serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+    public void AddExecutionTaskTracking() =>
+        serviceCollection.AddTransient(typeof(IWorkerMiddleware<,>), typeof(TaskExecutionTrackingMiddleware<,>));
 
-    public void AddContextLogging() => serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextLoggingBehavior<,>));
-
-    public void AddExecutionTaskTracking() => serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(TaskExecutionTrackingBehavior<,>));
-
-    public void AddCustomBehavior(Type behaviorType) => serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), behaviorType);
-
-    public void AddCustomBehavior<TBehavior, TRequest, TResponse>()
-        where TBehavior : class, IPipelineBehavior<TRequest, TResponse>
+    public void AddCustomMiddleware(Type middlewareType)
     {
-        serviceCollection.AddTransient<IPipelineBehavior<TRequest, TResponse>, TBehavior>();
+        if (middlewareType.GetInterface(typeof(IWorkerMiddleware<,>).Name) is null)
+            throw new ArgumentException($"Generic middleware must implement interface {typeof(IWorkerMiddleware<,>).Name}", nameof(middlewareType));
+
+        serviceCollection.AddTransient(typeof(IWorkerMiddleware<,>), middlewareType);
     }
+
+    public void AddCustomMiddleware<TWorkerMiddleware, TRequest, TResponse>()
+        where TWorkerMiddleware : class, IWorkerMiddleware<TRequest, TResponse>
+        where TRequest : ITaskInput<TResponse>, new() => serviceCollection.AddTransient<IWorkerMiddleware<TRequest, TResponse>, TWorkerMiddleware>();
 }

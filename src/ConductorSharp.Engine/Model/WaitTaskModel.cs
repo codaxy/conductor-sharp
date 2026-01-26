@@ -1,12 +1,9 @@
-﻿using MediatR;
+﻿using ConductorSharp.Engine.Interface;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ConductorSharp.Engine.Model
 {
-    public class WaitTaskInput : IRequest<NoOutput>
+    public class WaitTaskInput : ITaskInput<NoOutput>
     {
         [JsonProperty("duration")]
         public string Duration { get; set; }
@@ -15,5 +12,5 @@ namespace ConductorSharp.Engine.Model
         public string Until { get; set; }
     }
 
-    public class WaitTaskModel : TaskModel<WaitTaskInput, NoOutput> { }
+    public class WaitTaskModel : TaskModel<WaitTaskInput, NoOutput>;
 }

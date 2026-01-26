@@ -2,7 +2,7 @@
 
 namespace ConductorSharp.Engine.Tests.Samples.Workers;
 
-public class PrepareEmailRequest : IRequest<PrepareEmailResponse>
+public class PrepareEmailRequest : ITaskInput<PrepareEmailResponse>
 {
     public string CustomerName { get; set; }
     public string Address { get; set; }
@@ -14,8 +14,11 @@ public class PrepareEmailResponse
 }
 
 [OriginalName("EMAIL_prepare")]
-public class PrepareEmailHandler : TaskRequestHandler<PrepareEmailRequest, PrepareEmailResponse>
+public class PrepareEmailHandler : Worker<PrepareEmailRequest, PrepareEmailResponse>
 {
-    public override Task<PrepareEmailResponse> Handle(PrepareEmailRequest request, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public override Task<PrepareEmailResponse> Handle(
+        PrepareEmailRequest request,
+        WorkerExecutionContext context,
+        CancellationToken cancellationToken
+    ) => throw new NotImplementedException();
 }
