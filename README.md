@@ -26,6 +26,7 @@ A comprehensive .NET client library for [Conductor](https://github.com/conductor
 - [Toolkit CLI](#toolkit-cli)
 - [API Services](#api-services)
 - [Running the Examples](#running-the-examples)
+- [General Notes](#general-notes)
 
 ## Installation
 
@@ -141,19 +142,19 @@ public class SendNotificationWorkflow : Workflow<SendNotificationWorkflow, SendN
     {
         _builder.AddTask(
             wf => wf.GetCustomer,
-            wf => new() { CustomerId = wf.WorkflowInput.CustomerId }
+            wf => new GetCustomerRequest { CustomerId = wf.WorkflowInput.CustomerId }
         );
 
         _builder.AddTask(
             wf => wf.PrepareEmail,
-            wf => new() 
+            wf => new PrepareEmailRequest 
             { 
                 CustomerName = wf.GetCustomer.Output.Name,
                 Address = wf.GetCustomer.Output.Address 
             }
         );
 
-        _builder.SetOutput(wf => new()
+        _builder.SetOutput(wf => new SendNotificationOutput
         {
             EmailBody = wf.PrepareEmail.Output.EmailBody
         });
@@ -180,11 +181,11 @@ public class MyWorkflow : Workflow<MyWorkflow, MyWorkflowInput, MyWorkflowOutput
     public override void BuildDefinition()
     {
         // Add tasks with strongly-typed input expressions
-        _builder.AddTask(wf => wf.FirstTask, wf => new() { Input = wf.WorkflowInput.SomeValue });
-        _builder.AddTask(wf => wf.SecondTask, wf => new() { Input = wf.FirstTask.Output.Result });
+        _builder.AddTask(wf => wf.FirstTask, wf => new SomeTaskRequest { Input = wf.WorkflowInput.SomeValue });
+        _builder.AddTask(wf => wf.SecondTask, wf => new AnotherTaskRequest { Input = wf.FirstTask.Output.Result });
         
         // Set workflow output
-        _builder.SetOutput(wf => new() { Result = wf.SecondTask.Output.Value });
+        _builder.SetOutput(wf => new MyWorkflowOutput { Result = wf.SecondTask.Output.Value });
     }
 }
 ```
@@ -449,12 +450,22 @@ Note: `StringAddition` has an attribute `[OriginalName("string_addition")]` appl
 | `[Version(n)]` | Class | Version number for sub-workflow references |
 | `[TaskDomain("domain")]` | Class | Assign task to specific domain |
 
+Note: There is no task equivalent of the `WorkflowMetadata` attribute. The task metadata is configured when registering the task:
+
+```csharp
+services.RegisterWorkerTask<MyTaskHandler>(options =>
+{
+    options.OwnerEmail = "team@example.com";
+    options.Description = "My task description";
+});
+```
+
 ## Task Types
 
 ### Simple Task
 
 ```csharp
-_builder.AddTask(wf => wf.MySimpleTask, wf => new() { Input = wf.WorkflowInput.Value });
+_builder.AddTask(wf => wf.MySimpleTask, wf => new MySimpleTaskRequest { Input = wf.WorkflowInput.Value });
 ```
 
 ### Sub-Workflow Task
@@ -462,7 +473,7 @@ _builder.AddTask(wf => wf.MySimpleTask, wf => new() { Input = wf.WorkflowInput.V
 ```csharp
 public SubWorkflowTaskModel<ChildWorkflowInput, ChildWorkflowOutput> ChildWorkflow { get; set; }
 
-_builder.AddTask(wf => wf.ChildWorkflow, wf => new() { CustomerId = wf.WorkflowInput.CustomerId });
+_builder.AddTask(wf => wf.ChildWorkflow, wf => new ChildWorkflowInput { CustomerId = wf.WorkflowInput.CustomerId });
 ```
 
 ### Switch Task (Conditional Branching)
@@ -477,8 +488,8 @@ _builder.AddTask(
     wf => new SwitchTaskInput { SwitchCaseValue = wf.WorkflowInput.Operation },
     new DecisionCases<MyWorkflow>
     {
-        ["caseA"] = builder => builder.AddTask(wf => wf.TaskInCaseA, wf => new() { }),
-        ["caseB"] = builder => builder.AddTask(wf => wf.TaskInCaseB, wf => new() { }),
+        ["caseA"] = builder => builder.AddTask(wf => wf.TaskInCaseA, wf => new TaskARequest { }),
+        ["caseB"] = builder => builder.AddTask(wf => wf.TaskInCaseB, wf => new TaskBRequest { }),
         DefaultCase = builder => { /* default case tasks */ }
     }
 );
@@ -491,9 +502,9 @@ public DynamicTaskModel<ExpectedInput, ExpectedOutput> DynamicHandler { get; set
 
 _builder.AddTask(
     wf => wf.DynamicHandler,
-    wf => new()
+    wf => new DynamicTaskInput<ExpectedInput, ExpectedOutput>
     {
-        TaskInput = new() { CustomerId = wf.WorkflowInput.CustomerId },
+        TaskInput = new ExpectedInput { CustomerId = wf.WorkflowInput.CustomerId },
         TaskToExecute = wf.WorkflowInput.TaskName  // Task name resolved at runtime
     }
 );
@@ -514,16 +525,68 @@ _builder.AddTask(
 );
 ```
 
+### Do-While Loop Task
+
+```csharp
+public DoWhileTaskModel DoWhile { get; set; }
+public CustomerGetHandler GetCustomer { get; set; }
+
+_builder.AddTask(
+    wf => wf.DoWhile,
+    wf => new DoWhileInput { Value = wf.WorkflowInput.Loops },
+    "$.do_while.iteration < $.value",  // Loop condition
+    builder =>
+    {
+        builder.AddTask(wf => wf.GetCustomer, wf => new CustomerGetRequest { CustomerId = "CUSTOMER-1" });
+    }
+);
+```
+
+Note: ConductorSharp does not provide a strongly typed output for the `DoWhile` task, as can be seen from the implementation:
+
+```csharp
+public class DoWhileTaskModel : TaskModel<DoWhileInput, NoOutput>
+{
+}
+```
+
 ### Lambda Task (JavaScript)
 
 ```csharp
+public class LambdaInput : IRequest<LambdaOutput>
+{
+    public string Value { get; set; }
+}
+
+public class LambdaOutput
+{
+    public string Something { get; set; }
+}
+
 public LambdaTaskModel<LambdaInput, LambdaOutput> LambdaTask { get; set; }
+
 
 _builder.AddTask(
     wf => wf.LambdaTask,
-    wf => new() { Value = wf.WorkflowInput.Input },
-    script: "return { result: $.Value.toUpperCase() }"
+    wf => new LambdaInput { Value = wf.WorkflowInput.Input },
+    script: "return { something: $.Value.toUpperCase() }"  // JavaScript expression
 );
+```
+
+For context, in the above parameterized generic class `LambdaTaskModel`, the `LambdaOutput` instance is available as `Output.Result.Something`. This is less than ideal, but is the current way of things. Reasoning can be seen in the implementation:
+
+```csharp
+public abstract class LambdaOutputModel<O>
+{
+  public O Result { get; set; }
+}
+
+public abstract class LambdaTaskModel<I, O> where I : IRequest<O>
+{
+  public I Input { get; set; }
+
+  public LambdaOutputModel<O> Output { get; set; }
+}
 ```
 
 ### Wait Task
@@ -552,18 +615,6 @@ _builder.AddTask(
 );
 ```
 
-### Event Task
-
-```csharp
-public EventTaskModel<EventInput> EventTask { get; set; }
-
-_builder.AddTask(
-    wf => wf.EventTask,
-    wf => new() { EventData = wf.WorkflowInput.Data },
-    sink: "kafka:my-topic"
-);
-```
-
 ### Human Task
 
 ```csharp
@@ -582,7 +633,7 @@ public JsonJqTransformTaskModel<JqInput, JqOutput> TransformTask { get; set; }
 
 _builder.AddTask(
     wf => wf.TransformTask,
-    wf => new() { QueryExpression = ".data | map(.name)", Data = wf.WorkflowInput.Items }
+    wf => new JqInput { QueryExpression = ".data | map(.name)", Data = wf.WorkflowInput.Items }
 );
 ```
 
@@ -605,7 +656,7 @@ _builder.AddTasks(new WorkflowTask
 Mark tasks as optional (workflow continues on failure):
 
 ```csharp
-_builder.AddTask(wf => wf.OptionalTask, wf => new() { }).AsOptional();
+_builder.AddTask(wf => wf.OptionalTask, wf => new OptionalTaskRequest { }).AsOptional();
 ```
 
 ## Configuration
@@ -762,7 +813,7 @@ Additional built-in tasks and utilities:
 ```csharp
 public WaitSeconds WaitTask { get; set; }
 
-_builder.AddTask(wf => wf.WaitTask, wf => new() { Seconds = 30 });
+_builder.AddTask(wf => wf.WaitTask, wf => new WaitSecondsRequest { Seconds = 30 });
 ```
 
 ### ReadWorkflowTasks Task
@@ -774,7 +825,7 @@ public ReadWorkflowTasks ReadTasks { get; set; }
 
 _builder.AddTask(
     wf => wf.ReadTasks,
-    wf => new() 
+    wf => new ReadWorkflowTasksInput 
     { 
         WorkflowId = wf.WorkflowInput.TargetWorkflowId,
         TaskNames = "task1,task2"  // Comma-separated reference names
@@ -791,7 +842,7 @@ public CSharpLambdaTaskModel<LambdaInput, LambdaOutput> InlineLambda { get; set;
 
 _builder.AddTask(
     wf => wf.InlineLambda,
-    wf => new() { Value = wf.WorkflowInput.Input },
+    wf => new LambdaInput { Value = wf.WorkflowInput.Input },
     input => new LambdaOutput { Result = input.Value.ToUpperInvariant() }
 );
 ```
@@ -966,6 +1017,12 @@ docker-compose up
 cd examples/ConductorSharp.Definitions
 dotnet run
 ```
+
+## General Notes
+
+### Events Not Supported
+
+The Conductor events are currently not supported by the library.
 
 ## License
 

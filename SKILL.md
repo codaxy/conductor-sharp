@@ -140,10 +140,10 @@ public class MyWorkflow : Workflow<MyWorkflow, MyWorkflowInput, MyWorkflowOutput
 
     public override void BuildDefinition()
     {
-        _builder.AddTask(wf => wf.FirstTask, wf => new() { Input = wf.WorkflowInput.CustomerId });
-        _builder.AddTask(wf => wf.SecondTask, wf => new() { Input = wf.FirstTask.Output.Result });
+        _builder.AddTask(wf => wf.FirstTask, wf => new SomeTaskRequest { Input = wf.WorkflowInput.CustomerId });
+        _builder.AddTask(wf => wf.SecondTask, wf => new AnotherTaskRequest { Input = wf.FirstTask.Output.Result });
         
-        _builder.SetOutput(wf => new() { Result = wf.SecondTask.Output.Value });
+        _builder.SetOutput(wf => new MyWorkflowOutput { Result = wf.SecondTask.Output.Value });
     }
 }
 ```
@@ -173,32 +173,41 @@ public class MyWorkflow : Workflow<...> { }
 ```csharp
 public MyTaskHandler MyTask { get; set; }
 
-_builder.AddTask(wf => wf.MyTask, wf => new() { Input = wf.WorkflowInput.Value });
+_builder.AddTask(wf => wf.MyTask, wf => new MyTaskRequest { InputValue = wf.WorkflowInput.Value });
 ```
 
 ### Sub-Workflow Task
 
-```csharp
-public SubWorkflowTaskModel<ChildWorkflowInput, ChildWorkflowOutput> ChildWorkflow { get; set; }
+Sub-workflows allow referencing other workflows as tasks. Define a model class that inherits from `SubWorkflowTaskModel`:
 
-_builder.AddTask(wf => wf.ChildWorkflow, wf => new() { CustomerId = wf.WorkflowInput.CustomerId });
+```csharp
+// Define the sub-workflow model (usually scaffolded or defined separately)
+[OriginalName("CHILD_workflow")]
+public class ChildWorkflow : SubWorkflowTaskModel<ChildWorkflowInput, ChildWorkflowOutput> { }
+
+// In the parent workflow:
+public ChildWorkflow ChildWorkflow { get; set; }
+
+_builder.AddTask(wf => wf.ChildWorkflow, wf => new ChildWorkflowInput { CustomerId = wf.WorkflowInput.CustomerId });
 ```
 
 ### Switch Task (Conditional Branching)
 
+The Switch task evaluates a case value and executes tasks in the matching branch:
+
 ```csharp
 public SwitchTaskModel SwitchTask { get; set; }
-public TaskA TaskInCaseA { get; set; }
-public TaskB TaskInCaseB { get; set; }
+public CustomerGetHandler GetCustomer { get; set; }
+public TerminateTaskModel Terminate { get; set; }
 
 _builder.AddTask(
     wf => wf.SwitchTask,
     wf => new SwitchTaskInput { SwitchCaseValue = wf.WorkflowInput.Operation },
     new DecisionCases<MyWorkflow>
     {
-        ["caseA"] = builder => builder.AddTask(wf => wf.TaskInCaseA, wf => new() { }),
-        ["caseB"] = builder => builder.AddTask(wf => wf.TaskInCaseB, wf => new() { }),
-        DefaultCase = builder => { /* default case tasks */ }
+        ["process"] = builder => builder.AddTask(wf => wf.GetCustomer, wf => new CustomerGetRequest { CustomerId = 1 }),
+        ["skip"] = builder => { /* skip processing - no tasks */ },
+        DefaultCase = builder => builder.AddTask(wf => wf.Terminate, wf => new TerminateTaskInput { TerminationStatus = TerminationStatus.Failed })
     }
 );
 ```
@@ -208,14 +217,16 @@ _builder.AddTask(
 ```csharp
 #pragma warning disable CS0618
 public DecisionTaskModel Decision { get; set; }
+public CustomerGetHandler GetCustomer { get; set; }
+public TerminateTaskModel Terminate { get; set; }
 
 _builder.AddTask(
     wf => wf.Decision,
-    wf => new() { CaseValueParam = "test" },
-    new()
+    wf => new DecisionTaskInput { CaseValueParam = "test" },
+    new DecisionCases<MyWorkflow>
     {
-        ["test"] = builder => builder.AddTask(wf => wf.GetCustomer, wf => new() { CustomerId = 1 }),
-        DefaultCase = builder => builder.AddTask(wf => wf.Terminate, wf => new() { TerminationStatus = TerminationStatus.Failed })
+        ["test"] = builder => builder.AddTask(wf => wf.GetCustomer, wf => new CustomerGetRequest { CustomerId = 1 }),
+        DefaultCase = builder => builder.AddTask(wf => wf.Terminate, wf => new TerminateTaskInput { TerminationStatus = TerminationStatus.Failed })
     }
 );
 #pragma warning restore CS0618
@@ -223,16 +234,43 @@ _builder.AddTask(
 
 ### Dynamic Task
 
+Dynamic tasks allow selecting which task to execute at runtime. The task name is determined by a workflow input or computed value. You define the expected input/output types that the dynamically selected task should conform to:
+
 ```csharp
-public DynamicTaskModel<ExpectedInput, ExpectedOutput> DynamicHandler { get; set; }
+// Define the expected input/output for the dynamic task
+public class ExpectedDynamicInput : IRequest<ExpectedDynamicOutput>
+{
+    public int CustomerId { get; set; }
+}
+
+public class ExpectedDynamicOutput
+{
+    public string Name { get; set; }
+    public string Address { get; set; }
+}
+
+// In the workflow:
+public class MyWorkflowInput : WorkflowInput<MyWorkflowOutput>
+{
+    public string TaskName { get; set; }  // e.g., "CUSTOMER_get_v1" or "CUSTOMER_get_v2"
+    public int CustomerId { get; set; }
+}
+
+public DynamicTaskModel<ExpectedDynamicInput, ExpectedDynamicOutput> DynamicHandler { get; set; }
 
 _builder.AddTask(
     wf => wf.DynamicHandler,
-    wf => new()
+    wf => new DynamicTaskInput<ExpectedDynamicInput, ExpectedDynamicOutput>
     {
-        TaskInput = new() { CustomerId = wf.WorkflowInput.CustomerId },
-        TaskToExecute = wf.WorkflowInput.TaskName  // Resolved at runtime
+        TaskInput = new ExpectedDynamicInput { CustomerId = wf.WorkflowInput.CustomerId },
+        TaskToExecute = wf.WorkflowInput.TaskName  // Task name resolved at runtime
     }
+);
+
+// Access the output after the dynamic task executes
+_builder.AddTask(
+    wf => wf.PrepareEmail,
+    wf => new PrepareEmailRequest { Name = wf.DynamicHandler.Output.Name, Address = wf.DynamicHandler.Output.Address }
 );
 ```
 
@@ -253,67 +291,140 @@ _builder.AddTask(
 
 ### Do-While Loop Task
 
+The Do-While task executes a set of tasks repeatedly while a condition is true. The loop condition uses JSONPath expressions where:
+- `$.do_while.iteration` - the current iteration number (0-based)
+- `$.value` - the value passed in the `DoWhileInput.Value` property
+
 ```csharp
+public class MyWorkflowInput : WorkflowInput<MyWorkflowOutput>
+{
+    public int Loops { get; set; }  // Number of iterations
+}
+
 public DoWhileTaskModel DoWhile { get; set; }
 public CustomerGetHandler GetCustomer { get; set; }
 
 _builder.AddTask(
     wf => wf.DoWhile,
-    wf => new() { Value = wf.WorkflowInput.Loops },
-    "$.do_while.iteration < $.value",  // Loop condition
+    wf => new DoWhileInput { Value = wf.WorkflowInput.Loops },  // Value used in condition
+    "$.do_while.iteration < $.value",  // Loop while iteration < Loops
     builder =>
     {
-        builder.AddTask(wf => wf.GetCustomer, wf => new() { CustomerId = "CUSTOMER-1" });
+        // Tasks to execute in each iteration
+        builder.AddTask(wf => wf.GetCustomer, wf => new CustomerGetRequest { CustomerId = "CUSTOMER-1" });
     }
 );
 ```
 
-### Lambda Task (JavaScript)
+The loop continues as long as the condition evaluates to true. In this example, if `Loops = 3`, the inner tasks execute 3 times (iterations 0, 1, 2).
+
+Note: ConductorSharp does not provide a strongly typed output for the `DoWhile` task, as can be seen from the implementation:
 
 ```csharp
+public class DoWhileTaskModel : TaskModel<DoWhileInput, NoOutput>
+{
+}
+```
+
+### Lambda Task (JavaScript)
+
+The Lambda task executes inline JavaScript code. Define input/output models:
+
+```csharp
+public class LambdaInput : IRequest<LambdaOutput>
+{
+    public string Value { get; set; }
+}
+
+public class LambdaOutput
+{
+    public string Something { get; set; }
+}
+
 public LambdaTaskModel<LambdaInput, LambdaOutput> LambdaTask { get; set; }
+
 
 _builder.AddTask(
     wf => wf.LambdaTask,
-    wf => new() { Value = wf.WorkflowInput.Input },
-    script: "return { result: $.Value.toUpperCase() }"
+    wf => new LambdaInput { Value = wf.WorkflowInput.Input },
+    script: "return { something: $.Value.toUpperCase() }"  // JavaScript expression
 );
 ```
 
+For context, in the above parameterized generic class `LambdaTaskModel`, the `LambdaOutput` instance is available as `Output.Result.Something`. This is less than ideal, but is the current way of things. Reasoning can be seen in the implementation:
+
+```csharp
+public abstract class LambdaOutputModel<O>
+{
+  public O Result { get; set; }
+}
+
+public abstract class LambdaTaskModel<I, O> where I : IRequest<O>
+{
+  public I Input { get; set; }
+
+  public LambdaOutputModel<O> Output { get; set; }
+}```
+
 ### C# Lambda Task (Patterns Package)
+
+The C# Lambda task executes inline C# code. Requires the Patterns package.
 
 ```csharp
 // Requires: .AddCSharpLambdaTasks()
+public class LambdaInput : IRequest<LambdaOutput>
+{
+    public string Value { get; set; }
+}
+
+public class LambdaOutput
+{
+    public string Result { get; set; }
+}
+
 public CSharpLambdaTaskModel<LambdaInput, LambdaOutput> InlineLambda { get; set; }
 
 _builder.AddTask(
     wf => wf.InlineLambda,
-    wf => new() { Value = wf.WorkflowInput.Input },
-    input => new LambdaOutput { Result = input.Value.ToUpperInvariant() }
+    wf => new LambdaInput { Value = wf.WorkflowInput.Input },
+    input => new LambdaOutput { Result = input.Value.ToUpperInvariant() }  // C# lambda expression
 );
 ```
 
 ### Wait Task
 
+The Wait task pauses workflow execution for a duration or until a specific time:
+
 ```csharp
 public WaitTaskModel WaitTask { get; set; }
 
+// Wait for a duration (supports: s, m, h, d for seconds, minutes, hours, days)
 _builder.AddTask(
     wf => wf.WaitTask,
-    wf => new WaitTaskInput { Duration = "1h" }  // or Until = "2024-01-01T00:00:00Z"
+    wf => new WaitTaskInput { Duration = "1s" }
+);
+
+// Or wait until a specific datetime
+_builder.AddTask(
+    wf => wf.WaitTask,
+    wf => new WaitTaskInput { Until = "2024-12-31 11:59" }
 );
 ```
 
 ### WaitSeconds Task (Patterns Package)
 
+A convenience task for waiting a specific number of seconds:
+
 ```csharp
 // Requires: .AddConductorSharpPatterns()
 public WaitSeconds WaitTask { get; set; }
 
-_builder.AddTask(wf => wf.WaitTask, wf => new() { Seconds = 30 });
+_builder.AddTask(wf => wf.WaitTask, wf => new WaitSecondsRequest { Seconds = 30 });
 ```
 
 ### Terminate Task
+
+The Terminate task ends the workflow execution with a specific status and output:
 
 ```csharp
 public TerminateTaskModel TerminateTask { get; set; }
@@ -322,43 +433,55 @@ _builder.AddTask(
     wf => wf.TerminateTask,
     wf => new TerminateTaskInput
     {
-        TerminationStatus = "COMPLETED",
-        WorkflowOutput = new { Result = "Done" }
+        TerminationStatus = TerminationStatus.Completed,  // or TerminationStatus.Failed
+        WorkflowOutput = new { Property = "Test", Result = "Done" }
     }
 );
 ```
 
-### Event Task
-
-```csharp
-public EventTaskModel<EventInput> EventTask { get; set; }
-
-_builder.AddTask(
-    wf => wf.EventTask,
-    wf => new() { EventData = wf.WorkflowInput.Data },
-    sink: "kafka:my-topic"
-);
-```
 
 ### Human Task
 
-```csharp
-public HumanTaskModel<HumanTaskOutput> HumanTask { get; set; }
+The Human task pauses the workflow until a human completes an action (e.g., approval):
 
-_builder.AddTask(
-    wf => wf.HumanTask,
-    wf => new HumanTaskInput<HumanTaskOutput> { /* ... */ }
-);
+```csharp
+public class HumanTaskOutput
+{
+    public string CustomerId { get; set; }
+    public bool Approved { get; set; }
+}
+
+public HumanTaskModel<HumanTaskOutput> HumanTask { get; set; }
+public CustomerGetHandler GetCustomer { get; set; }
+
+// Add the human task
+_builder.AddTask(wf => wf.HumanTask, wf => new HumanTaskInput<HumanTaskOutput> { });
+
+// Use the human task output in subsequent tasks
+_builder.AddTask(wf => wf.GetCustomer, wf => new CustomerGetRequest { CustomerId = wf.HumanTask.Output.CustomerId });
 ```
 
 ### JSON JQ Transform Task
 
+The JSON JQ Transform task applies JQ expressions to transform data:
+
 ```csharp
+public class JqInput : IRequest<JqOutput>
+{
+    public string QueryExpression { get; set; }
+    public object Data { get; set; }
+}
+
+public class JqOutput
+{
+    public object Result { get; set; }
+}
+
 public JsonJqTransformTaskModel<JqInput, JqOutput> TransformTask { get; set; }
 
 _builder.AddTask(
     wf => wf.TransformTask,
-    wf => new() 
+    wf => new JqInput 
     { 
         QueryExpression = ".data | map(.name)", 
         Data = wf.WorkflowInput.Items 
@@ -368,24 +491,28 @@ _builder.AddTask(
 
 ### ReadWorkflowTasks Task (Patterns Package)
 
+Reads task data from another workflow execution:
+
 ```csharp
 // Requires: .AddConductorSharpPatterns()
 public ReadWorkflowTasks ReadTasks { get; set; }
 
 _builder.AddTask(
     wf => wf.ReadTasks,
-    wf => new() 
+    wf => new ReadWorkflowTasksInput 
     { 
         WorkflowId = wf.WorkflowInput.TargetWorkflowId,
-        TaskNames = "task1,task2"  // Comma-separated reference names
+        TaskNames = "task1,task2"  // Comma-separated task reference names
     }
 );
 ```
 
 ### Optional Tasks
 
+Mark a task as optional so workflow continues even if the task fails:
+
 ```csharp
-_builder.AddTask(wf => wf.OptionalTask, wf => new() { }).AsOptional();
+_builder.AddTask(wf => wf.OptionalTask, wf => new OptionalTaskRequest { Value = "test" }).AsOptional();
 ```
 
 ### PassThrough Task (Raw Definition)
@@ -649,29 +776,36 @@ public class MyTaskHandler : TaskRequestHandler<...> { }
 ### Workflow with Multiple Tasks
 
 ```csharp
+public GetCustomerHandler GetCustomer { get; set; }
+public PrepareEmailHandler PrepareEmail { get; set; }
+
 public override void BuildDefinition()
 {
-    _builder.AddTask(wf => wf.GetCustomer, wf => new() { CustomerId = wf.WorkflowInput.CustomerId });
-    _builder.AddTask(wf => wf.PrepareEmail, wf => new() 
+    _builder.AddTask(wf => wf.GetCustomer, wf => new GetCustomerRequest { CustomerId = wf.WorkflowInput.CustomerId });
+    _builder.AddTask(wf => wf.PrepareEmail, wf => new PrepareEmailRequest 
     { 
-        CustomerName = wf.GetCustomer.Output.Name,
+        Name = wf.GetCustomer.Output.Name,
         Address = wf.GetCustomer.Output.Address 
     });
-    _builder.SetOutput(wf => new() { EmailBody = wf.PrepareEmail.Output.EmailBody });
+    _builder.SetOutput(wf => new MyWorkflowOutput { EmailBody = wf.PrepareEmail.Output.EmailBody });
 }
 ```
 
 ### Conditional Workflow
 
 ```csharp
+public SwitchTaskModel SwitchTask { get; set; }
+public ProcessTaskHandler ProcessTask { get; set; }
+public DefaultTaskHandler DefaultTask { get; set; }
+
 _builder.AddTask(
     wf => wf.SwitchTask,
     wf => new SwitchTaskInput { SwitchCaseValue = wf.WorkflowInput.Operation },
     new DecisionCases<MyWorkflow>
     {
-        ["process"] = builder => builder.AddTask(wf => wf.ProcessTask, wf => new() { }),
-        ["skip"] = builder => { /* skip processing */ },
-        DefaultCase = builder => builder.AddTask(wf => wf.DefaultTask, wf => new() { })
+        ["process"] = builder => builder.AddTask(wf => wf.ProcessTask, wf => new ProcessTaskRequest { Value = "data" }),
+        ["skip"] = builder => { /* skip processing - no tasks */ },
+        DefaultCase = builder => builder.AddTask(wf => wf.DefaultTask, wf => new DefaultTaskRequest { })
     }
 );
 ```
