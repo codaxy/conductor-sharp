@@ -5,8 +5,9 @@ A comprehensive .NET client library for [Conductor](https://github.com/conductor
 [![NuGet](https://img.shields.io/nuget/v/ConductorSharp.Client.svg)](https://www.nuget.org/packages/ConductorSharp.Client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-
 **Note: This documentation has been AI generated and human reviewed.**
+
+> **AI Assistant Users**: See [SKILL.md](SKILL.md) for a condensed reference guide optimized for AI coding assistants. It provides quick-reference documentation for all task types, configuration options, and common patterns. This file follows the [Agent Skills](https://code.claude.com/docs/en/skills) open standard for extending AI assistant capabilities.
 
 ## Table of Contents
 
