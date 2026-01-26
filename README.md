@@ -35,23 +35,23 @@ A comprehensive .NET client library for [Conductor](https://github.com/conductor
 
 ```bash
 # API client for Conductor
-dotnet add package ConductorSharp.Client --version 3.5.0
+dotnet add package ConductorSharp.Client
 
 # Workflow engine with builder DSL, task handlers, and worker scheduling
-dotnet add package ConductorSharp.Engine --version 3.5.0
+dotnet add package ConductorSharp.Engine
 ```
 
 ### Additional Packages
 
 ```bash
 # Built-in tasks (WaitSeconds, ReadWorkflowTasks, C# Lambda Tasks)
-dotnet add package ConductorSharp.Patterns --version 3.5.0
+dotnet add package ConductorSharp.Patterns
 
 # Kafka-based task cancellation notifications
-dotnet add package ConductorSharp.KafkaCancellationNotifier --version 3.5.0
+dotnet add package ConductorSharp.KafkaCancellationNotifier
 
 # CLI tool for scaffolding task/workflow definitions
-dotnet tool install --global ConductorSharp.Toolkit --version 3.0.1-beta3
+dotnet tool install --global ConductorSharp.Toolki
 ```
 
 ## Quick Start
