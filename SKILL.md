@@ -135,8 +135,8 @@ public class MyWorkflow : Workflow<MyWorkflow, MyWorkflowInput, MyWorkflowOutput
         : base(builder) { }
 
     // Task properties
-    public SomeTaskV1 FirstTask { get; set; }
-    public AnotherTaskV1 SecondTask { get; set; }
+    public SomeTaskHandler FirstTask { get; set; }
+    public AnotherTaskHandler SecondTask { get; set; }
 
     public override void BuildDefinition()
     {
@@ -171,7 +171,7 @@ public class MyWorkflow : Workflow<...> { }
 ### Simple Task
 
 ```csharp
-public MyTaskV1 MyTask { get; set; }
+public MyTaskHandler MyTask { get; set; }
 
 _builder.AddTask(wf => wf.MyTask, wf => new() { Input = wf.WorkflowInput.Value });
 ```
@@ -255,7 +255,7 @@ _builder.AddTask(
 
 ```csharp
 public DoWhileTaskModel DoWhile { get; set; }
-public CustomerGetV1 GetCustomer { get; set; }
+public CustomerGetHandler GetCustomer { get; set; }
 
 _builder.AddTask(
     wf => wf.DoWhile,
