@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using ConductorSharp.Engine.Interface;
 
 namespace ConductorSharp.Engine.Util.Builders
 {
@@ -8,5 +9,6 @@ namespace ConductorSharp.Engine.Util.Builders
     {
         public string DefaultOwnerEmail { get; set; } = "undefined@undefined.local";
         public string DefaultOwnerApp { get; set; }
+        public INameBuilder NameBuilder { get; set; }
     }
 }

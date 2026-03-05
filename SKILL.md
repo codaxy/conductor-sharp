@@ -12,7 +12,7 @@ Complete guide for building Conductor workflows using ConductorSharp's strongly-
 ### Packages
 - `ConductorSharp.Client` - API client
 - `ConductorSharp.Engine` - Workflow engine, builder DSL, handlers
-- `ConductorSharp.Patterns` - Built-in tasks (WaitSeconds, ReadWorkflowTasks, C# Lambda)
+- `ConductorSharp.Patterns` - Built-in tasks (WaitSeconds, ReadWorkflowTasks, C# Lambda, Signal Wait)
 - `ConductorSharp.KafkaCancellationNotifier` - Kafka cancellation support
 - `ConductorSharp.Toolkit` - CLI scaffolding tool
 
@@ -422,6 +422,171 @@ public WaitSeconds WaitTask { get; set; }
 _builder.AddTask(wf => wf.WaitTask, wf => new WaitSecondsRequest { Seconds = 30 });
 ```
 
+### Signal Wait (Patterns Package)
+
+The Signal Wait pattern allows workflows to pause and wait for an external signal before continuing. This is useful for scenarios like:
+- Waiting for external system callbacks
+- Human approval workflows
+- Coordinating between multiple workflows
+- Integrating with external event sources
+
+#### Architecture
+
+The Signal Wait pattern consists of several components:
+
+| Component | Description |
+|-----------|-------------|
+| `SignalWait` | A subworkflow that pauses execution until signaled |
+| `RegisterWaiter` | Task that registers the waiting workflow in the signal store |
+| `ISignalStore` | Persistence abstraction for signal entries (implement your own for production) |
+| `ISignalService` | Service to send signals and unblock waiting workflows |
+| `SignalSweeperService` | Background service that completes WAIT tasks when signals arrive |
+| `InMemorySignalStore` | Development-only in-memory implementation |
+
+#### Setup
+
+```csharp
+// In your service configuration:
+services
+    .AddConductorSharp(baseUrl: "http://localhost:8080")
+    .AddExecutionManager(...)
+    .AddSignalWait<YourSignalStore>("OPTIONAL_PREFIX");  // Implement ISignalStore for production
+
+// Register the SignalWait workflow
+services.RegisterWorkflow<SignalWait>();
+```
+
+**Important**: The `InMemorySignalStore` is only suitable for development/testing. For production, implement `ISignalStore` with a persistent backend (database, Redis, etc.) to ensure signals survive process restarts and work across multiple instances.
+
+#### Using Signal Wait in a Workflow
+
+```csharp
+using ConductorSharp.Patterns.Workflows;
+
+public class MyWorkflowInput : WorkflowInput<MyWorkflowOutput>
+{
+    public string OrderId { get; set; }
+}
+
+public class MyWorkflow : Workflow<MyWorkflow, MyWorkflowInput, MyWorkflowOutput>
+{
+    public ProcessOrderHandler ProcessOrder { get; set; }
+    public SignalWait WaitForPayment { get; set; }  // Signal wait subworkflow
+    public CompleteOrderHandler CompleteOrder { get; set; }
+
+    public override void BuildDefinition()
+    {
+        // Process the order
+        _builder.AddTask(wf => wf.ProcessOrder, wf => new ProcessOrderRequest { OrderId = wf.WorkflowInput.OrderId });
+        
+        // Wait for external payment confirmation signal
+        _builder.AddTask(wf => wf.WaitForPayment, wf => new SignalWaitInput 
+        { 
+            SignalKey = $"payment_{wf.WorkflowInput.OrderId}"  // Unique key for this signal
+        });
+        
+        // Continue after signal received
+        _builder.AddTask(wf => wf.CompleteOrder, wf => new CompleteOrderRequest 
+        { 
+            OrderId = wf.WorkflowInput.OrderId,
+            PaymentStatus = wf.WaitForPayment.Output.SignalStatus  // Signal payload
+        });
+    }
+}
+```
+
+#### Sending a Signal
+
+Use `ISignalService` to send signals from your API or other services:
+
+```csharp
+public class PaymentController : ControllerBase
+{
+    private readonly ISignalService _signalService;
+
+    public PaymentController(ISignalService signalService)
+    {
+        _signalService = signalService;
+    }
+
+    [HttpPost("payment-confirmed/{orderId}")]
+    public async Task<IActionResult> PaymentConfirmed(string orderId, [FromBody] PaymentResult result)
+    {
+        await _signalService.SendAsync($"payment_{orderId}", result.Status);
+        return Ok();
+    }
+}
+```
+
+#### Signal Key Design
+
+Signal keys should be unique and predictable:
+- Use business identifiers: `$"order_{orderId}"`, `$"approval_{requestId}"`
+- Include workflow context when needed: `$"{workflowType}_{entityId}"`
+- Avoid collisions by including unique prefixes
+
+#### Order Independence
+
+The signal pattern is order-independent:
+- **Signal arrives first**: Stored until a workflow registers to wait for it
+- **Workflow waits first**: Waits until a signal arrives with matching key
+
+This ensures reliable coordination regardless of timing.
+
+#### Task Configuration
+
+The `RegisterWaiter` task is configured with specific settings for reliability:
+- **ConcurrentExecLimit = 1**: Only one registration executes at a time per worker, preventing race conditions
+- **RetryCount = 10** with **RetryDelaySeconds = 1**: Provides resilience against transient failures
+
+These settings serialize registrations, which may introduce slight delays under high load but ensures consistency.
+
+#### Implementing ISignalStore for Production
+
+```csharp
+public class DatabaseSignalStore : ISignalStore
+{
+    private readonly IDbConnection _db;
+
+    public async Task<SignalEntry?> GetAsync(string signalKey, CancellationToken ct = default)
+    {
+        return await _db.QueryFirstOrDefaultAsync<SignalEntry>(
+            "SELECT * FROM SignalEntries WHERE SignalKey = @signalKey", 
+            new { signalKey });
+    }
+
+    public async Task RegisterWaiterAsync(string signalKey, string waitWorkflowId, string waitTaskRefName, CancellationToken ct = default)
+    {
+        await _db.ExecuteAsync(
+            @"INSERT INTO SignalEntries (SignalKey, WaitWorkflowId, WaitTaskRefName, CreatedAt) 
+              VALUES (@signalKey, @waitWorkflowId, @waitTaskRefName, @createdAt)
+              ON CONFLICT (SignalKey) DO UPDATE SET WaitWorkflowId = @waitWorkflowId, WaitTaskRefName = @waitTaskRefName",
+            new { signalKey, waitWorkflowId, waitTaskRefName, createdAt = DateTime.UtcNow });
+    }
+
+    public async Task RegisterSignalAsync(string signalKey, string signalStatus, CancellationToken ct = default)
+    {
+        await _db.ExecuteAsync(
+            @"INSERT INTO SignalEntries (SignalKey, SignalStatus, CreatedAt) 
+              VALUES (@signalKey, @signalStatus, @createdAt)
+              ON CONFLICT (SignalKey) DO UPDATE SET SignalStatus = @signalStatus",
+            new { signalKey, signalStatus, createdAt = DateTime.UtcNow });
+    }
+
+    public async Task DeleteAsync(string signalKey, CancellationToken ct = default)
+    {
+        await _db.ExecuteAsync("DELETE FROM SignalEntries WHERE SignalKey = @signalKey", new { signalKey });
+    }
+
+    public async Task<IReadOnlyList<SignalEntry>> GetPendingWaitersAsync(CancellationToken ct = default)
+    {
+        return (await _db.QueryAsync<SignalEntry>(
+            "SELECT * FROM SignalEntries WHERE WaitWorkflowId IS NOT NULL AND SignalStatus IS NULL"))
+            .ToList();
+    }
+}
+```
+
 ### Terminate Task
 
 The Terminate task ends the workflow execution with a specific status and output:
@@ -588,6 +753,7 @@ public class MyController(
 .AddExecutionManager(...)
 .AddConductorSharpPatterns()      // Adds WaitSeconds, ReadWorkflowTasks
 .AddCSharpLambdaTasks()           // Adds C# lambda task support
+.AddSignalWait<YourSignalStore>() // Adds Signal Wait pattern (implement ISignalStore for production)
 ```
 
 ### Kafka Cancellation Notifier
@@ -700,7 +866,7 @@ public class WorkflowController : ControllerBase
 ### Installation
 
 ```bash
-dotnet tool install --global ConductorSharp.Toolkit --version 3.0.1-beta3
+dotnet tool install --global ConductorSharp.Toolkit --version 4.0.0
 ```
 
 ### Configuration
@@ -823,6 +989,7 @@ public class MyWorkflow : Workflow<...> { }
 2. **Register workflows** with `services.RegisterWorkflow<MyWorkflow>()`
 3. **Use strongly-typed models** for inputs/outputs instead of dictionaries
 4. **Add validation** using DataAnnotations and `.AddValidation()` pipeline
-5. **Use patterns package** for common tasks (WaitSeconds, ReadWorkflowTasks, C# Lambda)
+5. **Use patterns package** for common tasks (WaitSeconds, ReadWorkflowTasks, C# Lambda, Signal Wait)
 6. **Configure health checks** for production deployments
 7. **Use scaffolding tool** to generate models from existing Conductor definitions
+8. **Implement persistent ISignalStore** for production Signal Wait usage (not InMemorySignalStore)

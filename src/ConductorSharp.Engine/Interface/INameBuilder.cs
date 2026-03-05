@@ -2,8 +2,8 @@
 
 namespace ConductorSharp.Engine.Interface
 {
-    public interface ITaskNameBuilder
+    public interface INameBuilder
     {
-        string Build(Type taskType);
+        string Build(Type typeToName);
     }
 }

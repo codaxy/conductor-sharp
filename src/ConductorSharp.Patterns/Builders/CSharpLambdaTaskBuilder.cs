@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -31,7 +31,8 @@ namespace ConductorSharp.Patterns.Builders
                 ?? throw new LambdaTasksNotEnabledException();
             ;
 
-            var lambdaTaskNamePrefix = TaskNameBuilder.MakeTaskNamePrefix(configurationProp?.Value as string);
+            var prefix = configurationProp?.Value as string;
+            var lambdaTaskNamePrefix = prefix == null ? string.Empty : $"{prefix}.";
 
             var taskBuilder = new CSharpLambdaTaskBuilder<TInput, TOutput>(
                 task.Body,

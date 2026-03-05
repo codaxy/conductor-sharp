@@ -1,4 +1,4 @@
-﻿using ConductorSharp.Definitions.Behaviors;
+using ConductorSharp.Definitions.Behaviors;
 using ConductorSharp.Definitions.Workflows;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
@@ -36,7 +36,7 @@ var builder = Host.CreateDefaultBuilder()
                     pipelines.AddRequestResponseLogging();
                     pipelines.AddValidation();
                 })
-                .AddCSharpLambdaTasks();
+                .AddCSharpLambdaTasks("DEF");
 
             services.RegisterWorkflow<SendCustomerNotification>();
             services.RegisterWorkflow<HandleNotificationFailure>();

@@ -53,7 +53,7 @@ namespace ConductorSharp.Engine.Extensions
 
             builder.AddSingleton(new BuildConfiguration());
             builder.AddSingleton<WorkflowBuildItemRegistry>();
-            builder.AddTransient<ITaskNameBuilder, DefaultTaskNameBuilder>();
+            builder.AddTransient<INameBuilder, DefaultNameBuilder>();
             builder.AddTransient<TaskDefinitionBuilder>();
             builder.AddTransient(typeof(WorkflowDefinitionBuilder<,,>));
             return new ConductorSharpBuilder(builder);

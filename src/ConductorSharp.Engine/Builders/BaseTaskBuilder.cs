@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
@@ -23,7 +23,7 @@ namespace ConductorSharp.Engine.Builders
             var taskType = ExpressionUtil.ParseToType(taskExpression);
             _taskRefferenceName = ExpressionUtil.ParseToReferenceName(taskExpression);
             _inputParameters = ExpressionUtil.ParseToParameters(memberExpression);
-            _taskName = NamingUtil.DetermineRegistrationName(taskType);
+            _taskName = buildConfiguration?.NameBuilder?.Build(taskType) ?? NamingUtil.DetermineRegistrationName(taskType);
             _buildConfiguration = buildConfiguration;
         }
 

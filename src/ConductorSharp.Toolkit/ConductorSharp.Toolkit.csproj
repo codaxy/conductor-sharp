@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,7 +7,7 @@
     <Nullable>disable</Nullable>
 	<PackAsTool>true</PackAsTool>
 	<ToolCommandName>dotnet-conductorsharp</ToolCommandName>
-	<Version>3.0.1-beta3</Version>
+	<Version>4.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

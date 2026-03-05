@@ -848,6 +848,91 @@ _builder.AddTask(
 );
 ```
 
+### Signal Wait
+
+The Signal Wait pattern allows workflows to pause execution until an external signal is received, without consuming worker threads. Useful for human approvals, external callbacks, or long-running async operations.
+
+#### Setup
+
+```csharp
+.AddExecutionManager(...)
+.AddSignalWait<YourSignalStore>("MY_PREFIX")
+```
+
+**Important**: It is recommended to implement your own `ISignalStore` with a persistent backend (database, Redis, etc.). The built-in `InMemorySignalStore` is provided for development and testing only - it uses a static dictionary that only works within a single process and loses all data on restart.
+
+**Important**: The purpose of 'MY_PREFIX' is to allow multiple microservices running on the same Conductor instance to have different signal stores and not accidentally poll eachothers tasks.
+
+#### Using SignalWait in a Workflow
+
+```csharp
+public class OrderWorkflow : Workflow<OrderWorkflow, OrderInput, OrderOutput>
+{
+    public SignalWait WaitForPayment { get; set; }
+    
+    public override void BuildDefinition()
+    {
+        // ... previous tasks ...
+        
+        _builder.AddTask(
+            wf => wf.WaitForPayment,
+            wf => new SignalWaitInput { SignalKey = $"payment:{wf.WorkflowInput.OrderId}" }
+        );
+        
+        // ... tasks after signal received ...
+    }
+}
+```
+
+#### Sending Signals
+
+```csharp
+public class PaymentController : ControllerBase
+{
+    private readonly ISignalService _signalService;
+    
+    [HttpPost("webhook")]
+    public async Task<IActionResult> PaymentReceived(PaymentNotification notification)
+    {
+        await _signalService.SendSignalAsync(
+            $"payment:{notification.OrderId}",
+            TaskResultStatus.COMPLETED,
+            new Dictionary<string, object> { ["transactionId"] = notification.TransactionId }
+        );
+        return Ok();
+    }
+}
+```
+
+#### Monitoring Pending Signals
+
+```csharp
+var pending = await _signalStore.GetPendingWaitersAsync();
+```
+
+#### Architecture
+
+The signal system consists of:
+
+| Component | Description |
+|-----------|-------------|
+| `SignalWait` | Sub-workflow that registers a waiter and enters a WAIT task |
+| `RegisterWaiter` | Task that registers the workflow in the signal store |
+| `ISignalStore` | Persistence abstraction - implement with your own backend |
+| `ISignalService` | Service for sending signals to waiting workflows |
+| `SignalSweeperService` | Background service that reconciles signals with WAIT tasks |
+| `InMemorySignalStore` | Development-only in-memory implementation |
+
+Signals and waiters can arrive in any order - if a signal arrives before the workflow registers, the workflow will see it immediately and skip waiting.
+
+#### Task Configuration
+
+The `RegisterWaiter` task is registered with specific settings:
+- **ConcurrentExecLimit = 1**: Only one registration can execute at a time per worker, preventing race conditions when multiple workflows register simultaneously
+- **RetryCount = 10** with **RetryDelaySeconds = 1**: Provides resilience against transient failures (e.g., database connection issues)
+
+These settings mean that if many workflows start waiting at the same time, registrations will be serialized, which may introduce slight delays but ensures consistency in the signal store.
+
 ## Kafka Cancellation Notifier
 
 Handle task cancellation via Kafka events:
@@ -886,7 +971,7 @@ Generate C# models from existing Conductor task/workflow definitions.
 ### Installation
 
 ```bash
-dotnet tool install --global ConductorSharp.Toolkit --version 3.0.1-beta3
+dotnet tool install --global ConductorSharp.Toolkit --version 4.0.0
 ```
 
 ### Configuration

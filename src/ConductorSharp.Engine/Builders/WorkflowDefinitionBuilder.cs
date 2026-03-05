@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -38,16 +38,19 @@ namespace ConductorSharp.Engine.Builders
         public WorkflowDefinitionBuilder(
             BuildConfiguration buildConfiguration,
             IEnumerable<ConfigurationProperty> configurationProperties,
-            WorkflowBuildItemRegistry workflowBuildRegistry
+            WorkflowBuildItemRegistry workflowBuildRegistry,
+            INameBuilder nameBuilder
         )
         {
             BuildConfiguration = buildConfiguration;
+            BuildConfiguration.NameBuilder = nameBuilder;
             WorkflowBuildRegistry = workflowBuildRegistry;
             ConfigurationProperties = configurationProperties;
             GenerateWorkflowName();
         }
 
-        private void GenerateWorkflowName() => BuildContext.WorkflowName = NamingUtil.DetermineRegistrationName(_workflowType);
+        private void GenerateWorkflowName() =>
+            BuildContext.WorkflowName = BuildConfiguration?.NameBuilder?.Build(_workflowType) ?? NamingUtil.DetermineRegistrationName(_workflowType);
 
         public WorkflowDef Build()
         {
@@ -83,7 +86,10 @@ namespace ConductorSharp.Engine.Builders
             {
                 Name = BuildContext.WorkflowName,
                 Tasks = _taskBuilders.SelectMany(a => a.Build()).ToList(),
-                FailureWorkflow = failureWorkflow != null ? NamingUtil.DetermineRegistrationName(failureWorkflow) : null,
+                FailureWorkflow =
+                    failureWorkflow != null
+                        ? BuildConfiguration?.NameBuilder?.Build(failureWorkflow) ?? NamingUtil.DetermineRegistrationName(failureWorkflow)
+                        : null,
                 Description = description,
                 InputParameters = BuildContext.Inputs.ToArray(),
                 OutputParameters = (BuildContext.Outputs ?? []).ToObject<IDictionary<string, object>>(),

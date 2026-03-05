@@ -1,7 +1,10 @@
-﻿using ConductorSharp.ApiEnabled.Handlers;
+using ConductorSharp.ApiEnabled.Handlers;
 using ConductorSharp.ApiEnabled.Services;
+using ConductorSharp.ApiEnabled.Workflows;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Health;
+using ConductorSharp.Patterns.Extensions;
+using ConductorSharp.Patterns.Services;
 
 namespace ConductorSharp.ApiEnabled.Extensions;
 
@@ -26,13 +29,16 @@ public static class ServiceCollectionExtensions
                 pipelines.AddContextLogging();
                 pipelines.AddRequestResponseLogging();
                 pipelines.AddValidation();
-            });
+            })
+            .AddCSharpLambdaTasks("API")
+            .AddSignalWait<InMemorySignalStore>("API");
 
         hostBuilder.AddSingleton<ITaskExecutionCounterService, TaskExecutionCounterService>();
         hostBuilder.RegisterWorkerTask<PrepareEmailHandler>(options =>
         {
             options.OwnerEmail = "owneremail@gmail.com";
         });
+        hostBuilder.RegisterWorkflow<SignalTestWorkflow>();
 
         return hostBuilder;
     }

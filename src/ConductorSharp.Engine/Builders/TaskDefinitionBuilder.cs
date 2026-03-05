@@ -9,10 +9,10 @@ using ConductorSharp.Engine.Util.Builders;
 
 namespace ConductorSharp.Engine.Builders
 {
-    public class TaskDefinitionBuilder(BuildConfiguration buildConfiguration, ITaskNameBuilder taskNameBuilder)
+    public class TaskDefinitionBuilder(BuildConfiguration buildConfiguration, INameBuilder nameBuilder)
     {
         public BuildConfiguration BuildConfiguration { get; set; } = buildConfiguration;
-        private readonly ITaskNameBuilder _taskNameBuilder = taskNameBuilder;
+        private readonly INameBuilder _nameBuilder = nameBuilder;
 
         public TaskDef Build<T>(Action<TaskDefinitionOptions> updateOptions = null) => Build(typeof(T), updateOptions);
 
@@ -32,7 +32,7 @@ namespace ConductorSharp.Engine.Builders
             var inputType = genericArguments[0];
             var outputType = genericArguments[1];
 
-            var originalName = _taskNameBuilder.Build(taskType);
+            var originalName = _nameBuilder.Build(taskType);
 
             return new TaskDef
             {
