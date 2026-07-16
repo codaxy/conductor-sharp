@@ -866,7 +866,7 @@ public class WorkflowController : ControllerBase
 ### Installation
 
 ```bash
-dotnet tool install --global ConductorSharp.Toolkit --version 4.0.0
+dotnet tool install --global ConductorSharp.Toolkit --version 4.0.1
 ```
 
 ### Configuration

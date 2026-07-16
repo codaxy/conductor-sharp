@@ -971,7 +971,7 @@ Generate C# models from existing Conductor task/workflow definitions.
 ### Installation
 
 ```bash
-dotnet tool install --global ConductorSharp.Toolkit --version 4.0.0
+dotnet tool install --global ConductorSharp.Toolkit --version 4.0.1
 ```
 
 ### Configuration
