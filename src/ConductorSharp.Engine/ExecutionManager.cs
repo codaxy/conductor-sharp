@@ -11,6 +11,7 @@ using ConductorSharp.Client.Util;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Model;
 using ConductorSharp.Engine.Polling;
+using ConductorSharp.Engine.Service;
 using ConductorSharp.Engine.Util;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,7 @@ namespace ConductorSharp.Engine
         private readonly IPollTimingStrategy _pollTimingStrategy;
         private readonly IPollOrderStrategy _pollOrderStrategy;
         private readonly ICancellationNotifier _cancellationNotifier;
+        private readonly TaskQueuePollingService _taskQueuePollingService;
 
         public ExecutionManager(
             WorkerSetConfig options,
@@ -42,7 +44,8 @@ namespace ConductorSharp.Engine
             IServiceScopeFactory lifetimeScope,
             IPollTimingStrategy pollTimingStrategy,
             IPollOrderStrategy pollOrderStrategy,
-            ICancellationNotifier cancellationNotifier
+            ICancellationNotifier cancellationNotifier,
+            TaskQueuePollingService taskQueuePollingService
         )
         {
             _configuration = options;
@@ -55,6 +58,7 @@ namespace ConductorSharp.Engine
             _pollOrderStrategy = pollOrderStrategy;
             _cancellationNotifier = cancellationNotifier;
             _externalPayloadService = externalPayloadService;
+            _taskQueuePollingService = taskQueuePollingService;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -63,7 +67,7 @@ namespace ConductorSharp.Engine
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var queuedTasks = (await _taskManager.ListQueuesAsync(cancellationToken))
+                var queuedTasks = (await _taskQueuePollingService.ListQueuesAsync(cancellationToken))
                     .Where(a => a.Value > 0)
                     .ToDictionary(a => a.Key, a => a.Value);
 

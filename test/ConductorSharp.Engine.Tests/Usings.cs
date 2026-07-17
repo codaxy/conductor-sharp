@@ -6,3 +6,4 @@ global using ConductorSharp.Engine.Util;
 global using MediatR;
 global using Newtonsoft.Json;
 global using Xunit;
+global using EmbeddedFileHelper = ConductorSharp.Engine.Tests.Util.EmbeddedFileHelper;
