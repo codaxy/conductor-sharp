@@ -14,7 +14,6 @@ namespace ConductorSharp.Engine.Util
     /// worker throws a <see cref="ConductorSharp.Engine.Exceptions.StructuredErrorException"/>; and</item>
     /// <item>external signal senders (which have no exception to catch), which render via <see cref="ToOutputData"/>.</item>
     /// </list>
-    /// A round-trip contract test pins both producers to <see cref="TryParse"/> so the key/shape cannot drift.
     /// </summary>
     public static class StructuredErrorSerializer
     {
@@ -23,10 +22,7 @@ namespace ConductorSharp.Engine.Util
 
         /// <summary>
         /// Renders a <see cref="StructuredError"/> to an output-data fragment (<c>{ "structured_error": { ... } }</c>)
-        /// using the standard snake_case IO serializer settings. Intended for producers with no exception to catch —
-        /// signal senders on a signal-based wait path merge this into the failed WAIT task's outputData. (The
-        /// execution-manager catch block does not use this; it serializes <see cref="ErrorOutput.StructuredError"/>
-        /// directly.) Returns an empty dictionary for a null error.
+        /// using the standard snake_case IO serializer settings. Returns an empty dictionary for a null error.
         /// </summary>
         public static IDictionary<string, object> ToOutputData(StructuredError error)
         {
