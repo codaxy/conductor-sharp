@@ -2,7 +2,7 @@ name: Deploy packages
 
 on:
   push:
-    tags: ["v3.*"]
+    tags: ["v3.*", "v4.*"]
   workflow_dispatch:
 
 jobs:
