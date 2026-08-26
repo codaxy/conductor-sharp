@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ConductorSharp.Client;
 using ConductorSharp.Client.Util;
 using ConductorSharp.Engine.Exceptions;
@@ -12,40 +13,33 @@ namespace ConductorSharp.Engine.Tests.Unit
 {
     public class StructuredErrorTests
     {
-        // Mirrors the execution-manager catch block: builds the ErrorOutput (setting StructuredError for a
-        // StructuredErrorException) and serializes it. TryParse below asserts this output round-trips through the
-        // shared serializer, pinning the property-derived key/shape to StructuredErrorSerializer.OutputKey.
+        // Mirrors the execution-manager catch block. It calls StructuredError.FromException — the same mapping both
+        // ExecutionManager and TypePollSpreadingExecutionManager use — rather than reimplementing it, so a field
+        // added to the payload cannot pass here while being dropped by one of the managers.
         private static IDictionary<string, object> SerializeCatchOutput(System.Exception exception)
         {
-            var output = new ErrorOutput { ErrorMessage = exception.Message };
-
-            if (exception is StructuredErrorException structuredException)
-            {
-                output.StructuredError = new StructuredError
-                {
-                    Code = structuredException.Code,
-                    Reason = structuredException.Reason,
-                    ReferenceError = structuredException.ReferenceError
-                };
-            }
+            var output = new ErrorOutput { ErrorMessage = exception.Message, StructuredError = StructuredError.FromException(exception) };
 
             return SerializationHelper.ObjectToDictionary(output, ConductorConstants.IoJsonSerializerSettings);
         }
 
+        private static JToken StructuredErrorOf(IDictionary<string, object> dict) =>
+            JObject.Parse(JsonConvert.SerializeObject(dict))[StructuredErrorSerializer.OutputKey];
+
         [Fact]
         public void StructuredErrorException_produces_snake_case_structured_error()
         {
-            var exception = new StructuredErrorException("RESOURCE_UNAVAILABLE", "No port available", "https://rom/resourceOrder/42");
+            var exception = new StructuredErrorException("RESOURCE_UNAVAILABLE", "No port available", "https://example.org/entity/42");
 
             var dict = SerializeCatchOutput(exception);
 
             Assert.True(dict.ContainsKey("error_message"));
             Assert.True(dict.ContainsKey(StructuredErrorSerializer.OutputKey));
 
-            var structured = JObject.Parse(JsonConvert.SerializeObject(dict))["structured_error"];
+            var structured = StructuredErrorOf(dict);
             Assert.Equal("RESOURCE_UNAVAILABLE", (string)structured["code"]);
             Assert.Equal("No port available", (string)structured["reason"]);
-            Assert.Equal("https://rom/resourceOrder/42", (string)structured["reference_error"]);
+            Assert.Equal("https://example.org/entity/42", (string)structured["reference_error"]);
             Assert.Equal(StructuredError.CurrentVersion, (int)structured["version"]);
         }
 
@@ -61,13 +55,87 @@ namespace ConductorSharp.Engine.Tests.Unit
         }
 
         [Fact]
+        public void Message_is_carried_under_snake_case_message_key()
+        {
+            var exception = new StructuredErrorException(
+                "VALIDATION_FAILED",
+                "Input field not recognized",
+                "https://example.org/entity/7",
+                "Field 'widget_id' is not present in schema 'default'."
+            );
+
+            var structured = StructuredErrorOf(SerializeCatchOutput(exception));
+
+            Assert.Equal("VALIDATION_FAILED", (string)structured["code"]);
+            Assert.Equal("Input field not recognized", (string)structured["reason"]);
+            Assert.Equal("Field 'widget_id' is not present in schema 'default'.", (string)structured["message"]);
+            Assert.Equal("https://example.org/entity/7", (string)structured["reference_error"]);
+        }
+
+        [Fact]
+        public void Message_reaches_error_message_and_reason_for_incompletion()
+        {
+            // error_message is set from Exception.Message, which the message-taking constructor overrides. The same
+            // value is what the execution manager sends as TaskResult.ReasonForIncompletion (the Conductor UI banner).
+            var exception = new StructuredErrorException("CODE", "Short reason", null, "Long diagnostic detail");
+
+            Assert.Equal("Long diagnostic detail", exception.Message);
+            Assert.Equal("Long diagnostic detail", (string)SerializeCatchOutput(exception)["error_message"]);
+        }
+
+        [Fact]
+        public void Message_is_omitted_when_no_message_was_supplied()
+        {
+            // Guards the backward-compatibility promise: pre-existing call sites must keep their exact payload.
+            var structured = StructuredErrorOf(
+                SerializeCatchOutput(new StructuredErrorException("CODE", "Short reason", "https://example.org/entity/1"))
+            );
+
+            Assert.Null(structured["message"]);
+            Assert.Equal(
+                new[] { "code", "reason", "reference_error", "version" },
+                ((JObject)structured).Properties().Select(p => p.Name).OrderBy(n => n)
+            );
+        }
+
+        [Fact]
+        public void Message_is_omitted_when_it_only_repeats_the_reason()
+        {
+            var exception = new StructuredErrorException("CODE", "Same text", null, "Same text");
+
+            Assert.Null(StructuredErrorOf(SerializeCatchOutput(exception))["message"]);
+        }
+
+        [Fact]
+        public void Message_survives_the_round_trip()
+        {
+            var dict = SerializeCatchOutput(
+                new StructuredErrorException("CODE", "Short reason", "https://example.org/entity/9", "Long diagnostic detail")
+            );
+
+            Assert.True(StructuredErrorSerializer.TryParse(dict, out var parsed));
+            Assert.Equal("CODE", parsed.Code);
+            Assert.Equal("Short reason", parsed.Reason);
+            Assert.Equal("Long diagnostic detail", parsed.Message);
+            Assert.Equal("https://example.org/entity/9", parsed.ReferenceError);
+        }
+
+        [Fact]
+        public void FromException_returns_null_for_a_plain_exception()
+        {
+            Assert.Null(StructuredError.FromException(new System.InvalidOperationException("boom")));
+        }
+
+        [Fact]
         public void RoundTrip_helper_output_is_parsed_back()
         {
+            // The signal-sender producer: no exception to catch, so the payload is rendered from the model directly.
             var error = new StructuredError
             {
                 Code = "UNCLASSIFIED",
                 Reason = "generic failure",
-                ReferenceError = "https://rom/resourceOrder/7"
+                Message = "downstream call failed: connection refused",
+                ReferenceError = "https://example.org/entity/7"
             };
 
             var outputData = StructuredErrorSerializer.ToOutputData(error);
@@ -75,6 +143,7 @@ namespace ConductorSharp.Engine.Tests.Unit
             Assert.True(StructuredErrorSerializer.TryParse(outputData, out var parsed));
             Assert.Equal(error.Code, parsed.Code);
             Assert.Equal(error.Reason, parsed.Reason);
+            Assert.Equal(error.Message, parsed.Message);
             Assert.Equal(error.ReferenceError, parsed.ReferenceError);
             Assert.Equal(error.Version, parsed.Version);
         }
@@ -119,6 +188,18 @@ namespace ConductorSharp.Engine.Tests.Unit
             var dict = new Dictionary<string, object>
             {
                 [StructuredErrorSerializer.OutputKey] = new Dictionary<string, object> { ["reason"] = "no code here" }
+            };
+
+            Assert.False(StructuredErrorSerializer.TryParse(dict, out _));
+        }
+
+        [Fact]
+        public void TryParse_tolerates_a_message_only_payload_by_degrading()
+        {
+            // A message without a code is still unstructured: the caller must fall back to the generic path.
+            var dict = new Dictionary<string, object>
+            {
+                [StructuredErrorSerializer.OutputKey] = new Dictionary<string, object> { ["message"] = "detail but no code" }
             };
 
             Assert.False(StructuredErrorSerializer.TryParse(dict, out _));
