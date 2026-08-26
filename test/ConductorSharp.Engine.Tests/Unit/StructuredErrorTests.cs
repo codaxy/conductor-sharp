@@ -84,26 +84,27 @@ namespace ConductorSharp.Engine.Tests.Unit
         }
 
         [Fact]
-        public void Message_is_omitted_when_no_message_was_supplied()
+        public void Message_falls_back_to_the_reason_when_no_message_was_supplied()
         {
-            // Guards the backward-compatibility promise: pre-existing call sites must keep their exact payload.
+            // Exception.Message defaults to the reason, and the payload always carries it — consumers read
+            // message without needing a reason fallback of their own.
             var structured = StructuredErrorOf(
                 SerializeCatchOutput(new StructuredErrorException("CODE", "Short reason", "https://example.org/entity/1"))
             );
 
-            Assert.Null(structured["message"]);
+            Assert.Equal("Short reason", (string)structured["message"]);
             Assert.Equal(
-                new[] { "code", "reason", "reference_error", "version" },
+                new[] { "code", "message", "reason", "reference_error", "version" },
                 ((JObject)structured).Properties().Select(p => p.Name).OrderBy(n => n)
             );
         }
 
         [Fact]
-        public void Message_is_omitted_when_it_only_repeats_the_reason()
+        public void Message_repeating_the_reason_is_still_carried()
         {
             var exception = new StructuredErrorException("CODE", "Same text", null, "Same text");
 
-            Assert.Null(StructuredErrorOf(SerializeCatchOutput(exception))["message"]);
+            Assert.Equal("Same text", (string)StructuredErrorOf(SerializeCatchOutput(exception))["message"]);
         }
 
         [Fact]

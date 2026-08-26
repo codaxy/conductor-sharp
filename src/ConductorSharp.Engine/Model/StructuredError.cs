@@ -19,10 +19,11 @@ namespace ConductorSharp.Engine.Model
         public string Reason { get; set; }
 
         /// <summary>
-        /// Optional diagnostic detail, longer and more specific than <see cref="Reason"/> — the explanation an
-        /// operator needs, kept out of <see cref="Reason"/> so that stays short and stable. Null when the producer
-        /// supplied nothing distinct from the reason, in which case it is omitted from serialized output
-        /// (NullValueHandling.Ignore) and the payload is unchanged from before this field existed.
+        /// Diagnostic detail, longer and more specific than <see cref="Reason"/> — the explanation an
+        /// operator needs, kept out of <see cref="Reason"/> so that stays short and stable. Mirrors
+        /// <see cref="Exception.Message"/>, which falls back to the reason when the thrower supplied no
+        /// distinct detail — so on the exception path the field is always populated, and consumers can
+        /// read it without a reason fallback of their own.
         /// </summary>
         public string Message { get; set; }
 
@@ -47,9 +48,7 @@ namespace ConductorSharp.Engine.Model
             {
                 Code = structuredException.Code,
                 Reason = structuredException.Reason,
-                // Exception.Message falls back to Reason when the thrower supplied no distinct detail, so only
-                // carry it when it actually adds something. Existing call sites keep their exact payload.
-                Message = structuredException.Message == structuredException.Reason ? null : structuredException.Message,
+                Message = structuredException.Message,
                 ReferenceError = structuredException.ReferenceError
             };
         }
