@@ -247,19 +247,9 @@ namespace ConductorSharp.Engine
                     pollResponse.WorkflowInstanceId
                 );
 
-                var errorMessage = new ErrorOutput { ErrorMessage = exception.Message };
-
                 // A worker may throw a StructuredErrorException to attach a sanitized, stable classification to the
                 // failed task's output. Plain exceptions keep producing only error_message, preserving backward compatibility.
-                if (exception is StructuredErrorException structuredException)
-                {
-                    errorMessage.StructuredError = new StructuredError
-                    {
-                        Code = structuredException.Code,
-                        Reason = structuredException.Reason,
-                        ReferenceError = structuredException.ReferenceError
-                    };
-                }
+                var errorMessage = new ErrorOutput { ErrorMessage = exception.Message, StructuredError = StructuredError.FromException(exception) };
 
                 // TODO: We should verify that this is alright, it is possible that when executed concurrently,
                 // the updates caused by LogAsync will be discarded because the call of UpdateAsync(TaskResult...)
