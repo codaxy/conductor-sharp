@@ -49,6 +49,8 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.AddScoped<ConductorSharpExecutionContext>();
 
+            Builder.AddTransient<FailedTaskStructuredErrorReader>();
+
             Builder.AddSingleton<IConductorSharpHealthService, InMemoryHealthService>();
 
             Builder.AddTransient<IPollTimingStrategy, InverseExponentialBackoff>();
