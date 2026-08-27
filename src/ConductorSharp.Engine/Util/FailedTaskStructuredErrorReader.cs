@@ -1,3 +1,4 @@
+#nullable enable
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,26 +29,20 @@ namespace ConductorSharp.Engine.Util
 
         /// <summary>
         /// Reads the structured error declared by the deepest failed task of <paramref name="workflowId"/>,
-        /// following the Try pattern: returns <c>false</c> (with a <c>null</c> <paramref name="error"/>) when
-        /// the execution has no failed task or the failed task declared nothing. Synchronous — an <c>out</c>
-        /// parameter rules out <c>async</c> — so the underlying Conductor call blocks the calling thread.
+        /// or <c>null</c> when the execution has no failed task or the failed task declared nothing.
         /// </summary>
-        public bool TryRead(string workflowId, out StructuredError error, CancellationToken cancellationToken)
+        public async Task<StructuredError?> ReadOrNullAsync(string? workflowId, CancellationToken cancellationToken)
         {
-            var failed = FindDeepestFailedTaskAsync(workflowId, cancellationToken).GetAwaiter().GetResult();
+            var failed = await FindDeepestFailedTaskAsync(workflowId, cancellationToken);
 
             if (failed?.OutputData != null && StructuredErrorSerializer.TryDeserialize(failed.OutputData, out var structured))
-            {
-                error = structured;
-                return true;
-            }
+                return structured;
 
-            error = null;
-            return false;
+            return null;
         }
 
         /// <summary>
-        /// Like <see cref="TryRead"/>, but always yields an error: a failure that declared nothing is
+        /// Like <see cref="ReadOrNullAsync"/>, but never returns <c>null</c>: a failure that declared nothing is
         /// classified as <see cref="StructuredError.UnclassifiedCode"/> with <paramref name="genericReason"/> as the
         /// sanitized reason, so raw internals never cross a boundary by default. The returned
         /// <see cref="StructuredError.Message"/> always carries the most specific diagnostic available: the declared
@@ -64,9 +59,9 @@ namespace ConductorSharp.Engine.Util
         /// inside the diagnostic message, never as the sanitized reason.
         /// </param>
         public async Task<StructuredError> ReadOrFallbackAsync(
-            string workflowId,
+            string? workflowId,
             string genericReason,
-            string fallbackReason,
+            string? fallbackReason,
             CancellationToken cancellationToken
         )
         {
@@ -98,7 +93,7 @@ namespace ConductorSharp.Engine.Util
         /// so any failed sub-workflow is descended into first (walking from the last), and FORK/JOIN aggregators
         /// are skipped when picking a leaf. Returns <c>null</c> when the execution has no failed task.
         /// </summary>
-        public async Task<ConductorSharp.Client.Generated.Task> FindDeepestFailedTaskAsync(string workflowId, CancellationToken cancellationToken)
+        public async Task<ConductorSharp.Client.Generated.Task?> FindDeepestFailedTaskAsync(string? workflowId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(workflowId))
                 return null;
@@ -124,7 +119,7 @@ namespace ConductorSharp.Engine.Util
             return failedTasks.LastOrDefault(t => t.TaskType is not ("JOIN" or "FORK")) ?? failedTasks[^1];
         }
 
-        private static string BuildDiagnosticMessage(ConductorSharp.Client.Generated.Task task, string fallbackReason)
+        private static string BuildDiagnosticMessage(ConductorSharp.Client.Generated.Task? task, string? fallbackReason)
         {
             if (task == null)
                 return fallbackReason ?? "No failed task found.";
