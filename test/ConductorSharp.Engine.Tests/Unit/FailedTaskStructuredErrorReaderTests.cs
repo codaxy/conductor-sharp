@@ -159,42 +159,36 @@ namespace ConductorSharp.Engine.Tests.Unit
         private static Workflow Execution(params GeneratedTask[] tasks) => new() { Tasks = tasks };
 
         [Fact]
-        public void TryRead_returns_the_declared_structured_error()
+        public async Task ReadOrNull_returns_the_declared_structured_error()
         {
             var output = StructuredErrorSerializer.Serialize(new StructuredError { Code = "RESOURCE_UNAVAILABLE", Reason = "No port available" });
             var reader = Reader(new() { ["wf"] = Execution(FailedTask(outputData: output)) });
 
-            var found = reader.TryRead("wf", out var error, CancellationToken.None);
+            var error = await reader.ReadOrNullAsync("wf", CancellationToken.None);
 
-            Assert.True(found);
+            Assert.NotNull(error);
             Assert.Equal("RESOURCE_UNAVAILABLE", error.Code);
             Assert.Equal("No port available", error.Reason);
         }
 
         [Fact]
-        public void TryRead_returns_false_when_the_failed_task_declared_nothing()
+        public async Task ReadOrNull_returns_null_when_the_failed_task_declared_nothing()
         {
             var reader = Reader(new() { ["wf"] = Execution(FailedTask(reason: "raw internals")) });
 
-            var found = reader.TryRead("wf", out var error, CancellationToken.None);
-
-            Assert.False(found);
-            Assert.Null(error);
+            Assert.Null(await reader.ReadOrNullAsync("wf", CancellationToken.None));
         }
 
         [Fact]
-        public void TryRead_returns_false_when_nothing_failed()
+        public async Task ReadOrNull_returns_null_when_nothing_failed()
         {
             var reader = Reader(new() { ["wf"] = Execution() });
 
-            var found = reader.TryRead("wf", out var error, CancellationToken.None);
-
-            Assert.False(found);
-            Assert.Null(error);
+            Assert.Null(await reader.ReadOrNullAsync("wf", CancellationToken.None));
         }
 
         [Fact]
-        public void Descends_into_the_failed_sub_workflow_instead_of_stopping_on_the_join()
+        public async Task Descends_into_the_failed_sub_workflow_instead_of_stopping_on_the_join()
         {
             // Parent: a failed SUB_WORKFLOW and the aggregating JOIN that failed after it. The declared error
             // lives on the leaf task inside the child execution.
@@ -207,23 +201,23 @@ namespace ConductorSharp.Engine.Tests.Unit
                 }
             );
 
-            var found = reader.TryRead("parent", out var error, CancellationToken.None);
+            var error = await reader.ReadOrNullAsync("parent", CancellationToken.None);
 
-            Assert.True(found);
+            Assert.NotNull(error);
             Assert.Equal("LEAF", error.Code);
         }
 
         [Fact]
-        public void Skips_fork_and_join_aggregators_when_picking_the_leaf()
+        public async Task Skips_fork_and_join_aggregators_when_picking_the_leaf()
         {
             var output = StructuredErrorSerializer.Serialize(new StructuredError { Code = "SIMPLE_LEAF", Reason = "r" });
             var reader = Reader(
                 new() { ["wf"] = Execution(FailedTask(taskType: "FORK"), FailedTask(outputData: output), FailedTask(taskType: "JOIN")) }
             );
 
-            var found = reader.TryRead("wf", out var error, CancellationToken.None);
+            var error = await reader.ReadOrNullAsync("wf", CancellationToken.None);
 
-            Assert.True(found);
+            Assert.NotNull(error);
             Assert.Equal("SIMPLE_LEAF", error.Code);
         }
 
