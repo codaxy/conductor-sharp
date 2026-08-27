@@ -12,6 +12,12 @@ namespace ConductorSharp.Engine.Model
         /// <summary>Current structured-error payload shape version.</summary>
         public const int CurrentVersion = 1;
 
+        /// <summary>
+        /// Reserved classification code for failures that declared no structured error. Producers must not
+        /// use it for declared errors; consumers may treat it as "no classification available".
+        /// </summary>
+        public const string UnclassifiedCode = "UNCLASSIFIED";
+
         /// <summary>Stable, opaque classification code (e.g. an implementation-defined code, or <c>UNCLASSIFIED</c>).</summary>
         public string Code { get; set; }
 
