@@ -27,21 +27,27 @@ namespace ConductorSharp.Engine.Util
         }
 
         /// <summary>
-        /// Returns the structured error declared by the deepest failed task of <paramref name="workflowId"/>,
-        /// or <c>null</c> when the execution has no failed task or the failed task declared nothing.
+        /// Reads the structured error declared by the deepest failed task of <paramref name="workflowId"/>,
+        /// following the Try pattern: returns <c>false</c> (with a <c>null</c> <paramref name="error"/>) when
+        /// the execution has no failed task or the failed task declared nothing. Synchronous — an <c>out</c>
+        /// parameter rules out <c>async</c> — so the underlying Conductor call blocks the calling thread.
         /// </summary>
-        public async Task<StructuredError> TryReadAsync(string workflowId, CancellationToken cancellationToken)
+        public bool TryRead(string workflowId, out StructuredError error, CancellationToken cancellationToken)
         {
-            var failed = await FindDeepestFailedTaskAsync(workflowId, cancellationToken);
+            var failed = FindDeepestFailedTaskAsync(workflowId, cancellationToken).GetAwaiter().GetResult();
 
             if (failed?.OutputData != null && StructuredErrorSerializer.TryParse(failed.OutputData, out var structured))
-                return structured;
+            {
+                error = structured;
+                return true;
+            }
 
-            return null;
+            error = null;
+            return false;
         }
 
         /// <summary>
-        /// Like <see cref="TryReadAsync"/>, but never returns <c>null</c>: a failure that declared nothing is
+        /// Like <see cref="TryRead"/>, but always yields an error: a failure that declared nothing is
         /// classified as <see cref="StructuredError.UnclassifiedCode"/> with <paramref name="genericReason"/> as the
         /// sanitized reason, so raw internals never cross a boundary by default. The returned
         /// <see cref="StructuredError.Message"/> always carries the most specific diagnostic available: the declared
