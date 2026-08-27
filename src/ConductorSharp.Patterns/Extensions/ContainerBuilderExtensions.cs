@@ -15,6 +15,7 @@ namespace ConductorSharp.Patterns.Extensions
         {
             executionManagerBuilder.Builder.RegisterWorkerTask<ReadWorkflowTasks>();
             executionManagerBuilder.Builder.RegisterWorkerTask<WaitSeconds>();
+            executionManagerBuilder.Builder.RegisterWorkerTask<BuildFailureError>();
             executionManagerBuilder.Builder.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(WaitSeconds).Assembly));
 
             return executionManagerBuilder;

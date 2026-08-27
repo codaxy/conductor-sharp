@@ -6,16 +6,15 @@ using Newtonsoft.Json;
 namespace ConductorSharp.Engine.Util
 {
     /// <summary>
-    /// Defines the <c>structured_error</c> task-output contract (key + shape) and the read side used by all consumers
-    /// (<see cref="TryParse"/>). There are two producers, both emitting the same shape because they serialize the same
-    /// <see cref="StructuredError"/> type with the same serializer settings:
-    /// <list type="bullet">
-    /// <item>the execution-manager catch block, which serializes <see cref="ErrorOutput.StructuredError"/> when a
-    /// worker throws a <see cref="ConductorSharp.Engine.Exceptions.StructuredErrorException"/>; and</item>
-    /// <item>external signal senders (which have no exception to catch), which render via <see cref="ToOutputData"/>.</item>
-    /// </list>
+    /// Defines the <c>structured_error</c> task-output contract (key + shape): the write side
+    /// (<see cref="Serialize"/>) and the tolerant read side used by all consumers (<see cref="TryDeserialize"/>).
+    /// The execution-manager catch block emits the same shape without this class, by serializing
+    /// <see cref="ErrorOutput.StructuredError"/> with the same serializer settings when a worker throws a
+    /// <see cref="ConductorSharp.Engine.Exceptions.StructuredErrorException"/>. Internal on purpose: consumers
+    /// read the contract through <see cref="FailedTaskStructuredErrorReader"/>, and producers outside this
+    /// assembly declare errors by throwing, not by rendering the payload themselves.
     /// </summary>
-    public static class StructuredErrorSerializer
+    internal static class StructuredErrorSerializer
     {
         /// <summary>Well-known task-output key carrying the structured error payload.</summary>
         public const string OutputKey = "structured_error";
@@ -24,19 +23,15 @@ namespace ConductorSharp.Engine.Util
         /// Renders a <see cref="StructuredError"/> to an output-data fragment (<c>{ "structured_error": { ... } }</c>)
         /// using the standard snake_case IO serializer settings. Returns an empty dictionary for a null error.
         /// </summary>
-        public static IDictionary<string, object> ToOutputData(StructuredError error)
+        public static IDictionary<string, object> Serialize(StructuredError error)
         {
             if (error == null)
                 return new Dictionary<string, object>();
 
-            return new Dictionary<string, object> { [OutputKey] = ToOutputValue(error) };
-        }
-
-        /// <summary>Renders just the value placed under <see cref="OutputKey"/>, in the canonical snake_case shape.</summary>
-        public static object ToOutputValue(StructuredError error)
-        {
             var json = JsonConvert.SerializeObject(error, ConductorConstants.IoJsonSerializerSettings);
-            return JsonConvert.DeserializeObject<IDictionary<string, object>>(json, ConductorConstants.IoJsonSerializerSettings);
+            var value = JsonConvert.DeserializeObject<IDictionary<string, object>>(json, ConductorConstants.IoJsonSerializerSettings);
+
+            return new Dictionary<string, object> { [OutputKey] = value };
         }
 
         /// <summary>
@@ -45,7 +40,7 @@ namespace ConductorSharp.Engine.Util
         /// payload returns <c>false</c> and never throws, so a parse problem degrades error quality (falling back to
         /// the generic path) rather than failing the failure workflow.
         /// </summary>
-        public static bool TryParse(IDictionary<string, object> taskOutput, out StructuredError error)
+        public static bool TryDeserialize(IDictionary<string, object> taskOutput, out StructuredError error)
         {
             error = null;
 
