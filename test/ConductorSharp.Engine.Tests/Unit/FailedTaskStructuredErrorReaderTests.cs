@@ -161,7 +161,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         [Fact]
         public void TryRead_returns_the_declared_structured_error()
         {
-            var output = StructuredErrorSerializer.ToOutputData(new StructuredError { Code = "RESOURCE_UNAVAILABLE", Reason = "No port available" });
+            var output = StructuredErrorSerializer.Serialize(new StructuredError { Code = "RESOURCE_UNAVAILABLE", Reason = "No port available" });
             var reader = Reader(new() { ["wf"] = Execution(FailedTask(outputData: output)) });
 
             var found = reader.TryRead("wf", out var error, CancellationToken.None);
@@ -198,7 +198,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         {
             // Parent: a failed SUB_WORKFLOW and the aggregating JOIN that failed after it. The declared error
             // lives on the leaf task inside the child execution.
-            var output = StructuredErrorSerializer.ToOutputData(new StructuredError { Code = "LEAF", Reason = "leaf failed" });
+            var output = StructuredErrorSerializer.Serialize(new StructuredError { Code = "LEAF", Reason = "leaf failed" });
             var reader = Reader(
                 new()
                 {
@@ -216,7 +216,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         [Fact]
         public void Skips_fork_and_join_aggregators_when_picking_the_leaf()
         {
-            var output = StructuredErrorSerializer.ToOutputData(new StructuredError { Code = "SIMPLE_LEAF", Reason = "r" });
+            var output = StructuredErrorSerializer.Serialize(new StructuredError { Code = "SIMPLE_LEAF", Reason = "r" });
             var reader = Reader(
                 new() { ["wf"] = Execution(FailedTask(taskType: "FORK"), FailedTask(outputData: output), FailedTask(taskType: "JOIN")) }
             );
@@ -246,7 +246,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         [Fact]
         public async Task ReadOrFallback_keeps_the_declared_message_and_fills_a_diagnostic_one_when_absent()
         {
-            var withMessage = StructuredErrorSerializer.ToOutputData(
+            var withMessage = StructuredErrorSerializer.Serialize(
                 new StructuredError
                 {
                     Code = "C",
@@ -260,7 +260,7 @@ namespace ConductorSharp.Engine.Tests.Unit
                 new()
                 {
                     ["with"] = Execution(FailedTask(outputData: withMessage)),
-                    ["without"] = Execution(FailedTask(outputData: StructuredErrorSerializer.ToOutputData(withoutMessage), taskId: "t9"))
+                    ["without"] = Execution(FailedTask(outputData: StructuredErrorSerializer.Serialize(withoutMessage), taskId: "t9"))
                 }
             );
 

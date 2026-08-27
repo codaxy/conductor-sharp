@@ -36,7 +36,7 @@ namespace ConductorSharp.Engine.Util
         {
             var failed = FindDeepestFailedTaskAsync(workflowId, cancellationToken).GetAwaiter().GetResult();
 
-            if (failed?.OutputData != null && StructuredErrorSerializer.TryParse(failed.OutputData, out var structured))
+            if (failed?.OutputData != null && StructuredErrorSerializer.TryDeserialize(failed.OutputData, out var structured))
             {
                 error = structured;
                 return true;
@@ -72,7 +72,7 @@ namespace ConductorSharp.Engine.Util
         {
             var failed = await FindDeepestFailedTaskAsync(workflowId, cancellationToken);
 
-            if (failed?.OutputData != null && StructuredErrorSerializer.TryParse(failed.OutputData, out var structured))
+            if (failed?.OutputData != null && StructuredErrorSerializer.TryDeserialize(failed.OutputData, out var structured))
             {
                 return new StructuredError
                 {

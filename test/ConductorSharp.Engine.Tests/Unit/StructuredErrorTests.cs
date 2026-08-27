@@ -114,7 +114,7 @@ namespace ConductorSharp.Engine.Tests.Unit
                 new StructuredErrorException("CODE", "Short reason", "https://example.org/entity/9", "Long diagnostic detail")
             );
 
-            Assert.True(StructuredErrorSerializer.TryParse(dict, out var parsed));
+            Assert.True(StructuredErrorSerializer.TryDeserialize(dict, out var parsed));
             Assert.Equal("CODE", parsed.Code);
             Assert.Equal("Short reason", parsed.Reason);
             Assert.Equal("Long diagnostic detail", parsed.Message);
@@ -139,9 +139,9 @@ namespace ConductorSharp.Engine.Tests.Unit
                 ReferenceError = "https://example.org/entity/7"
             };
 
-            var outputData = StructuredErrorSerializer.ToOutputData(error);
+            var outputData = StructuredErrorSerializer.Serialize(error);
 
-            Assert.True(StructuredErrorSerializer.TryParse(outputData, out var parsed));
+            Assert.True(StructuredErrorSerializer.TryDeserialize(outputData, out var parsed));
             Assert.Equal(error.Code, parsed.Code);
             Assert.Equal(error.Reason, parsed.Reason);
             Assert.Equal(error.Message, parsed.Message);
@@ -154,7 +154,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         {
             var dict = SerializeCatchOutput(new StructuredErrorException("RESOURCE_UNAVAILABLE", "No port available"));
 
-            Assert.True(StructuredErrorSerializer.TryParse(dict, out var parsed));
+            Assert.True(StructuredErrorSerializer.TryDeserialize(dict, out var parsed));
             Assert.Equal("RESOURCE_UNAVAILABLE", parsed.Code);
             Assert.Equal("No port available", parsed.Reason);
         }
@@ -164,14 +164,14 @@ namespace ConductorSharp.Engine.Tests.Unit
         {
             var dict = new Dictionary<string, object> { ["error_message"] = "boom" };
 
-            Assert.False(StructuredErrorSerializer.TryParse(dict, out var parsed));
+            Assert.False(StructuredErrorSerializer.TryDeserialize(dict, out var parsed));
             Assert.Null(parsed);
         }
 
         [Fact]
         public void TryParse_returns_false_on_null_input()
         {
-            Assert.False(StructuredErrorSerializer.TryParse(null, out var parsed));
+            Assert.False(StructuredErrorSerializer.TryDeserialize(null, out var parsed));
             Assert.Null(parsed);
         }
 
@@ -180,7 +180,7 @@ namespace ConductorSharp.Engine.Tests.Unit
         {
             var dict = new Dictionary<string, object> { [StructuredErrorSerializer.OutputKey] = "not-a-structured-error" };
 
-            Assert.False(StructuredErrorSerializer.TryParse(dict, out _));
+            Assert.False(StructuredErrorSerializer.TryDeserialize(dict, out _));
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace ConductorSharp.Engine.Tests.Unit
                 [StructuredErrorSerializer.OutputKey] = new Dictionary<string, object> { ["reason"] = "no code here" }
             };
 
-            Assert.False(StructuredErrorSerializer.TryParse(dict, out _));
+            Assert.False(StructuredErrorSerializer.TryDeserialize(dict, out _));
         }
 
         [Fact]
@@ -203,7 +203,7 @@ namespace ConductorSharp.Engine.Tests.Unit
                 [StructuredErrorSerializer.OutputKey] = new Dictionary<string, object> { ["message"] = "detail but no code" }
             };
 
-            Assert.False(StructuredErrorSerializer.TryParse(dict, out _));
+            Assert.False(StructuredErrorSerializer.TryDeserialize(dict, out _));
         }
     }
 }
