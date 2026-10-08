@@ -456,6 +456,8 @@ services
 services.RegisterWorkflow<SignalWait>();
 ```
 
+`RegisterWaiter` and `ISignalStore` are registered only by `AddSignalWait`. Projects that call `AddConductorSharpPatterns()` or `AddCSharpLambdaTasks()` without `AddSignalWait` need no signal store.
+
 **Important**: The `InMemorySignalStore` is only suitable for development/testing. For production, implement `ISignalStore` with a persistent backend (database, Redis, etc.) to ensure signals survive process restarts and work across multiple instances.
 
 #### Using Signal Wait in a Workflow

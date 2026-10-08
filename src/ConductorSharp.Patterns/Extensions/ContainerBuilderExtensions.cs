@@ -1,3 +1,4 @@
+using System.Reflection;
 using ConductorSharp.Engine.Extensions;
 using ConductorSharp.Engine.Interface;
 using ConductorSharp.Engine.Util;
@@ -16,7 +17,7 @@ namespace ConductorSharp.Patterns.Extensions
             executionManagerBuilder.Builder.RegisterWorkerTask<ReadWorkflowTasks>();
             executionManagerBuilder.Builder.RegisterWorkerTask<WaitSeconds>();
             executionManagerBuilder.Builder.RegisterWorkerTask<BuildFailureError>();
-            executionManagerBuilder.Builder.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(WaitSeconds).Assembly));
+            executionManagerBuilder.Builder.AddMediatR(cfg => RegisterPatternHandlers(cfg, typeof(WaitSeconds).Assembly));
 
             return executionManagerBuilder;
         }
@@ -30,7 +31,7 @@ namespace ConductorSharp.Patterns.Extensions
             {
                 options.OwnerEmail = "owneremail@gmail.com";
             });
-            executionManagerBuilder.Builder.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CSharpLambdaTask).Assembly));
+            executionManagerBuilder.Builder.AddMediatR(cfg => RegisterPatternHandlers(cfg, typeof(CSharpLambdaTask).Assembly));
             executionManagerBuilder.Builder.AddSingleton(
                 new ConfigurationProperty(CSharpLambdaTask.LambdaTaskNameConfigurationProperty, csharpLambdaTaskNamePrefix)
             );
@@ -94,6 +95,14 @@ namespace ConductorSharp.Patterns.Extensions
             executionManagerBuilder.Builder.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(RegisterWaiter).Assembly));
 
             return executionManagerBuilder;
+        }
+
+        // RegisterWaiter depends on ISignalStore, which only AddSignalWait registers,
+        // so the other registrations leave it out of the assembly scan.
+        private static void RegisterPatternHandlers(MediatRServiceConfiguration cfg, Assembly assembly)
+        {
+            cfg.RegisterServicesFromAssemblies(assembly);
+            cfg.TypeEvaluator = type => type != typeof(RegisterWaiter);
         }
     }
 }
