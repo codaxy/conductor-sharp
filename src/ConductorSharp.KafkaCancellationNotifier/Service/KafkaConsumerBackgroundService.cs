@@ -35,7 +35,6 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
         private readonly IOptions<KafkaOptions> _kafkaOptions;
         private readonly KafkaCancellationNotifier _notifier;
         private readonly ILogger<KafkaConsumerBackgroundService> _logger;
-        private const int KafkaRetryPeriodSeconds = 5;
 
         public KafkaConsumerBackgroundService(
             IOptions<KafkaOptions> kafkaOptions,
@@ -65,28 +64,27 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
             consumer.Subscribe(_kafkaOptions.Value.TopicName);
 
             await Task.Run(
-                async () =>
+                () =>
                 {
                     try
                     {
                         while (true)
                         {
-                            var result = consumer.Consume(stoppingToken);
-                            _notifier.HandleKafkaEvent(result.Message.Value);
+                            // One bad message must not stop the consumer, so log it and move on to the next one.
+                            try
+                            {
+                                var result = consumer.Consume(stoppingToken);
+                                _notifier.HandleKafkaEvent(result.Message.Value);
+                            }
+                            catch (Exception e) when (e is not OperationCanceledException)
+                            {
+                                _logger.LogError(e, "Exception during message consumption from kafka, skipping the message");
+                            }
                         }
                     }
                     catch (OperationCanceledException)
                     {
                         _logger.LogInformation("Stopping KafkaCancellationNotifier background service");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(
-                            e,
-                            "Exception during message consumption from kafka, will retry to consume after {Period} seconds",
-                            KafkaRetryPeriodSeconds
-                        );
-                        await Task.Delay(TimeSpan.FromSeconds(KafkaRetryPeriodSeconds), stoppingToken);
                     }
                 },
                 stoppingToken
