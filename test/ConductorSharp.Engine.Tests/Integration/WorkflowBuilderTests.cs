@@ -176,6 +176,27 @@ namespace ConductorSharp.Engine.Tests.Integration
         }
 
         [Fact]
+        public void BuilderReturnsCorrectDefinitionForkJoinTask()
+        {
+            var definition = GetDefinitionFromWorkflow<ForkJoinTask>();
+            var expectedDefinition = EmbeddedFileHelper.GetLinesFromEmbeddedFile("~/Samples/Workflows/ForkJoinTask.json");
+
+            Assert.Equal(expectedDefinition, definition);
+        }
+
+        [Fact]
+        public void BuilderThrowsInvalidOperationExceptionForForkJoinTaskWithoutBranches()
+        {
+            Assert.Throws<InvalidOperationException>(GetDefinitionFromWorkflow<EmptyForkJoinTask>);
+        }
+
+        [Fact]
+        public void BuilderThrowsInvalidOperationExceptionForForkJoinTaskWithEmptyBranch()
+        {
+            Assert.Throws<InvalidOperationException>(GetDefinitionFromWorkflow<EmptyBranchForkJoinTask>);
+        }
+
+        [Fact]
         public void BuilderReturnsCorrectDefinitionSwitchTask()
         {
             var definition = GetDefinitionFromWorkflow<SwitchTask>();
