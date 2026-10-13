@@ -799,6 +799,19 @@ public class MyHandler : TaskRequestHandler<MyRequest, MyResponse>
 }
 ```
 
+#### Run context (Maestro)
+
+Maestro can start a workflow run with an execution context: key/value pairs such as the tenant
+and user the run is for. It sends the context with every polled task, and the workflow cannot
+change it, so read identity from there rather than from the task input:
+
+```csharp
+var workspaceId = _context.Context.TryGetValue("workspaceId", out var id) ? id : null;
+```
+
+Set it when starting a run with `StartWorkflowRequest.Context`. Conductor sends no context, so
+against Conductor `Context` is empty and the field is left out of start requests.
+
 ## Patterns Package
 
 Additional built-in tasks and utilities:

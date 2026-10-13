@@ -145,6 +145,12 @@ namespace ConductorSharp.Engine
                 return;
             }
 
+            // A transport other than HTTP may answer "no task" with null instead of a 204, as
+            // Maestro's in-process transport does. Handling it here keeps that from surfacing as a
+            // NullReferenceException in a poll nobody awaits.
+            if (pollResponse == null)
+                return;
+
             await ProcessPolledTask(pollResponse, workerId, scheduledWorker, cancellationToken);
         }
 
@@ -200,6 +206,7 @@ namespace ConductorSharp.Engine
                     context.TaskReferenceName = pollResponse.ReferenceTaskName;
                     context.WorkflowId = pollResponse.WorkflowInstanceId;
                     context.CorrelationId = pollResponse.CorrelationId;
+                    context.Context = ConductorSharpExecutionContext.CopyContext(pollResponse.Context);
                     context.TaskId = pollResponse.TaskId;
                     context.WorkerId = workerId;
                 }
