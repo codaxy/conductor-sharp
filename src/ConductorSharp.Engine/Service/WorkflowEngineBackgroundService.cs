@@ -47,7 +47,9 @@ namespace ConductorSharp.Engine.Service
                 await _healthService.SetExecutionManagerRunning(cancellationToken);
                 await _executionManager.StartAsync(cancellationToken);
             }
-            catch (TaskCanceledException)
+            // A stop can surface from any wait the manager is in. Task.Delay throws
+            // TaskCanceledException, while a semaphore or a channel throws its base type.
+            catch (OperationCanceledException exception) when (exception is TaskCanceledException || cancellationToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Stopping ConductorSharp background service");
             }

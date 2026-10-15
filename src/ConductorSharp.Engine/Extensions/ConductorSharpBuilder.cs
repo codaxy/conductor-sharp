@@ -47,6 +47,8 @@ namespace ConductorSharp.Engine.Extensions
 
             Builder.AddSingleton<IExecutionManager, ExecutionManager>();
 
+            Builder.AddSingleton<PolledTaskRunner>();
+
             Builder.AddScoped<ConductorSharpExecutionContext>();
 
             Builder.AddTransient<FailedTaskStructuredErrorReader>();
@@ -67,6 +69,22 @@ namespace ConductorSharp.Engine.Extensions
         public IExecutionManagerBuilder UseBetaExecutionManager()
         {
             Builder.AddSingleton<IExecutionManager, TypePollSpreadingExecutionManager>();
+            return this;
+        }
+
+        public IExecutionManagerBuilder UseTaskAvailabilityNotifications(int fallbackPollInterval = 30000)
+        {
+            if (fallbackPollInterval <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(fallbackPollInterval),
+                    fallbackPollInterval,
+                    "The fallback poll interval must be positive."
+                );
+            }
+
+            Builder.AddSingleton(new NotifiedPollingConfig { FallbackPollInterval = fallbackPollInterval });
+            Builder.AddSingleton<IExecutionManager, NotifiedExecutionManager>();
             return this;
         }
 

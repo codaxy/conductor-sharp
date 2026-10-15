@@ -749,6 +749,16 @@ public class MyController(
 .UseBetaExecutionManager()  // Uses TypePollSpreadingExecutionManager
 ```
 
+### Polling on Task Availability Notices (Maestro)
+
+```csharp
+.AddExecutionManager(...)
+.UseTaskAvailabilityNotifications(fallbackPollInterval: 30000)  // Polls a type when the transport announces it
+```
+
+Needs a transport that registers `ITaskAvailabilityNotifications`, such as Maestro's NATS transport
+(`AddMaestroNatsWorkers`). An idle worker then sends only the fallback poll.
+
 ### Patterns Package
 
 ```csharp
