@@ -706,6 +706,21 @@ public class MyController(
 .UseConstantPollTimingStrategy()
 ```
 
+### Polling on task availability notices (Maestro)
+
+A transport that can announce when tasks of a type may be waiting registers
+`ITaskAvailabilityNotifications`. Maestro's NATS transport does. With it, the worker polls a type
+when its notice arrives and keeps polling until the queue is empty, instead of reading the queue
+sizes on every sleep interval. An idle worker sends nothing but a fallback poll, which picks up
+tasks whose notice was lost:
+
+```csharp
+.AddExecutionManager(...)
+.UseTaskAvailabilityNotifications(fallbackPollInterval: 30000)
+```
+
+Conductor's REST API has no such notices, so this only works with a transport that provides them.
+
 ### Worker Task Registration
 
 Register standalone tasks without workflow:
