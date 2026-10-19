@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
+using ConductorSharp.Engine.Health;
 using Microsoft.Extensions.Logging;
 using Task = System.Threading.Tasks.Task;
 
@@ -19,6 +20,7 @@ namespace ConductorSharp.Engine.Service
 
         private readonly ITaskService _taskService;
         private readonly ILogger<TaskQueuePollingService> _logger;
+        private readonly IConductorSharpHealthService _healthService;
         private readonly int _maxAttempts;
         private readonly TimeSpan _initialRetryDelay;
         private readonly TimeSpan _maxRetryDelay;
@@ -26,10 +28,11 @@ namespace ConductorSharp.Engine.Service
         private readonly Func<TimeSpan, CancellationToken, Task> _delay;
         private readonly Func<double> _jitter;
 
-        public TaskQueuePollingService(ITaskService taskService, ILogger<TaskQueuePollingService> logger)
+        public TaskQueuePollingService(ITaskService taskService, ILogger<TaskQueuePollingService> logger, IConductorSharpHealthService healthService)
             : this(
                 taskService,
                 logger,
+                healthService,
                 DefaultMaxAttempts,
                 DefaultInitialRetryDelay,
                 DefaultMaxRetryDelay,
@@ -41,6 +44,7 @@ namespace ConductorSharp.Engine.Service
         internal TaskQueuePollingService(
             ITaskService taskService,
             ILogger<TaskQueuePollingService> logger,
+            IConductorSharpHealthService healthService,
             int maxAttempts,
             TimeSpan initialRetryDelay,
             TimeSpan maxRetryDelay,
@@ -51,6 +55,7 @@ namespace ConductorSharp.Engine.Service
         {
             _taskService = taskService;
             _logger = logger;
+            _healthService = healthService;
             _maxAttempts = maxAttempts;
             _initialRetryDelay = initialRetryDelay;
             _maxRetryDelay = maxRetryDelay;
@@ -67,7 +72,13 @@ namespace ConductorSharp.Engine.Service
             {
                 try
                 {
-                    return await _taskService.ListQueuesAsync(cancellationToken);
+                    var queues = await _taskService.ListQueuesAsync(cancellationToken);
+
+                    // The engine counts as running once it reads the queues; the background service clears this on failure.
+                    if (!(await _healthService.GetHealthData(cancellationToken)).IsExecutionManagerRunning)
+                        await _healthService.SetExecutionManagerRunning(cancellationToken);
+
+                    return queues;
                 }
                 catch (Exception exception) when (!cancellationToken.IsCancellationRequested && IsTransient(exception) && attempt < _maxAttempts)
                 {

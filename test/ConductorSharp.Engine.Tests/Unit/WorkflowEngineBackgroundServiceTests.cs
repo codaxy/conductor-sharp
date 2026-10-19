@@ -21,7 +21,7 @@ public class WorkflowEngineBackgroundServiceTests
     public async Task DeployApiError_IsRetriedAndEngineStarts()
     {
         var deployment = new ScriptedDeploymentService(Api(500), Api(409));
-        var executionManager = new ScriptedExecutionManager();
+        var executionManager = new ScriptedExecutionManager(_healthService);
         var service = CreateService(deployment, executionManager, RecordDelay);
 
         await service.StartAsync(CancellationToken.None);
@@ -39,7 +39,7 @@ public class WorkflowEngineBackgroundServiceTests
     public async Task ConnectionError_WhileRunning_RestartsEngine()
     {
         var deployment = new ScriptedDeploymentService();
-        var executionManager = new ScriptedExecutionManager(new HttpRequestException("Connection refused"));
+        var executionManager = new ScriptedExecutionManager(_healthService, Fails(new HttpRequestException("Connection refused")));
         var service = CreateService(deployment, executionManager, RecordDelay);
 
         await service.StartAsync(CancellationToken.None);
@@ -56,7 +56,7 @@ public class WorkflowEngineBackgroundServiceTests
     public async Task HttpTimeout_IsAnErrorNotAShutdown()
     {
         var deployment = new ScriptedDeploymentService();
-        var executionManager = new ScriptedExecutionManager(new TaskCanceledException("timeout", new TimeoutException()));
+        var executionManager = new ScriptedExecutionManager(_healthService, Fails(new TaskCanceledException("timeout", new TimeoutException())));
         var service = CreateService(deployment, executionManager, RecordDelay);
 
         await service.StartAsync(CancellationToken.None);
@@ -73,7 +73,7 @@ public class WorkflowEngineBackgroundServiceTests
     public async Task HealthIsNotRunning_WhileBackingOff()
     {
         var deployment = new ScriptedDeploymentService();
-        var executionManager = new ScriptedExecutionManager(new HttpRequestException("Connection refused"));
+        var executionManager = new ScriptedExecutionManager(_healthService, PollsThenFails(new HttpRequestException("Connection refused")));
         var backingOff = new TaskCompletionSource();
         var resume = new TaskCompletionSource();
         var service = CreateService(
@@ -103,7 +103,7 @@ public class WorkflowEngineBackgroundServiceTests
     public async Task NonTransientDeployError_IsRetriedWithCappedBackoff()
     {
         var deployment = new ScriptedDeploymentService(Enumerable.Range(0, 8).Select(_ => Api(401)).ToArray());
-        var executionManager = new ScriptedExecutionManager();
+        var executionManager = new ScriptedExecutionManager(_healthService);
         var service = CreateService(deployment, executionManager, RecordDelay);
 
         await service.StartAsync(CancellationToken.None);
@@ -115,10 +115,10 @@ public class WorkflowEngineBackgroundServiceTests
     }
 
     [Fact]
-    public async Task SuccessfulDeploy_ResetsBackoff()
+    public async Task SuccessfulPoll_ResetsBackoff()
     {
         var deployment = new ScriptedDeploymentService(Api(500), Api(500), Api(500));
-        var executionManager = new ScriptedExecutionManager(new HttpRequestException("Connection refused"));
+        var executionManager = new ScriptedExecutionManager(_healthService, PollsThenFails(new HttpRequestException("Connection refused")));
         var service = CreateService(deployment, executionManager, RecordDelay);
 
         await service.StartAsync(CancellationToken.None);
@@ -130,10 +130,56 @@ public class WorkflowEngineBackgroundServiceTests
     }
 
     [Fact]
+    public async Task SuccessfulDeployWithoutPoll_KeepsBackingOff()
+    {
+        // Metadata works but the task queues fail (e.g. Conductor's queue backend is down).
+        var deployment = new ScriptedDeploymentService();
+        var executionManager = new ScriptedExecutionManager(_healthService, Fails(Api(500)), Fails(Api(500)), Fails(Api(500)));
+        var service = CreateService(deployment, executionManager, RecordDelay);
+
+        await service.StartAsync(CancellationToken.None);
+        await executionManager.Running.Task.WaitAsync(WaitTimeout);
+
+        Assert.Equal(new[] { 1, 2, 4 }.Select(s => TimeSpan.FromSeconds(s)), _delays);
+
+        await service.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task SuccessfulDeploy_DoesNotMarkEngineRunning()
+    {
+        var deployment = new ScriptedDeploymentService();
+        var executionManager = new ScriptedExecutionManager(_healthService) { PollsWhenRunning = false };
+        var service = CreateService(deployment, executionManager, RecordDelay);
+
+        await service.StartAsync(CancellationToken.None);
+        await executionManager.Running.Task.WaitAsync(WaitTimeout);
+
+        Assert.False((await _healthService.GetHealthData()).IsExecutionManagerRunning);
+
+        await service.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task Stop_WhileDeployHangs_ReturnsPromptly()
+    {
+        var deployment = new ScriptedDeploymentService { Hangs = true };
+        var executionManager = new ScriptedExecutionManager(_healthService);
+        var service = CreateService(deployment, executionManager, RecordDelay);
+
+        await service.StartAsync(CancellationToken.None);
+        await deployment.Called.Task.WaitAsync(WaitTimeout);
+        await service.StopAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(1));
+
+        Assert.Equal(0, executionManager.Calls);
+        Assert.Contains(_logger.Entries, e => e.Message == "Stopping ConductorSharp background service");
+    }
+
+    [Fact]
     public async Task Stop_DuringBackoff_ExitsWithoutRetry()
     {
         var deployment = new ScriptedDeploymentService(Api(500));
-        var executionManager = new ScriptedExecutionManager();
+        var executionManager = new ScriptedExecutionManager(_healthService);
         var backingOff = new TaskCompletionSource();
         var service = CreateService(
             deployment,
@@ -158,7 +204,7 @@ public class WorkflowEngineBackgroundServiceTests
     public async Task Stop_WhileRunning_DoesNotRestart()
     {
         var deployment = new ScriptedDeploymentService();
-        var executionManager = new ScriptedExecutionManager();
+        var executionManager = new ScriptedExecutionManager(_healthService);
         var service = CreateService(deployment, executionManager, RecordDelay);
 
         await service.StartAsync(CancellationToken.None);
@@ -197,36 +243,62 @@ public class WorkflowEngineBackgroundServiceTests
     private static ApiException Api(int statusCode) =>
         new($"HTTP {statusCode}", statusCode, "{}", new Dictionary<string, IEnumerable<string>>(), null);
 
+    private static Run Fails(Exception failure) => new(failure, PollsFirst: false);
+
+    private static Run PollsThenFails(Exception failure) => new(failure, PollsFirst: true);
+
+    private sealed record Run(Exception Failure, bool PollsFirst);
+
     private sealed class ScriptedDeploymentService(params Exception[] failures) : IDeploymentService
     {
         private readonly Queue<Exception> _failures = new(failures);
 
         public int Calls { get; private set; }
 
+        /// <summary>When set, Deploy never completes (a hung Conductor request).</summary>
+        public bool Hangs { get; init; }
+
+        public TaskCompletionSource Called { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
         public Task Deploy(Deployment deployment)
         {
             Calls++;
+            Called.TrySetResult();
+            if (Hangs)
+                return new TaskCompletionSource().Task;
             return _failures.TryDequeue(out var failure) ? Task.FromException(failure) : Task.CompletedTask;
         }
 
         public Task Remove(Deployment deployment) => Task.CompletedTask;
     }
 
-    /// <summary>Throws the queued failures, one per call; once they run out, polls (blocks) until cancelled.</summary>
-    private sealed class ScriptedExecutionManager(params Exception[] failures) : IExecutionManager
+    /// <summary>
+    /// Plays the queued runs, one per call. Once they run out, it reads the queues successfully (marks the engine
+    /// running, as <see cref="TaskQueuePollingService"/> does) and blocks until cancelled.
+    /// </summary>
+    private sealed class ScriptedExecutionManager(IConductorSharpHealthService healthService, params Run[] runs) : IExecutionManager
     {
-        private readonly Queue<Exception> _failures = new(failures);
+        private readonly Queue<Run> _runs = new(runs);
 
         public int Calls { get; private set; }
+
+        /// <summary>When cleared, the final run blocks without a successful queue read.</summary>
+        public bool PollsWhenRunning { get; init; } = true;
 
         public TaskCompletionSource Running { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             Calls++;
-            if (_failures.TryDequeue(out var failure))
-                throw failure;
+            if (_runs.TryDequeue(out var run))
+            {
+                if (run.PollsFirst)
+                    await healthService.SetExecutionManagerRunning(cancellationToken);
+                throw run.Failure;
+            }
 
+            if (PollsWhenRunning)
+                await healthService.SetExecutionManagerRunning(cancellationToken);
             Running.TrySetResult();
             await Task.Delay(Timeout.Infinite, cancellationToken);
         }

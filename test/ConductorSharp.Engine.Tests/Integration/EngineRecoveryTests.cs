@@ -58,6 +58,7 @@ public class EngineRecoveryTests : IAsyncLifetime
                 new TaskQueuePollingService(
                     sp.GetRequiredService<ITaskService>(),
                     sp.GetRequiredService<ILogger<TaskQueuePollingService>>(),
+                    sp.GetRequiredService<IConductorSharpHealthService>(),
                     maxAttempts: 2,
                     initialRetryDelay: TimeSpan.FromMilliseconds(10),
                     maxRetryDelay: TimeSpan.FromMilliseconds(50),
@@ -123,6 +124,28 @@ public class EngineRecoveryTests : IAsyncLifetime
         _conductor.Enqueue("after-hang");
 
         await WaitUntil(() => IsCompleted("after-hang"), "the task queued after the hang completes");
+        Assert.True((await _health.GetHealthData()).IsExecutionManagerRunning);
+    }
+
+    [Fact]
+    public async Task QueuesFailWhileMetadataWorks_EngineStaysUnhealthy()
+    {
+        _conductor.Mode = FakeConductor.FailTasks;
+        await StartEngineAsync();
+        await WaitUntil(() => Task.FromResult(_conductor.TaskDefRegistrations >= 3), "the engine has redeployed twice");
+
+        var samples = new List<bool>();
+        for (var i = 0; i < 50; i++)
+        {
+            samples.Add((await _health.GetHealthData()).IsExecutionManagerRunning);
+            await Task.Delay(10);
+        }
+
+        Assert.DoesNotContain(true, samples);
+
+        _conductor.Mode = FakeConductor.Ok;
+        _conductor.Enqueue("after-queue-outage");
+        await WaitUntil(() => IsCompleted("after-queue-outage"), "the task queued after the queue outage completes");
         Assert.True((await _health.GetHealthData()).IsExecutionManagerRunning);
     }
 
@@ -226,6 +249,7 @@ public class EngineRecoveryTests : IAsyncLifetime
         public const string Ok = "ok";
         public const string Fail503 = "fail503";
         public const string Hang = "hang";
+        public const string FailTasks = "failTasks"; // metadata works, every /api/tasks call answers 500
 
         private readonly ConcurrentQueue<string> _queued = new();
         private int _queueReads;
@@ -249,6 +273,9 @@ public class EngineRecoveryTests : IAsyncLifetime
                 await Task.Delay(Timeout.Infinite, cancellationToken);
 
             var path = request.RequestUri!.AbsolutePath;
+
+            if (Mode == FailTasks && path.StartsWith("/api/tasks"))
+                return Json(HttpStatusCode.InternalServerError, new { status = 500, message = "queue backend unavailable" });
 
             if (request.Method == HttpMethod.Post && path == "/api/metadata/taskdefs")
             {

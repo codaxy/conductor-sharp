@@ -2,14 +2,40 @@ using System.Net;
 using System.Text;
 using ConductorSharp.Client.Generated;
 using ConductorSharp.Client.Service;
+using ConductorSharp.Engine.Health;
 using ConductorSharp.Engine.Service;
 using Microsoft.Extensions.Logging.Abstractions;
 using Task = System.Threading.Tasks.Task;
 
 namespace ConductorSharp.Engine.Tests.Unit;
 
+[Collection(nameof(InMemoryHealthService))] // InMemoryHealthService keeps its flag in a static field
 public class TaskQueuePollingServiceTests
 {
+    private readonly InMemoryHealthService _healthService = new();
+
+    public TaskQueuePollingServiceTests() => _healthService.ResetHealthData().Wait();
+
+    [Fact]
+    public async Task ListQueuesAsync_MarksEngineRunning_AfterSuccessfulRead()
+    {
+        var service = CreateService(new SequenceHandler(HttpStatusCode.InternalServerError, HttpStatusCode.OK), []);
+
+        await service.ListQueuesAsync(CancellationToken.None);
+
+        Assert.True((await _healthService.GetHealthData()).IsExecutionManagerRunning);
+    }
+
+    [Fact]
+    public async Task ListQueuesAsync_DoesNotMarkEngineRunning_WhenReadsFail()
+    {
+        var service = CreateService(new SequenceHandler(HttpStatusCode.Unauthorized), []);
+
+        await Assert.ThrowsAsync<ApiException>(() => service.ListQueuesAsync(CancellationToken.None));
+
+        Assert.False((await _healthService.GetHealthData()).IsExecutionManagerRunning);
+    }
+
     [Fact]
     public async Task ListQueuesAsync_RetriesTransientFailuresAndReturnsQueues()
     {
@@ -58,7 +84,7 @@ public class TaskQueuePollingServiceTests
         Assert.Equal(4, delays.Count);
     }
 
-    private static TaskQueuePollingService CreateService(HttpMessageHandler handler, ICollection<TimeSpan> delays)
+    private TaskQueuePollingService CreateService(HttpMessageHandler handler, ICollection<TimeSpan> delays)
     {
         var httpClient = new HttpClient(handler) { BaseAddress = new Uri("http://conductor/") };
         var taskService = new TaskService(httpClient);
@@ -66,6 +92,7 @@ public class TaskQueuePollingServiceTests
         return new TaskQueuePollingService(
             taskService,
             NullLogger<TaskQueuePollingService>.Instance,
+            _healthService,
             maxAttempts: 5,
             initialRetryDelay: TimeSpan.FromSeconds(1),
             maxRetryDelay: TimeSpan.FromSeconds(30),

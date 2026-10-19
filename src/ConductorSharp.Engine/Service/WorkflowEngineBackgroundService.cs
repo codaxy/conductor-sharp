@@ -89,6 +89,8 @@ namespace ConductorSharp.Engine.Service
         /// <summary>
         /// Deploys the definitions and runs the execution manager until the service stops. Any failure, including a
         /// Conductor request timeout, marks the engine as not running and starts both again after a capped backoff.
+        /// The engine is marked running by its first successful queue read (<see cref="TaskQueuePollingService"/>);
+        /// only a run that got that far starts the backoff over.
         /// </summary>
         private async Task RunAsync(CancellationToken cancellationToken)
         {
@@ -102,10 +104,8 @@ namespace ConductorSharp.Engine.Service
                 {
                     try
                     {
-                        await _deploymentService.Deploy(_deployment);
-                        retryDelay = _initialRetryDelay;
-                        attempt = 0;
-                        await _healthService.SetExecutionManagerRunning(cancellationToken);
+                        // Deploy takes no token; WaitAsync lets a shutdown leave a hung request behind.
+                        await _deploymentService.Deploy(_deployment).WaitAsync(cancellationToken);
                         await _executionManager.StartAsync(cancellationToken);
                     }
                     catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -114,6 +114,12 @@ namespace ConductorSharp.Engine.Service
                     }
                     catch (Exception exception)
                     {
+                        if ((await _healthService.GetHealthData(CancellationToken.None)).IsExecutionManagerRunning)
+                        {
+                            retryDelay = _initialRetryDelay;
+                            attempt = 0;
+                        }
+
                         attempt++;
                         await _healthService.UnsetExecutionManagerRunning(CancellationToken.None);
                         var delay = retryDelay + TimeSpan.FromMilliseconds(_jitter() * _maxJitter.TotalMilliseconds);
