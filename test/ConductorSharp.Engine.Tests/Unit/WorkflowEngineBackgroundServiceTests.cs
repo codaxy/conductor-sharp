@@ -6,6 +6,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace ConductorSharp.Engine.Tests.Unit;
 
+[Collection(nameof(InMemoryHealthService))] // InMemoryHealthService keeps its flag in a static field
 public class WorkflowEngineBackgroundServiceTests
 {
     private static readonly TimeSpan WaitTimeout = TimeSpan.FromSeconds(5);
