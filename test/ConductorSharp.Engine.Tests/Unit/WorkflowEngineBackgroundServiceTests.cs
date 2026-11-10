@@ -100,6 +100,25 @@ public class WorkflowEngineBackgroundServiceTests
     }
 
     [Fact]
+    public async Task HealthStoreError_WhileBackingOff_KeepsRetrying()
+    {
+        // The store fails once on read, then once on write (e.g. a locked FileHealthService file).
+        var healthService = new FaultyHealthService(_healthService) { FailNextRead = true, FailNextUnset = true };
+        var deployment = new ScriptedDeploymentService(Api(500), Api(500));
+        var executionManager = new ScriptedExecutionManager(healthService);
+        var service = CreateService(deployment, executionManager, RecordDelay, healthService);
+
+        await service.StartAsync(CancellationToken.None);
+        await executionManager.Running.Task.WaitAsync(WaitTimeout);
+
+        Assert.Equal(3, deployment.Calls);
+        Assert.Equal(new[] { 1, 2 }.Select(s => TimeSpan.FromSeconds(s)), _delays);
+        Assert.Equal(2, _logger.Entries.Count(e => e.Level == LogLevel.Warning));
+
+        await service.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
     public async Task NonTransientDeployError_IsRetriedWithCappedBackoff()
     {
         var deployment = new ScriptedDeploymentService(Enumerable.Range(0, 8).Select(_ => Api(401)).ToArray());
@@ -225,10 +244,11 @@ public class WorkflowEngineBackgroundServiceTests
     private WorkflowEngineBackgroundService CreateService(
         IDeploymentService deploymentService,
         IExecutionManager executionManager,
-        Func<TimeSpan, CancellationToken, Task> delay
+        Func<TimeSpan, CancellationToken, Task> delay,
+        IConductorSharpHealthService healthService = null
     ) =>
         new(
-            _healthService,
+            healthService ?? _healthService,
             _logger,
             deploymentService,
             executionManager,
@@ -302,6 +322,36 @@ public class WorkflowEngineBackgroundServiceTests
             Running.TrySetResult();
             await Task.Delay(Timeout.Infinite, cancellationToken);
         }
+    }
+
+    /// <summary>Passes every call to <paramref name="inner"/>, but fails the next read or unset once when told to.</summary>
+    private sealed class FaultyHealthService(IConductorSharpHealthService inner) : IConductorSharpHealthService
+    {
+        public bool FailNextRead { get; set; }
+
+        public bool FailNextUnset { get; set; }
+
+        public Task<HealthData> GetHealthData(CancellationToken cancellationToken = default)
+        {
+            if (!FailNextRead)
+                return inner.GetHealthData(cancellationToken);
+            FailNextRead = false;
+            return Task.FromException<HealthData>(new IOException("The health file is locked"));
+        }
+
+        public Task UnsetExecutionManagerRunning(CancellationToken cancellationToken = default)
+        {
+            if (!FailNextUnset)
+                return inner.UnsetExecutionManagerRunning(cancellationToken);
+            FailNextUnset = false;
+            return Task.FromException(new IOException("The health file is locked"));
+        }
+
+        public Task SetExecutionManagerRunning(CancellationToken cancellationToken = default) => inner.SetExecutionManagerRunning(cancellationToken);
+
+        public Task ResetHealthData(CancellationToken cancellationToken = default) => inner.ResetHealthData(cancellationToken);
+
+        public void RemoveHealthData() => inner.RemoveHealthData();
     }
 
     private sealed class ListLogger : ILogger<WorkflowEngineBackgroundService>

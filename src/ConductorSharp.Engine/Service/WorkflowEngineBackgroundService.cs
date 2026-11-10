@@ -114,14 +114,23 @@ namespace ConductorSharp.Engine.Service
                     }
                     catch (Exception exception)
                     {
-                        if ((await _healthService.GetHealthData(CancellationToken.None)).IsExecutionManagerRunning)
+                        // A failing health store must not end the loop: log it and retry anyway.
+                        try
                         {
-                            retryDelay = _initialRetryDelay;
-                            attempt = 0;
+                            if ((await _healthService.GetHealthData(CancellationToken.None)).IsExecutionManagerRunning)
+                            {
+                                retryDelay = _initialRetryDelay;
+                                attempt = 0;
+                            }
+
+                            await _healthService.UnsetExecutionManagerRunning(CancellationToken.None);
+                        }
+                        catch (Exception healthException)
+                        {
+                            _logger.LogWarning(healthException, "Could not update the ConductorSharp health data; retrying anyway");
                         }
 
                         attempt++;
-                        await _healthService.UnsetExecutionManagerRunning(CancellationToken.None);
                         var delay = retryDelay + TimeSpan.FromMilliseconds(_jitter() * _maxJitter.TotalMilliseconds);
 
                         _logger.LogError(
