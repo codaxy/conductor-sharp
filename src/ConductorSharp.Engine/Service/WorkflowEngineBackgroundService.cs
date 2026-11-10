@@ -10,21 +10,69 @@ using Task = System.Threading.Tasks.Task;
 
 namespace ConductorSharp.Engine.Service
 {
-    internal class WorkflowEngineBackgroundService(
-        IConductorSharpHealthService healthService,
-        ILogger<WorkflowEngineBackgroundService> logger,
-        IDeploymentService deploymentService,
-        IExecutionManager executionManager,
-        ModuleDeployment deployment
-    ) : IHostedService, IDisposable
+    internal class WorkflowEngineBackgroundService : IHostedService, IDisposable
     {
-        private readonly ILogger<WorkflowEngineBackgroundService> _logger = logger;
-        private readonly IDeploymentService _deploymentService = deploymentService;
-        private readonly IExecutionManager _executionManager = executionManager;
-        private readonly ModuleDeployment _deployment = deployment;
-        private readonly IConductorSharpHealthService _healthService = healthService;
+        private static readonly TimeSpan DefaultInitialRetryDelay = TimeSpan.FromSeconds(1);
+        private static readonly TimeSpan DefaultMaxRetryDelay = TimeSpan.FromSeconds(30);
+        private static readonly TimeSpan DefaultMaxJitter = TimeSpan.FromMilliseconds(500);
+
+        private readonly ILogger<WorkflowEngineBackgroundService> _logger;
+        private readonly IDeploymentService _deploymentService;
+        private readonly IExecutionManager _executionManager;
+        private readonly ModuleDeployment _deployment;
+        private readonly IConductorSharpHealthService _healthService;
+        private readonly TimeSpan _initialRetryDelay;
+        private readonly TimeSpan _maxRetryDelay;
+        private readonly TimeSpan _maxJitter;
+        private readonly Func<TimeSpan, CancellationToken, Task> _delay;
+        private readonly Func<double> _jitter;
         private Task _executingTask;
         private readonly CancellationTokenSource _stoppingCts = new();
+
+        public WorkflowEngineBackgroundService(
+            IConductorSharpHealthService healthService,
+            ILogger<WorkflowEngineBackgroundService> logger,
+            IDeploymentService deploymentService,
+            IExecutionManager executionManager,
+            ModuleDeployment deployment
+        )
+            : this(
+                healthService,
+                logger,
+                deploymentService,
+                executionManager,
+                deployment,
+                DefaultInitialRetryDelay,
+                DefaultMaxRetryDelay,
+                DefaultMaxJitter,
+                Task.Delay,
+                Random.Shared.NextDouble
+            ) { }
+
+        internal WorkflowEngineBackgroundService(
+            IConductorSharpHealthService healthService,
+            ILogger<WorkflowEngineBackgroundService> logger,
+            IDeploymentService deploymentService,
+            IExecutionManager executionManager,
+            ModuleDeployment deployment,
+            TimeSpan initialRetryDelay,
+            TimeSpan maxRetryDelay,
+            TimeSpan maxJitter,
+            Func<TimeSpan, CancellationToken, Task> delay,
+            Func<double> jitter
+        )
+        {
+            _healthService = healthService;
+            _logger = logger;
+            _deploymentService = deploymentService;
+            _executionManager = executionManager;
+            _deployment = deployment;
+            _initialRetryDelay = initialRetryDelay;
+            _maxRetryDelay = maxRetryDelay;
+            _maxJitter = maxJitter;
+            _delay = delay;
+            _jitter = jitter;
+        }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -38,30 +86,66 @@ namespace ConductorSharp.Engine.Service
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Deploys the definitions and runs the execution manager until the service stops. Any failure, including a
+        /// Conductor request timeout, marks the engine as not running and starts both again after a capped backoff.
+        /// The engine is marked running by its first successful queue read (<see cref="TaskQueuePollingService"/>);
+        /// only a run that got that far starts the backoff over.
+        /// </summary>
         private async Task RunAsync(CancellationToken cancellationToken)
         {
             try
             {
                 _healthService.RemoveHealthData();
-                await _deploymentService.Deploy(_deployment);
-                await _healthService.SetExecutionManagerRunning(cancellationToken);
-                await _executionManager.StartAsync(cancellationToken);
-            }
-            catch (TaskCanceledException)
-            {
+                var retryDelay = _initialRetryDelay;
+                var attempt = 0;
+
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        // Deploy takes no token; WaitAsync lets a shutdown leave a hung request behind.
+                        await _deploymentService.Deploy(_deployment).WaitAsync(cancellationToken);
+                        await _executionManager.StartAsync(cancellationToken);
+                    }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    catch (Exception exception)
+                    {
+                        if ((await _healthService.GetHealthData(CancellationToken.None)).IsExecutionManagerRunning)
+                        {
+                            retryDelay = _initialRetryDelay;
+                            attempt = 0;
+                        }
+
+                        attempt++;
+                        await _healthService.UnsetExecutionManagerRunning(CancellationToken.None);
+                        var delay = retryDelay + TimeSpan.FromMilliseconds(_jitter() * _maxJitter.TotalMilliseconds);
+
+                        _logger.LogError(
+                            exception,
+                            "ConductorSharp engine stopped polling (attempt {Attempt}); retrying in {RetryDelay}. API errors: {ApiErrors}",
+                            attempt,
+                            delay,
+                            (exception as ApiException)?.Errors
+                        );
+
+                        try
+                        {
+                            await _delay(delay, cancellationToken);
+                        }
+                        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
+                        retryDelay = TimeSpan.FromMilliseconds(Math.Min(retryDelay.TotalMilliseconds * 2, _maxRetryDelay.TotalMilliseconds));
+                    }
+                }
+
                 _logger.LogInformation("Stopping ConductorSharp background service");
-            }
-            catch (ApiException exception)
-            {
-                await _healthService.UnsetExecutionManagerRunning(cancellationToken);
-                _logger.LogCritical(exception, "Workflow Engine Background Service encountered an API error(s): {apiErrors}", exception.Errors);
-                throw;
-            }
-            catch (Exception exception)
-            {
-                await _healthService.UnsetExecutionManagerRunning(cancellationToken);
-                _logger.LogCritical(exception, "Workflow Engine Background Service encountered an error");
-                throw;
             }
             finally
             {
