@@ -1,0 +1,51 @@
+{
+  "name": "fork_join_task",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "FORK_JOIN_fork_join",
+      "taskReferenceName": "FORK_JOIN_fork_join",
+      "inputParameters": {},
+      "type": "FORK_JOIN",
+      "forkTasks": [
+        [
+          {
+            "name": "task_a1",
+            "taskReferenceName": "task_a1",
+            "type": "SIMPLE",
+            "workflowTaskType": "SIMPLE"
+          },
+          {
+            "name": "task_a2",
+            "taskReferenceName": "task_a2",
+            "type": "SIMPLE",
+            "workflowTaskType": "SIMPLE"
+          }
+        ],
+        [
+          {
+            "name": "task_b1",
+            "taskReferenceName": "task_b1",
+            "type": "SIMPLE",
+            "workflowTaskType": "SIMPLE"
+          }
+        ]
+      ],
+      "workflowTaskType": "FORK_JOIN"
+    },
+    {
+      "name": "JOIN_fork_join",
+      "taskReferenceName": "JOIN_fork_join",
+      "type": "JOIN",
+      "joinOn": [
+        "task_a2",
+        "task_b1"
+      ],
+      "workflowTaskType": "JOIN"
+    }
+  ],
+  "inputParameters": [],
+  "outputParameters": {},
+  "schemaVersion": 2,
+  "timeoutSeconds": 0
+}
