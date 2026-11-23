@@ -50,17 +50,19 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            if (_kafkaOptions.Value.HasSslSettings && !_kafkaOptions.Value.IsSslProtocol)
+                _logger.LogWarning(
+                    "SSL settings are configured but SecurityProtocol is {SecurityProtocol}, SSL settings will be ignored",
+                    _kafkaOptions.Value.SecurityProtocol ?? SecurityProtocol.Plaintext
+                );
+
             if (_kafkaOptions.Value.CreateTopicOnStartup)
                 await CreateTopicIfDoesNotExists();
 
-            using var consumer = new ConsumerBuilder<string, TaskStatusModel>(
-                new ConsumerConfig
-                {
-                    BootstrapServers = _kafkaOptions.Value.BootstrapServers,
-                    GroupId = _kafkaOptions.Value.GroupId,
-                    AutoOffsetReset = AutoOffsetReset.Latest
-                }
-            ).SetValueDeserializer(new TaskStatusModelDeserializer()).SetLogHandler(LogHandler).Build();
+            using var consumer = new ConsumerBuilder<string, TaskStatusModel>(KafkaClientConfigFactory.CreateConsumerConfig(_kafkaOptions.Value))
+                .SetValueDeserializer(new TaskStatusModelDeserializer())
+                .SetLogHandler(LogHandler)
+                .Build();
 
             consumer.Subscribe(_kafkaOptions.Value.TopicName);
 
@@ -95,7 +97,7 @@ namespace ConductorSharp.KafkaCancellationNotifier.Service
 
         private async Task CreateTopicIfDoesNotExists()
         {
-            using var admin = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _kafkaOptions.Value.BootstrapServers }).Build();
+            using var admin = new AdminClientBuilder(KafkaClientConfigFactory.CreateAdminClientConfig(_kafkaOptions.Value)).Build();
 
             try
             {
