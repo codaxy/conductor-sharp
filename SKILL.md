@@ -760,6 +760,30 @@ public class MyController(
 
 ### Kafka Cancellation Notifier
 
+Register from configuration (supports SSL, mTLS, SASL_SSL and SASL_PLAINTEXT; settings are validated on startup):
+
+```csharp
+.AddExecutionManager(...)
+.AddKafkaCancellationNotifier(configuration.GetSection("Conductor:KafkaCancellationNotifier"))
+```
+
+```json
+"KafkaCancellationNotifier": {
+  "BootstrapServers": "broker:9094",
+  "GroupId": "my-worker-group",
+  "TopicName": "conductor.status.task",
+  "SecurityProtocol": "SaslSsl",
+  "SaslMechanism": "ScramSha512",
+  "SaslUsername": "my-user",
+  "SaslPassword": "my-password",
+  "SslCaLocation": "/certs/ca.pem"
+}
+```
+
+`BootstrapServers`, `GroupId` and `TopicName` are required. `SecurityProtocol` defaults to `Plaintext`. SASL protocols require `SaslMechanism` (`Plain`, `ScramSha256`, `ScramSha512`), `SaslUsername` and `SaslPassword`. For mTLS, set `SslCertificateLocation` and `SslKeyLocation` (PEM files) or `SslKeystoreLocation` (PKCS#12). Certificates are configured as file paths only. See the README for the full settings reference.
+
+Or register from code (plaintext connections only):
+
 ```csharp
 .AddExecutionManager(...)
 .AddKafkaCancellationNotifier(

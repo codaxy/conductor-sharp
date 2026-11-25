@@ -40,11 +40,7 @@ var builder = Host.CreateDefaultBuilder()
                     pipelines.AddCustomBehavior<PrepareEmailBehavior, PrepareEmailRequest, PrepareEmailResponse>();
                 })
                 .AddConductorSharpPatterns();
-            //.AddKafkaCancellationNotifier(
-            //    kafkaBootstrapServers: configuration.GetValue<string>(
-            //        "Conductor:KafkaCancellationNotifier:BootstrapServers"),
-            //    topicName: configuration.GetValue<string>("Conductor:KafkaCancellationNotifier:TopicName"),
-            //    groupId: configuration.GetValue<string>("Conductor:KafkaCancellationNotifier:GroupId"));
+            //.AddKafkaCancellationNotifier(configuration.GetSection("Conductor:KafkaCancellationNotifier"));
 
             services.RegisterWorkerTask<GetCustomerHandler>();
             services.RegisterWorkerTask<PrepareEmailHandler>();

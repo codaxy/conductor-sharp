@@ -935,7 +935,18 @@ These settings mean that if many workflows start waiting at the same time, regis
 
 ## Kafka Cancellation Notifier
 
-Handle task cancellation via Kafka events:
+Handle task cancellation via Kafka events. The notifier can be registered in two ways.
+
+**From configuration (recommended, supports SSL, mTLS and SASL):**
+
+```csharp
+.AddExecutionManager(...)
+.AddKafkaCancellationNotifier(configuration.GetSection("Conductor:KafkaCancellationNotifier"))
+```
+
+Settings are validated on startup, so a misconfigured connection fails fast with a descriptive error.
+
+**From code (plaintext connections only):**
 
 ```csharp
 .AddExecutionManager(...)
@@ -963,6 +974,88 @@ Handle task cancellation via Kafka events:
   }
 }
 ```
+
+### Settings
+
+Optional settings that are not configured are not passed to Kafka, so the librdkafka default applies.
+
+| Setting | Required | Default | Description |
+|---|---|---|---|
+| `BootstrapServers` | Yes | — | Kafka broker list |
+| `TopicName` | Yes | — | Topic with Conductor task status events |
+| `GroupId` | Yes | — | Consumer group id |
+| `CreateTopicOnStartup` | No | `false` | Create the topic if it does not exist |
+| `SecurityProtocol` | No | `Plaintext` | `Plaintext`, `Ssl`, `SaslPlaintext` or `SaslSsl` |
+| `SaslMechanism` | With `SaslPlaintext`/`SaslSsl` | — | `Plain`, `ScramSha256` or `ScramSha512` |
+| `SaslUsername` | With `SaslPlaintext`/`SaslSsl` | — | SASL username |
+| `SaslPassword` | With `SaslPlaintext`/`SaslSsl` | — | SASL password |
+| `SslCaLocation` | No | System trust store | Path to CA certificate PEM file |
+| `SslCertificateLocation` | Together with `SslKeyLocation` | — | Path to client certificate PEM file (mTLS) |
+| `SslKeyLocation` | Together with `SslCertificateLocation` | — | Path to client private key PEM file (mTLS) |
+| `SslKeyPassword` | No | — | Password of an encrypted private key |
+| `SslKeystoreLocation` | No | — | Path to PKCS#12 keystore (mTLS), alternative to certificate and key |
+| `SslKeystorePassword` | No | — | Keystore password |
+| `EnableSslCertificateVerification` | No | `true` | Verify the broker certificate; disable only for local development |
+| `SslEndpointIdentificationAlgorithm` | No | `Https` | `None` disables broker hostname verification |
+
+`Ssl*` settings are used only when `SecurityProtocol` is `Ssl` or `SaslSsl`. Configured file paths must exist on startup.
+
+### Security examples
+
+**SSL** (broker certificate signed by a private CA):
+```json
+"KafkaCancellationNotifier": {
+  "BootstrapServers": "broker:9093",
+  "GroupId": "my-worker",
+  "TopicName": "conductor.status.task",
+  "SecurityProtocol": "Ssl",
+  "SslCaLocation": "/certs/ca.pem"
+}
+```
+
+**mTLS** (client certificate authentication):
+```json
+"KafkaCancellationNotifier": {
+  "BootstrapServers": "broker:9093",
+  "GroupId": "my-worker",
+  "TopicName": "conductor.status.task",
+  "SecurityProtocol": "Ssl",
+  "SslCaLocation": "/certs/ca.pem",
+  "SslCertificateLocation": "/certs/client.pem",
+  "SslKeyLocation": "/certs/client.key"
+}
+```
+
+Instead of `SslCertificateLocation` and `SslKeyLocation`, a PKCS#12 keystore can be used with `SslKeystoreLocation` and `SslKeystorePassword`.
+
+**SASL_SSL** (username and password over TLS):
+```json
+"KafkaCancellationNotifier": {
+  "BootstrapServers": "broker:9094",
+  "GroupId": "my-worker",
+  "TopicName": "conductor.status.task",
+  "SecurityProtocol": "SaslSsl",
+  "SaslMechanism": "ScramSha512",
+  "SaslUsername": "my-user",
+  "SaslPassword": "my-password",
+  "SslCaLocation": "/certs/ca.pem"
+}
+```
+
+**SASL_PLAINTEXT** (username and password without TLS):
+```json
+"KafkaCancellationNotifier": {
+  "BootstrapServers": "broker:9092",
+  "GroupId": "my-worker",
+  "TopicName": "conductor.status.task",
+  "SecurityProtocol": "SaslPlaintext",
+  "SaslMechanism": "Plain",
+  "SaslUsername": "my-user",
+  "SaslPassword": "my-password"
+}
+```
+
+Keep passwords out of `appsettings.json`, for example by using environment variables (`Conductor__KafkaCancellationNotifier__SaslPassword`) or a secret store.
 
 ## Toolkit CLI
 
